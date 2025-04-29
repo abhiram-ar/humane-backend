@@ -18,6 +18,9 @@ spec:
       containers:
       - name: user-mongo
         image: mongo
+        volumeMounts:
+        - name: user-mongo-storage
+          mountPath: /data/db 
         resources:
           requests:
             memory: "256Mi"
@@ -25,6 +28,10 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "500m"
+      volumes: 
+      - name: user-mongo-storage
+        persistentVolumeClaim: 
+          claimName: user-mongo-pvc
 ---
 apiVersion: v1
 kind: Service

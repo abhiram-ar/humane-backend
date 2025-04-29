@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: user-mongo-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /home/abhiram/Bootcamp/week-23-to-27/humane/backend/data/user-mongo
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: user-mongo-pvc
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
