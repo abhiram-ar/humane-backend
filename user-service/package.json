@@ -17,6 +17,9 @@
   "devDependencies": {
     "@tsconfig/node22": "^22.0.1",
     "@types/express": "^5.0.1",
+    "@types/mongoose": "^5.11.96",
+    "@types/node": "^22.15.3",
+    "mongoose": "^8.14.0",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3"
   }
