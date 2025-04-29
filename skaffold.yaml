@@ -1,0 +1,27 @@
+apiVersion: skaffold/v4beta13
+kind: Config
+
+metadata:
+  name: humane-backend
+
+manifests:
+  rawYaml:
+    - ./infra/k8s/*
+
+build:
+  local:
+    push: false
+  artifacts:
+    - image: abhiramar/userservice
+      context: user-service
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: "src/**/*.ts"
+
+  
+
+deploy:
+  kubectl: {}

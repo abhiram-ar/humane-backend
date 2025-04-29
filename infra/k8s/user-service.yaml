@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: humane
+      service: user
+      type: web-server
+  template:
+    metadata:
+      labels:
+        app: humane
+        service: user
+        type: web-server
+    spec:
+      containers:
+        - name: user-server
+          image: abhiramar/userservice
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-srv
+spec:
+  selector:
+    app: humane
+    service: user
+    type: web-server
+  ports:
+  - name: user
+    protocol: TCP
+    port: 3000
+    targetPort: 3000
