@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-mongoDB-depl
+spec:
+  selector:
+    matchLabels:
+      app: humane
+      service: user
+      type: db
+  template:
+    metadata:
+      labels:
+        app: humane
+        service: user
+        type: db
+    spec:
+      containers:
+      - name: user-mongoDB
+        image: mongo
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
