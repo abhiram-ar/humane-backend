@@ -1,8 +1,10 @@
-import app from "./infrastructure/http/server";
+import checkEnv from "./config/checkEnv";
+import app from "./interface/server";
 import connectDB from "./infrastructure/persistance/mongoDB/client";
 
 const start = async () => {
   try {
+    checkEnv()
     await connectDB();
 
     app.listen(3000, () =>

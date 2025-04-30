@@ -1,5 +1,5 @@
-import { IUserRepository } from "../../domain/interfaces/IUserRepository";
-import { createUserDTO } from "../../infrastructure/DTOs/user/createUser.dto";
+import { IUserRepository } from "../ports/IUserRepository";
+import { createUserDTO } from "../DTOs/user/createUser.dto";
 
 class userInteractor {
   constructor(private userRepository: IUserRepository) {}

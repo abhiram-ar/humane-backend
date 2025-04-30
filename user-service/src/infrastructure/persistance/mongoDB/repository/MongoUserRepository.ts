@@ -1,7 +1,7 @@
 import { User } from '../../../../domain/entities/user.entity';
-import { IUserRepository } from '../../../../domain/interfaces/IUserRepository';
+import { IUserRepository } from '../../../../application/ports/IUserRepository';
 import userModel from '../models/user.model';
-import { createUserDTO } from '../../../DTOs/user/createUser.dto';
+import { createUserDTO } from '../../../../application/DTOs/user/createUser.dto';
 
 export class MongoUserRepository implements IUserRepository {
   constructor() {}

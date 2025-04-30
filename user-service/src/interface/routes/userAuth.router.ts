@@ -1,6 +1,6 @@
 import express from 'express';
 import { UserAuthController } from '../controllers/user.controller';
-import { MongoUserRepository } from '../../persistance/mongoDB/repository/MongoUserRepository';
+import { MongoUserRepository } from '../../infrastructure/persistance/mongoDB/repository/MongoUserRepository';
 
 const authRouter = express.Router();
 const userRepository = new MongoUserRepository();
