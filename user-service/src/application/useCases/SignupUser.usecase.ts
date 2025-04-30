@@ -3,6 +3,7 @@ import { IJWTService } from '../ports/IJWTService';
 import { IUserRepository } from '../ports/IUserRepository';
 import { IHashService } from '../ports/IHashService';
 import { signupUserDTO } from '../DTOs/user/signupUser.dto';
+import { verifedUserToken } from '../DTOs/user/verifyUser.dto';
 
 export class SignupUser {
    constructor(
@@ -26,7 +27,7 @@ export class SignupUser {
       const otp = this.OTPService.generate();
       const otpHash = await this.hashService.hash(otp, parseInt(process.env.otpSalt as string));
 
-      const userSignupData = {
+      const userSignupData: verifedUserToken = {
          firstName: dto.firstName,
          lastName: dto.lastName,
          email: dto.email,

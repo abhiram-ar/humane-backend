@@ -5,6 +5,7 @@ import { OTP } from '../../domain/services/otpGenerator';
 import { JWTService } from '../../infrastructure/service/JWTService';
 import { SignupUser } from '../../application/useCases/SignupUser.usecase';
 import { BcryptHashService } from '../../infrastructure/service/BcryptHashService';
+import { VerifyUser } from '../../application/useCases/VerifyUser.usecase';
 
 const authRouter = express.Router();
 
@@ -13,9 +14,10 @@ const jwtService = new JWTService();
 const otpService = new OTP();
 const bcryptHashService = new BcryptHashService();
 const singupUser = new SignupUser(userRepository, jwtService, otpService, bcryptHashService);
-const userAuthController = new UserAuthController(singupUser);
+const verifyUser = new VerifyUser(userRepository, jwtService);
+const userAuthController = new UserAuthController(singupUser, verifyUser);
 
-authRouter.get('/signup', userAuthController.signup);
+authRouter.post('/signup', userAuthController.signup);
 authRouter.post('/verify', userAuthController.verify);
 
 export default authRouter;

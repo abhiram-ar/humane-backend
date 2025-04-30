@@ -6,9 +6,7 @@ import { createUserDTO } from '../../../../application/DTOs/user/createUser.dto'
 export class MongoUserRepository implements IUserRepository {
    constructor() {}
 
-   create = async (
-      dto: createUserDTO
-   ): Promise<Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>> => {
+   create = async (dto: createUserDTO): Promise<Pick<User, 'firstName' | 'lastName' | 'email'>> => {
       const newUser = await userModel.create({
          firstName: dto.firstName,
          lastName: dto.lastName,
@@ -17,7 +15,6 @@ export class MongoUserRepository implements IUserRepository {
       });
 
       return {
-         id: newUser.id,
          firstName: newUser.firstName,
          lastName: newUser.lastName,
          email: newUser.email,
