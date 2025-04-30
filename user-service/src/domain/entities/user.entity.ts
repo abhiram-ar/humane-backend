@@ -3,6 +3,7 @@ export class User {
     public id: string,
     public firstName: string,
     public email: string,
+    public isEmailVerified: boolean = false,
     public humaneScore: number = 0,
     public isHotUser: boolean = false,
     public lastLoginTime?: Date,

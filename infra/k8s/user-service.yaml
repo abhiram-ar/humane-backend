@@ -19,6 +19,9 @@ spec:
       containers:
         - name: user-server
           image: abhiramar/userservice
+          envFrom:
+            - secretRef:
+                name: user-pod-secret
           resources:
             requests:
               memory: "128Mi"
@@ -37,7 +40,7 @@ spec:
     service: user
     type: web-server
   ports:
-  - name: user
-    protocol: TCP
-    port: 3000
-    targetPort: 3000
+    - name: user
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

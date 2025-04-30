@@ -1,9 +1,9 @@
-import { User } from '../../domain/entities/user.entity';
-import { IUserRepository } from '../../domain/interfaces/IUserRepository';
-import userModel from '../../infrastructure/persistance/mongoDB/models/user.model';
-import { createUserDTO } from '../DTOs/createUser.dto';
+import { User } from '../../../../domain/entities/user.entity';
+import { IUserRepository } from '../../../../domain/interfaces/IUserRepository';
+import userModel from '../models/user.model';
+import { createUserDTO } from '../../../DTOs/user/createUser.dto';
 
-class MongoUserRepository implements IUserRepository {
+export class MongoUserRepository implements IUserRepository {
   constructor() {}
 
   create = async (dto: createUserDTO): Promise<Pick<User, 'id' | 'firstName' | 'lastName' | 'email'>> => {

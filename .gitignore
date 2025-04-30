@@ -2,3 +2,4 @@ node_modules
 **/skaffold
 **/skaffold/
 data
+infra/k8s/secret/
