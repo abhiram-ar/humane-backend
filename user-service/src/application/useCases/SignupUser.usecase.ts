@@ -4,6 +4,7 @@ import { IUserRepository } from '../ports/IUserRepository';
 import { IHashService } from '../ports/IHashService';
 import { signupUserDTO } from '../DTOs/user/signupUser.dto';
 import { verifedUserToken } from '../DTOs/user/verifyUser.dto';
+import { EmailError } from '../errors/EmailError';
 
 export class SignupUser {
    constructor(
@@ -16,7 +17,7 @@ export class SignupUser {
    execute = async (dto: signupUserDTO): Promise<string> => {
       const isEmailTaken = await this.userRepository.emailExists(dto.email);
       if (isEmailTaken) {
-         throw new Error('Email already taken');
+         throw new EmailError('Email already exists');
       }
 
       const passwordHash = await this.hashService.hash(
@@ -25,6 +26,7 @@ export class SignupUser {
       );
 
       const otp = this.OTPService.generate();
+      console.log(`otp ${otp}`);
       const otpHash = await this.hashService.hash(otp, parseInt(process.env.otpSalt as string));
 
       const userSignupData: verifedUserToken = {

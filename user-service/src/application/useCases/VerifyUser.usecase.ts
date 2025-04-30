@@ -1,11 +1,14 @@
 import { JWTService } from '../../infrastructure/service/JWTService';
 import { verifedUserToken, verifyUserDTO } from '../DTOs/user/verifyUser.dto';
+import { OTPError } from '../errors/OTPError';
+import { IHashService } from '../ports/IHashService';
 import { IUserRepository } from '../ports/IUserRepository';
 
 export class VerifyUser {
    constructor(
       private readonly userRepository: IUserRepository,
-      private readonly JWT: JWTService
+      private readonly JWT: JWTService,
+      private readonly hashService: IHashService
    ) {}
 
    execute = async (
@@ -15,6 +18,11 @@ export class VerifyUser {
          dto.activationToken,
          process.env.otpTokenSecret as string
       );
+
+      const validHash = await this.hashService.compare(dto.activationCode, verifiedUser.otpHash);
+      if (!validHash) {
+         throw new OTPError('OTP does not match');
+      }
 
       const newUser = await this.userRepository.create(verifiedUser);
       return newUser;

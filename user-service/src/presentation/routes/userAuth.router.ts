@@ -14,7 +14,7 @@ const jwtService = new JWTService();
 const otpService = new OTP();
 const bcryptHashService = new BcryptHashService();
 const singupUser = new SignupUser(userRepository, jwtService, otpService, bcryptHashService);
-const verifyUser = new VerifyUser(userRepository, jwtService);
+const verifyUser = new VerifyUser(userRepository, jwtService, bcryptHashService);
 const userAuthController = new UserAuthController(singupUser, verifyUser);
 
 authRouter.post('/signup', userAuthController.signup);

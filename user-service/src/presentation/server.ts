@@ -1,6 +1,7 @@
 import express from 'express';
 import authRouter from './routes/userAuth.router';
 import morgan from 'morgan';
+import { errorHandler } from './middlewares/error.middeware';
 
 const app = express();
 
@@ -13,5 +14,5 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/v1/user/auth', authRouter);
-
+app.use(errorHandler)
 export default app;

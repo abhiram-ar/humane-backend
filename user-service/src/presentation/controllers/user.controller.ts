@@ -3,6 +3,7 @@ import { SignupUser } from '../../application/useCases/SignupUser.usecase';
 import { signupUserSchema } from '../../application/DTOs/user/signupUser.dto';
 import { verifyUserSchema } from '../../application/DTOs/user/verifyUser.dto';
 import { VerifyUser } from '../../application/useCases/VerifyUser.usecase';
+import { ZodValidationError } from '../errors/ZodValidationError';
 
 export class UserAuthController {
    constructor(private readonly singupUser: SignupUser, private readonly verifyUser: VerifyUser) {}
@@ -12,9 +13,7 @@ export class UserAuthController {
          const parsed = signupUserSchema.safeParse(req.body);
 
          if (!parsed.success) {
-            return res
-               .status(400)
-               .json({ success: false, message: 'error in request schema', errors: parsed.error });
+            throw new ZodValidationError(parsed.error);
          }
 
          const signupToken = await this.singupUser.execute(parsed.data);
@@ -33,9 +32,7 @@ export class UserAuthController {
       try {
          const parsed = verifyUserSchema.safeParse(req.body);
          if (!parsed.success) {
-            return res
-               .status(400)
-               .json({ success: true, message: 'error in request schema', errors: parsed.error });
+            throw new ZodValidationError(parsed.error);
          }
 
          const newUser = await this.verifyUser.execute(parsed.data);
