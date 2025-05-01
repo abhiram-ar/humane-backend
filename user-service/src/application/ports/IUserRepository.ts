@@ -9,4 +9,6 @@ export interface IUserRepository {
    retriveUserByEmail(
       email: string
    ): Promise<Pick<User, 'id' | 'email' | 'passwordHash' | 'isBlocked'> | null>;
+
+   getUserStatusById(userId: string): Promise<Pick<User, 'id' | 'isBlocked'> | null>;
 }

@@ -22,5 +22,6 @@ const userAuthController = new UserAuthController(singupUser, verifyUser, userEm
 authRouter.post('/signup', userAuthController.signup);
 authRouter.post('/verify', userAuthController.verify);
 authRouter.post('/login/email', userAuthController.login);
+authRouter.get('/refresh', userAuthController.refreshAccessToken);
 
 export default authRouter;

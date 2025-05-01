@@ -35,6 +35,17 @@ export class MongoUserRepository implements IUserRepository {
       );
       if (!user) return null;
 
-      return { id: user.id, email: user.email, passwordHash: user.passwordHash, isBlocked: user.isBlocked };
+      return {
+         id: user.id,
+         email: user.email,
+         passwordHash: user.passwordHash,
+         isBlocked: user.isBlocked,
+      };
+   };
+
+   getUserStatusById = async (userId: string): Promise<Pick<User, 'id' | 'isBlocked'> | null> => {
+      const user = await userModel.findOne({ _id: userId });
+      if (!user) return null;
+      return { id: user.id, isBlocked: user.isBlocked };
    };
 }

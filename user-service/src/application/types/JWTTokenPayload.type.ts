@@ -1,9 +1,9 @@
-type UserJWTTokenPayload = {
+export type UserJWTTokenPayload = {
    anonId: string;
    type: 'user';
 };
 
-type AdminJWTTokenPaylod = {
+export type AdminJWTTokenPaylod = {
    adminId: string;
    type: 'admin';
 };

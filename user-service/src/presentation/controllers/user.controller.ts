@@ -80,4 +80,14 @@ export class UserAuthController {
          next(error);
       }
    };
+
+   refreshAccessToken = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+      try {
+         const { refreshJWT } = req.cookies;
+         console.log(refreshJWT);
+         res.status(200).json({ success: true });
+      } catch (error) {
+         next(error);
+      }
+   };
 }

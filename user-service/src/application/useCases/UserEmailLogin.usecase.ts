@@ -20,7 +20,6 @@ export class UserEmailLogin {
    ) {}
 
    execute = async (dto: userLoginDTO): Promise<{ accessToken: string; refreshToken: string }> => {
-      // retrive userInfo
       const user = await this.userRepository.retriveUserByEmail(dto.email);
       if (!user) {
          throw new UserNotFoundError('Invalid user trying to authenticate');
@@ -36,7 +35,6 @@ export class UserEmailLogin {
          );
       }
 
-      // check password
       const passwordMatch = this.hasingService.compare(dto.password, user.passwordHash);
       if (!passwordMatch) {
          throw new PasswordError('password does not match');
