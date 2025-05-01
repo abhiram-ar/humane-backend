@@ -28,10 +28,13 @@ export class MongoUserRepository implements IUserRepository {
 
    retriveUserByEmail = async (
       email: string
-   ): Promise<Pick<User, 'id' | 'email' | 'passwordHash'> | null> => {
-      const user = await userModel.findOne({ email }, { firstName: 1, passwordHash: 1 });
+   ): Promise<Pick<User, 'id' | 'email' | 'passwordHash' | 'isBlocked'> | null> => {
+      const user = await userModel.findOne(
+         { email },
+         { firstName: 1, passwordHash: 1, isBlocked: 1 }
+      );
       if (!user) return null;
 
-      return { id: user.id, email: user.email, passwordHash: user.passwordHash };
+      return { id: user.id, email: user.email, passwordHash: user.passwordHash, isBlocked: user.isBlocked };
    };
 }

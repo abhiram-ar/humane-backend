@@ -1,4 +1,4 @@
-import checkEnv from './config/checkEnv';
+import checkEnv from './config/env';
 import app from './presentation/server';
 import connectDB from './infrastructure/persistance/mongoDB/client';
 
