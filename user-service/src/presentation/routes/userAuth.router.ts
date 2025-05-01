@@ -3,11 +3,11 @@ import { UserAuthController } from '../controllers/user.controller';
 import { MongoUserRepository } from '../../infrastructure/persistance/mongoDB/repository/MongoUserRepository';
 import { OTP } from '../../domain/services/otpGenerator';
 import { JWTService } from '../../infrastructure/service/JWTService';
-import { SignupUser } from '../../application/useCases/SignupUser.usecase';
 import { BcryptHashService } from '../../infrastructure/service/BcryptHashService';
-import { VerifyUser } from '../../application/useCases/VerifyUser.usecase';
-import { UserEmailLogin } from '../../application/useCases/UserEmailLogin.usecase';
-import { RefreshUserAccessToken } from '../../application/useCases/RefreshUserToken.usecase';
+import { VerifyUser } from '../../application/useCases/user/VerifyUser.usecase';
+import { RefreshUserAccessToken } from '../../application/useCases/user/RefreshUserToken.usecase';
+import { SignupUser } from '../../application/useCases/user/SignupUser.usecase';
+import { UserEmailLogin } from '../../application/useCases/user/UserEmailLogin.usecase';
 
 const authRouter = express.Router();
 

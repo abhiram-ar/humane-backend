@@ -1,16 +1,13 @@
-import { ENV } from '../../config/env';
-import { userLoginDTO } from '../DTOs/user/userLogin.dto';
-import { PasswordError } from '../errors/PasswordError';
-import { UserBlockedError } from '../errors/UserBlockedError';
-import { UserNotFoundError } from '../errors/UserNotFoundError';
-import { IHashService } from '../ports/IHashService';
-import { IJWTService } from '../ports/IJWTService';
-import { IUserRepository } from '../ports/IUserRepository';
-import { JWTTokenPaylod } from './../types/JWTTokenPayload.type';
-import {
-   JWT_ACCESS_TOKEN_EXPIRY_SECONDS,
-   JWT_REFRESH_TOKEN_EXPIRY_SECONDS,
-} from '../../config/jwt';
+import { ENV } from '@config/env';
+import { userLoginDTO } from '@application/DTOs/user/userLogin.dto';
+import { PasswordError } from '@application/errors/PasswordError';
+import { UserBlockedError } from '@application/errors/UserBlockedError';
+import { UserNotFoundError } from '@application/errors/UserNotFoundError';
+import { IHashService } from '@ports/IHashService';
+import { IJWTService } from '@ports/IJWTService';
+import { IUserRepository } from '@ports/IUserRepository';
+import { JWTTokenPaylod } from '@application/types/JWTTokenPayload.type';
+import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS, JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 
 export class UserEmailLogin {
    constructor(

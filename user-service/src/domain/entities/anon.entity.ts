@@ -1,9 +1,9 @@
-class Anon {
-  constructor(
-    public id: string,
-    public userId: string,
-    public revoked: boolean,
-    public createdAt: Date,
-    public expiresAt: Date
-  ) {}
+class Anonymous {
+   constructor(
+      public anonId: string,
+      public userId: string,
+      public revoked: boolean,
+      public createdAt: Date,
+      public expiresAt: Date
+   ) {}
 }

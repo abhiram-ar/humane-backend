@@ -1,18 +1,18 @@
 import { NextFunction, Request, Response } from 'express';
-import { SignupUser } from '../../application/useCases/SignupUser.usecase';
 import { signupUserSchema } from '../../application/DTOs/user/signupUser.dto';
 import { verifyUserSchema } from '../../application/DTOs/user/verifyUser.dto';
-import { VerifyUser } from '../../application/useCases/VerifyUser.usecase';
+import { VerifyUser } from '../../application/useCases/user/VerifyUser.usecase';
 import { ZodValidationError } from '../errors/ZodValidationError';
 import { userLoginSchema } from '../../application/DTOs/user/userLogin.dto';
-import { UserEmailLogin } from '../../application/useCases/UserEmailLogin.usecase';
 import { ENV } from '../../config/env';
 import { JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '../../config/jwt';
-import { RefreshUserAccessToken } from '../../application/useCases/RefreshUserToken.usecase';
+import { RefreshUserAccessToken } from '../../application/useCases/user/RefreshUserToken.usecase';
 import { UnAuthenticatedError } from '../../application/errors/UnAuthenticatedError';
 import { JWTRefreshError } from '../../application/errors/JWTRefreshError';
 import { UserNotFoundError } from '../../application/errors/UserNotFoundError';
 import { UserBlockedError } from '../../application/errors/UserBlockedError';
+import { SignupUser } from '../../application/useCases/user/SignupUser.usecase';
+import { UserEmailLogin } from '../../application/useCases/user/UserEmailLogin.usecase';
 
 export class UserAuthController {
    constructor(

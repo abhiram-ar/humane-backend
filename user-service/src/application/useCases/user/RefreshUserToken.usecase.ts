@@ -1,11 +1,11 @@
-import { ENV } from '../../config/env';
-import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS } from '../../config/jwt';
-import { JWTService } from '../../infrastructure/service/JWTService';
-import { JWTRefreshError } from '../errors/JWTRefreshError';
-import { UserBlockedError } from '../errors/UserBlockedError';
-import { UserNotFoundError } from '../errors/UserNotFoundError';
-import { IUserRepository } from '../ports/IUserRepository';
-import { JWTTokenPaylod, UserJWTTokenPayload } from '../types/JWTTokenPayload.type';
+import { ENV } from '../../../config/env';
+import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS } from '../../../config/jwt';
+import { JWTService } from '../../../infrastructure/service/JWTService';
+import { JWTRefreshError } from '../../errors/JWTRefreshError';
+import { UserBlockedError } from '../../errors/UserBlockedError';
+import { UserNotFoundError } from '../../errors/UserNotFoundError';
+import { IUserRepository } from '../../ports/IUserRepository';
+import { JWTTokenPaylod, UserJWTTokenPayload } from '../../types/JWTTokenPayload.type';
 
 export class RefreshUserAccessToken {
    constructor(
