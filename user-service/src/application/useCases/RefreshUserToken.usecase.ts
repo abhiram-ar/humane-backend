@@ -1,12 +1,13 @@
 import { ENV } from '../../config/env';
 import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS } from '../../config/jwt';
 import { JWTService } from '../../infrastructure/service/JWTService';
+import { JWTRefreshError } from '../errors/JWTRefreshError';
 import { UserBlockedError } from '../errors/UserBlockedError';
 import { UserNotFoundError } from '../errors/UserNotFoundError';
 import { IUserRepository } from '../ports/IUserRepository';
 import { JWTTokenPaylod, UserJWTTokenPayload } from '../types/JWTTokenPayload.type';
 
-class RefreshUserToken {
+export class RefreshUserToken {
    constructor(
       private readonly userReporitory: IUserRepository,
       private readonly jwtService: JWTService
@@ -21,8 +22,7 @@ class RefreshUserToken {
             ENV.REFRESH_TOKEN_SECRET as string
          );
       } catch (error) {
-         // todo: Refresh token error
-         throw new Error('Invalid refresh token');
+         throw new JWTRefreshError('Invalid/Expired refresh token');
       }
 
       // todo: retirve userId by anonID
@@ -39,7 +39,7 @@ class RefreshUserToken {
          throw new UserBlockedError('Cannot refresh token of a blocked user');
       }
 
-      // create new anonId, old one is expired or if expires in < 1hr
+      // create new anonId, if old one is expired or if expires in < 1hr
       const tokenPayload: JWTTokenPaylod = { anonId: verifedTokenPayload.anonId, type: 'user' };
       const newAccessToken = this.jwtService.sign(
          tokenPayload,
