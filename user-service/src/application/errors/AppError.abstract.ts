@@ -10,5 +10,5 @@ export abstract class AppError extends Error {
       Object.setPrototypeOf(this, AppError.prototype);
    }
 
-   abstract serialize(): { message: string; toastMessage?: boolean; field?: string }[];
+   abstract serialize(): { message: string; field?: string }[];
 }

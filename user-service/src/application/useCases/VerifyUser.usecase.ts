@@ -1,5 +1,6 @@
 import { JWTService } from '../../infrastructure/service/JWTService';
 import { verifedUserToken, verifyUserDTO } from '../DTOs/user/verifyUser.dto';
+import { JWTError } from '../errors/JWTError';
 import { OTPError } from '../errors/OTPError';
 import { IHashService } from '../ports/IHashService';
 import { IUserRepository } from '../ports/IUserRepository';
@@ -14,10 +15,16 @@ export class VerifyUser {
    execute = async (
       dto: verifyUserDTO
    ): Promise<{ firstName: string; lastName?: string; email: string }> => {
-      const verifiedUser = this.JWT.verify<verifedUserToken>(
-         dto.activationToken,
-         process.env.otpTokenSecret as string
-      );
+      let verifiedUser: verifedUserToken;
+
+      try {
+         verifiedUser = this.JWT.verify<verifedUserToken>(
+            dto.activationToken,
+            process.env.otpTokenSecret as string
+         );
+      } catch (error) {
+         throw new OTPError('OTP token expires/Invalid');
+      }
 
       const validHash = await this.hashService.compare(dto.activationCode, verifiedUser.otpHash);
       if (!validHash) {
