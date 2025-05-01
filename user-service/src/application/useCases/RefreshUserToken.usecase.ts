@@ -7,7 +7,7 @@ import { UserNotFoundError } from '../errors/UserNotFoundError';
 import { IUserRepository } from '../ports/IUserRepository';
 import { JWTTokenPaylod, UserJWTTokenPayload } from '../types/JWTTokenPayload.type';
 
-export class RefreshUserToken {
+export class RefreshUserAccessToken {
    constructor(
       private readonly userReporitory: IUserRepository,
       private readonly jwtService: JWTService

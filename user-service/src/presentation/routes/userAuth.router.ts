@@ -7,7 +7,7 @@ import { SignupUser } from '../../application/useCases/SignupUser.usecase';
 import { BcryptHashService } from '../../infrastructure/service/BcryptHashService';
 import { VerifyUser } from '../../application/useCases/VerifyUser.usecase';
 import { UserEmailLogin } from '../../application/useCases/UserEmailLogin.usecase';
-import { RefreshUserToken } from '../../application/useCases/RefreshUserToken.usecase';
+import { RefreshUserAccessToken } from '../../application/useCases/RefreshUserToken.usecase';
 
 const authRouter = express.Router();
 
@@ -18,12 +18,18 @@ const bcryptHashService = new BcryptHashService();
 const singupUser = new SignupUser(userRepository, jwtService, otpService, bcryptHashService);
 const verifyUser = new VerifyUser(userRepository, jwtService, bcryptHashService);
 const userEmailLogin = new UserEmailLogin(userRepository, bcryptHashService, jwtService);
-const refreshUserAccessToken = new RefreshUserToken(userRepository, jwtService);
-const userAuthController = new UserAuthController(singupUser, verifyUser, userEmailLogin, refreshUserAccessToken);
+const refreshUserAccessToken = new RefreshUserAccessToken(userRepository, jwtService);
+const userAuthController = new UserAuthController(
+   singupUser,
+   verifyUser,
+   userEmailLogin,
+   refreshUserAccessToken
+);
 
 authRouter.post('/signup', userAuthController.signup);
 authRouter.post('/verify', userAuthController.verify);
 authRouter.post('/login/email', userAuthController.login);
 authRouter.get('/refresh', userAuthController.refreshAccessToken);
+authRouter.post('/logout', userAuthController.logout);
 
 export default authRouter;

@@ -8,7 +8,7 @@ import { userLoginSchema } from '../../application/DTOs/user/userLogin.dto';
 import { UserEmailLogin } from '../../application/useCases/UserEmailLogin.usecase';
 import { ENV } from '../../config/env';
 import { JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '../../config/jwt';
-import { RefreshUserToken } from '../../application/useCases/RefreshUserToken.usecase';
+import { RefreshUserAccessToken } from '../../application/useCases/RefreshUserToken.usecase';
 import { UnAuthenticatedError } from '../../application/errors/UnAuthenticatedError';
 import { JWTRefreshError } from '../../application/errors/JWTRefreshError';
 import { UserNotFoundError } from '../../application/errors/UserNotFoundError';
@@ -19,7 +19,7 @@ export class UserAuthController {
       private readonly singupUser: SignupUser,
       private readonly verifyUser: VerifyUser,
       private readonly userEmailLogin: UserEmailLogin,
-      private readonly refreshUserAccessToken: RefreshUserToken
+      private readonly refreshUserAccessToken: RefreshUserAccessToken
    ) {}
 
    signup = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -101,8 +101,6 @@ export class UserAuthController {
             message: 'Access token refreshed',
             data: { token: newAccessToken },
          });
-
-         console.log(refreshJWT);
       } catch (error) {
          if (
             error instanceof JWTRefreshError ||
@@ -114,6 +112,32 @@ export class UserAuthController {
                secure: ENV.NODE_ENV === 'production' ? true : false,
                sameSite: ENV.NODE_ENV === 'production' ? 'none' : 'lax',
             });
+         }
+         next(error);
+      }
+   };
+
+   logout = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+      try {
+         const { refreshJWT } = req.cookies;
+         if (!refreshJWT) {
+            throw new UnAuthenticatedError('refresh token not found in cookies');
+         }
+
+         res.clearCookie('refreshJWT', {
+            httpOnly: true,
+            secure: ENV.NODE_ENV === 'production' ? true : false,
+            sameSite: ENV.NODE_ENV === 'production' ? 'none' : 'lax',
+         });
+         res.status(200).json({ success: true, message: 'User logout successful' });
+      } catch (error) {
+         if (error instanceof UnAuthenticatedError) {
+            return res
+               .status(200)
+               .json({
+                  success: true,
+                  message: `${error.message},User is not authenticated to logout`,
+               });
          }
          next(error);
       }
