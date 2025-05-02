@@ -1,5 +1,5 @@
-import { Anonymous } from "@domain/entities/anon.entity";
+import { Anonymous } from '@domain/entities/anon.entity';
 
-interface IAnonymousUserRepository{
-    create(userId: string, anonId: string): Anonymous
+export interface IAnonymousUserRepository {
+   create(newAnon: Anonymous): Promise<Anonymous>;
 }

@@ -6,8 +6,9 @@ export const createAnonSchema = z.object({
    expiresAt: z
       .number()
       .int()
-      .refine((epoch) => epoch > Date.now(), { message: 'anonId expiry cannot be in past' }),
+      .refine((expiryEpoch) => expiryEpoch > Date.now(), { message: 'anonId expired' }),
    createdAt: z.number().int().gte(0),
+   revoked: z.boolean().optional().default(false),
 });
 
 export type createAnonDTO = z.infer<typeof createAnonSchema>;

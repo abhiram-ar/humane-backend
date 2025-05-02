@@ -1,16 +1,22 @@
 import { Anonymous } from '@domain/entities/anon.entity';
-import { createAnonDTO } from '@dtos/anonymous/createAnon.dto';
+import { IAnonymousUserRepository } from '@ports/IAnonymousUserRepository';
 import { IUUIDService } from '@ports/IUUIDService';
 
 export class CreateAnonymousUser {
-   constructor(private readonly UUIDService: IUUIDService) {}
+   constructor(
+      private readonly anonUserRepository: IAnonymousUserRepository,
+      private readonly UUIDService: IUUIDService
+   ) {}
 
-   execute = (userId: string) => {
-      const newAnon: createAnonDTO = {
+   execute = async (userId: string): Promise<Anonymous> => {
+      const newAnon = new Anonymous(
+         this.UUIDService.generate(),
          userId,
-         anonId: this.UUIDService.generate(),
-         expiresAt: Date.now() + Anonymous.ANON_EXPIRY_TIME_IN_MILLI_SECONDS,
-         createdAt: Date.now(),
-      };
+         Date.now() + Anonymous.ANON_EXPIRY_TIME_IN_MILLI_SECONDS,
+         Date.now()
+      );
+
+      const anon = await this.anonUserRepository.create(newAnon);
+      return anon;
    };
 }
