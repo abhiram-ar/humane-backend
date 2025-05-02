@@ -21,7 +21,7 @@ const userSchema = new Schema<IUser>(
    {
       firstName: { type: String, required: true },
       lastName: { type: String },
-      email: { type: String, required: true },
+      email: { type: String, required: true, index: true, unique: true },
       isEmailVerified: { type: Boolean, default: false },
       isBlocked: { type: Boolean, default: false },
       humaneScore: { type: Number, default: 0 },
@@ -34,6 +34,8 @@ const userSchema = new Schema<IUser>(
    },
    { timestamps: true }
 );
+
+userSchema.index({ email: 1 }, { unique: true });
 
 const userModel = mongoose.model('user', userSchema);
 export default userModel;

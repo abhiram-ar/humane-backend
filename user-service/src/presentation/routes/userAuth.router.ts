@@ -3,22 +3,42 @@ import { UserAuthController } from '../controllers/user.controller';
 import { MongoUserRepository } from '../../infrastructure/persistance/mongoDB/repository/MongoUserRepository';
 import { OTP } from '../../domain/services/otpGenerator';
 import { JWTService } from '../../infrastructure/service/JWTService';
-import { SignupUser } from '../../application/useCases/SignupUser.usecase';
 import { BcryptHashService } from '../../infrastructure/service/BcryptHashService';
-import { VerifyUser } from '../../application/useCases/VerifyUser.usecase';
-import { UserEmailLogin } from '../../application/useCases/UserEmailLogin.usecase';
-import { RefreshUserAccessToken } from '../../application/useCases/RefreshUserToken.usecase';
+import { VerifyUser } from '../../application/useCases/user/VerifyUser.usecase';
+import { RefreshUserAccessToken } from '../../application/useCases/user/RefreshUserToken.usecase';
+import { SignupUser } from '../../application/useCases/user/SignupUser.usecase';
+import { UserEmailLogin } from '../../application/useCases/user/UserEmailLogin.usecase';
+import { CreateAnonymousUser } from '@application/useCases/anonymous/CreateAnonymousUser.usercase';
+import { MongoAnonymousUserRepository } from '@infrastructure/persistance/mongoDB/repository/MongoAnoymousUserRepository';
+import { CryptoUUIDService } from '@infrastructure/service/CryptoUUIDService';
+import { ResolveAnoymousUser } from '@application/useCases/anonymous/ResolveAnonymousUser.usecase';
 
 const authRouter = express.Router();
 
 const userRepository = new MongoUserRepository();
+const anonUserRepository = new MongoAnonymousUserRepository();
+
 const jwtService = new JWTService();
 const otpService = new OTP();
 const bcryptHashService = new BcryptHashService();
+const cryptoUUIDService = new CryptoUUIDService();
+
 const singupUser = new SignupUser(userRepository, jwtService, otpService, bcryptHashService);
 const verifyUser = new VerifyUser(userRepository, jwtService, bcryptHashService);
-const userEmailLogin = new UserEmailLogin(userRepository, bcryptHashService, jwtService);
-const refreshUserAccessToken = new RefreshUserAccessToken(userRepository, jwtService);
+const creataAnonUser = new CreateAnonymousUser(anonUserRepository, cryptoUUIDService);
+const userEmailLogin = new UserEmailLogin(
+   userRepository,
+   bcryptHashService,
+   jwtService,
+   creataAnonUser
+);
+const resolveAnonUser = new ResolveAnoymousUser(anonUserRepository);
+const refreshUserAccessToken = new RefreshUserAccessToken(
+   userRepository,
+   jwtService,
+   resolveAnonUser,
+   creataAnonUser
+);
 const userAuthController = new UserAuthController(
    singupUser,
    verifyUser,

@@ -1,5 +1,18 @@
 {
-  "extends": "@tsconfig/node22/tsconfig.json",
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+   "extends": "@tsconfig/node22/tsconfig.json",
+   "include": ["src/**/*"],
+   "exclude": ["node_modules"],
+   "compilerOptions": {
+      "baseUrl": "src",
+      "paths": {
+         "@dtos/*": ["application/DTOs/*"],
+         "@ports/*": ["application/ports/*"],
+         "@services/*": ["application/services/*"],
+         "@domain/*": ["domain/*"],
+         "@application/*": ["application/*"],
+         "@infrastructure/*": ["infrastructure/*"],
+         "@presentation/*": ["presentation/*"],
+         "@config/*": ["config/*"]
+      }
+   }
 }

@@ -1,10 +1,10 @@
-import { OTP } from '../../domain/services/otpGenerator';
-import { IJWTService } from '../ports/IJWTService';
-import { IUserRepository } from '../ports/IUserRepository';
-import { IHashService } from '../ports/IHashService';
-import { signupUserDTO } from '../DTOs/user/signupUser.dto';
-import { verifedUserToken } from '../DTOs/user/verifyUser.dto';
-import { EmailError } from '../errors/EmailError';
+import { OTP } from '@domain/services/otpGenerator';
+import { IJWTService } from '@ports/IJWTService';
+import { IUserRepository } from '@ports/IUserRepository';
+import { IHashService } from '@ports/IHashService';
+import { signupUserDTO } from '@dtos/user/signupUser.dto';
+import { verifedUserToken } from '@dtos/user/verifyUser.dto';
+import { EmailError } from '@application/errors/EmailError';
 
 export class SignupUser {
    constructor(
