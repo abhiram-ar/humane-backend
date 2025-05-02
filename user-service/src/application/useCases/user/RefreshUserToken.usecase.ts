@@ -47,10 +47,19 @@ export class RefreshUserAccessToken {
          throw new UserBlockedError('Cannot refresh token of a blocked user');
       }
 
-      let newTokenPaylod = verifedTokenPayload;
+      // we cannot reuse the old verifiedTokenPaylod,
+      // as it contain additonal fields after verifing including old token expiry
+      let newTokenPaylod: AnonJWTTokenPayload = {
+         anonId: verifedTokenPayload.anonId,
+         createdAt: verifedTokenPayload.createdAt,
+         expiresAt: verifedTokenPayload.expiresAt,
+         revoked: verifedTokenPayload.revoked,
+         type: 'anon',
+      };
 
+      // create new anonId, if old one is expired or if expires in < 1hr
       if (
-         anonUser.expiresAt > Date.now() ||
+         anonUser.expiresAt < Date.now() ||
          anonUser.expiresAt - anonUser.createdAt < 1000 * 60 * 60
       ) {
          const newAnon = await this.createAnonUser.execute(anonUser.userId);
@@ -62,8 +71,6 @@ export class RefreshUserAccessToken {
             type: 'anon',
          };
       }
-
-      // create new anonId, if old one is expired or if expires in < 1hr
 
       const newAccessToken = this.jwtService.sign(
          newTokenPaylod,

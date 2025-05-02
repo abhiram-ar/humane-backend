@@ -1,18 +1,18 @@
 import { NextFunction, Request, Response } from 'express';
-import { signupUserSchema } from '../../application/DTOs/user/signupUser.dto';
-import { verifyUserSchema } from '../../application/DTOs/user/verifyUser.dto';
-import { VerifyUser } from '../../application/useCases/user/VerifyUser.usecase';
-import { ZodValidationError } from '../errors/ZodValidationError';
-import { userLoginSchema } from '../../application/DTOs/user/userLogin.dto';
-import { ENV } from '../../config/env';
-import { JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '../../config/jwt';
-import { RefreshUserAccessToken } from '../../application/useCases/user/RefreshUserToken.usecase';
-import { UnAuthenticatedError } from '../../application/errors/UnAuthenticatedError';
-import { JWTRefreshError } from '../../application/errors/JWTRefreshError';
-import { UserNotFoundError } from '../../application/errors/UserNotFoundError';
-import { UserBlockedError } from '../../application/errors/UserBlockedError';
-import { SignupUser } from '../../application/useCases/user/SignupUser.usecase';
-import { UserEmailLogin } from '../../application/useCases/user/UserEmailLogin.usecase';
+import { signupUserSchema } from '@application/DTOs/user/signupUser.dto';
+import { verifyUserSchema } from '@application/DTOs/user/verifyUser.dto';
+import { VerifyUser } from '@application/useCases/user/VerifyUser.usecase';
+import { ZodValidationError } from '@presentation/errors/ZodValidationError';
+import { SignupUser } from '@application/useCases/user/SignupUser.usecase';
+import { UserEmailLogin } from '@application/useCases/user/UserEmailLogin.usecase';
+import { RefreshUserAccessToken } from '@application/useCases/user/RefreshUserToken.usecase';
+import { userLoginSchema } from '@dtos/user/userLogin.dto';
+import { JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
+import { ENV } from '@config/env';
+import { UnAuthenticatedError } from '@application/errors/UnAuthenticatedError';
+import { JWTRefreshError } from '@application/errors/JWTRefreshError';
+import { UserNotFoundError } from '@application/errors/UserNotFoundError';
+import { UserBlockedError } from '@application/errors/UserBlockedError';
 
 export class UserAuthController {
    constructor(
@@ -107,6 +107,7 @@ export class UserAuthController {
             error instanceof UserNotFoundError ||
             error instanceof UserBlockedError
          ) {
+            console.error(error.message);
             res.clearCookie('refreshJWT', {
                httpOnly: true,
                secure: ENV.NODE_ENV === 'production' ? true : false,
@@ -132,12 +133,10 @@ export class UserAuthController {
          res.status(200).json({ success: true, message: 'User logout successful' });
       } catch (error) {
          if (error instanceof UnAuthenticatedError) {
-            return res
-               .status(200)
-               .json({
-                  success: true,
-                  message: `${error.message},User is not authenticated to logout`,
-               });
+            return res.status(200).json({
+               success: true,
+               message: `${error.message},User is not authenticated to logout`,
+            });
          }
          next(error);
       }

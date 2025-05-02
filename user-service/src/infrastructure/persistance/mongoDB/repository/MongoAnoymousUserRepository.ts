@@ -2,7 +2,7 @@ import { Anonymous } from '@domain/entities/anon.entity';
 import { IAnonymousUserRepository } from '@ports/IAnonymousUserRepository';
 import anoymousUserModel from '../models/anonymousUser.mode';
 
-class MongoAnonymousUserRepository implements IAnonymousUserRepository {
+export class MongoAnonymousUserRepository implements IAnonymousUserRepository {
    create = async (newAnon: Anonymous): Promise<Anonymous> => {
       const anon = await anoymousUserModel.create({
          anonId: newAnon.anonId,
