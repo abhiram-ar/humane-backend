@@ -6,14 +6,16 @@ import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { IHashService } from '@ports/IHashService';
 import { IJWTService } from '@ports/IJWTService';
 import { IUserRepository } from '@ports/IUserRepository';
-import { JWTTokenPaylod } from '@application/types/JWTTokenPayload.type';
+import { AnonJWTTokenPayload, JWTTokenPaylod } from '@application/types/JWTTokenPayload.type';
 import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS, JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
+import { CreateAnonymousUser } from '../anonymous/CreateAnonymousUser.usercase';
 
 export class UserEmailLogin {
    constructor(
       private readonly userRepository: IUserRepository,
       private readonly hasingService: IHashService,
-      private readonly jwtService: IJWTService
+      private readonly jwtService: IJWTService,
+      private readonly createAnonUser: CreateAnonymousUser
    ) {}
 
    execute = async (dto: userLoginDTO): Promise<{ accessToken: string; refreshToken: string }> => {
@@ -39,10 +41,16 @@ export class UserEmailLogin {
 
       // create anon id
       // todo: replace this with real annon is
-      let anonId = user.id;
+      let anonUser = await this.createAnonUser.execute(user.id);
 
       // create JWT
-      const jwtTokenPaylod: JWTTokenPaylod = { anonId, type: 'user' };
+      const jwtTokenPaylod: AnonJWTTokenPayload = {
+         anonId: anonUser.anonId,
+         createdAt: anonUser.createdAt,
+         expiresAt: anonUser.expiresAt,
+         revoked: anonUser.revoked,
+         type: 'anon',
+      };
 
       const accessToken = this.jwtService.sign(
          jwtTokenPaylod,

@@ -13,4 +13,10 @@ class MongoAnonymousUserRepository implements IAnonymousUserRepository {
       });
       return new Anonymous(anon.anonId, anon.userId, anon.expiresAt, anon.createdAt, anon.revoked);
    };
+
+   getAnonUser = async (anonId: string): Promise<Anonymous | null> => {
+      const anon = await anoymousUserModel.findOne({ anonId });
+      if (!anon) return null;
+      return new Anonymous(anon.anonId, anon.userId, anon.expiresAt, anon.createdAt, anon.revoked);
+   };
 }

@@ -2,8 +2,8 @@ export class Anonymous {
    constructor(
       public readonly anonId: string,
       public readonly userId: string,
-      public readonly expiresAt: number,
-      public readonly createdAt: number,
+      public readonly expiresAt: number, //unix epoch in ms
+      public readonly createdAt: number, // unix epoch in ms
       public revoked: boolean = false
    ) {}
 

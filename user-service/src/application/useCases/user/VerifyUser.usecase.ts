@@ -1,6 +1,5 @@
 import { JWTService } from '../../../infrastructure/service/JWTService';
 import { verifedUserToken, verifyUserDTO } from '../../DTOs/user/verifyUser.dto';
-import { JWTError } from '../errors/JWTError';
 import { OTPError } from '../../errors/OTPError';
 import { IHashService } from '../../ports/IHashService';
 import { IUserRepository } from '../../ports/IUserRepository';
