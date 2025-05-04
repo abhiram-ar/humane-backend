@@ -10,7 +10,7 @@ interface IAnonymousUserModel extends Document {
 
 const anonymousUserSchema = new mongoose.Schema<IAnonymousUserModel>({
    userId: { type: String, required: true },
-   anonId: { type: String, required: true, index: true, unique: true },
+   anonId: { type: String, required: true },
    revoked: { type: Boolean, default: false },
    expiresAt: { type: Number, required: true },
    createdAt: { type: Number, required: true },
