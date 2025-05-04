@@ -13,13 +13,16 @@ import { UnAuthenticatedError } from '@application/errors/UnAuthenticatedError';
 import { JWTRefreshError } from '@application/errors/JWTRefreshError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { UserBlockedError } from '@application/errors/UserBlockedError';
+import { forgotPasswordSchema } from '@dtos/user/forgotPassword.dto';
+import { ForgotPassword } from '@application/useCases/user/ForgotPassword.usecase';
 
 export class UserAuthController {
    constructor(
       private readonly singupUser: SignupUser,
       private readonly verifyUser: VerifyUser,
       private readonly userEmailLogin: UserEmailLogin,
-      private readonly refreshUserAccessToken: RefreshUserAccessToken
+      private readonly refreshUserAccessToken: RefreshUserAccessToken,
+      private readonly forgotPassoword: ForgotPassword
    ) {}
 
    signup = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -140,6 +143,25 @@ export class UserAuthController {
                message: `${error.message},User is not authenticated to logout`,
             });
          }
+         next(error);
+      }
+   };
+
+   forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const parsed = forgotPasswordSchema.safeParse(req.body);
+
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
+         }
+
+         const { email } = await this.forgotPassoword.execute(parsed.data);
+
+         res.status(201).json({
+            success: true,
+            message: `password recovery send to ${email}`,
+         });
+      } catch (error) {
          next(error);
       }
    };

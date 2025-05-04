@@ -29,10 +29,8 @@ export class MongoUserRepository implements IUserRepository {
    retriveUserByEmail = async (
       email: string
    ): Promise<Pick<User, 'id' | 'email' | 'passwordHash' | 'isBlocked'> | null> => {
-      const user = await userModel.findOne(
-         { email },
-         { firstName: 1, passwordHash: 1, isBlocked: 1 }
-      );
+
+      const user = await userModel.findOne({ email }, { email: 1, passwordHash: 1, isBlocked: 1 });
       if (!user) return null;
 
       return {
