@@ -2,13 +2,15 @@ import express from 'express';
 import authRouter from './routes/userAuth.router';
 import morgan from 'morgan';
 import { errorHandler } from './middlewares/error.middeware';
-import cookieParse from "cookie-parser"
+import cookieParse from 'cookie-parser';
+import cors from 'cors';
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
-app.use(cookieParse())
+app.use(cookieParse());
 
 app.get('/', (req, res) => {
    console.log('salt', process.env.passwordSalt);
@@ -16,5 +18,5 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/v1/user/auth', authRouter);
-app.use(errorHandler)
+app.use(errorHandler);
 export default app;

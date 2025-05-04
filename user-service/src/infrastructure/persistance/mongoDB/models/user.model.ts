@@ -21,7 +21,7 @@ const userSchema = new Schema<IUser>(
    {
       firstName: { type: String, required: true },
       lastName: { type: String },
-      email: { type: String, required: true, index: true, unique: true },
+      email: { type: String, required: true },
       isEmailVerified: { type: Boolean, default: false },
       isBlocked: { type: Boolean, default: false },
       humaneScore: { type: Number, default: 0 },
