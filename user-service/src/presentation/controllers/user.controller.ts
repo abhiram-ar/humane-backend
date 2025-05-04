@@ -70,6 +70,8 @@ export class UserAuthController {
 
          const { refreshToken, accessToken } = await this.userEmailLogin.execute(parsed.data);
 
+         console.log(ENV.NODE_ENV);
+
          res.cookie('refreshJWT', refreshToken, {
             httpOnly: true,
             secure: ENV.NODE_ENV === 'production' ? true : false,

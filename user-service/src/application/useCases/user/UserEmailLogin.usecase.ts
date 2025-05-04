@@ -2,13 +2,13 @@ import { ENV } from '@config/env';
 import { userLoginDTO } from '@application/DTOs/user/userLogin.dto';
 import { PasswordError } from '@application/errors/PasswordError';
 import { UserBlockedError } from '@application/errors/UserBlockedError';
-import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { IHashService } from '@ports/IHashService';
 import { IJWTService } from '@ports/IJWTService';
 import { IUserRepository } from '@ports/IUserRepository';
-import { AnonJWTTokenPayload, JWTTokenPaylod } from '@application/types/JWTTokenPayload.type';
+import { AnonJWTTokenPayload } from '@application/types/JWTTokenPayload.type';
 import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS, JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 import { CreateAnonymousUser } from '../anonymous/CreateAnonymousUser.usercase';
+import { EmailError } from '@application/errors/EmailError';
 
 export class UserEmailLogin {
    constructor(
@@ -21,7 +21,7 @@ export class UserEmailLogin {
    execute = async (dto: userLoginDTO): Promise<{ accessToken: string; refreshToken: string }> => {
       const user = await this.userRepository.retriveUserByEmail(dto.email);
       if (!user) {
-         throw new UserNotFoundError('Invalid user trying to authenticate');
+         throw new EmailError('Email does not exist, create an account.');
       }
 
       if (user.isBlocked) {
@@ -30,17 +30,16 @@ export class UserEmailLogin {
 
       if (!user.passwordHash) {
          throw new PasswordError(
-            'User has no password, Account might be created Using Social Auth'
+            'Account has no password, try social Auth'
          );
       }
 
-      const passwordMatch = this.hasingService.compare(dto.password, user.passwordHash);
+      const passwordMatch = await this.hasingService.compare(dto.password, user.passwordHash);
       if (!passwordMatch) {
          throw new PasswordError('password does not match');
       }
 
       // create anon id
-      // todo: replace this with real annon is
       let anonUser = await this.createAnonUser.execute(user.id);
 
       // create JWT
