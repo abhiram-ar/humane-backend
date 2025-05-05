@@ -5,8 +5,10 @@ import {
    refreshUserAccessToken,
    singupUser,
    userEmailLogin,
+   userGooglgAuth,
    verifyUser,
 } from '@di/usecase/userUsercase.container';
+import { googleOAuth2Client } from '@infrastructure/service/GoogleOAuth2Service';
 
 export const userAuthController = new UserAuthController(
    singupUser,
@@ -14,5 +16,7 @@ export const userAuthController = new UserAuthController(
    userEmailLogin,
    refreshUserAccessToken,
    forgotPassoword,
-   recoverPassword
+   recoverPassword,
+   googleOAuth2Client,
+   userGooglgAuth
 );

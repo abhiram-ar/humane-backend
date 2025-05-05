@@ -17,6 +17,10 @@ import { forgotPasswordSchema } from '@dtos/user/forgotPassword.dto';
 import { ForgotPassword } from '@application/useCases/user/ForgotPassword.usecase';
 import { RecoverPassword } from '@application/useCases/user/RecoverPassword.usecase';
 import { recoverPasswordSchema } from '@dtos/user/recoverPassword.dto';
+import { OAuth2Client } from 'google-auth-library';
+import { GenericError } from '@application/errors/GenericError';
+import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
+import { UserGoogleAuth } from '@application/useCases/user/googleAuth.usecase';
 
 export class UserAuthController {
    constructor(
@@ -25,7 +29,9 @@ export class UserAuthController {
       private readonly userEmailLogin: UserEmailLogin,
       private readonly refreshUserAccessToken: RefreshUserAccessToken,
       private readonly forgotPassoword: ForgotPassword,
-      private readonly recoverPassword: RecoverPassword
+      private readonly recoverPassword: RecoverPassword,
+      private readonly googleAuth2Client: OAuth2Client,
+      private readonly userGooglgAuth: UserGoogleAuth
    ) {}
 
    signup = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -183,6 +189,53 @@ export class UserAuthController {
             success: true,
             message: 'password changed successfully',
             data: { email },
+         });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   googleAuth = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const { credentials } = req.body;
+
+         if (!credentials) {
+            throw new GenericError('Cannot find credentials in request body');
+         }
+
+         const verifiedToken = await this.googleAuth2Client.verifyIdToken({
+            idToken: credentials,
+            audience: ENV.GOOGLE_CLIENT_ID,
+         });
+
+         const payload = verifiedToken.getPayload();
+         if (!payload) {
+            throw new GenericError('Invalid 0Auth2Token');
+         }
+
+         if (!payload.email) {
+            throw new GenericError('OAuthpayload does not contain email');
+         }
+
+         const googleAuthDTO: googleAuthDTO = {
+            email: payload.email,
+            firstName: payload.name || 'anon',
+            avaratURL: payload.picture,
+         };
+
+         const { accessToken, refreshToken } = await this.userGooglgAuth.execute(googleAuthDTO);
+
+         res.cookie('refreshJWT', refreshToken, {
+            httpOnly: true,
+            secure: ENV.NODE_ENV === 'production' ? true : false,
+            sameSite: ENV.NODE_ENV === 'production' ? 'none' : 'lax',
+            maxAge: JWT_REFRESH_TOKEN_EXPIRY_SECONDS * 1000,
+         });
+
+         res.status(200).json({
+            success: true,
+            message: 'User google login successful',
+            data: { accessToken },
          });
       } catch (error) {
          next(error);

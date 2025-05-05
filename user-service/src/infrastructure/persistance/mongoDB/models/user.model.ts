@@ -28,7 +28,7 @@ const userSchema = new Schema<IUser>(
       isHotUser: { type: Boolean, default: false },
       avatar: { type: String },
       coverPhoto: { type: String },
-      passwordHash: { type: String, required: true },
+      passwordHash: { type: String },
       bio: { type: String },
       lastLoginTime: { type: Date, default: Date.now() },
    },

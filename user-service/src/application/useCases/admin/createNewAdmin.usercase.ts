@@ -15,6 +15,7 @@ export class CreateAdmin {
       dto: signupAdminDTO
    ): Promise<{ firstName: string; lastName?: string; email: string }> => {
       const emailExists = await this.adminRepository.emailExists(dto.email);
+      
       if (emailExists) {
          throw new EmailError('Email already exists');
       }
