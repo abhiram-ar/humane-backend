@@ -26,6 +26,6 @@ const adminAuthController = new AdminAuthController(
 adminAuthRouter.post('/signup', adminAuthController.signup);
 adminAuthRouter.post('/login', adminAuthController.login);
 adminAuthRouter.get('/refresh', adminAuthController.refreshAccessToken);
-adminAuthRouter.post('logout', adminAuthController.logout);
+adminAuthRouter.post('/logout', adminAuthController.logout);
 
 export default adminAuthRouter;

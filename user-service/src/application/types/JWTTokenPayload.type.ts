@@ -1,7 +1,6 @@
 import { Anonymous } from '@domain/entities/anon.entity';
 
 export type SafeAnon = Pick<Anonymous, 'anonId' | 'createdAt' | 'expiresAt' | 'revoked'>;
-
 export type AnonJWTTokenPayload = SafeAnon & {
    type: 'anon';
 };
@@ -11,4 +10,4 @@ export type AdminJWTTokenPaylod = {
    type: 'admin';
 };
 
-export type JWTTokenPaylod = AdminJWTTokenPaylod | AdminJWTTokenPaylod;
+export type JWTTokenPaylod = AdminJWTTokenPaylod | AnonJWTTokenPayload;
