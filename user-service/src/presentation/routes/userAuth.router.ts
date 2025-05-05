@@ -10,5 +10,6 @@ authRouter.get('/refresh', userAuthController.refreshAccessToken);
 authRouter.post('/logout', userAuthController.logout);
 authRouter.post('/forgot-password', userAuthController.forgotPassword);
 authRouter.patch('/reset-password', userAuthController.resetPassword);
+authRouter.post('/google', userAuthController.googleAuth);
 
 export default authRouter;

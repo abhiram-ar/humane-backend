@@ -195,7 +195,7 @@ export class UserAuthController {
       }
    };
 
-   socialAuth = async (req: Request, res: Response, next: NextFunction) => {
+   googleAuth = async (req: Request, res: Response, next: NextFunction) => {
       try {
          const { credentials } = req.body();
 

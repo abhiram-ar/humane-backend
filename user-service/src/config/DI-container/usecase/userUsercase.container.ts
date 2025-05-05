@@ -12,6 +12,7 @@ import {
 } from '../services.container';
 import { mongoUserRespository } from '../repository.container';
 import { creataAnonUser, resolveAnonUser } from './anonUsercase.container';
+import { UserGoogleAuth } from '@application/useCases/user/googleAuth.usecase';
 
 export const singupUser = new SignupUser(
    mongoUserRespository,
@@ -48,3 +49,5 @@ export const recoverPassword = new RecoverPassword(
    jwtService,
    bcryptHashService
 );
+
+export const userGooglgAuth = new UserGoogleAuth(mongoUserRespository, creataAnonUser, jwtService);
