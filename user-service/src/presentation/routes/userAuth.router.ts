@@ -12,6 +12,7 @@ import { CreateAnonymousUser } from '@application/useCases/anonymous/CreateAnony
 import { MongoAnonymousUserRepository } from '@infrastructure/persistance/mongoDB/repository/MongoAnoymousUserRepository';
 import { CryptoUUIDService } from '@infrastructure/service/CryptoUUIDService';
 import { ResolveAnoymousUser } from '@application/useCases/anonymous/ResolveAnonymousUser.usecase';
+import { ForgotPassword } from '@application/useCases/user/ForgotPassword.usecase';
 
 const authRouter = express.Router();
 
@@ -39,11 +40,13 @@ const refreshUserAccessToken = new RefreshUserAccessToken(
    resolveAnonUser,
    creataAnonUser
 );
+const forgotPassoword = new ForgotPassword(userRepository, jwtService);
 const userAuthController = new UserAuthController(
    singupUser,
    verifyUser,
    userEmailLogin,
-   refreshUserAccessToken
+   refreshUserAccessToken,
+   forgotPassoword
 );
 
 authRouter.post('/signup', userAuthController.signup);
@@ -51,5 +54,6 @@ authRouter.post('/verify', userAuthController.verify);
 authRouter.post('/login/email', userAuthController.login);
 authRouter.get('/refresh', userAuthController.refreshAccessToken);
 authRouter.post('/logout', userAuthController.logout);
+authRouter.post('/forgot-password', userAuthController.forgotPassword);
 
 export default authRouter;

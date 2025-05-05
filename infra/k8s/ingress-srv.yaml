@@ -8,7 +8,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: humanedev.abhiram-ar.com
+  - host: localhost
     http:
       paths:
       - pathType: Prefix
