@@ -197,7 +197,7 @@ export class UserAuthController {
 
    googleAuth = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         const { credentials } = req.body();
+         const { credentials } = req.body;
 
          if (!credentials) {
             throw new GenericError('Cannot find credentials in request body');
