@@ -1,5 +1,6 @@
 import { AdminEmailLogin } from '@application/useCases/admin/AdminEmailLogin.usecase';
 import { CreateAdmin } from '@application/useCases/admin/createNewAdmin.usercase';
+import { RefreshAdminAccessToken } from '@application/useCases/admin/RefreshAdminToken.usecase';
 import { MongoAdminRepository } from '@infrastructure/persistance/mongoDB/repository/MongoAdminRepository';
 import { BcryptHashService } from '@infrastructure/service/BcryptHashService';
 import { JWTService } from '@infrastructure/service/JWTService';
@@ -15,9 +16,16 @@ const jwtService = new JWTService();
 const createAdmin = new CreateAdmin(adminMongoRepository, bcryptHashService);
 const adminEmailLogin = new AdminEmailLogin(adminMongoRepository, bcryptHashService, jwtService);
 
-const adminAuthController = new AdminAuthController(createAdmin, adminEmailLogin);
+const refreshAccessToken = new RefreshAdminAccessToken(jwtService);
+const adminAuthController = new AdminAuthController(
+   createAdmin,
+   adminEmailLogin,
+   refreshAccessToken
+);
 
 adminAuthRouter.post('/signup', adminAuthController.signup);
 adminAuthRouter.post('/login', adminAuthController.login);
+adminAuthRouter.get('/refresh', adminAuthController.refreshAccessToken);
+adminAuthRouter.post('logout', adminAuthController.logout);
 
 export default adminAuthRouter;

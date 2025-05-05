@@ -1,5 +1,7 @@
+import { UnAuthenticatedError } from '@application/errors/UnAuthenticatedError';
 import { AdminEmailLogin } from '@application/useCases/admin/AdminEmailLogin.usecase';
 import { CreateAdmin } from '@application/useCases/admin/createNewAdmin.usercase';
+import { RefreshAdminAccessToken } from '@application/useCases/admin/RefreshAdminToken.usecase';
 import { ENV } from '@config/env';
 import { JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 import { adminLoginSchema } from '@dtos/admin/adminLogin.dto';
@@ -10,7 +12,8 @@ import { NextFunction, Request, Response } from 'express';
 export class AdminAuthController {
    constructor(
       private readonly createAdmin: CreateAdmin,
-      private readonly adminEmailLogin: AdminEmailLogin
+      private readonly adminEmailLogin: AdminEmailLogin,
+      private readonly refreshToken: RefreshAdminAccessToken
    ) {}
 
    signup = async (req: Request, res: Response, next: NextFunction) => {
@@ -55,6 +58,49 @@ export class AdminAuthController {
             data: { accessToken },
          });
       } catch (error) {
+         next(error);
+      }
+   };
+
+   refreshAccessToken = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const { refreshJWT } = req.cookies;
+         if (!refreshJWT) {
+            throw new UnAuthenticatedError('refresh token not found in cookies');
+         }
+
+         const { newAccessToken } = await this.refreshToken.execute(refreshJWT);
+
+         res.status(200).json({
+            success: true,
+            message: 'Access token refreshed',
+            data: { token: newAccessToken },
+         });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   logout = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+      try {
+         const { refreshJWT } = req.cookies;
+         if (!refreshJWT) {
+            throw new UnAuthenticatedError('refresh token not found in cookies');
+         }
+
+         res.clearCookie('refreshJWT', {
+            httpOnly: true,
+            secure: ENV.NODE_ENV === 'production' ? true : false,
+            sameSite: ENV.NODE_ENV === 'production' ? 'none' : 'lax',
+         });
+         res.status(200).json({ success: true, message: 'User logout successful' });
+      } catch (error) {
+         if (error instanceof UnAuthenticatedError) {
+            return res.status(200).json({
+               success: true,
+               message: `${error.message},User is not authenticated to logout`,
+            });
+         }
          next(error);
       }
    };
