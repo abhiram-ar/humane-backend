@@ -37,7 +37,11 @@ export const refreshUserAccessToken = new RefreshUserAccessToken(
    creataAnonUser
 );
 
-export const forgotPassoword = new ForgotPassword(mongoUserRespository, jwtService);
+export const forgotPassoword = new ForgotPassword(
+   mongoUserRespository,
+   jwtService,
+   nodeMailerEmailService
+);
 
 export const recoverPassword = new RecoverPassword(
    mongoUserRespository,

@@ -10,6 +10,7 @@ import {
    UserVerifyEmailDataFields,
 } from '@application/types/userVerifyEmail';
 import { IEmailService } from '@ports/IEmailService';
+import { MailServiceError } from '@application/errors/MailServiceError';
 
 export class SignupUser {
    constructor(
@@ -45,7 +46,10 @@ export class SignupUser {
          type: 'email-verification',
       };
 
-      await this.emailService.send(sendVerificaionMailEvent);
+      const { ack } = await this.emailService.send(sendVerificaionMailEvent);
+      if (!ack) {
+         throw new MailServiceError(`Unable to send mail to ${dto.email}`);
+      }
 
       const otpHash = await this.hashService.hash(otp, parseInt(process.env.otpSalt as string));
 

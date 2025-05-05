@@ -4,6 +4,7 @@ import nodeMailer from 'nodemailer';
 import path from 'path';
 import { SentEmailEvent } from '@application/types/SentEmailEvent.type';
 import { SendEmailVerificationEvent } from '@application/types/userVerifyEmail';
+import { SendEmailUserForgotPasswordEvent } from '@application/types/ForgotPasswordEmail';
 
 export class NodeMailerEmailService implements IEmailService {
    private transporter = nodeMailer.createTransport({
@@ -27,6 +28,23 @@ export class NodeMailerEmailService implements IEmailService {
             const templatePath = path.join(
                '/app/src/infrastructure/service/mails',
                'userEmailVerification.ejs'
+            );
+            const html = await ejs.renderFile(templatePath, typedEvent.data);
+
+            const mailOptions = {
+               from: process.env.SMTP_MAIL as string,
+               to: typedEvent.email,
+               subject: 'Humane email verification',
+               html,
+            };
+
+            this.transporter.sendMail(mailOptions);
+            return { ack: true };
+         } else if ((event.type = 'user-forgot-password')) {
+            const typedEvent = event as SendEmailUserForgotPasswordEvent;
+            const templatePath = path.join(
+               '/app/src/infrastructure/service/mails',
+               'userForgotPassword.ejs'
             );
             const html = await ejs.renderFile(templatePath, typedEvent.data);
 

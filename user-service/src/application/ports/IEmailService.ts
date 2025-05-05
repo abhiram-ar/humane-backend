@@ -1,5 +1,5 @@
-import { SendEmailVerificationEvent } from '@application/types/userVerifyEmail';
+import { SentEmailEvent } from '@application/types/SentEmailEvent.type';
 
 export interface IEmailService {
-   send(event: SendEmailVerificationEvent): Promise<{ ack: boolean }>;
+   send(event: SentEmailEvent<any>): Promise<{ ack: boolean }>;
 }
