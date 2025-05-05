@@ -2,6 +2,7 @@ import { User } from '../../../../domain/entities/user.entity';
 import { IUserRepository } from '../../../../application/ports/IUserRepository';
 import userModel from '../models/user.model';
 import { createUserDTO } from '../../../../application/DTOs/user/createUser.dto';
+import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
 
 export class MongoUserRepository implements IUserRepository {
    constructor() {}
@@ -58,5 +59,22 @@ export class MongoUserRepository implements IUserRepository {
 
       if (!user) return null;
       return { email: user.email };
+   };
+
+   googleAuthCreate = async (
+      dto: googleAuthDTO
+   ): Promise<Pick<User, 'id' | 'isBlocked' | 'firstName' | 'email'>> => {
+      const user = await userModel.create({
+         email: dto.email,
+         firstName: dto.firstName,
+         avatar: dto.avaratURL,
+      });
+
+      return {
+         id: user.id,
+         firstName: user.firstName,
+         email: user.email,
+         isBlocked: user.isBlocked,
+      };
    };
 }
