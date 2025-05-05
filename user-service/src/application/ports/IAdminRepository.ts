@@ -7,4 +7,6 @@ export interface IAdminRepository {
    ): Promise<Pick<Admin, 'id' | 'email' | 'firstName' | 'lastName'> | null>;
 
    emailExists(email: string): Promise<boolean>;
+
+   retriveAdminByEmail(email: string): Promise<Pick<Admin, 'id' | 'email' | 'passwordHash'> | null>;
 }

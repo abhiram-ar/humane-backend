@@ -27,4 +27,16 @@ export class MongoAdminRepository implements IAdminRepository {
 
       return admin ? true : false;
    };
+
+   retriveAdminByEmail = async (
+      email: string
+   ): Promise<Pick<Admin, 'id' | 'email' | 'passwordHash'> | null> => {
+      const admin = await adminModel.findOne({ email });
+
+      if (!admin) {
+         return null;
+      }
+
+      return { id: admin.id, email: admin.email, passwordHash: admin.passwordHash };
+   };
 }

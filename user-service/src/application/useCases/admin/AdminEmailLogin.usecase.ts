@@ -1,54 +1,39 @@
 import { ENV } from '@config/env';
-import { userLoginDTO } from '@application/DTOs/user/userLogin.dto';
 import { PasswordError } from '@application/errors/PasswordError';
-import { UserBlockedError } from '@application/errors/UserBlockedError';
 import { IHashService } from '@ports/IHashService';
 import { IJWTService } from '@ports/IJWTService';
-import { IUserRepository } from '@ports/IUserRepository';
-import { AnonJWTTokenPayload } from '@application/types/JWTTokenPayload.type';
+import { AdminJWTTokenPaylod } from '@application/types/JWTTokenPayload.type';
 import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS, JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
-import { CreateAnonymousUser } from '../anonymous/CreateAnonymousUser.usercase';
 import { EmailError } from '@application/errors/EmailError';
+import { IAdminRepository } from '@ports/IAdminRepository';
+import { adminLoginDTO } from '@dtos/admin/adminLogin.dto';
 
-export class UserEmailLogin {
+export class AdminEmailLogin {
    constructor(
-      private readonly userRepository: IUserRepository,
+      private readonly AdminRepository: IAdminRepository,
       private readonly hasingService: IHashService,
-      private readonly jwtService: IJWTService,
-      private readonly createAnonUser: CreateAnonymousUser
+      private readonly jwtService: IJWTService
    ) {}
 
-   execute = async (dto: userLoginDTO): Promise<{ accessToken: string; refreshToken: string }> => {
-      const user = await this.userRepository.retriveUserByEmail(dto.email);
-      if (!user) {
-         throw new EmailError('Email does not exist, create an account.');
+   execute = async (dto: adminLoginDTO): Promise<{ accessToken: string; refreshToken: string }> => {
+      const admin = await this.AdminRepository.retriveAdminByEmail(dto.email);
+      if (!admin) {
+         throw new EmailError('Email does not exist');
       }
 
-      if (user.isBlocked) {
-         throw new UserBlockedError('Cannot login, user is blocked');
+      if (!admin.passwordHash) {
+         throw new PasswordError('Account has no password');
       }
 
-      if (!user.passwordHash) {
-         throw new PasswordError(
-            'Account has no password, try social Auth'
-         );
-      }
-
-      const passwordMatch = await this.hasingService.compare(dto.password, user.passwordHash);
+      const passwordMatch = await this.hasingService.compare(dto.password, admin.passwordHash);
       if (!passwordMatch) {
          throw new PasswordError('password does not match');
       }
 
-      // create anon id
-      let anonUser = await this.createAnonUser.execute(user.id);
-
       // create JWT
-      const jwtTokenPaylod: AnonJWTTokenPayload = {
-         anonId: anonUser.anonId,
-         createdAt: anonUser.createdAt,
-         expiresAt: anonUser.expiresAt,
-         revoked: anonUser.revoked,
-         type: 'anon',
+      const jwtTokenPaylod: AdminJWTTokenPaylod = {
+         adminId: admin.id,
+         type: 'admin',
       };
 
       const accessToken = this.jwtService.sign(
