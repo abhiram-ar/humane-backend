@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Humane Account Activation</title>
+      <style>
+         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+         }
+
+         .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0e0e0;
+         }
+
+         .header {
+            background: linear-gradient(135deg, #abf600, #c8ff65);
+            padding: 30px 20px;
+            text-align: center;
+         }
+
+         .header h1 {
+            margin: 0;
+            font-size: 26px;
+            color: #1a1a1a;
+         }
+
+         .content {
+            padding: 30px 20px;
+            color: #444;
+            line-height: 1.6;
+            font-size: 16px;
+         }
+
+         .activation-code {
+            font-size: 20px;
+            color: #1b3c00;
+            background-color: #eaffd0;
+            padding: 12px 18px;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 12px 0;
+            font-weight: bold;
+            letter-spacing: 1px;
+         }
+
+         .button {
+            display: inline-block;
+            margin: 25px 0;
+            padding: 12px 24px;
+            background-color: #abf600;
+            color: #1b1b1b;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+         }
+
+         .button:hover {
+            background-color: #9ddc00;
+         }
+
+         .footer {
+            background-color: #f0f9d2;
+            text-align: center;
+            padding: 18px 20px;
+            font-size: 0.9em;
+            color: #4a4a4a;
+            border-top: 1px solid #dceea4;
+         }
+      </style>
+   </head>
+   <body>
+      <div class="email-container">
+         <div class="header">
+            <h1>Activate Your Humane Account</h1>
+         </div>
+         <div class="content">
+            <p>Hi <%= firstName %>,</p>
+            <p>
+               Thank you for registering with us! To activate your account, please use the
+               activation code below:
+            </p>
+            <div class="activation-code"><%= otp %></div>
+            <p>This code is only valid for 5 minutes.</p>
+            <p>If you did not register, you can safely ignore this email.</p>
+         </div>
+         <div class="footer">
+            <p>&copy; 2025 Humane. All rights reserved.</p>
+         </div>
+      </div>
+   </body>
+</html>

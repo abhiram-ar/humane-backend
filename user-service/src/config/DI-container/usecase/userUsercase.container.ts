@@ -4,7 +4,12 @@ import { RefreshUserAccessToken } from '@application/useCases/user/RefreshUserTo
 import { SignupUser } from '@application/useCases/user/SignupUser.usecase';
 import { UserEmailLogin } from '@application/useCases/user/UserEmailLogin.usecase';
 import { VerifyUser } from '@application/useCases/user/VerifyUser.usecase';
-import { bcryptHashService, jwtService, otpService } from '../services.container';
+import {
+   bcryptHashService,
+   jwtService,
+   nodeMailerEmailService,
+   otpService,
+} from '../services.container';
 import { mongoUserRespository } from '../repository.container';
 import { creataAnonUser, resolveAnonUser } from './anonUsercase.container';
 
@@ -12,7 +17,8 @@ export const singupUser = new SignupUser(
    mongoUserRespository,
    jwtService,
    otpService,
-   bcryptHashService
+   bcryptHashService,
+   nodeMailerEmailService
 );
 
 export const verifyUser = new VerifyUser(mongoUserRespository, jwtService, bcryptHashService);
