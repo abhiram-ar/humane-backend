@@ -8,9 +8,4 @@ const bcryptHashService = new BcryptHashService();
 const otpService = new OTP();
 const cryptoUUIDService = new CryptoUUIDService();
 
-export const serviceContainer = {
-   jwtService,
-   bcryptHashService,
-   otpService,
-   cryptoUUIDService,
-};
+export { jwtService, bcryptHashService, otpService, cryptoUUIDService };

@@ -8,6 +8,7 @@
       "paths": {
          "@dtos/*": ["application/DTOs/*"],
          "@ports/*": ["application/ports/*"],
+         "@di/*": ["config/DI-container/*"],
          "@services/*": ["application/services/*"],
          "@domain/*": ["domain/*"],
          "@application/*": ["application/*"],
