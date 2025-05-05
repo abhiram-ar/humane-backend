@@ -4,7 +4,6 @@
    "exclude": ["node_modules"],
    "compilerOptions": {
       "noUnusedLocals": true,
-      "noUnusedParameters": true,
       "baseUrl": "src",
       "paths": {
          "@dtos/*": ["application/DTOs/*"],

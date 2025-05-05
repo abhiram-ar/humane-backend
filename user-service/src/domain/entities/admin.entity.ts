@@ -3,7 +3,7 @@ export class Admin {
       public readonly id: string,
       public readonly email: string,
       public firstName: string,
-      public lastName: string,
-      public passwordHash: string
+      public passwordHash: string,
+      public lastName?: string
    ) {}
 }
