@@ -4,3 +4,5 @@ import express from 'express';
 const globalRefreshRouter = express.Router();
 
 globalRefreshRouter.get('/', globalRefreshController.refresh);
+
+export default globalRefreshRouter
