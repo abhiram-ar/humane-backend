@@ -5,13 +5,20 @@ import { IHashService } from '@ports/IHashService';
 import { signupUserDTO } from '@dtos/user/signupUser.dto';
 import { verifedUserToken } from '@dtos/user/verifyUser.dto';
 import { EmailError } from '@application/errors/EmailError';
+import {
+   SendEmailVerificationEvent,
+   UserVerifyEmailDataFields,
+} from '@application/types/userVerifyEmail';
+import { IEmailService } from '@ports/IEmailService';
+import { MailServiceError } from '@application/errors/MailServiceError';
 
 export class SignupUser {
    constructor(
       private readonly userRepository: IUserRepository,
       private readonly JWTService: IJWTService,
       private readonly OTPService: OTP,
-      private readonly hashService: IHashService
+      private readonly hashService: IHashService,
+      private readonly emailService: IEmailService
    ) {}
 
    execute = async (dto: signupUserDTO): Promise<string> => {
@@ -27,6 +34,23 @@ export class SignupUser {
 
       const otp = this.OTPService.generate();
       console.log(`otp ${otp}`);
+
+      const emailData: UserVerifyEmailDataFields = {
+         otp,
+         firstName: dto.firstName,
+      };
+
+      const sendVerificaionMailEvent: SendEmailVerificationEvent = {
+         email: dto.email,
+         data: emailData,
+         type: 'email-verification',
+      };
+
+      const { ack } = await this.emailService.send(sendVerificaionMailEvent);
+      if (!ack) {
+         throw new MailServiceError(`Unable to send mail to ${dto.email}`);
+      }
+
       const otpHash = await this.hashService.hash(otp, parseInt(process.env.otpSalt as string));
 
       const userSignupData: verifedUserToken = {
