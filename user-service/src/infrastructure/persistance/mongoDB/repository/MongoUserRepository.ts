@@ -29,7 +29,6 @@ export class MongoUserRepository implements IUserRepository {
    retriveUserByEmail = async (
       email: string
    ): Promise<Pick<User, 'id' | 'email' | 'passwordHash' | 'isBlocked'> | null> => {
-
       const user = await userModel.findOne({ email }, { email: 1, passwordHash: 1, isBlocked: 1 });
       if (!user) return null;
 
@@ -45,5 +44,19 @@ export class MongoUserRepository implements IUserRepository {
       const user = await userModel.findOne({ _id: userId });
       if (!user) return null;
       return { id: user.id, isBlocked: user.isBlocked };
+   };
+
+   changePassword = async (
+      email: string,
+      newPasswordHash: string
+   ): Promise<Pick<User, 'email'> | null> => {
+      const user = await userModel.findOneAndUpdate(
+         { email: email },
+         { passwordHash: newPasswordHash },
+         { new: true }
+      );
+
+      if (!user) return null;
+      return { email: user.email };
    };
 }

@@ -11,4 +11,6 @@ export interface IUserRepository {
    ): Promise<Pick<User, 'id' | 'email' | 'passwordHash' | 'isBlocked'> | null>;
 
    getUserStatusById(userId: string): Promise<Pick<User, 'id' | 'isBlocked'> | null>;
+
+   changePassword(email: string, newPasswordHash: string): Promise<Pick<User, 'email'> | null>;
 }
