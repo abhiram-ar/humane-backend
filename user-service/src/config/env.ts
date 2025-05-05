@@ -8,6 +8,8 @@ type ENVConfig = {
    readonly ACCESS_TOKEN_SECRET: ENVValue;
    readonly REFRESH_TOKEN_SECRET: ENVValue;
    readonly RESET_PASSWORD_SECRET: ENVValue;
+   readonly GOOGLE_CLIENT_ID: ENVValue;
+   readonly GOOGLE_CLIENT_SECRET: ENVValue;
 };
 
 export const ENV: ENVConfig = {
@@ -18,6 +20,8 @@ export const ENV: ENVConfig = {
    ACCESS_TOKEN_SECRET: process.env.accessTokenSecret,
    REFRESH_TOKEN_SECRET: process.env.refreshTokenSecret,
    RESET_PASSWORD_SECRET: process.env.resetPasswordTokenSecret,
+   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
 };
 
 function checkEnv() {
