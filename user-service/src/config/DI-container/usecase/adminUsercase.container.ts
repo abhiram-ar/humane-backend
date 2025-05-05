@@ -12,5 +12,3 @@ export const adminEmailLogin = new AdminEmailLogin(
    jwtService
 );
 export const refreshAccessToken = new RefreshAdminAccessToken(jwtService);
-
-
