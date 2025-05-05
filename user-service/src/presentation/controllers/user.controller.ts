@@ -15,6 +15,8 @@ import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { UserBlockedError } from '@application/errors/UserBlockedError';
 import { forgotPasswordSchema } from '@dtos/user/forgotPassword.dto';
 import { ForgotPassword } from '@application/useCases/user/ForgotPassword.usecase';
+import { RecoverPassword } from '@application/useCases/user/RecoverPassword.usecase';
+import { recoverPasswordSchema } from '@dtos/user/recoverPassword.dto';
 
 export class UserAuthController {
    constructor(
@@ -22,7 +24,8 @@ export class UserAuthController {
       private readonly verifyUser: VerifyUser,
       private readonly userEmailLogin: UserEmailLogin,
       private readonly refreshUserAccessToken: RefreshUserAccessToken,
-      private readonly forgotPassoword: ForgotPassword
+      private readonly forgotPassoword: ForgotPassword,
+      private readonly recoverPassword: RecoverPassword
    ) {}
 
    signup = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -160,6 +163,26 @@ export class UserAuthController {
          res.status(201).json({
             success: true,
             message: `password recovery send to ${email}`,
+         });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const parsed = recoverPasswordSchema.safeParse(req.body);
+
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
+         }
+
+         const { email } = await this.recoverPassword.execute(parsed.data);
+
+         res.status(201).json({
+            success: true,
+            message: 'password changed successfully',
+            data: { email },
          });
       } catch (error) {
          next(error);

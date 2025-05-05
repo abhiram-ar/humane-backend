@@ -4,11 +4,11 @@
    "exclude": ["node_modules"],
    "compilerOptions": {
       "noUnusedLocals": true,
-      "noUnusedParameters": true,
       "baseUrl": "src",
       "paths": {
          "@dtos/*": ["application/DTOs/*"],
          "@ports/*": ["application/ports/*"],
+         "@di/*": ["config/DI-container/*"],
          "@services/*": ["application/services/*"],
          "@domain/*": ["domain/*"],
          "@application/*": ["application/*"],

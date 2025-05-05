@@ -4,6 +4,8 @@ import morgan from 'morgan';
 import { errorHandler } from './middlewares/error.middeware';
 import cookieParse from 'cookie-parser';
 import cors from 'cors';
+import adminAuthRouter from './routes/adminAuth.router';
+import globalRefreshRouter from './routes/globalRefresh.router';
 
 const app = express();
 
@@ -22,6 +24,9 @@ app.get('/', (req, res) => {
    res.status(200).send('server live');
 });
 
+app.use('/api/v1/global/auth/refresh', globalRefreshRouter);
 app.use('/api/v1/user/auth', authRouter);
+app.use('/api/v1/admin/auth', adminAuthRouter);
+
 app.use(errorHandler);
 export default app;
