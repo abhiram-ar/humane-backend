@@ -24,4 +24,9 @@ export interface IUserRepository {
       users: Pick<User, 'id' | 'email' | 'firstName' | 'isBlocked'>[];
       totalEntries: number;
    }>;
+
+   updateBlockStatus(
+      userId: string,
+      newStatus: boolean
+   ): Promise<Pick<User, 'id' | 'email' | 'firstName' | 'isBlocked'> | null>;
 }

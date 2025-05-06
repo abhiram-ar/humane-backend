@@ -113,4 +113,26 @@ export class MongoUserRepository implements IUserRepository {
 
       return { users: parsedUserList, totalEntries };
    };
+
+   updateBlockStatus = async (
+      userId: string,
+      newStatus: boolean
+   ): Promise<Pick<User, 'id' | 'email' | 'firstName' | 'isBlocked'> | null> => {
+      const user = await userModel.findByIdAndUpdate(
+         userId,
+         { isBlocked: newStatus },
+         { new: true }
+      );
+
+      if (!user) {
+         return null;
+      }
+
+      return {
+         id: user.id,
+         email: user.email,
+         firstName: user.firstName,
+         isBlocked: user.isBlocked,
+      };
+   };
 }

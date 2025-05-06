@@ -2,6 +2,7 @@ import { AdminAuthController } from '@presentation/controllers/adminAuth.control
 import {
    adminEmailLogin,
    adminGetUserList,
+   adminUpdateUserBlockStatus,
    createAdmin,
    refreshAccessToken,
 } from '@di/usecase/adminUsercase.container';
@@ -13,4 +14,7 @@ export const adminAuthController = new AdminAuthController(
    refreshAccessToken
 );
 
-export const adminUserManagementController = new AdminUserManagementController(adminGetUserList);
+export const adminUserManagementController = new AdminUserManagementController(
+   adminGetUserList,
+   adminUpdateUserBlockStatus
+);
