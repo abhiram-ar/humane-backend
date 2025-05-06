@@ -17,16 +17,6 @@ export class AdminGetUserList {
 
       const result = await this.userRepository.getUserList({ ...dto, skip });
 
-      if (!result) {
-         const pagination: IPagination = {
-            page: 1,
-            limit: dto.limit,
-            totalItems: 0,
-            totalPages: 1,
-         };
-         return { users: [], pagination };
-      }
-
       const totalPages = Math.ceil(result.totalEntries / dto.limit);
 
       const pagination: IPagination = {

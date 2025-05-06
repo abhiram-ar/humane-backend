@@ -85,7 +85,7 @@ export class MongoUserRepository implements IUserRepository {
    ): Promise<{
       users: Pick<User, 'id' | 'email' | 'firstName' | 'isBlocked'>[];
       totalEntries: number;
-   } | null> => {
+   }> => {
       let filter: FilterQuery<IUser> = {};
 
       if (dto.searchQuery) {
@@ -101,13 +101,6 @@ export class MongoUserRepository implements IUserRepository {
          .select('email firstName isBlocked')
          .skip(dto.skip)
          .limit(dto.limit);
-
-      if (!userlist || userlist.length === 0) {
-         return null;
-      }
-
-      console.log('usr list');
-      console.log(userlist);
 
       const parsedUserList = userlist.map((user) => ({
          id: user.id,

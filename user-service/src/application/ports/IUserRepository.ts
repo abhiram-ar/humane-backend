@@ -2,7 +2,6 @@ import { createUserDTO } from '../DTOs/user/createUser.dto';
 import { User } from '../../domain/entities/user.entity';
 import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
 import { GetUserDTO } from '@dtos/admin/getUsers.dto';
-import { number } from 'zod';
 
 export interface IUserRepository {
    create(dto: createUserDTO): Promise<Pick<User, 'firstName' | 'lastName' | 'email'>>;
@@ -21,10 +20,8 @@ export interface IUserRepository {
       dto: googleAuthDTO
    ): Promise<Pick<User, 'id' | 'isBlocked' | 'firstName' | 'email'>>;
 
-   getUserList(
-      dto: GetUserDTO & { skip: number }
-   ): Promise<{
+   getUserList(dto: GetUserDTO & { skip: number }): Promise<{
       users: Pick<User, 'id' | 'email' | 'firstName' | 'isBlocked'>[];
       totalEntries: number;
-   } | null>;
+   }>;
 }
