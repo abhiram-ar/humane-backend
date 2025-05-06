@@ -1,8 +1,10 @@
 import { User } from '../../../../domain/entities/user.entity';
 import { IUserRepository } from '../../../../application/ports/IUserRepository';
-import userModel from '../models/user.model';
+import userModel, { IUser } from '../models/user.model';
 import { createUserDTO } from '../../../../application/DTOs/user/createUser.dto';
 import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
+import { GetUserDTO } from '@dtos/admin/getUsers.dto';
+import { FilterQuery } from 'mongoose';
 
 export class MongoUserRepository implements IUserRepository {
    constructor() {}
@@ -76,5 +78,46 @@ export class MongoUserRepository implements IUserRepository {
          email: user.email,
          isBlocked: user.isBlocked,
       };
+   };
+
+   getUserList = async (
+      dto: GetUserDTO & { skip: number }
+   ): Promise<{
+      users: Pick<User, 'id' | 'email' | 'firstName' | 'isBlocked'>[];
+      totalEntries: number;
+   } | null> => {
+      let filter: FilterQuery<IUser> = {};
+
+      if (dto.searchQuery) {
+         filter.$or = [
+            { firstName: { $regex: dto.searchQuery, $options: 'i' } },
+            { lastName: { $regex: dto.searchQuery, $options: 'i' } },
+            { email: { $regex: dto.searchQuery, $options: 'i' } },
+         ];
+      }
+
+      const userlist = await userModel
+         .find(filter)
+         .select('email firstName isBlocked')
+         .skip(dto.skip)
+         .limit(dto.limit);
+
+      if (!userlist || userlist.length === 0) {
+         return null;
+      }
+
+      console.log('usr list');
+      console.log(userlist);
+
+      const parsedUserList = userlist.map((user) => ({
+         id: user.id,
+         firstName: user.firstName,
+         email: user.email,
+         isBlocked: user.isBlocked,
+      }));
+
+      const totalEntries = await userModel.countDocuments(filter);
+
+      return { users: parsedUserList, totalEntries };
    };
 }
