@@ -83,7 +83,7 @@ export class MongoUserRepository implements IUserRepository {
    getUserList = async (
       dto: GetUserDTO & { skip: number }
    ): Promise<{
-      users: Pick<User, 'id' | 'email' | 'firstName' | 'isBlocked'>[];
+      users: AdminGetUserResponseDTO[];
       totalEntries: number;
    }> => {
       let filter: FilterQuery<IUser> = {};
@@ -98,15 +98,19 @@ export class MongoUserRepository implements IUserRepository {
 
       const userlist = await userModel
          .find(filter)
-         .select('email firstName isBlocked')
+         .select('firstName lastName email isBlocked isHotUser createdAt humaneScore')
          .skip(dto.skip)
          .limit(dto.limit);
 
-      const parsedUserList = userlist.map((user) => ({
+      const parsedUserList: AdminGetUserResponseDTO[] = userlist.map((user) => ({
+         email: user.email,
          id: user.id,
          firstName: user.firstName,
-         email: user.email,
+         lastName: user.lastName,
          isBlocked: user.isBlocked,
+         isHotUser: user.isHotUser,
+         createdAt: user.createdAt,
+         humaneScore: user.humaneScore,
       }));
 
       const totalEntries = await userModel.countDocuments(filter);

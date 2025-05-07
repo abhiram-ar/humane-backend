@@ -21,7 +21,7 @@ export interface IUserRepository {
    ): Promise<Pick<User, 'id' | 'isBlocked' | 'firstName' | 'email'>>;
 
    getUserList(dto: GetUserDTO & { skip: number }): Promise<{
-      users: Pick<User, 'id' | 'email' | 'firstName' | 'isBlocked'>[];
+      users: AdminGetUserResponseDTO[];
       totalEntries: number;
    }>;
 
