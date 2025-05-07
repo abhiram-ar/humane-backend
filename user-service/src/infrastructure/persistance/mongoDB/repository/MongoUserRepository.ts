@@ -3,7 +3,7 @@ import { IUserRepository } from '../../../../application/ports/IUserRepository';
 import userModel, { IUser } from '../models/user.model';
 import { createUserDTO } from '../../../../application/DTOs/user/createUser.dto';
 import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
-import { GetUserDTO } from '@dtos/admin/getUsers.dto';
+import { AdminGetUserResponseDTO, GetUserDTO } from '@dtos/admin/getUsers.dto';
 import { FilterQuery } from 'mongoose';
 
 export class MongoUserRepository implements IUserRepository {
@@ -117,7 +117,7 @@ export class MongoUserRepository implements IUserRepository {
    updateBlockStatus = async (
       userId: string,
       newStatus: boolean
-   ): Promise<Pick<User, 'id' | 'email' | 'firstName' | 'isBlocked'> | null> => {
+   ): Promise<AdminGetUserResponseDTO | null> => {
       const user = await userModel.findByIdAndUpdate(
          userId,
          { isBlocked: newStatus },
@@ -130,9 +130,13 @@ export class MongoUserRepository implements IUserRepository {
 
       return {
          id: user.id,
-         email: user.email,
          firstName: user.firstName,
+         lastName: user.lastName,
+         email: user.email,
          isBlocked: user.isBlocked,
+         isHotUser: user.isHotUser,
+         createdAt: user.createdAt,
+         humaneScore: user.humaneScore,
       };
    };
 }

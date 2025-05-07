@@ -1,3 +1,4 @@
+import { User } from '@domain/entities/user.entity';
 import z from 'zod';
 
 export const getUsersForAdminSchema = z.object({
@@ -7,3 +8,15 @@ export const getUsersForAdminSchema = z.object({
 });
 
 export type GetUserDTO = z.infer<typeof getUsersForAdminSchema>;
+
+export type AdminGetUserResponseDTO = Pick<
+   User,
+   | 'id'
+   | 'firstName'
+   | 'lastName'
+   | 'email'
+   | 'isBlocked'
+   | 'isHotUser'
+   | 'createdAt'
+   | 'humaneScore'
+>;

@@ -22,7 +22,6 @@ export class AdminUserManagementController {
          } as GetUserDTO;
 
          const parsed = getUsersForAdminSchema.safeParse(dto);
-         console.log('dto', dto, parsed.data);
 
          if (!parsed.success) {
             throw new ZodValidationError(parsed.error);
