@@ -1,8 +1,10 @@
 import { User } from '../../../../domain/entities/user.entity';
 import { IUserRepository } from '../../../../application/ports/IUserRepository';
-import userModel from '../models/user.model';
+import userModel, { IUser } from '../models/user.model';
 import { createUserDTO } from '../../../../application/DTOs/user/createUser.dto';
 import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
+import { AdminGetUserResponseDTO, GetUserDTO } from '@dtos/admin/getUsers.dto';
+import { FilterQuery } from 'mongoose';
 
 export class MongoUserRepository implements IUserRepository {
    constructor() {}
@@ -75,6 +77,70 @@ export class MongoUserRepository implements IUserRepository {
          firstName: user.firstName,
          email: user.email,
          isBlocked: user.isBlocked,
+      };
+   };
+
+   getUserList = async (
+      dto: GetUserDTO & { skip: number }
+   ): Promise<{
+      users: AdminGetUserResponseDTO[];
+      totalEntries: number;
+   }> => {
+      let filter: FilterQuery<IUser> = {};
+
+      if (dto.searchQuery) {
+         filter.$or = [
+            { firstName: { $regex: dto.searchQuery, $options: 'i' } },
+            { lastName: { $regex: dto.searchQuery, $options: 'i' } },
+            { email: { $regex: dto.searchQuery, $options: 'i' } },
+         ];
+      }
+
+      const userlist = await userModel
+         .find(filter)
+         .select('firstName lastName email isBlocked isHotUser createdAt humaneScore')
+         .skip(dto.skip)
+         .limit(dto.limit);
+
+      const parsedUserList: AdminGetUserResponseDTO[] = userlist.map((user) => ({
+         email: user.email,
+         id: user.id,
+         firstName: user.firstName,
+         lastName: user.lastName,
+         isBlocked: user.isBlocked,
+         isHotUser: user.isHotUser,
+         createdAt: user.createdAt,
+         humaneScore: user.humaneScore,
+      }));
+
+      const totalEntries = await userModel.countDocuments(filter);
+
+      return { users: parsedUserList, totalEntries };
+   };
+
+   updateBlockStatus = async (
+      userId: string,
+      newStatus: boolean
+   ): Promise<AdminGetUserResponseDTO | null> => {
+      const user = await userModel.findByIdAndUpdate(
+         userId,
+         { isBlocked: newStatus },
+         { new: true }
+      );
+
+      if (!user) {
+         return null;
+      }
+
+      return {
+         id: user.id,
+         firstName: user.firstName,
+         lastName: user.lastName,
+         email: user.email,
+         isBlocked: user.isBlocked,
+         isHotUser: user.isHotUser,
+         createdAt: user.createdAt,
+         humaneScore: user.humaneScore,
       };
    };
 }

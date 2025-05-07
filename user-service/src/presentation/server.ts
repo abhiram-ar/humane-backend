@@ -6,6 +6,7 @@ import cookieParse from 'cookie-parser';
 import cors from 'cors';
 import adminAuthRouter from './routes/adminAuth.router';
 import globalRefreshRouter from './routes/globalRefresh.router';
+import adminUserManagementRouter from './routes/adminUserManagement.router';
 
 const app = express();
 
@@ -27,6 +28,8 @@ app.get('/', (req, res) => {
 app.use('/api/v1/global/auth/refresh', globalRefreshRouter);
 app.use('/api/v1/user/auth', authRouter);
 app.use('/api/v1/admin/auth', adminAuthRouter);
+
+app.use('/api/v1/admin/manage/user', adminUserManagementRouter);
 
 app.use(errorHandler);
 export default app;
