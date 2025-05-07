@@ -26,9 +26,8 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
 
    if (payload.type === 'anon' || payload.type === 'admin') {
       req.user = payload;
+      return next();
    }
 
    throw new UnAuthenticatedError('Something wrong with authentication');
 };
-
-

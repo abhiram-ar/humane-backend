@@ -7,6 +7,8 @@ import cors from 'cors';
 import adminAuthRouter from './routes/adminAuth.router';
 import globalRefreshRouter from './routes/globalRefresh.router';
 import adminUserManagementRouter from './routes/adminUserManagement.router';
+import { isAuthenticated } from './middlewares/isAuthenticated.middleware';
+import { authorizedRoles } from './middlewares/authorization.middleware';
 
 const app = express();
 
@@ -21,7 +23,6 @@ app.use(morgan('dev'));
 app.use(cookieParse());
 
 app.get('/', (req, res) => {
-   console.log('salt', process.env.passwordSalt);
    res.status(200).send('server live');
 });
 
@@ -29,7 +30,12 @@ app.use('/api/v1/global/auth/refresh', globalRefreshRouter);
 app.use('/api/v1/user/auth', authRouter);
 app.use('/api/v1/admin/auth', adminAuthRouter);
 
-app.use('/api/v1/admin/manage/user', adminUserManagementRouter);
+app.use(
+   '/api/v1/admin/manage/user',
+   isAuthenticated,
+   authorizedRoles('admin'),
+   adminUserManagementRouter
+);
 
 app.use(errorHandler);
 export default app;
