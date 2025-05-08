@@ -9,7 +9,6 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 
 app.get('/api/v1/notification/health', (req, res) => {
-   console.log('hello from nofi');
    res.status(200).json({ status: 'OK' });
 });
 
