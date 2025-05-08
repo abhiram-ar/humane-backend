@@ -11,7 +11,8 @@
          "@di/*": ["config/di/*"],
          "@domain/*": ["domain/*"],
          "@application/*": ["application/*"],
-         "@adapter/*": ["adapter/*"],
+         "@infrastructure/*": ["infrastructure/*"],
+         "@presentation/*": ["presentation/*"],
          "@config/*": ["config/*"],
          "@shared/*": ["shared/*"]
       }
