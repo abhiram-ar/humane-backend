@@ -11,3 +11,5 @@ export type AdminJWTTokenPaylod = {
 };
 
 export type JWTTokenPaylod = AdminJWTTokenPaylod | AnonJWTTokenPayload;
+
+export type JWTTokenPaylodTypeField = JWTTokenPaylod['type'];
