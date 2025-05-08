@@ -13,6 +13,7 @@
    "type": "commonjs",
    "devDependencies": {
       "@tsconfig/node22": "^22.0.1",
+      "@types/cookie-parser": "^1.4.8",
       "@types/ejs": "^3.1.5",
       "@types/express": "^5.0.1",
       "@types/jsonwebtoken": "^9.0.9",
@@ -23,7 +24,7 @@
       "typescript": "^5.8.3"
    },
    "dependencies": {
-      "cookie-parse": "^0.4.0",
+      "cookie-parser": "^1.4.7",
       "cors": "^2.8.5",
       "ejs": "^3.1.10",
       "express": "^5.1.0",

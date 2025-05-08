@@ -2,19 +2,26 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-service
-  annotations: 
+  annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
 
 spec:
   ingressClassName: nginx
   rules:
-  - host: localhost
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: user-srv
-            port: 
-              number: 3000
+    - host: localhost
+      http:
+        paths:
+          - pathType: ImplementationSpecific #required for regex pattern matching
+            path: /api/v[0-9]+/(admin|user|global)/.*
+            backend:
+              service:
+                name: user-srv
+                port:
+                  number: 3000
+          - pathType: ImplementationSpecific
+            path: /api/v[0-9]+/notification/.*
+            backend:
+              service:
+                name: notification-srv
+                port:
+                  number: 3000
