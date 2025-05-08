@@ -1,0 +1,19 @@
+{
+   "extends": "@tsconfig/node22/tsconfig.json",
+   "include": ["src/**/*"],
+   "exclude": ["node_modules"],
+   "compilerOptions": {
+      "noUnusedLocals": true,
+      "baseUrl": "src",
+      "paths": {
+         "@dtos/*": ["application/dto/*"],
+         "@ports/*": ["application/ports/*"],
+         "@di/*": ["config/di/*"],
+         "@domain/*": ["domain/*"],
+         "@application/*": ["application/*"],
+         "@adapter/*": ["adapter/*"],
+         "@config/*": ["config/*"],
+         "@shared/*": ["shared/*"]
+      }
+   }
+}
