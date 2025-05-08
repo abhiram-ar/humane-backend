@@ -10,3 +10,5 @@ Exposing a mongoDB container port to inspect via mongoDB compass
 kubectl port-forward svc/user-mongo-srv 27017:27017
 ```
 
+production change
+- kafka ui nodePort need to be closed
