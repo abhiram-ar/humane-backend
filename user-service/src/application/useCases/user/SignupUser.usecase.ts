@@ -5,9 +5,9 @@ import { IHashService } from '@ports/IHashService';
 import { signupUserDTO } from '@dtos/user/signupUser.dto';
 import { verifedUserToken } from '@dtos/user/verifyUser.dto';
 import { EmailError } from '@application/errors/EmailError';
-import { MailServiceError } from '@application/errors/MailServiceError';
 import { IEventPublisher } from '@application/ports/IEventProducer';
 import { UserSignupEventPayload, createEvent, AppEventsTypes } from 'humane-common';
+import { EventBusError } from '@application/errors/EventbusError';
 
 export class SignupUser {
    constructor(
@@ -42,9 +42,9 @@ export class SignupUser {
 
       const verifyUserEvent = createEvent(AppEventsTypes.USER_SINGUP, userSignuoEventPaylod);
 
-      const { ack } = await this._eventPublisher.send(verifyUserEvent.USER_SINGUP, verifyUserEvent);
+      const { ack } = await this._eventPublisher.send(verifyUserEvent.eventType, verifyUserEvent);
       if (!ack) {
-         throw new MailServiceError(`Unable to send mail to ${dto.email}`);
+         throw new EventBusError(`Unable to send mail to ${dto.email}`);
       }
 
       const otpHash = await this._hashService.hash(otp, parseInt(process.env.otpSalt as string));

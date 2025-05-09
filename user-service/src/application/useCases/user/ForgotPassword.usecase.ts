@@ -1,18 +1,12 @@
 import { EmailError } from '@application/errors/EmailError';
-import { MailServiceError } from '@application/errors/MailServiceError';
+import { EventBusError } from '@application/errors/EventbusError';
 import { ForgotPasswordPayload } from '@application/types/ForgotPasswordTokenPayload';
 import { ENV } from '@config/env';
 import { forgotPasswordDTO } from '@dtos/user/forgotPassword.dto';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IJWTService } from '@ports/IJWTService';
 import { IUserRepository } from '@ports/IUserRepository';
-import {
-   UserPasswordRecoveryEventPaylaod,
-   createEvent,
-   AppEventsTypes,
-   EventSource,
-   UserPasswordRecoveryRequestEvent,
-} from 'humane-common';
+import { UserPasswordRecoveryEventPaylaod, createEvent, AppEventsTypes } from 'humane-common';
 
 export class ForgotPassword {
    constructor(
@@ -46,7 +40,7 @@ export class ForgotPassword {
          },
       };
 
-      const passwordRevoveryEvent: UserPasswordRecoveryRequestEvent = createEvent(
+      const passwordRevoveryEvent = createEvent(
          AppEventsTypes.USER_PASSWORD_RECOVERY_REQUESTED,
          passwordRecoveryEventPayload
       );
@@ -56,7 +50,7 @@ export class ForgotPassword {
          passwordRevoveryEvent
       );
       if (!ack) {
-         throw new MailServiceError(`Error while sending password recovery mail to ${user.email}`);
+         throw new EventBusError(`Error while sending password recovery mail to ${user.email}`);
       }
 
       return { email: user.email };
