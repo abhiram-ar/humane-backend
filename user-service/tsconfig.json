@@ -1,6 +1,6 @@
 {
    "extends": "@tsconfig/node22/tsconfig.json",
-   "include": ["src/**/*"],
+   "include": ["src/**/*", "../notification-service/src/infrastructure/mail-service/NodeMailerEmailService.ts"],
    "exclude": ["node_modules"],
    "compilerOptions": {
       "noUnusedLocals": true,
