@@ -1,0 +1,3 @@
+[submodule "humane-common"]
+	path = humane-common
+	url = https://github.com/abhiram-ar/humane-common
