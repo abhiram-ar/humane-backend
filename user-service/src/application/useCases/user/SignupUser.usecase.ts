@@ -9,8 +9,8 @@ import {
    SendEmailVerificationEvent,
    UserVerifyEmailDataFields,
 } from '@application/types/userVerifyEmail';
-import { IEmailService } from '@ports/IEmailService';
 import { MailServiceError } from '@application/errors/MailServiceError';
+
 
 export class SignupUser {
    constructor(
@@ -18,7 +18,6 @@ export class SignupUser {
       private readonly JWTService: IJWTService,
       private readonly OTPService: OTP,
       private readonly hashService: IHashService,
-      private readonly emailService: IEmailService
    ) {}
 
    execute = async (dto: signupUserDTO): Promise<string> => {
