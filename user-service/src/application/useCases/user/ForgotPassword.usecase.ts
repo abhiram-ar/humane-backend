@@ -7,15 +7,14 @@ import {
 import { ForgotPasswordPayload } from '@application/types/ForgotPasswordTokenPayload';
 import { ENV } from '@config/env';
 import { forgotPasswordDTO } from '@dtos/user/forgotPassword.dto';
-import { IEmailService } from '@ports/IEmailService';
 import { IJWTService } from '@ports/IJWTService';
 import { IUserRepository } from '@ports/IUserRepository';
+import { UserPasswordRecoveryEventPaylaod } from 'humane-common';
 
 export class ForgotPassword {
    constructor(
       private readonly userRepository: IUserRepository,
-      private readonly jwtService: IJWTService,
-      private readonly emailService: IEmailService
+      private readonly jwtService: IJWTService
    ) {}
 
    execute = async (dto: forgotPasswordDTO): Promise<{ email: string }> => {
@@ -36,13 +35,11 @@ export class ForgotPassword {
       );
 
       //  todo: send mail to user email
-      const emailData: ForgotPasswordEmailField = {
-         token: passwordResetToken,
-      };
-      const emailEvent: SendEmailUserForgotPasswordEvent = {
-         data: emailData,
+      const emailPayload: UserPasswordRecoveryEventPaylaod = {
+         data: {
+            token: passwordResetToken,
+         },
          email: user.email,
-         type: 'user-forgot-password',
       };
 
       const { ack } = await this.emailService.send(emailEvent);
