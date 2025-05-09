@@ -42,6 +42,13 @@ spec:
             limits:
               memory: "2Gi"
               cpu: "2"
+          volumeMounts: 
+          - name: kafka-data
+            mountPath: /bitnami/kafka
+      volumes:
+      - name: kafka-data
+        persistentVolumeClaim:
+          claimName: kafka-pvc
 ---
 apiVersion: v1
 kind: Service
