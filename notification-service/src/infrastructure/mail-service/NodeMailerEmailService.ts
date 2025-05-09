@@ -1,10 +1,10 @@
-import { IEmailService } from '@ports/IEmailService';
 import ejs from 'ejs';
 import nodeMailer from 'nodemailer';
 import path from 'path';
+import { IEmailService } from '@ports/out/IEmailService';
 import { SentEmailEvent } from '@application/types/SentEmailEvent.type';
-import { SendEmailVerificationEvent } from '@application/types/userVerifyEmail';
 import { SendEmailUserForgotPasswordEvent } from '@application/types/ForgotPasswordEmail';
+import { SendEmailVerificationEvent } from '@application/types/userVerifyEmail';
 
 export class NodeMailerEmailService implements IEmailService {
    private transporter = nodeMailer.createTransport({
