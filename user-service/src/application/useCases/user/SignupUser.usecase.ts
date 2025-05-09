@@ -5,52 +5,49 @@ import { IHashService } from '@ports/IHashService';
 import { signupUserDTO } from '@dtos/user/signupUser.dto';
 import { verifedUserToken } from '@dtos/user/verifyUser.dto';
 import { EmailError } from '@application/errors/EmailError';
-import {
-   SendEmailVerificationEvent,
-   UserVerifyEmailDataFields,
-} from '@application/types/userVerifyEmail';
 import { MailServiceError } from '@application/errors/MailServiceError';
-
+import { IEventPublisher } from '@application/ports/IEventProducer';
+import { UserSignupEventPayload, createEvent, AppEventsTypes } from 'humane-common';
 
 export class SignupUser {
    constructor(
-      private readonly userRepository: IUserRepository,
-      private readonly JWTService: IJWTService,
-      private readonly OTPService: OTP,
-      private readonly hashService: IHashService,
+      private readonly _userRepository: IUserRepository,
+      private readonly _JWTService: IJWTService,
+      private readonly _OTPService: OTP,
+      private readonly _hashService: IHashService,
+      private readonly _eventPublisher: IEventPublisher
    ) {}
 
    execute = async (dto: signupUserDTO): Promise<string> => {
-      const isEmailTaken = await this.userRepository.emailExists(dto.email);
+      const isEmailTaken = await this._userRepository.emailExists(dto.email);
       if (isEmailTaken) {
          throw new EmailError('Email already exists');
       }
 
-      const passwordHash = await this.hashService.hash(
+      const passwordHash = await this._hashService.hash(
          dto.password,
          parseInt(process.env.passwordSalt as string)
       );
 
-      const otp = this.OTPService.generate();
+      const otp = this._OTPService.generate();
       console.log(`otp ${otp}`);
 
-      const emailData: UserVerifyEmailDataFields = {
-         otp,
-         firstName: dto.firstName,
-      };
-
-      const sendVerificaionMailEvent: SendEmailVerificationEvent = {
+      const userSignuoEventPaylod: UserSignupEventPayload = {
          email: dto.email,
-         data: emailData,
-         type: 'email-verification',
+         data: {
+            otp,
+            firstName: dto.firstName,
+         },
       };
 
-      const { ack } = await this.emailService.send(sendVerificaionMailEvent);
+      const verifyUserEvent = createEvent(AppEventsTypes.USER_SINGUP, userSignuoEventPaylod);
+
+      const { ack } = await this._eventPublisher.send(verifyUserEvent.USER_SINGUP, verifyUserEvent);
       if (!ack) {
          throw new MailServiceError(`Unable to send mail to ${dto.email}`);
       }
 
-      const otpHash = await this.hashService.hash(otp, parseInt(process.env.otpSalt as string));
+      const otpHash = await this._hashService.hash(otp, parseInt(process.env.otpSalt as string));
 
       const userSignupData: verifedUserToken = {
          firstName: dto.firstName,
@@ -60,7 +57,7 @@ export class SignupUser {
          otpHash,
       };
 
-      const singUpToken = this.JWTService.sign(
+      const singUpToken = this._JWTService.sign(
          userSignupData,
          process.env.otpTokenSecret as string,
          5 * 60 * 60

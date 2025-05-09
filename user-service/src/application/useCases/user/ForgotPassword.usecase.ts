@@ -1,24 +1,28 @@
 import { EmailError } from '@application/errors/EmailError';
 import { MailServiceError } from '@application/errors/MailServiceError';
-import {
-   ForgotPasswordEmailField,
-   SendEmailUserForgotPasswordEvent,
-} from '@application/types/ForgotPasswordEmail';
 import { ForgotPasswordPayload } from '@application/types/ForgotPasswordTokenPayload';
 import { ENV } from '@config/env';
 import { forgotPasswordDTO } from '@dtos/user/forgotPassword.dto';
+import { IEventPublisher } from '@ports/IEventProducer';
 import { IJWTService } from '@ports/IJWTService';
 import { IUserRepository } from '@ports/IUserRepository';
-import { UserPasswordRecoveryEventPaylaod } from 'humane-common';
+import {
+   UserPasswordRecoveryEventPaylaod,
+   createEvent,
+   AppEventsTypes,
+   EventSource,
+   UserPasswordRecoveryRequestEvent,
+} from 'humane-common';
 
 export class ForgotPassword {
    constructor(
-      private readonly userRepository: IUserRepository,
-      private readonly jwtService: IJWTService
+      private readonly _userRepository: IUserRepository,
+      private readonly _jwtService: IJWTService,
+      private readonly _eventPublisher: IEventPublisher
    ) {}
 
    execute = async (dto: forgotPasswordDTO): Promise<{ email: string }> => {
-      const user = await this.userRepository.retriveUserByEmail(dto.email);
+      const user = await this._userRepository.retriveUserByEmail(dto.email);
 
       if (!user) {
          throw new EmailError('Email does not exist');
@@ -28,21 +32,29 @@ export class ForgotPassword {
          email: user.email,
       };
 
-      const passwordResetToken = this.jwtService.sign(
+      const passwordResetToken = this._jwtService.sign(
          tokenPayload,
          ENV.RESET_PASSWORD_SECRET as string,
          5 * 60
       );
 
       //  todo: send mail to user email
-      const emailPayload: UserPasswordRecoveryEventPaylaod = {
+      const passwordRecoveryEventPayload: UserPasswordRecoveryEventPaylaod = {
+         email: user.email,
          data: {
             token: passwordResetToken,
          },
-         email: user.email,
       };
 
-      const { ack } = await this.emailService.send(emailEvent);
+      const passwordRevoveryEvent: UserPasswordRecoveryRequestEvent = createEvent(
+         AppEventsTypes.USER_PASSWORD_RECOVERY_REQUESTED,
+         passwordRecoveryEventPayload
+      );
+
+      const { ack } = await this._eventPublisher.send(
+         passwordRevoveryEvent.eventType,
+         passwordRevoveryEvent
+      );
       if (!ack) {
          throw new MailServiceError(`Error while sending password recovery mail to ${user.email}`);
       }
