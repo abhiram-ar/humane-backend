@@ -32,7 +32,7 @@ export class SignupUser {
       const otp = this._OTPService.generate();
       console.log(`otp ${otp}`);
 
-      const userSignuoEventPaylod: UserSignupEventPayload = {
+      const userSignuoEventPayload: UserSignupEventPayload = {
          email: dto.email,
          data: {
             otp,
@@ -40,7 +40,7 @@ export class SignupUser {
          },
       };
 
-      const verifyUserEvent = createEvent(AppEventsTypes.USER_SINGUP, userSignuoEventPaylod);
+      const verifyUserEvent = createEvent(AppEventsTypes.USER_SINGUP, userSignuoEventPayload);
 
       const { ack } = await this._eventPublisher.send(verifyUserEvent.eventType, verifyUserEvent);
       if (!ack) {
