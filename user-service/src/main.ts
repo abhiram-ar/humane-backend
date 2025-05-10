@@ -10,7 +10,12 @@ const start = async () => {
       await connectDB();
 
       await connectKafkaProducer();
+      
       process.on('SIGINT', async () => {
+         await disconnectKafkaProducer();
+      });
+
+      process.on('SIGTERM', async () => {
          await disconnectKafkaProducer();
       });
 
@@ -22,5 +27,3 @@ const start = async () => {
 };
 
 start();
-
-

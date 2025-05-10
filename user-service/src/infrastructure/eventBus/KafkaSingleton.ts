@@ -9,7 +9,7 @@ class KafkaSingleton {
    // esures single instance throughout the app
    private constructor() {
       this._kafka = new Kafka({
-         clientId: 'humane-user-service',
+         clientId: 'humane-user-service-v1',
          brokers: ['kafka:9092'],
       });
    }
