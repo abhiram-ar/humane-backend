@@ -1,5 +1,4 @@
-import { SentEmailEvent } from "@application/types/SentEmailEvent.type";
 
 export interface IEmailService {
-   send(event: SentEmailEvent<any>): Promise<{ ack: boolean }>;
+   send(email: string, subject: string, data: any, template: string): Promise<{ ack: boolean }>;
 }

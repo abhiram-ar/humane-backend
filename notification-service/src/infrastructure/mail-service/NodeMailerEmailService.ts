@@ -2,9 +2,6 @@ import ejs from 'ejs';
 import nodeMailer from 'nodemailer';
 import path from 'path';
 import { IEmailService } from '@ports/out/IEmailService';
-import { SentEmailEvent } from '@application/types/SentEmailEvent.type';
-import { SendEmailUserForgotPasswordEvent } from '@application/types/ForgotPasswordEmail';
-import { SendEmailVerificationEvent } from '@application/types/userVerifyEmail';
 
 export class NodeMailerEmailService implements IEmailService {
    private transporter = nodeMailer.createTransport({
@@ -19,47 +16,25 @@ export class NodeMailerEmailService implements IEmailService {
 
    constructor() {}
 
-   send = async (event: SentEmailEvent<any, any>): Promise<{ ack: boolean }> => {
+   send = async (
+      email: string,
+      subject: string,
+      data: any,
+      template: string
+   ): Promise<{ ack: boolean }> => {
       try {
-         //  const { email, subject, template, data } =
+         const templatePath = path.join('/app/src/infrastructure/service/mails', template);
+         const html: string = await ejs.renderFile(templatePath, data);
 
-         if (event.type === 'email-verification') {
-            const typedEvent = event as SendEmailVerificationEvent;
-            const templatePath = path.join(
-               '/app/src/infrastructure/service/mails',
-               'userEmailVerification.ejs'
-            );
-            const html = await ejs.renderFile(templatePath, typedEvent.data);
+         const mailOptions = {
+            from: process.env.SMTP_MAIL as string,
+            to: email,
+            subject: subject,
+            html,
+         };
 
-            const mailOptions = {
-               from: process.env.SMTP_MAIL as string,
-               to: typedEvent.email,
-               subject: 'Humane email verification',
-               html,
-            };
-
-            this.transporter.sendMail(mailOptions);
-            return { ack: true };
-         } else if ((event.type = 'user-forgot-password')) {
-            const typedEvent = event as SendEmailUserForgotPasswordEvent;
-            const templatePath = path.join(
-               '/app/src/infrastructure/service/mails',
-               'userForgotPassword.ejs'
-            );
-            const html = await ejs.renderFile(templatePath, typedEvent.data);
-
-            const mailOptions = {
-               from: process.env.SMTP_MAIL as string,
-               to: typedEvent.email,
-               subject: 'Humane email verification',
-               html,
-            };
-
-            this.transporter.sendMail(mailOptions);
-            return { ack: true };
-         }
-
-         return { ack: false };
+         this.transporter.sendMail(mailOptions);
+         return { ack: true };
       } catch (error) {
          console.log('error while sending mail', error);
          return { ack: false };
