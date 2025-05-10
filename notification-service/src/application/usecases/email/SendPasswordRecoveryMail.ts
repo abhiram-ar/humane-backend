@@ -1,6 +1,6 @@
 import { SendPasswordRecoveryMailInputDTO } from '@dtos/sendPasswordRecoveryMailInput.dto';
 import { EmailTemplateMap } from '@infrastructure/mail-service/EmailTemplateMap';
-import { IEmailService } from '@ports/out/IEmailService';
+import { IEmailService } from '@ports/IEmailService';
 
 export class SendPasswordRecoveryMail {
    constructor(private readonly _mailService: IEmailService) {}

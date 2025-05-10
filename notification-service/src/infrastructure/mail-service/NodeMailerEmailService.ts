@@ -1,7 +1,7 @@
 import ejs from 'ejs';
 import nodeMailer from 'nodemailer';
 import path from 'path';
-import { IEmailService } from '@ports/out/IEmailService';
+import { IEmailService } from '@ports/IEmailService';
 
 export class NodeMailerEmailService implements IEmailService {
    private transporter = nodeMailer.createTransport({

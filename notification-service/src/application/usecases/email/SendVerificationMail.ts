@@ -1,6 +1,6 @@
 import { SendUserVerificationMailDTO } from '@dtos/sendVerificationMailInput.dto';
 import { EmailTemplateMap } from '@infrastructure/mail-service/EmailTemplateMap';
-import { IEmailService } from '@ports/out/IEmailService';
+import { IEmailService } from '@ports/IEmailService';
 
 export class SendUserVerificationMail {
    constructor(private readonly _emailService: IEmailService) {}
