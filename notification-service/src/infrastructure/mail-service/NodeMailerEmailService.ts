@@ -33,7 +33,7 @@ export class NodeMailerEmailService implements IEmailService {
             html,
          };
 
-         this.transporter.sendMail(mailOptions);
+         await this.transporter.sendMail(mailOptions);
          return { ack: true };
       } catch (error) {
          console.log('error while sending mail', error);
