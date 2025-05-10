@@ -8,16 +8,19 @@ import {
 } from '@dtos/sendPasswordRecoveryMailInput.dto';
 
 export class UserPasswordRecoveryRequestEventConsumer {
-   consumer: Consumer;
+   private consumer: Consumer;
 
    constructor(
       private readonly _sendPasswordRecoveryMail: SendPasswordRecoveryMail,
-      readonly kafka: KafkaSingleton
+      private readonly _kafka: KafkaSingleton
    ) {
-      this.consumer = this.kafka.createConsumer('email-group-1');
+      this.consumer = this._kafka.createConsumer('email-group-1');
    }
 
    start = async () => {
+      await this.consumer.connect();
+      console.log('User password recovery event consumer connected ');
+
       await this.consumer.subscribe({ topic: KafkaTopics.USER_PASSWORD_RECOVERY_EVENTS_TOPIC });
 
       await this.consumer.run({
@@ -39,8 +42,12 @@ export class UserPasswordRecoveryRequestEventConsumer {
             }
 
             await this._sendPasswordRecoveryMail.execute(parsed.data);
-            console.log(`event handled: mail send to${dto.email}`);
+            console.log(`event handled: mail send to ${dto.email}`);
          },
       });
+   };
+
+   stop = async () => {
+      await this.consumer.disconnect();
    };
 }
