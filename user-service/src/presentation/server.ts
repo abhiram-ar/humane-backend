@@ -26,6 +26,10 @@ app.get('/', (req, res) => {
    res.status(200).send('server live');
 });
 
+app.get('/api/v1/user/health', (req, res) => {
+   res.status(200).json({ status: 'OK' });
+});
+
 app.use('/api/v1/global/auth/refresh', globalRefreshRouter);
 app.use('/api/v1/user/auth', authRouter);
 app.use('/api/v1/admin/auth', adminAuthRouter);

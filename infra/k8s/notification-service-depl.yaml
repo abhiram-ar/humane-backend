@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: humane
+      service: notification
+      type: web-server
+  template:
+    metadata:
+      labels:
+        app: humane
+        service: notification
+        type: web-server
+    spec:
+      containers:
+        - name: notification-server
+          image: abhiramar/humane-notification
+          envFrom:
+            - secretRef:
+                name: notification-pod-secret
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification-srv
+spec:
+  selector:
+    app: humane
+    service: notification
+    type: web-server
+  ports:
+    - name: notification
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

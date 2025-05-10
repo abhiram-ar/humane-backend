@@ -13,15 +13,21 @@ build:
     push: false
   artifacts:
     - image: abhiramar/userservice
-      context: user-service
+      context: user-service # where to look for .docker file (local path)
       docker:
         dockerfile: Dockerfile
       sync:
         manual:
           - dest: .
             src: "src/**/*.ts"
-
-  
+    - image: abhiramar/humane-notification
+      context: notification-service
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: "src/**/*.ts"
 
 deploy:
   kubectl: {}

@@ -1,20 +1,20 @@
 {
    "extends": "@tsconfig/node22/tsconfig.json",
-   "include": ["src/**/*", "../notification-service/src/infrastructure/mail-service/NodeMailerEmailService.ts"],
+   "include": ["src/**/*"],
    "exclude": ["node_modules"],
    "compilerOptions": {
       "noUnusedLocals": true,
       "baseUrl": "src",
       "paths": {
-         "@dtos/*": ["application/DTOs/*"],
+         "@dtos/*": ["application/dto/*"],
          "@ports/*": ["application/ports/*"],
-         "@di/*": ["config/DI-container/*"],
-         "@services/*": ["application/services/*"],
+         "@DI-container/*": ["config/DI-container/*"],
          "@domain/*": ["domain/*"],
          "@application/*": ["application/*"],
          "@infrastructure/*": ["infrastructure/*"],
          "@presentation/*": ["presentation/*"],
-         "@config/*": ["config/*"]
+         "@config/*": ["config/*"],
+         "@shared/*": ["shared/*"]
       }
    }
 }

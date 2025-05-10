@@ -7,7 +7,7 @@ import { VerifyUser } from '@application/useCases/user/VerifyUser.usecase';
 import {
    bcryptHashService,
    jwtService,
-   nodeMailerEmailService,
+   kafkaPubliserService,
    otpService,
 } from '../services.container';
 import { mongoUserRespository } from '../repository.container';
@@ -19,7 +19,7 @@ export const singupUser = new SignupUser(
    jwtService,
    otpService,
    bcryptHashService,
-   nodeMailerEmailService
+   kafkaPubliserService
 );
 
 export const verifyUser = new VerifyUser(mongoUserRespository, jwtService, bcryptHashService);
@@ -41,7 +41,7 @@ export const refreshUserAccessToken = new RefreshUserAccessToken(
 export const forgotPassoword = new ForgotPassword(
    mongoUserRespository,
    jwtService,
-   nodeMailerEmailService
+   kafkaPubliserService
 );
 
 export const recoverPassword = new RecoverPassword(

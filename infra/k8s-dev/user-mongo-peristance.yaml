@@ -8,7 +8,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /home/abhiram/Bootcamp/week-23-to-27/humane/backend/data/user-mongo
+    path: /home/abhiram/Bootcamp/week-23-to-27/humane/backend/data/user-mongo #make sure the path exist
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
