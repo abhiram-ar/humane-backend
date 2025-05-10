@@ -23,7 +23,7 @@ export class NodeMailerEmailService implements IEmailService {
       template: string
    ): Promise<{ ack: boolean }> => {
       try {
-         const templatePath = path.join('/app/src/infrastructure/service/mails', template);
+         const templatePath = path.join(__dirname, './mails/', template);
          const html: string = await ejs.renderFile(templatePath, data);
 
          const mailOptions = {

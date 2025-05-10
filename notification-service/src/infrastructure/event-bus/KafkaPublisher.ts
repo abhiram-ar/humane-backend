@@ -6,8 +6,8 @@ import { IEventPublisher } from '@ports/IEventProducer';
 export class KafkaPublisher implements IEventPublisher {
    producer: Producer;
 
-   constructor(readonly _kafka: KafkaSingleton) {
-      this.producer = _kafka.getProducer();
+   constructor(readonly kafka: KafkaSingleton) {
+      this.producer = kafka.getProducer();
    }
 
    send = async (topic: string, event: AppEvent): Promise<{ ack: boolean }> => {
