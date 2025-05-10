@@ -1,8 +1,18 @@
-import { sendPasswordRecoveryMail } from '@DI-container/usecases/emailUsecase.container';
 import KafkaSingleton from '@infrastructure/event-bus/KafkaSingleton';
+import { UserSingupEventConsumer } from '@presentation/event/consumers/UserSignupEvent.consumer';
 import { UserPasswordRecoveryRequestEventConsumer } from '@presentation/event/consumers/UserPasswordRecoveryRequestEvent.consumer';
-
-export const userPasswordRecoveryRequestEventConsumer = new UserPasswordRecoveryRequestEventConsumer(
+import {
    sendPasswordRecoveryMail,
-   KafkaSingleton.getInstance()
+   sendVerificationMail,
+} from '@DI-container/usecases/emailUsecase.container';
+
+export const userPasswordRecoveryRequestEventConsumer =
+   new UserPasswordRecoveryRequestEventConsumer(
+      sendPasswordRecoveryMail,
+      KafkaSingleton.getInstance()
+   );
+
+export const useSignupEventConsumer = new UserSingupEventConsumer(
+   KafkaSingleton.getInstance(),
+   sendVerificationMail
 );

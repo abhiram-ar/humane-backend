@@ -1,4 +1,7 @@
-import { userPasswordRecoveryRequestEventConsumer } from '@DI-container/consumers/sendEmailConsumer.container';
+import {
+   userPasswordRecoveryRequestEventConsumer,
+   useSignupEventConsumer,
+} from '@DI-container/consumers/sendEmailConsumer.container';
 import KafkaSingleton from '@infrastructure/event-bus/KafkaSingleton';
 
 export async function connectKafkaProducer() {
@@ -13,8 +16,10 @@ export const disconnectKafkaProducer = async () => {
 
 export const startAllConsumers = async () => {
    await userPasswordRecoveryRequestEventConsumer.start();
+   await useSignupEventConsumer.start();
 };
 
 export const stopAllConsumers = async () => {
    await userPasswordRecoveryRequestEventConsumer.stop();
+   await useSignupEventConsumer.stop();
 };

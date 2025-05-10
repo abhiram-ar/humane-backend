@@ -1,7 +1,7 @@
 import z from 'zod';
 import { UserSignupEventPayload } from 'humane-common';
 
-const sendUserVerificationMailInputSchema = z.object({
+export const sendUserVerificationMailInputSchema = z.object({
    email: z.string().nonempty().email(),
    data: z.object({
       otp: z.string(),
