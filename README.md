@@ -12,3 +12,4 @@ kubectl port-forward svc/user-mongo-srv 27017:27017
 
 production change
 - kafka ui nodePort need to be closed
+- convert kafka srv to stateful set
