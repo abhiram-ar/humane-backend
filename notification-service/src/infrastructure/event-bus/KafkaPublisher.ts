@@ -10,8 +10,13 @@ export class KafkaPublisher implements IEventPublisher {
       this.producer = _kafka.getProducer();
    }
 
-   send = async (topic: string, event: AppEvent): Promise<{ ack: true }> => {
-      await this.producer.send({ topic, messages: [{ value: JSON.stringify(event) }] });
-      return { ack: true };
+   send = async (topic: string, event: AppEvent): Promise<{ ack: boolean }> => {
+      try {
+         await this.producer.send({ topic, messages: [{ value: JSON.stringify(event) }] });
+         return { ack: true };
+      } catch (error) {
+         console.error('error while publising event to kafka', error);
+         return { ack: false };
+      }
    };
 }
