@@ -13,8 +13,8 @@ export interface IUser extends Document {
    lastName?: string;
    passwordHash?: string;
    bio?: string;
-   lastLoginTime?: Date;
-   createdAt?: Date;
+   lastLoginTime?: string;
+   createdAt: string;
 }
 
 const userSchema = new Schema<IUser>(

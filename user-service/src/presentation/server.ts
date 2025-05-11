@@ -9,6 +9,7 @@ import globalRefreshRouter from './routes/globalRefresh.router';
 import adminUserManagementRouter from './routes/adminUserManagement.router';
 import { isAuthenticated } from './middlewares/isAuthenticated.middleware';
 import { authorizedRoles } from './middlewares/authorization.middleware';
+import anonProfileRouter from './routes/anonProfile.router';
 
 const app = express();
 
@@ -33,6 +34,8 @@ app.get('/api/v1/user/health', (req, res) => {
 app.use('/api/v1/global/auth/refresh', globalRefreshRouter);
 app.use('/api/v1/user/auth', authRouter);
 app.use('/api/v1/admin/auth', adminAuthRouter);
+
+app.use('/api/v1/anon/profile', isAuthenticated, authorizedRoles('anon'), anonProfileRouter);
 
 app.use(
    '/api/v1/admin/manage/user',

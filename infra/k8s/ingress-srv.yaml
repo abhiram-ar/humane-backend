@@ -12,7 +12,7 @@ spec:
       http:
         paths:
           - pathType: ImplementationSpecific #required for regex pattern matching
-            path: /api/v[0-9]+/(admin|user|global)/.*
+            path: /api/v[0-9]+/(admin|user|anon|global)/.*
             backend:
               service:
                 name: user-srv

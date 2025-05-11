@@ -143,4 +143,21 @@ export class MongoUserRepository implements IUserRepository {
          humaneScore: user.humaneScore,
       };
    };
+
+   retriveUserById = async (userId: string): Promise<User | null> => {
+      const retrivedUser = await userModel.findById(userId);
+
+      if (!retrivedUser) return null;
+
+      return new User(
+         retrivedUser.id,
+         retrivedUser.firstName,
+         retrivedUser.email,
+         retrivedUser.isEmailVerified,
+         retrivedUser.isBlocked,
+         retrivedUser.humaneScore,
+         retrivedUser.isHotUser,
+         retrivedUser.createdAt
+      );
+   };
 }
