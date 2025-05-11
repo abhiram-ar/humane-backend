@@ -157,7 +157,35 @@ export class MongoUserRepository implements IUserRepository {
          retrivedUser.isBlocked,
          retrivedUser.humaneScore,
          retrivedUser.isHotUser,
-         retrivedUser.createdAt
+         retrivedUser.createdAt,
+         retrivedUser.lastLoginTime,
+         retrivedUser.avatar,
+         retrivedUser.coverPhoto,
+         retrivedUser.lastName,
+         retrivedUser.passwordHash,
+         retrivedUser.bio
       );
+   };
+
+   updateNameAndBio = async (
+      userId: string,
+      firstName: string,
+      lastName: string,
+      bio: string
+   ): Promise<Pick<User, 'id' | 'firstName' | 'lastName' | 'bio'> | null> => {
+      const updatedUser = await userModel.findByIdAndUpdate(
+         userId,
+         { firstName, lastName, bio },
+         { new: true }
+      );
+
+      if (!updatedUser) return null;
+
+      return {
+         id: updatedUser.id,
+         firstName: updatedUser.firstName,
+         lastName: updatedUser.lastName,
+         bio: updatedUser.bio,
+      };
    };
 }

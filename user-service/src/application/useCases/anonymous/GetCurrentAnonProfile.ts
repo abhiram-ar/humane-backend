@@ -18,7 +18,7 @@ export class GetCurrentAnonProfile {
       avatarId?: string;
       coverPhoto?: string;
       createdAt: string;
-      humaneScore: number
+      humaneScore: number;
    }> => {
       const resolvedAnon = await this._resolveAnonUser.execute(dto.anonId);
 
@@ -39,7 +39,7 @@ export class GetCurrentAnonProfile {
          avatarId: currentUser.avatar,
          coverPhoto: currentUser.coverPhoto,
          createdAt: currentUser.createdAt,
-         humaneScore: currentUser.humaneScore
+         humaneScore: currentUser.humaneScore,
       };
    };
 }

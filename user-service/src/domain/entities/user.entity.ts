@@ -8,7 +8,7 @@ export class User {
       public humaneScore: number = 0,
       public isHotUser: boolean = false,
       public createdAt: string,
-      public lastLoginTime?: Date,
+      public lastLoginTime?: string,
       public avatar?: string,
       public coverPhoto?: string,
       public lastName?: string,

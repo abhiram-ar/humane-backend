@@ -2,7 +2,8 @@ import { CreateAnonymousUser } from '@application/useCases/anonymous/CreateAnony
 import { mongoAnonUserRepository, mongoUserRespository } from '../repository.container';
 import { cryptoUUIDService } from '../services.container';
 import { ResolveAnoymousUser } from '@application/useCases/anonymous/ResolveAnonymousUser.usecase';
-import { GetCurrentAnonProfile } from '@application/useCases/anonymous/GetCurrentUserDetails';
+import { GetCurrentAnonProfile } from '@application/useCases/anonymous/GetCurrentAnonProfile';
+import { UpdateAnonProfile } from '@application/useCases/anonymous/UpdateAnonProfile';
 
 export const creataAnonUser = new CreateAnonymousUser(mongoAnonUserRepository, cryptoUUIDService);
 
@@ -12,3 +13,5 @@ export const getCurrentAnonProfile = new GetCurrentAnonProfile(
    resolveAnonUser,
    mongoUserRespository
 );
+
+export const updateAnonProfile = new UpdateAnonProfile(resolveAnonUser, mongoUserRespository);

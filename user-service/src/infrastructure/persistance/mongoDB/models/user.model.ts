@@ -30,7 +30,7 @@ const userSchema = new Schema<IUser>(
       coverPhoto: { type: String },
       passwordHash: { type: String },
       bio: { type: String },
-      lastLoginTime: { type: Date, default: Date.now() },
+      lastLoginTime: { type: String, default: new Date().toISOString() },
    },
    { timestamps: true }
 );
