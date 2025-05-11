@@ -188,4 +188,34 @@ export class MongoUserRepository implements IUserRepository {
          bio: updatedUser.bio,
       };
    };
+
+   updateAvatar = async (
+      userId: string,
+      newAvatarKey: string
+   ): Promise<{ updatedAvatarKey: string } | null> => {
+      const update = await userModel.findByIdAndUpdate(
+         userId,
+         { avatar: newAvatarKey },
+         { new: true }
+      );
+
+      if (!update) return null;
+
+      return { updatedAvatarKey: update.avatar as string };
+   };
+
+   updateCoverPhoto = async (
+      userId: string,
+      newCoverPhotoKey: string
+   ): Promise<{ updatedCoverPhotoKey: string } | null> => {
+      const update = await userModel.findByIdAndUpdate(
+         userId,
+         { coverPhoto: newCoverPhotoKey },
+         { new: true }
+      );
+
+      if (!update) return null;
+
+      return { updatedCoverPhotoKey: update.coverPhoto as string };
+   };
 }

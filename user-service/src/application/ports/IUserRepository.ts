@@ -35,4 +35,11 @@ export interface IUserRepository {
       lastName: string,
       bio: string
    ): Promise<Pick<User, 'id' | 'firstName' | 'lastName' | 'bio'> | null>;
+
+   updateAvatar(userId: string, newAvatarKey: string): Promise<{ updatedAvatarKey: string } | null>;
+
+   updateCoverPhoto(
+      userId: string,
+      newCoverPhotoKey: string
+   ): Promise<{ updatedCoverPhotoKey: string } | null>;
 }

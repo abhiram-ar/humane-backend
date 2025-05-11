@@ -1,6 +1,8 @@
 import {
    generatePresignedURL,
    getCurrentAnonProfile,
+   updateAnonAvatar,
+   updateAnonCoverPhoto,
    updateAnonProfile,
 } from '@di/usecase/anonUsercase.container';
 import { AnonProfileController } from '@presentation/controllers/anonProfile.controller';
@@ -8,5 +10,7 @@ import { AnonProfileController } from '@presentation/controllers/anonProfile.con
 export const anonProfileController = new AnonProfileController(
    getCurrentAnonProfile,
    updateAnonProfile,
-   generatePresignedURL
+   generatePresignedURL,
+   updateAnonAvatar,
+   updateAnonCoverPhoto
 );
