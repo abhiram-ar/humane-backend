@@ -1,7 +1,9 @@
 import { AuthorizationError } from '@application/errors/AuthorizationError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
+import { GeneratePresignedURL } from '@application/useCases/anonymous/GeneratePresignedURL';
 import { GetCurrentAnonProfile } from '@application/useCases/anonymous/GetCurrentAnonProfile';
 import { UpdateAnonProfile } from '@application/useCases/anonymous/UpdateAnonProfile';
+import { generatePresignedURLInputSchema } from '@dtos/anonymous/generatePreSignedURL.input.dto';
 import { getCurrentAnonProfileSchema } from '@dtos/anonymous/getCurrentAnonProfile.input.dto';
 import { updateAnonProfileSchema } from '@dtos/anonymous/updateAnonProfile.input.dto';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
@@ -10,7 +12,8 @@ import { NextFunction, Request, Response } from 'express';
 export class AnonProfileController {
    constructor(
       private readonly _getCurrentAnonProfile: GetCurrentAnonProfile,
-      private readonly _updateAnonProfile: UpdateAnonProfile
+      private readonly _updateAnonProfile: UpdateAnonProfile,
+      private readonly _generatePreSignedURL: GeneratePresignedURL
    ) {}
 
    getProfile = async (req: Request, res: Response, next: NextFunction) => {
@@ -60,6 +63,27 @@ export class AnonProfileController {
             success: true,
             message: 'profile updated',
             data: { profile: updatedProfile },
+         });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   generatePreSignedURL = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const parsed = generatePresignedURLInputSchema.safeParse(req.body);
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
+         }
+
+         const preSignedURL = await this._generatePreSignedURL.execute(parsed.data);
+
+         res.status(201).json({
+            success: true,
+            message: `presigned url created for ${parsed.data.fileName} with  mimeType:${parsed.data.mimeType}`,
+            data: {
+               preSignedURL,
+            },
          });
       } catch (error) {
          next(error);
