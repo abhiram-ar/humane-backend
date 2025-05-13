@@ -4,4 +4,4 @@ export const updateAnonAvatarSchema = z.object({
    newAvatarKey: z.string().nonempty(),
 });
 
-export type UpdateAnonAvatarnputDTO = z.infer<typeof updateAnonAvatarSchema>;
+export type UpdateAnonAvatarInputDTO = z.infer<typeof updateAnonAvatarSchema>;

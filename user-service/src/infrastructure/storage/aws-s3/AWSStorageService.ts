@@ -21,4 +21,7 @@ export class AWSStorageService implements IStorageService {
          return null;
       }
    };
+   getPublicCDNURL(key: string): string {
+      return `${ENV.AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME}/${key}`;
+   }
 }

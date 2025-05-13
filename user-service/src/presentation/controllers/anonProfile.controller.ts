@@ -112,13 +112,17 @@ export class AnonProfileController {
             throw new ZodValidationError(parsed.error);
          }
 
-         const { updatedAvatarKey } = await this._updateAnonAvatar.execute(anonId, parsed.data);
+         const { updatedAvatarKey, newAvatarURL } = await this._updateAnonAvatar.execute(
+            anonId,
+            parsed.data
+         );
 
          res.status(201).json({
             success: true,
             message: 'user profile picture updated',
             data: {
-               avatar: updatedAvatarKey,
+               avatarKey: updatedAvatarKey,
+               avatarURL: newAvatarURL,
             },
          });
       } catch (error) {
@@ -142,16 +146,15 @@ export class AnonProfileController {
             throw new ZodValidationError(parsed.error);
          }
 
-         const { updatedCoverPhotoKey } = await this._updateAnonCoverPhoto.execute(
-            anonId,
-            parsed.data
-         );
+         const { updatedCoverPhotoKey, newCoverPhotoURL } =
+            await this._updateAnonCoverPhoto.execute(anonId, parsed.data);
 
          res.status(201).json({
             success: true,
             message: 'user profile picture updated',
             data: {
                coverPhoto: updatedCoverPhotoKey,
+               coverPhotoURL: newCoverPhotoURL,
             },
          });
       } catch (error) {

@@ -2,11 +2,13 @@ import { IUserRepository } from '@ports/IUserRepository';
 import { ResolveAnoymousUser } from './ResolveAnonymousUser.usecase';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { GetCurrentAnonProfileInputDTO } from '@dtos/anonymous/getCurrentAnonProfile.input.dto';
+import { IStorageService } from '@ports/IStorageService';
 
 export class GetCurrentAnonProfile {
    constructor(
       private readonly _resolveAnonUser: ResolveAnoymousUser,
-      private readonly _userRepository: IUserRepository
+      private readonly _userRepository: IUserRepository,
+      private readonly _storageService: IStorageService
    ) {}
 
    execute = async (
@@ -15,8 +17,8 @@ export class GetCurrentAnonProfile {
       firstName: string;
       lastName?: string;
       bio?: string;
-      avatarId?: string;
-      coverPhoto?: string;
+      avatarURL?: string;
+      coverPhotoURL?: string;
       createdAt: string;
       humaneScore: number;
    }> => {
@@ -32,12 +34,22 @@ export class GetCurrentAnonProfile {
          throw new UserNotFoundError('Resolved anon->user does not exist');
       }
 
+      let avatarURL: string | undefined;
+      if (currentUser.avatar) {
+         avatarURL = this._storageService.getPublicCDNURL(currentUser.avatar);
+      }
+
+      let coverPhotoURL: string | undefined;
+      if (currentUser.coverPhoto) {
+         coverPhotoURL = this._storageService.getPublicCDNURL(currentUser.coverPhoto);
+      }
+
       return {
          firstName: currentUser.firstName,
          lastName: currentUser.lastName,
          bio: currentUser.bio,
-         avatarId: currentUser.avatar,
-         coverPhoto: currentUser.coverPhoto,
+         avatarURL,
+         coverPhotoURL,
          createdAt: currentUser.createdAt,
          humaneScore: currentUser.humaneScore,
       };

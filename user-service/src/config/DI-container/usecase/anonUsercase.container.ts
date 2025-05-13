@@ -14,13 +14,22 @@ export const resolveAnonUser = new ResolveAnoymousUser(mongoAnonUserRepository);
 
 export const getCurrentAnonProfile = new GetCurrentAnonProfile(
    resolveAnonUser,
-   mongoUserRespository
+   mongoUserRespository,
+   awsStorageService
 );
 
 export const updateAnonProfile = new UpdateAnonProfile(resolveAnonUser, mongoUserRespository);
 
 export const generatePresignedURL = new GeneratePresignedURL(awsStorageService);
 
-export const updateAnonAvatar = new UpdateAnonAvatar(resolveAnonUser, mongoUserRespository);
+export const updateAnonAvatar = new UpdateAnonAvatar(
+   resolveAnonUser,
+   mongoUserRespository,
+   awsStorageService
+);
 
-export const updateAnonCoverPhoto = new UpdateAnonCoverPhoto(resolveAnonUser, mongoUserRespository);
+export const updateAnonCoverPhoto = new UpdateAnonCoverPhoto(
+   resolveAnonUser,
+   mongoUserRespository,
+   awsStorageService
+);
