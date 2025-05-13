@@ -14,7 +14,7 @@ export class UpdateAnonCoverPhoto {
    execute = async (
       anonId: string,
       dto: UpdateAnonCoverPhotoInputDTO
-   ): Promise<{ updatedCoverPhotoKey: string; newCoverPhotoURL: string }> => {
+   ): Promise<{ updatedCoverPhotoKey: string; newCoverPhotoURL: string | undefined }> => {
       const resolvedAnon = await this._resolveAnonUser.execute(anonId);
 
       if (!resolvedAnon) {
@@ -30,7 +30,12 @@ export class UpdateAnonCoverPhoto {
          throw new UserNotFoundError('unable to update avatar of resolved anon');
       }
 
-      const newCoverPhotoURL = this._storageService.getPublicCDNURL(update.updatedCoverPhotoKey);
+      // if the client remove the avatar photo be setting newAvatarKey as "",
+      // we dont want to generete a CND link for a invalid key
+      let newCoverPhotoURL: string | undefined;
+      if (update.updatedCoverPhotoKey) {
+         newCoverPhotoURL = this._storageService.getPublicCDNURL(update.updatedCoverPhotoKey);
+      }
 
       return { updatedCoverPhotoKey: update.updatedCoverPhotoKey, newCoverPhotoURL };
    };
