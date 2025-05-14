@@ -5,13 +5,13 @@ import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 import { JWTService } from '@infrastructure/service/JWTService';
 
 export class RefreshAdminAccessToken {
-   constructor(private readonly jwtService: JWTService) {}
+   constructor(private readonly _jwtService: JWTService) {}
 
    execute = async (refreshToken: string): Promise<{ newAccessToken: string }> => {
       let verifedTokenPayload: AdminJWTTokenPaylod;
 
       try {
-         verifedTokenPayload = this.jwtService.verify<AdminJWTTokenPaylod>(
+         verifedTokenPayload = this._jwtService.verify<AdminJWTTokenPaylod>(
             refreshToken,
             ENV.REFRESH_TOKEN_SECRET as string
          );
@@ -26,7 +26,7 @@ export class RefreshAdminAccessToken {
          type: 'admin',
       };
 
-      const newAccessToken = this.jwtService.sign(
+      const newAccessToken = this._jwtService.sign(
          newTokenPaylod,
          ENV.ACCESS_TOKEN_SECRET as string,
          JWT_ACCESS_TOKEN_EXPIRY_SECONDS

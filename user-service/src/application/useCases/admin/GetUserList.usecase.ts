@@ -3,7 +3,7 @@ import { AdminGetUserResponseDTO, GetUserDTO } from '@dtos/admin/getUsers.dto';
 import { IUserRepository } from '@ports/IUserRepository';
 
 export class AdminGetUserList {
-   constructor(private readonly userRepository: IUserRepository) {}
+   constructor(private readonly _userRepository: IUserRepository) {}
 
    execute = async (
       dto: GetUserDTO
@@ -13,7 +13,7 @@ export class AdminGetUserList {
    }> => {
       const skip = (dto.page - 1) * dto.limit;
 
-      const result = await this.userRepository.getUserList({ ...dto, skip });
+      const result = await this._userRepository.getUserList({ ...dto, skip });
 
       const totalPages = Math.ceil(result.totalEntries / dto.limit) || 1;
 
