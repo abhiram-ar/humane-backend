@@ -10,6 +10,11 @@ type ENVConfig = {
    readonly RESET_PASSWORD_SECRET: ENVValue;
    readonly GOOGLE_CLIENT_ID: ENVValue;
    readonly GOOGLE_CLIENT_SECRET: ENVValue;
+   readonly AWS_ACCESS_KEY: ENVValue;
+   readonly AWS_SECRET_KEY: ENVValue;
+   readonly AWS_REGION: ENVValue;
+   readonly AWS_S3_BUCKET_NAME: ENVValue;
+   readonly AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME: ENVValue;
 };
 
 export const ENV: ENVConfig = {
@@ -22,6 +27,11 @@ export const ENV: ENVConfig = {
    RESET_PASSWORD_SECRET: process.env.resetPasswordTokenSecret,
    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+   AWS_ACCESS_KEY: process.env.AWS_ACCESS_KEY,
+   AWS_SECRET_KEY: process.env.AWS_SECRET_KEY,
+   AWS_REGION: process.env.AWS_REGION,
+   AWS_S3_BUCKET_NAME: process.env.AWS_S3_BUCKET_NAME,
+   AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME: process.env.AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME,
 };
 
 function checkEnv() {

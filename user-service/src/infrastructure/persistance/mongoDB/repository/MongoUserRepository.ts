@@ -143,4 +143,79 @@ export class MongoUserRepository implements IUserRepository {
          humaneScore: user.humaneScore,
       };
    };
+
+   retriveUserById = async (userId: string): Promise<User | null> => {
+      const retrivedUser = await userModel.findById(userId);
+
+      if (!retrivedUser) return null;
+
+      return new User(
+         retrivedUser.id,
+         retrivedUser.firstName,
+         retrivedUser.email,
+         retrivedUser.isEmailVerified,
+         retrivedUser.isBlocked,
+         retrivedUser.humaneScore,
+         retrivedUser.isHotUser,
+         retrivedUser.createdAt,
+         retrivedUser.lastLoginTime,
+         retrivedUser.avatar,
+         retrivedUser.coverPhoto,
+         retrivedUser.lastName,
+         retrivedUser.passwordHash,
+         retrivedUser.bio
+      );
+   };
+
+   updateNameAndBio = async (
+      userId: string,
+      firstName: string,
+      lastName: string,
+      bio: string
+   ): Promise<Pick<User, 'id' | 'firstName' | 'lastName' | 'bio'> | null> => {
+      const updatedUser = await userModel.findByIdAndUpdate(
+         userId,
+         { firstName, lastName, bio },
+         { new: true }
+      );
+
+      if (!updatedUser) return null;
+
+      return {
+         id: updatedUser.id,
+         firstName: updatedUser.firstName,
+         lastName: updatedUser.lastName,
+         bio: updatedUser.bio,
+      };
+   };
+
+   updateAvatar = async (
+      userId: string,
+      newAvatarKey: string
+   ): Promise<{ updatedAvatarKey: string } | null> => {
+      const update = await userModel.findByIdAndUpdate(
+         userId,
+         { avatar: newAvatarKey },
+         { new: true }
+      );
+
+      if (!update) return null;
+
+      return { updatedAvatarKey: update.avatar as string };
+   };
+
+   updateCoverPhoto = async (
+      userId: string,
+      newCoverPhotoKey: string
+   ): Promise<{ updatedCoverPhotoKey: string } | null> => {
+      const update = await userModel.findByIdAndUpdate(
+         userId,
+         { coverPhoto: newCoverPhotoKey },
+         { new: true }
+      );
+
+      if (!update) return null;
+
+      return { updatedCoverPhotoKey: update.coverPhoto as string };
+   };
 }

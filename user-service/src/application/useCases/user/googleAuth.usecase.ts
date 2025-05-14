@@ -11,23 +11,23 @@ import { GenericError } from '@application/errors/GenericError';
 
 export class UserGoogleAuth {
    constructor(
-      private readonly userRepository: IUserRepository,
-      private readonly createAnon: CreateAnonymousUser,
-      private readonly jetService: IJWTService
+      private readonly _userRepository: IUserRepository,
+      private readonly _createAnon: CreateAnonymousUser,
+      private readonly _jetService: IJWTService
    ) {}
 
    execute = async (dto: googleAuthDTO): Promise<{ accessToken: string; refreshToken: string }> => {
-      let user = await this.userRepository.retriveUserByEmail(dto.email);
+      let user = await this._userRepository.retriveUserByEmail(dto.email);
 
       if (!user) {
-         user = await this.userRepository.googleAuthCreate(dto);
+         user = await this._userRepository.googleAuthCreate(dto);
       }
 
       if (user.isBlocked) {
          throw new UserBlockedError('User is blocked, cannot do social auth');
       }
 
-      const anon = await this.createAnon.execute(user.id);
+      const anon = await this._createAnon.execute(user.id);
       if (!anon) {
          throw new GenericError('cannot create annon');
       }
@@ -40,13 +40,13 @@ export class UserGoogleAuth {
          expiresAt: Date.now() + Anonymous.ANON_EXPIRY_TIME_IN_MILLI_SECONDS,
       };
 
-      const accessToken = this.jetService.sign(
+      const accessToken = this._jetService.sign(
          tokenPayload,
          ENV.ACCESS_TOKEN_SECRET as string,
          JWT_ACCESS_TOKEN_EXPIRY_SECONDS
       );
 
-      const refreshToken = this.jetService.sign(
+      const refreshToken = this._jetService.sign(
          tokenPayload,
          ENV.REFRESH_TOKEN_SECRET as string,
          JWT_REFRESH_TOKEN_EXPIRY_SECONDS

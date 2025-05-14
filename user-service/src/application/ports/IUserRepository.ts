@@ -26,4 +26,20 @@ export interface IUserRepository {
    }>;
 
    updateBlockStatus(userId: string, newStatus: boolean): Promise<AdminGetUserResponseDTO | null>;
+
+   retriveUserById(userId: string): Promise<User | null>;
+
+   updateNameAndBio(
+      userId: string,
+      firstName: string,
+      lastName: string,
+      bio: string
+   ): Promise<Pick<User, 'id' | 'firstName' | 'lastName' | 'bio'> | null>;
+
+   updateAvatar(userId: string, newAvatarKey: string): Promise<{ updatedAvatarKey: string } | null>;
+
+   updateCoverPhoto(
+      userId: string,
+      newCoverPhotoKey: string
+   ): Promise<{ updatedCoverPhotoKey: string } | null>;
 }

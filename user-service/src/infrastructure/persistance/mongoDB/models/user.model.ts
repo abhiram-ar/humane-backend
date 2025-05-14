@@ -13,8 +13,8 @@ export interface IUser extends Document {
    lastName?: string;
    passwordHash?: string;
    bio?: string;
-   lastLoginTime?: Date;
-   createdAt?: Date;
+   lastLoginTime?: string;
+   createdAt: string;
 }
 
 const userSchema = new Schema<IUser>(
@@ -29,8 +29,8 @@ const userSchema = new Schema<IUser>(
       avatar: { type: String },
       coverPhoto: { type: String },
       passwordHash: { type: String },
-      bio: { type: String },
-      lastLoginTime: { type: Date, default: Date.now() },
+      bio: { type: String, default: '' },
+      lastLoginTime: { type: String, default: new Date().toISOString() },
    },
    { timestamps: true }
 );

@@ -10,13 +10,13 @@ import { adminLoginDTO } from '@dtos/admin/adminLogin.dto';
 
 export class AdminEmailLogin {
    constructor(
-      private readonly AdminRepository: IAdminRepository,
-      private readonly hasingService: IHashService,
-      private readonly jwtService: IJWTService
+      private readonly _AdminRepository: IAdminRepository,
+      private readonly _hasingService: IHashService,
+      private readonly _jwtService: IJWTService
    ) {}
 
    execute = async (dto: adminLoginDTO): Promise<{ accessToken: string; refreshToken: string }> => {
-      const admin = await this.AdminRepository.retriveAdminByEmail(dto.email);
+      const admin = await this._AdminRepository.retriveAdminByEmail(dto.email);
       if (!admin) {
          throw new EmailError('Email does not exist');
       }
@@ -25,7 +25,7 @@ export class AdminEmailLogin {
          throw new PasswordError('Account has no password');
       }
 
-      const passwordMatch = await this.hasingService.compare(dto.password, admin.passwordHash);
+      const passwordMatch = await this._hasingService.compare(dto.password, admin.passwordHash);
       if (!passwordMatch) {
          throw new PasswordError('password does not match');
       }
@@ -36,13 +36,13 @@ export class AdminEmailLogin {
          type: 'admin',
       };
 
-      const accessToken = this.jwtService.sign(
+      const accessToken = this._jwtService.sign(
          jwtTokenPaylod,
          ENV.ACCESS_TOKEN_SECRET as string,
          JWT_ACCESS_TOKEN_EXPIRY_SECONDS
       );
 
-      const refreshToken = this.jwtService.sign(
+      const refreshToken = this._jwtService.sign(
          jwtTokenPaylod,
          ENV.REFRESH_TOKEN_SECRET as string,
          JWT_REFRESH_TOKEN_EXPIRY_SECONDS
