@@ -7,20 +7,20 @@ import { EmailError } from '@application/errors/EmailError';
 
 export class CreateAdmin {
    constructor(
-      private readonly adminRepository: IAdminRepository,
-      private readonly hashService: IHashService
+      private readonly _adminRepository: IAdminRepository,
+      private readonly _hashService: IHashService
    ) {}
 
    execute = async (
       dto: signupAdminDTO
    ): Promise<{ firstName: string; lastName?: string; email: string }> => {
-      const emailExists = await this.adminRepository.emailExists(dto.email);
+      const emailExists = await this._adminRepository.emailExists(dto.email);
       
       if (emailExists) {
          throw new EmailError('Email already exists');
       }
 
-      const passwordHash = await this.hashService.hash(
+      const passwordHash = await this._hashService.hash(
          dto.password,
          parseInt(ENV.PASSWORD_SALT as string)
       );
@@ -32,7 +32,7 @@ export class CreateAdmin {
          passwordHash,
       };
 
-      const newAdmin = await this.adminRepository.create(createAdminDTO);
+      const newAdmin = await this._adminRepository.create(createAdminDTO);
 
       if (!newAdmin) {
          throw new Error('cannot create new admin');
