@@ -6,11 +6,10 @@ import { connectKafkaProducer, disconnectKafkaProducer } from '@config/kafka';
 const start = async () => {
    try {
       checkEnv();
-
       await connectDB();
 
       await connectKafkaProducer();
-      
+
       process.on('SIGINT', async () => {
          await disconnectKafkaProducer();
       });
