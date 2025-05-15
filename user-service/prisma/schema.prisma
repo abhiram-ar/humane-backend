@@ -13,3 +13,29 @@ datasource db {
   provider = "postgresql"
   url      = env("POSTGRES_URI")
 }
+
+model User {
+  id              String     @id @default(uuid())
+  firstName       String
+  lastName        String?
+  email           String     @unique
+  passwordHash    String
+  isEmailVerified Boolean    @default(false)
+  isBlocked       Boolean    @default(false)
+  isHotUser       Boolean    @default(false)
+  avatarKey       String?
+  coverPhotoKey   String?
+  bio             String     @default("")
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @default(now())
+  lastLoginTime   DateTime   @default(now())
+  userScore       UserScore?
+
+  @@index(fields: [email])
+}
+
+model UserScore {
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String @unique
+  humaneScore Int    @default(0)
+}
