@@ -11,7 +11,6 @@ import {
    otpService,
 } from '../services.container';
 import { userRepository } from '../repository.container';
-import { creataAnonUser, resolveAnonUser } from './anonUsercase.container';
 import { UserGoogleAuth } from '@application/useCases/user/googleAuth.usecase';
 
 export const singupUser = new SignupUser(
@@ -24,22 +23,12 @@ export const singupUser = new SignupUser(
 
 export const verifyUser = new VerifyUser(userRepository, jwtService, bcryptHashService);
 
-export const userEmailLogin = new UserEmailLogin(
-   userRepository,
-   bcryptHashService,
-   jwtService,
-   creataAnonUser
-);
+export const userEmailLogin = new UserEmailLogin(userRepository, bcryptHashService, jwtService);
 
-export const refreshUserAccessToken = new RefreshUserAccessToken(
-   userRepository,
-   jwtService,
-   resolveAnonUser,
-   creataAnonUser
-);
+export const refreshUserAccessToken = new RefreshUserAccessToken(userRepository, jwtService);
 
 export const forgotPassoword = new ForgotPassword(userRepository, jwtService, kafkaPubliserService);
 
 export const recoverPassword = new RecoverPassword(userRepository, jwtService, bcryptHashService);
 
-export const userGooglgAuth = new UserGoogleAuth(userRepository, creataAnonUser, jwtService);
+export const userGooglgAuth = new UserGoogleAuth(userRepository, jwtService);

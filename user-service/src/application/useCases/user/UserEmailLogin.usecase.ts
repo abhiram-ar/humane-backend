@@ -5,17 +5,15 @@ import { UserBlockedError } from '@application/errors/UserBlockedError';
 import { IHashService } from '@ports/IHashService';
 import { IJWTService } from '@ports/IJWTService';
 import { IUserRepository } from '@ports/IUserRepository';
-import { AnonJWTTokenPayload } from '@application/types/JWTTokenPayload.type';
+import { UserJWTTokenPayload } from '@application/types/JWTTokenPayload.type';
 import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS, JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
-import { CreateAnonymousUser } from '../anonymous/CreateAnonymousUser.usercase';
 import { EmailError } from '@application/errors/EmailError';
 
 export class UserEmailLogin {
    constructor(
       private readonly userRepository: IUserRepository,
       private readonly hasingService: IHashService,
-      private readonly jwtService: IJWTService,
-      private readonly createAnonUser: CreateAnonymousUser
+      private readonly jwtService: IJWTService // private readonly createAnonUser: CreateAnonymousUser
    ) {}
 
    execute = async (dto: userLoginDTO): Promise<{ accessToken: string; refreshToken: string }> => {
@@ -29,9 +27,7 @@ export class UserEmailLogin {
       }
 
       if (!user.passwordHash) {
-         throw new PasswordError(
-            'Account has no password, try social Auth'
-         );
+         throw new PasswordError('Account has no password, try social Auth');
       }
 
       const passwordMatch = await this.hasingService.compare(dto.password, user.passwordHash);
@@ -39,16 +35,10 @@ export class UserEmailLogin {
          throw new PasswordError('password does not match');
       }
 
-      // create anon id
-      let anonUser = await this.createAnonUser.execute(user.id);
-
       // create JWT
-      const jwtTokenPaylod: AnonJWTTokenPayload = {
-         anonId: anonUser.anonId,
-         createdAt: anonUser.createdAt,
-         expiresAt: anonUser.expiresAt,
-         revoked: anonUser.revoked,
-         type: 'anon',
+      const jwtTokenPaylod: UserJWTTokenPayload = {
+         userId: user.id,
+         type: 'user',
       };
 
       const accessToken = this.jwtService.sign(

@@ -35,7 +35,7 @@ app.use('/api/v1/global/auth/refresh', globalRefreshRouter);
 app.use('/api/v1/user/auth', authRouter);
 app.use('/api/v1/admin/auth', adminAuthRouter);
 
-app.use('/api/v1/anon/profile', isAuthenticated, authorizedRoles('anon'), anonProfileRouter);
+app.use('/api/v1/anon/profile', isAuthenticated, authorizedRoles('user'), anonProfileRouter);
 
 app.use(
    '/api/v1/admin/manage/user',

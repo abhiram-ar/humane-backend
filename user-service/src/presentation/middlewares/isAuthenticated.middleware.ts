@@ -24,7 +24,7 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
 
    const payload = verifyAccessToken.execute(token);
 
-   if (payload.type === 'anon' || payload.type === 'admin') {
+   if (payload.type === 'user' || payload.type === 'admin') {
       req.user = payload;
       return next();
    }

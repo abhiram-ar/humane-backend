@@ -11,9 +11,9 @@ import { Request, Response, NextFunction } from 'express';
 
 export class GlobalRefreshController {
    constructor(
-      private readonly jwtService: IJWTService,
-      private readonly refreshAdminToken: RefreshAdminAccessToken,
-      private readonly refreshUserToken: RefreshUserAccessToken
+      private readonly _jwtService: IJWTService,
+      private readonly _refreshAdminToken: RefreshAdminAccessToken,
+      private readonly _refreshUserToken: RefreshUserAccessToken
    ) {}
 
    refresh = async (req: Request, res: Response, next: NextFunction) => {
@@ -25,7 +25,7 @@ export class GlobalRefreshController {
 
          let payload: JWTTokenPaylod;
          try {
-            payload = this.jwtService.verify<JWTTokenPaylod>(
+            payload = this._jwtService.verify<JWTTokenPaylod>(
                refreshJWT,
                ENV.REFRESH_TOKEN_SECRET as string
             );
@@ -36,10 +36,10 @@ export class GlobalRefreshController {
          let newToken: string;
 
          if (payload.type === 'admin') {
-            const { newAccessToken } = await this.refreshAdminToken.execute(refreshJWT);
+            const { newAccessToken } = await this._refreshAdminToken.execute(refreshJWT);
             newToken = newAccessToken;
-         } else if (payload.type === 'anon') {
-            const { newAccessToken } = await this.refreshUserToken.execute(refreshJWT);
+         } else if (payload.type === "user") {
+            const { newAccessToken } = await this._refreshUserToken.execute(refreshJWT);
             newToken = newAccessToken;
          } else {
             throw new JWTRefreshError('Invalid token type');
