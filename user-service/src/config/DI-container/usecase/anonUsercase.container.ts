@@ -1,5 +1,5 @@
 import { CreateAnonymousUser } from '@application/useCases/anonymous/CreateAnonymousUser.usercase';
-import { mongoAnonUserRepository, mongoUserRespository } from '../repository.container';
+import { mongoAnonUserRepository, userRepository } from '../repository.container';
 import { awsStorageService, cryptoUUIDService } from '../services.container';
 import { ResolveAnoymousUser } from '@application/useCases/anonymous/ResolveAnonymousUser.usecase';
 import { GetCurrentAnonProfile } from '@application/useCases/anonymous/GetCurrentAnonProfile';
@@ -14,22 +14,22 @@ export const resolveAnonUser = new ResolveAnoymousUser(mongoAnonUserRepository);
 
 export const getCurrentAnonProfile = new GetCurrentAnonProfile(
    resolveAnonUser,
-   mongoUserRespository,
+   userRepository,
    awsStorageService
 );
 
-export const updateAnonProfile = new UpdateAnonProfile(resolveAnonUser, mongoUserRespository);
+export const updateAnonProfile = new UpdateAnonProfile(resolveAnonUser, userRepository);
 
 export const generatePresignedURL = new GeneratePresignedURL(awsStorageService);
 
 export const updateAnonAvatar = new UpdateAnonAvatar(
    resolveAnonUser,
-   mongoUserRespository,
+   userRepository,
    awsStorageService
 );
 
 export const updateAnonCoverPhoto = new UpdateAnonCoverPhoto(
    resolveAnonUser,
-   mongoUserRespository,
+   userRepository,
    awsStorageService
 );
