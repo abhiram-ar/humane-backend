@@ -10,44 +10,36 @@ import {
    kafkaPubliserService,
    otpService,
 } from '../services.container';
-import { mongoUserRespository } from '../repository.container';
+import { userRepository } from '../repository.container';
 import { creataAnonUser, resolveAnonUser } from './anonUsercase.container';
 import { UserGoogleAuth } from '@application/useCases/user/googleAuth.usecase';
 
 export const singupUser = new SignupUser(
-   mongoUserRespository,
+   userRepository,
    jwtService,
    otpService,
    bcryptHashService,
    kafkaPubliserService
 );
 
-export const verifyUser = new VerifyUser(mongoUserRespository, jwtService, bcryptHashService);
+export const verifyUser = new VerifyUser(userRepository, jwtService, bcryptHashService);
 
 export const userEmailLogin = new UserEmailLogin(
-   mongoUserRespository,
+   userRepository,
    bcryptHashService,
    jwtService,
    creataAnonUser
 );
 
 export const refreshUserAccessToken = new RefreshUserAccessToken(
-   mongoUserRespository,
+   userRepository,
    jwtService,
    resolveAnonUser,
    creataAnonUser
 );
 
-export const forgotPassoword = new ForgotPassword(
-   mongoUserRespository,
-   jwtService,
-   kafkaPubliserService
-);
+export const forgotPassoword = new ForgotPassword(userRepository, jwtService, kafkaPubliserService);
 
-export const recoverPassword = new RecoverPassword(
-   mongoUserRespository,
-   jwtService,
-   bcryptHashService
-);
+export const recoverPassword = new RecoverPassword(userRepository, jwtService, bcryptHashService);
 
-export const userGooglgAuth = new UserGoogleAuth(mongoUserRespository, creataAnonUser, jwtService);
+export const userGooglgAuth = new UserGoogleAuth(userRepository, creataAnonUser, jwtService);

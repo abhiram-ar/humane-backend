@@ -7,5 +7,9 @@ COPY package.json .
 RUN npm install 
 
 COPY . .
+COPY prisma ./prisma
+
+# 🔥 Critical step
+RUN npx prisma generate
 
 CMD [ "npm", "run" , "dev" ]
