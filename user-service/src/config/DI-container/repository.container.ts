@@ -1,12 +1,11 @@
-import { MongoAnonymousUserRepository } from '@infrastructure/persistance/mongoDB/repository/MongoAnoymousUserRepository';
 import { PostgresAdminRepository } from '@infrastructure/persistance/postgres/repository/AdminRepository';
 import { PostresUserRepository } from '@infrastructure/persistance/postgres/repository/UserRepository';
 
 // const mongoUserRespository = new MongoUserRepository();
 // const mongoAdminRepositrory = new MongoAdminRepository();
+// const mongoAnonUserRepository = new MongoAnonymousUserRepository();
 
-const mongoAnonUserRepository = new MongoAnonymousUserRepository();
 const userRepository = new PostresUserRepository();
-const adminRepository = new PostgresAdminRepository()
+const adminRepository = new PostgresAdminRepository();
 
-export { mongoAnonUserRepository, userRepository, adminRepository };
+export { userRepository, adminRepository };

@@ -11,13 +11,13 @@ import { EmailError } from '@application/errors/EmailError';
 
 export class UserEmailLogin {
    constructor(
-      private readonly userRepository: IUserRepository,
-      private readonly hasingService: IHashService,
-      private readonly jwtService: IJWTService // private readonly createAnonUser: CreateAnonymousUser
+      private readonly _userRepository: IUserRepository,
+      private readonly _hasingService: IHashService,
+      private readonly _jwtService: IJWTService // private readonly createAnonUser: CreateAnonymousUser
    ) {}
 
    execute = async (dto: userLoginDTO): Promise<{ accessToken: string; refreshToken: string }> => {
-      const user = await this.userRepository.retriveUserByEmail(dto.email);
+      const user = await this._userRepository.retriveUserByEmail(dto.email);
       if (!user) {
          throw new EmailError('Email does not exist, create an account.');
       }
@@ -30,7 +30,7 @@ export class UserEmailLogin {
          throw new PasswordError('Account has no password, try social Auth');
       }
 
-      const passwordMatch = await this.hasingService.compare(dto.password, user.passwordHash);
+      const passwordMatch = await this._hasingService.compare(dto.password, user.passwordHash);
       if (!passwordMatch) {
          throw new PasswordError('password does not match');
       }
@@ -41,13 +41,13 @@ export class UserEmailLogin {
          type: 'user',
       };
 
-      const accessToken = this.jwtService.sign(
+      const accessToken = this._jwtService.sign(
          jwtTokenPaylod,
          ENV.ACCESS_TOKEN_SECRET as string,
          JWT_ACCESS_TOKEN_EXPIRY_SECONDS
       );
 
-      const refreshToken = this.jwtService.sign(
+      const refreshToken = this._jwtService.sign(
          jwtTokenPaylod,
          ENV.REFRESH_TOKEN_SECRET as string,
          JWT_REFRESH_TOKEN_EXPIRY_SECONDS

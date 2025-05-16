@@ -11,9 +11,9 @@ import { NextFunction, Request, Response } from 'express';
 
 export class AdminAuthController {
    constructor(
-      private readonly createAdmin: CreateAdmin,
-      private readonly adminEmailLogin: AdminEmailLogin,
-      private readonly refreshToken: RefreshAdminAccessToken
+      private readonly _createAdmin: CreateAdmin,
+      private readonly _adminEmailLogin: AdminEmailLogin,
+      private readonly _refreshToken: RefreshAdminAccessToken
    ) {}
 
    signup = async (req: Request, res: Response, next: NextFunction) => {
@@ -24,7 +24,7 @@ export class AdminAuthController {
             throw new ZodValidationError(parsed.error);
          }
 
-         const newAdmin = await this.createAdmin.execute(parsed.data);
+         const newAdmin = await this._createAdmin.execute(parsed.data);
 
          res.status(201).json({
             success: true,
@@ -43,7 +43,7 @@ export class AdminAuthController {
             throw new ZodValidationError(parsed.error);
          }
 
-         const { accessToken, refreshToken } = await this.adminEmailLogin.execute(parsed.data);
+         const { accessToken, refreshToken } = await this._adminEmailLogin.execute(parsed.data);
 
          res.cookie('refreshJWT', refreshToken, {
             httpOnly: true,
@@ -69,7 +69,7 @@ export class AdminAuthController {
             throw new UnAuthenticatedError('refresh token not found in cookies');
          }
 
-         const { newAccessToken } = await this.refreshToken.execute(refreshJWT);
+         const { newAccessToken } = await this._refreshToken.execute(refreshJWT);
 
          res.status(200).json({
             success: true,

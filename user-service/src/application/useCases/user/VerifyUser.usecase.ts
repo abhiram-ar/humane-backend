@@ -6,9 +6,9 @@ import { IUserRepository } from '../../ports/IUserRepository';
 
 export class VerifyUser {
    constructor(
-      private readonly userRepository: IUserRepository,
-      private readonly JWT: JWTService,
-      private readonly hashService: IHashService
+      private readonly _userRepository: IUserRepository,
+      private readonly _JWT: JWTService,
+      private readonly _hashService: IHashService
    ) {}
 
    execute = async (
@@ -17,7 +17,7 @@ export class VerifyUser {
       let verifiedUser: verifedUserToken;
 
       try {
-         verifiedUser = this.JWT.verify<verifedUserToken>(
+         verifiedUser = this._JWT.verify<verifedUserToken>(
             dto.activationToken,
             process.env.otpTokenSecret as string
          );
@@ -25,12 +25,12 @@ export class VerifyUser {
          throw new OTPError('OTP token expires/Invalid');
       }
 
-      const validHash = await this.hashService.compare(dto.activationCode, verifiedUser.otpHash);
+      const validHash = await this._hashService.compare(dto.activationCode, verifiedUser.otpHash);
       if (!validHash) {
          throw new OTPError('OTP does not match');
       }
 
-      const newUser = await this.userRepository.create(verifiedUser);
+      const newUser = await this._userRepository.create(verifiedUser);
       return newUser;
    };
 }
