@@ -1,14 +1,20 @@
 import { UserAuthController } from '@presentation/controllers/user.controller';
 import {
    forgotPassoword,
+   generatePresignedURL,
+   getCurrentUserProfile,
    recoverPassword,
    refreshUserAccessToken,
    singupUser,
+   updateUserAvatar,
+   updateUserCoverPhoto,
+   updateUserProfile,
    userEmailLogin,
    userGooglgAuth,
    verifyUser,
 } from '@di/usecase/userUsercase.container';
 import { googleOAuth2Client } from '@infrastructure/service/GoogleOAuth2Service';
+import { UserProfileController } from '@presentation/controllers/userProfile.controller';
 
 export const userAuthController = new UserAuthController(
    singupUser,
@@ -19,4 +25,12 @@ export const userAuthController = new UserAuthController(
    recoverPassword,
    googleOAuth2Client,
    userGooglgAuth
+);
+
+export const userProfileController = new UserProfileController(
+   getCurrentUserProfile,
+   updateUserProfile,
+   generatePresignedURL,
+   updateUserAvatar,
+   updateUserCoverPhoto
 );

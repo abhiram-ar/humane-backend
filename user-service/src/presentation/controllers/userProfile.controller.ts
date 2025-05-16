@@ -1,42 +1,42 @@
 import { AuthorizationError } from '@application/errors/AuthorizationError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
-import { GeneratePresignedURL } from '@application/useCases/anonymous/GeneratePresignedURL';
-import { GetCurrentAnonProfile } from '@application/useCases/anonymous/GetCurrentAnonProfile';
-import { UpdateAnonAvatar } from '@application/useCases/anonymous/UpdateAnonAvatar';
-import { UpdateAnonCoverPhoto } from '@application/useCases/anonymous/UpdateAnonCoverPhoto';
-import { UpdateAnonProfile } from '@application/useCases/anonymous/UpdateAnonProfile';
-import { generatePresignedURLInputSchema } from '@dtos/anonymous/generatePreSignedURL.input.dto';
-import { getCurrentAnonProfileSchema } from '@dtos/anonymous/getCurrentAnonProfile.input.dto';
-import { updateAnonCoverPhotoSchema } from '@dtos/anonymous/updateAnonCoverPhoto.input.dto';
-import { updateAnonProfileSchema } from '@dtos/anonymous/updateAnonProfile.input.dto';
-import { updateAnonAvatarSchema } from '@dtos/anonymous/updateAnonProfileAvatar.input.dto';
+import { GeneratePresignedURL } from '@application/useCases/user/GeneratePresignedURL';
+import { GetCurrentUserProfile } from '@application/useCases/user/GetCurrentUserProfile';
+import { UpdateUserAvatar } from '@application/useCases/user/UpdateUserAvatar';
+import { UpdateUserCoverPhoto } from '@application/useCases/user/UpdateUserCoverPhoto';
+import { UpdateUserProfile } from '@application/useCases/user/UpdateUserProfile';
+import { generatePresignedURLInputSchema } from '@dtos/user/generatePreSignedURL.input.dto';
+import { getCurrentAnonProfileSchema } from '@dtos/user/getCurrentAnonProfile.input.dto';
+import { updateUserCoverPhotoSchema } from '@dtos/user/updateUserCoverPhoto.input.dto';
+import { updateUserProfileSchema } from '@dtos/user/updateUserProfile.input.dto';
+import { updateUserAvatarSchema } from '@dtos/user/updateAnonProfileAvatar.input.dto';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
 import { NextFunction, Request, Response } from 'express';
 
-export class AnonProfileController {
+export class UserProfileController {
    constructor(
-      private readonly _getCurrentAnonProfile: GetCurrentAnonProfile,
-      private readonly _updateAnonProfile: UpdateAnonProfile,
+      private readonly _getCurrentUserProfile: GetCurrentUserProfile,
+      private readonly _updateUserProfile: UpdateUserProfile,
       private readonly _generatePreSignedURL: GeneratePresignedURL,
-      private readonly _updateAnonAvatar: UpdateAnonAvatar,
-      private readonly _updateAnonCoverPhoto: UpdateAnonCoverPhoto
+      private readonly _updatUserAvatar: UpdateUserAvatar,
+      private readonly _updateUserCoverPhoto: UpdateUserCoverPhoto
    ) {}
 
    getProfile = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         if (req.user?.type !== 'anon') {
-            throw new AuthorizationError('only anon can user this resource');
+         if (req.user?.type !== 'user') {
+            throw new AuthorizationError('only user can user this resource');
          }
 
          const parsed = getCurrentAnonProfileSchema.safeParse({
-            anonId: req.user?.anonId,
+            userId: req.user?.userId,
          });
 
          if (!parsed.success) {
             throw new ZodValidationError(parsed.error);
          }
 
-         const profile = await this._getCurrentAnonProfile.execute(parsed.data);
+         const profile = await this._getCurrentUserProfile.execute(parsed.data);
 
          res.status(200).json({
             success: true,
@@ -50,20 +50,20 @@ export class AnonProfileController {
 
    updateProfile = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         if (req.user?.type !== 'anon') {
-            throw new AuthorizationError('only anon can user this resource');
+         if (req.user?.type !== 'user') {
+            throw new AuthorizationError('only user can user this resource');
          }
 
-         if (!req.user.anonId) {
-            throw new UserNotFoundError('anonId is missing');
+         if (!req.user.userId) {
+            throw new UserNotFoundError('userId is missing');
          }
 
-         const parsed = updateAnonProfileSchema.safeParse(req.body);
+         const parsed = updateUserProfileSchema.safeParse(req.body);
          if (!parsed.success) {
             throw new ZodValidationError(parsed.error);
          }
 
-         const updatedProfile = await this._updateAnonProfile.execute(req.user.anonId, parsed.data);
+         const updatedProfile = await this._updateUserProfile.execute(req.user.userId, parsed.data);
 
          res.status(201).json({
             success: true,
@@ -98,22 +98,22 @@ export class AnonProfileController {
 
    updateAvatarPhoto = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         if (req.user?.type !== 'anon') {
-            throw new AuthorizationError('only anon can user this resource');
+         if (req.user?.type !== 'user') {
+            throw new AuthorizationError('only user can user this resource');
          }
 
-         const anonId = req.user.anonId;
-         if (!anonId) {
-            throw new UserNotFoundError('no anonId in resolved JWT bearer');
+         const userId = req.user.userId;
+         if (!userId) {
+            throw new UserNotFoundError('no userId in resolved JWT bearer');
          }
 
-         const parsed = updateAnonAvatarSchema.safeParse(req.body);
+         const parsed = updateUserAvatarSchema.safeParse(req.body);
          if (!parsed.success) {
             throw new ZodValidationError(parsed.error);
          }
 
-         const { updatedAvatarKey, newAvatarURL } = await this._updateAnonAvatar.execute(
-            anonId,
+         const { updatedAvatarKey, newAvatarURL } = await this._updatUserAvatar.execute(
+            userId,
             parsed.data
          );
 
@@ -132,22 +132,22 @@ export class AnonProfileController {
 
    updateCoverPhoto = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         if (req.user?.type !== 'anon') {
+         if (req.user?.type !== 'user') {
             throw new AuthorizationError('only anon can user this resource');
          }
 
-         const anonId = req.user.anonId;
-         if (!anonId) {
-            throw new UserNotFoundError('no anonId in resolved JWT bearer');
+         const userId = req.user.userId;
+         if (!userId) {
+            throw new UserNotFoundError('no userId in resolved JWT bearer');
          }
 
-         const parsed = updateAnonCoverPhotoSchema.safeParse(req.body);
+         const parsed = updateUserCoverPhotoSchema.safeParse(req.body);
          if (!parsed.success) {
             throw new ZodValidationError(parsed.error);
          }
 
          const { updatedCoverPhotoKey, newCoverPhotoURL } =
-            await this._updateAnonCoverPhoto.execute(anonId, parsed.data);
+            await this._updateUserCoverPhoto.execute(userId, parsed.data);
 
          res.status(201).json({
             success: true,
