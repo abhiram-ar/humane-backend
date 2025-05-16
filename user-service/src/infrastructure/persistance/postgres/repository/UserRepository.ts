@@ -130,7 +130,7 @@ export class PostresUserRepository implements IUserRepository {
          lastName: res.lastName ?? undefined,
          email: res.email,
          isBlocked: res.isBlocked,
-         isHotUser: res.isBlocked,
+         isHotUser: res.isHotUser,
          createdAt: res.createdAt.toUTCString(),
          humaneScore: res.humaneScore,
       };
