@@ -9,15 +9,15 @@ import { IUserRepository } from '@ports/IUserRepository';
 
 export class RecoverPassword {
    constructor(
-      private readonly userRepository: IUserRepository,
-      private readonly jwtService: IJWTService,
-      private readonly hashService: IHashService
+      private readonly _userRepository: IUserRepository,
+      private readonly _jwtService: IJWTService,
+      private readonly _hashService: IHashService
    ) {}
 
    execute = async (dto: recoverPasswordDTO) => {
       let payload: ForgotPasswordPayload;
       try {
-         payload = this.jwtService.verify<ForgotPasswordPayload>(
+         payload = this._jwtService.verify<ForgotPasswordPayload>(
             dto.recoveryToken,
             ENV.RESET_PASSWORD_SECRET as string
          );
@@ -25,12 +25,12 @@ export class RecoverPassword {
          throw new JWTError('Invalid/Expired recovery token');
       }
 
-      const hashedPassword = await this.hashService.hash(
+      const hashedPassword = await this._hashService.hash(
          dto.newPassword,
          parseInt(ENV.PASSWORD_SALT as string)
       );
 
-      const userUpdate = await this.userRepository.changePassword(payload.email, hashedPassword);
+      const userUpdate = await this._userRepository.changePassword(payload.email, hashedPassword);
       if (!userUpdate) {
          throw new UserNotFoundError('Email does not exist');
       }

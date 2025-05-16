@@ -1,19 +1,17 @@
 import checkEnv from './config/env';
 import app from './presentation/server';
-import connectDB from './infrastructure/persistance/mongoDB/client';
 import { connectKafkaProducer, disconnectKafkaProducer } from '@config/kafka';
+import db from '@infrastructure/persistance/postgres/prisma-client';
 
 const start = async () => {
    try {
       checkEnv();
-      await connectDB();
+      await db.$connect();
 
       await connectKafkaProducer();
-
       process.on('SIGINT', async () => {
          await disconnectKafkaProducer();
       });
-
       process.on('SIGTERM', async () => {
          await disconnectKafkaProducer();
       });

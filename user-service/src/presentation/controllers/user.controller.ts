@@ -24,14 +24,14 @@ import { UserGoogleAuth } from '@application/useCases/user/googleAuth.usecase';
 
 export class UserAuthController {
    constructor(
-      private readonly singupUser: SignupUser,
-      private readonly verifyUser: VerifyUser,
-      private readonly userEmailLogin: UserEmailLogin,
-      private readonly refreshUserAccessToken: RefreshUserAccessToken,
-      private readonly forgotPassoword: ForgotPassword,
-      private readonly recoverPassword: RecoverPassword,
-      private readonly googleAuth2Client: OAuth2Client,
-      private readonly userGooglgAuth: UserGoogleAuth
+      private readonly _singupUser: SignupUser,
+      private readonly _verifyUser: VerifyUser,
+      private readonly _userEmailLogin: UserEmailLogin,
+      private readonly _refreshUserAccessToken: RefreshUserAccessToken,
+      private readonly _forgotPassoword: ForgotPassword,
+      private readonly _recoverPassword: RecoverPassword,
+      private readonly _googleAuth2Client: OAuth2Client,
+      private readonly _userGooglgAuth: UserGoogleAuth
    ) {}
 
    signup = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -42,7 +42,7 @@ export class UserAuthController {
             throw new ZodValidationError(parsed.error);
          }
 
-         const signupToken = await this.singupUser.execute(parsed.data);
+         const signupToken = await this._singupUser.execute(parsed.data);
 
          res.status(201).json({
             success: true,
@@ -61,7 +61,7 @@ export class UserAuthController {
             throw new ZodValidationError(parsed.error);
          }
 
-         const newUser = await this.verifyUser.execute(parsed.data);
+         const newUser = await this._verifyUser.execute(parsed.data);
 
          res.status(201).json({
             success: true,
@@ -80,7 +80,7 @@ export class UserAuthController {
             throw new ZodValidationError(parsed.error);
          }
 
-         const { refreshToken, accessToken } = await this.userEmailLogin.execute(parsed.data);
+         const { refreshToken, accessToken } = await this._userEmailLogin.execute(parsed.data);
 
          console.log(ENV.NODE_ENV);
 
@@ -108,7 +108,7 @@ export class UserAuthController {
             throw new UnAuthenticatedError('refresh token not found in cookies');
          }
 
-         const { newAccessToken } = await this.refreshUserAccessToken.execute(refreshJWT);
+         const { newAccessToken } = await this._refreshUserAccessToken.execute(refreshJWT);
 
          res.status(200).json({
             success: true,
@@ -164,7 +164,7 @@ export class UserAuthController {
             throw new ZodValidationError(parsed.error);
          }
 
-         const { email } = await this.forgotPassoword.execute(parsed.data);
+         const { email } = await this._forgotPassoword.execute(parsed.data);
 
          res.status(201).json({
             success: true,
@@ -183,7 +183,7 @@ export class UserAuthController {
             throw new ZodValidationError(parsed.error);
          }
 
-         const { email } = await this.recoverPassword.execute(parsed.data);
+         const { email } = await this._recoverPassword.execute(parsed.data);
 
          res.status(201).json({
             success: true,
@@ -203,7 +203,7 @@ export class UserAuthController {
             throw new GenericError('Cannot find credentials in request body');
          }
 
-         const verifiedToken = await this.googleAuth2Client.verifyIdToken({
+         const verifiedToken = await this._googleAuth2Client.verifyIdToken({
             idToken: credentials,
             audience: ENV.GOOGLE_CLIENT_ID,
          });
@@ -223,7 +223,7 @@ export class UserAuthController {
             avaratURL: payload.picture,
          };
 
-         const { accessToken, refreshToken } = await this.userGooglgAuth.execute(googleAuthDTO);
+         const { accessToken, refreshToken } = await this._userGooglgAuth.execute(googleAuthDTO);
 
          res.cookie('refreshJWT', refreshToken, {
             httpOnly: true,

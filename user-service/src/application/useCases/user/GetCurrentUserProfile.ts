@@ -1,12 +1,10 @@
 import { IUserRepository } from '@ports/IUserRepository';
-import { ResolveAnoymousUser } from './ResolveAnonymousUser.usecase';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
-import { GetCurrentAnonProfileInputDTO } from '@dtos/anonymous/getCurrentAnonProfile.input.dto';
+import { GetCurrentAnonProfileInputDTO } from '@dtos/user/getCurrentAnonProfile.input.dto';
 import { IStorageService } from '@ports/IStorageService';
 
-export class GetCurrentAnonProfile {
+export class GetCurrentUserProfile {
    constructor(
-      private readonly _resolveAnonUser: ResolveAnoymousUser,
       private readonly _userRepository: IUserRepository,
       private readonly _storageService: IStorageService
    ) {}
@@ -22,16 +20,10 @@ export class GetCurrentAnonProfile {
       createdAt: string;
       humaneScore: number;
    }> => {
-      const resolvedAnon = await this._resolveAnonUser.execute(dto.anonId);
-
-      if (!resolvedAnon) {
-         throw new UserNotFoundError('Invalid anonId');
-      }
-
-      const currentUser = await this._userRepository.retriveUserById(resolvedAnon.userId);
+      const currentUser = await this._userRepository.retriveUserById(dto.userId);
 
       if (!currentUser) {
-         throw new UserNotFoundError('Resolved anon->user does not exist');
+         throw new UserNotFoundError('User does not exist');
       }
 
       let avatarURL: string | undefined;

@@ -1,7 +1,5 @@
-import { Anonymous } from '@domain/entities/anon.entity';
-import { IAnonymousUserRepository } from '@ports/IAnonymousUserRepository';
-import { IUUIDService } from '@ports/IUUIDService';
-
+/* eslint-disable */
+/* tslint:disable */
 export class CreateAnonymousUser {
    constructor(
       private readonly _anonUserRepository: IAnonymousUserRepository,

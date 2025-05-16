@@ -1,18 +1,14 @@
 import { UserBlockedError } from '@application/errors/UserBlockedError';
-import { AnonJWTTokenPayload } from '@application/types/JWTTokenPayload.type';
 import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
 import { IUserRepository } from '@ports/IUserRepository';
-import { CreateAnonymousUser } from '../anonymous/CreateAnonymousUser.usercase';
-import { Anonymous } from '@domain/entities/anon.entity';
 import { IJWTService } from '@ports/IJWTService';
 import { ENV } from '@config/env';
 import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS, JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
-import { GenericError } from '@application/errors/GenericError';
+import { UserJWTTokenPayload } from '@application/types/JWTTokenPayload.type';
 
 export class UserGoogleAuth {
    constructor(
       private readonly _userRepository: IUserRepository,
-      private readonly _createAnon: CreateAnonymousUser,
       private readonly _jetService: IJWTService
    ) {}
 
@@ -27,17 +23,9 @@ export class UserGoogleAuth {
          throw new UserBlockedError('User is blocked, cannot do social auth');
       }
 
-      const anon = await this._createAnon.execute(user.id);
-      if (!anon) {
-         throw new GenericError('cannot create annon');
-      }
-
-      const tokenPayload: AnonJWTTokenPayload = {
-         anonId: anon.anonId,
-         type: 'anon',
-         revoked: false,
-         createdAt: Date.now(),
-         expiresAt: Date.now() + Anonymous.ANON_EXPIRY_TIME_IN_MILLI_SECONDS,
+      const tokenPayload: UserJWTTokenPayload = {
+         userId: user.id,
+         type: 'user',
       };
 
       const accessToken = this._jetService.sign(

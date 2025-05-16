@@ -1,27 +1,23 @@
 import { JWTRefreshError } from '@application/errors/JWTRefreshError';
 import { UserBlockedError } from '@application/errors/UserBlockedError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
-import { AnonJWTTokenPayload } from '@application/types/JWTTokenPayload.type';
+import { UserJWTTokenPayload } from '@application/types/JWTTokenPayload.type';
 import { ENV } from '@config/env';
 import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 import { JWTService } from '@infrastructure/service/JWTService';
 import { IUserRepository } from '@ports/IUserRepository';
-import { ResolveAnoymousUser } from '../anonymous/ResolveAnonymousUser.usecase';
-import { CreateAnonymousUser } from '../anonymous/CreateAnonymousUser.usercase';
 
 export class RefreshUserAccessToken {
    constructor(
-      private readonly userReporitory: IUserRepository,
-      private readonly jwtService: JWTService,
-      private readonly resolveAnonUser: ResolveAnoymousUser,
-      private readonly createAnonUser: CreateAnonymousUser
+      private readonly _userReporitory: IUserRepository,
+      private readonly _jwtService: JWTService
    ) {}
 
    execute = async (refreshToken: string): Promise<{ newAccessToken: string }> => {
-      let verifedTokenPayload: AnonJWTTokenPayload;
+      let verifedTokenPayload: UserJWTTokenPayload;
 
       try {
-         verifedTokenPayload = this.jwtService.verify<AnonJWTTokenPayload>(
+         verifedTokenPayload = this._jwtService.verify<UserJWTTokenPayload>(
             refreshToken,
             ENV.REFRESH_TOKEN_SECRET as string
          );
@@ -29,13 +25,7 @@ export class RefreshUserAccessToken {
          throw new JWTRefreshError('Invalid/Expired refresh token');
       }
 
-      // todo: retirve userId by anonID
-      const anonUser = await this.resolveAnonUser.execute(verifedTokenPayload.anonId);
-      if (!anonUser) {
-         throw new UserNotFoundError('anon record missing, cannot resolve anon user');
-      }
-
-      const userStatus = await this.userReporitory.getUserStatusById(anonUser.userId);
+      const userStatus = await this._userReporitory.getUserStatusById(verifedTokenPayload.userId);
 
       if (!userStatus) {
          throw new UserNotFoundError(
@@ -49,30 +39,12 @@ export class RefreshUserAccessToken {
 
       // we cannot reuse the old verifiedTokenPaylod,
       // as it contain additonal fields after verifing including old token expiry
-      let newTokenPaylod: AnonJWTTokenPayload = {
-         anonId: verifedTokenPayload.anonId,
-         createdAt: verifedTokenPayload.createdAt,
-         expiresAt: verifedTokenPayload.expiresAt,
-         revoked: verifedTokenPayload.revoked,
-         type: 'anon',
+      let newTokenPaylod: UserJWTTokenPayload = {
+         userId: userStatus.id,
+         type: 'user',
       };
 
-      // create new anonId, if old one is expired or if expires in < 1hr
-      if (
-         anonUser.expiresAt < Date.now() ||
-         anonUser.expiresAt - anonUser.createdAt < 1000 * 60 * 60
-      ) {
-         const newAnon = await this.createAnonUser.execute(anonUser.userId);
-         newTokenPaylod = {
-            anonId: newAnon.anonId,
-            createdAt: newAnon.createdAt,
-            expiresAt: newAnon.expiresAt,
-            revoked: newAnon.revoked,
-            type: 'anon',
-         };
-      }
-
-      const newAccessToken = this.jwtService.sign(
+      const newAccessToken = this._jwtService.sign(
          newTokenPaylod,
          ENV.ACCESS_TOKEN_SECRET as string,
          JWT_ACCESS_TOKEN_EXPIRY_SECONDS
