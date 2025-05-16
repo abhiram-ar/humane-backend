@@ -4,7 +4,6 @@ import { createUserDTO } from '@dtos/user/createUser.dto';
 import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
 import { IUserRepository } from '@ports/IUserRepository';
 import db from '../prisma-client';
-import { number } from 'zod';
 
 export class PostresUserRepository implements IUserRepository {
    create = async (dto: createUserDTO): Promise<Pick<User, 'firstName' | 'lastName' | 'email'>> => {
