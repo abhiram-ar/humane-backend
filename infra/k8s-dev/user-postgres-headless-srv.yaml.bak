@@ -1,8 +1,9 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: user-postgres-depl
+  name: user-postgres-sts
 spec:
+  serviceName: user-postgres-srv
   replicas: 1
   selector:
     matchLabels:
@@ -30,16 +31,22 @@ spec:
             limits:
               memory: "1024Mi"
               cpu: "1"
-      volumes:
-        - name: user-postgres-storage
-          persistentVolumeClaim:
-            claimName: user-postgres-pvc
+  volumeClaimTemplates:
+    - metadata:
+        name: user-postgres-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: manual
+        resources:
+          requests:
+            storage: 2Gi
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: user-postgres-srv
 spec:
+  clusterIP: None
   selector:
     app: postgres
   ports:
