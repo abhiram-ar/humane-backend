@@ -8,11 +8,11 @@ metadata:
 spec:
   storageClassName: manual
   capacity:
-    storage: 2Gi
+    storage: 1Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /home/abhiram/Bootcamp/week-23-to-27/humane/backend/data/user-postgres-sql
+    path: /home/abhiram/Bootcamp/week-23-to-27/humane/backend/data/user-postgree
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -26,4 +26,4 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
+      storage: 1Gi
