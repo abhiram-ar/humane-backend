@@ -28,6 +28,14 @@ build:
         manual:
           - dest: .
             src: "src/**/*.ts"
+    - image: abhiramar/humane-elasticsearch-proxy
+      context: elasticsearch-proxy
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: "src/**/*.ts"
 
 deploy:
   kubectl: {}
