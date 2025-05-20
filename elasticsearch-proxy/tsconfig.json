@@ -6,14 +6,10 @@
       "noUnusedLocals": true,
       "baseUrl": "src",
       "paths": {
-         "@dtos/*": ["application/DTOs/*"],
-         "@ports/*": ["application/ports/*"],
+         "@dtos/*": ["dto/*"],
          "@di/*": ["config/DI-container/*"],
-         "@services/*": ["application/services/*"],
-         "@domain/*": ["domain/*"],
-         "@application/*": ["application/*"],
-         "@infrastructure/*": ["infrastructure/*"],
-         "@presentation/*": ["presentation/*"],
+         "@services/*": ["services/*"],
+         "@repository/*": ["repository/*"],
          "@config/*": ["config/*"]
       }
    }

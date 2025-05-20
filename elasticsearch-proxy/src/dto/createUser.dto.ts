@@ -12,14 +12,11 @@ export const createUserSchema = z.object({
    coverPhotoURL: z.string().nullish(),
 
    createdAt: z.string(),
-   updatedAt: z.string(),
-   lastLoginTime: z.string(),
 
    isBlocked: z.boolean(),
    isHotUser: z.boolean(),
 
    email: z.string().nonempty().email(),
 });
-
 
 export type CreateUserDTO = z.infer<typeof createUserSchema>;

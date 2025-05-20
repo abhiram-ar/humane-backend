@@ -12,8 +12,10 @@
       "uc": "npm update humane-common"
    },
    "dependencies": {
-      "humane-common": "^1.0.29",
+      "date-fns": "^4.1.0",
+      "humane-common": "^1.0.33",
       "kafkajs": "^2.2.4",
+      "winston": "^3.17.0",
       "zod": "^3.24.4"
    },
    "devDependencies": {
