@@ -3,20 +3,22 @@ import { Client } from '@elastic/elasticsearch';
 import { CreateUserDTO } from 'dto/createUser.dto';
 import { IUserRepository } from 'repository/Interfaces/IUserRepository';
 import { ES_INDEXES } from './ES_INDEXES';
-import { logger } from '@config/logger';
+import { UserDocument } from './UserDocument';
+import { UpdateNameAndBioDTO } from '@dtos/updateUserNameBio.dto';
 
 export class UserRepository implements IUserRepository {
-   private readonly client;
+   private readonly _client;
+   private readonly _index = ES_INDEXES.USER_PROFILE_INDEX;
    constructor() {
-      this.client = new Client({ node: ENV.ELASTICSEARCH_URI });
+      this._client = new Client({ node: ENV.ELASTICSEARCH_URI });
    }
 
    initializeUserIndex = async () => {
-      const indexExists = await this.client.indices.exists({
+      const indexExists = await this._client.indices.exists({
          index: ES_INDEXES.USER_PROFILE_INDEX,
       });
       if (!indexExists)
-         await this.client.indices.create({
+         await this._client.indices.create({
             index: ES_INDEXES.USER_PROFILE_INDEX,
             mappings: {
                // prevent dynamic filed creation in production, improve query performance and better resouce utilization
@@ -38,20 +40,33 @@ export class UserRepository implements IUserRepository {
          });
    };
 
-   create = async (dto: CreateUserDTO): Promise<{ ack: boolean }> => {
-      try {
-         const { id, ...data } = dto;
-         await this.client.index({
-            index: ES_INDEXES.USER_PROFILE_INDEX,
-            id: dto.id,
-            document: data,
-         });
-         return { ack: true };
-      } catch (error) {
-         logger.error(`error while createing user:${dto.id}`);
-         logger.error(error);
-         console.log(error);
-         return { ack: false };
-      }
+   createCommand = async (dto: CreateUserDTO): Promise<void> => {
+      const { id, ...data } = dto;
+      await this._client.index({
+         index: ES_INDEXES.USER_PROFILE_INDEX,
+         id: dto.id,
+         document: { ...data, updatedAt: dto.createdAt },
+      });
+   };
+   updatedAtQuery = async (id: string): Promise<{ updatedAt: string | undefined } | null> => {
+      const res = await this._client.get<Pick<UserDocument, 'updatedAt'>>({
+         index: this._index,
+         id,
+         _source: ['updatedAt'],
+      });
+      if (!res.found) return null;
+
+      return { updatedAt: res._source?.updatedAt };
+   };
+
+   updateNameAndBioCommand = async (updatedAt: string, dto: UpdateNameAndBioDTO): Promise<void> => {
+      type PartialDoc = Pick<UserDocument, 'firstName' | 'lastName' | 'bio' | 'updatedAt'>;
+      const { id, ...data } = dto;
+
+      await this._client.update({
+         index: this._index,
+         id: id,
+         doc: { ...data, updatedAt } as PartialDoc,
+      });
    };
 }
