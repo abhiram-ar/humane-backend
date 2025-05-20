@@ -12,12 +12,12 @@ export class UserProfileEventsConsumer {
       private readonly _kafka: KafkaSingleton,
       private readonly _userServices: UserServices
    ) {
-      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-9.971');
+      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-22');
    }
 
    start = async () => {
       await this.consumer.connect();
-      console.log('User profile event consumer connected ');
+      logger.info('User profile event consumer connected ');
 
       await this.consumer.subscribe({
          topic: KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
@@ -32,21 +32,24 @@ export class UserProfileEventsConsumer {
 
             const tempTraceId = `${event.eventType}-${event.eventId.split('-')[0]}`;
             logger.debug(`new Event-> ${tempTraceId}`);
+            logger.verbose(JSON.stringify(event, null, 2));
 
             try {
                if (event.eventType === AppEventsTypes.USER_CREATED) {
                   const parsed = createUserSchema.safeParse(event.payload);
 
-                  if (!parsed.success) {
-                     console.log('');
-                     return;
+                  if (!parsed.success) throw new Error('Invalid event payload');
+
+                  const { ack } = await this._userServices.create(parsed.data);
+                  if (!ack) {
+                     throw new Error('Unable to write to query model');
                   }
 
-                  // this._userServices.create(parsed.data);
                   logger.info(`processed-> ${tempTraceId}`);
                }
-            } catch (error) {
-               logger.error(`error processing: ${tempTraceId}`, error);
+            } catch (e) {
+               logger.error(`error processing: ${tempTraceId}`);
+               logger.error((e as Error).message);
             }
          },
       });

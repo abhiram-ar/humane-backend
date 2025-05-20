@@ -3,6 +3,7 @@ import { Client } from '@elastic/elasticsearch';
 import { CreateUserDTO } from 'dto/createUser.dto';
 import { IUserRepository } from 'repository/Interfaces/IUserRepository';
 import { ES_INDEXES } from './ES_INDEXES';
+import { logger } from '@config/logger';
 
 export class UserRepository implements IUserRepository {
    private readonly client;
@@ -47,7 +48,9 @@ export class UserRepository implements IUserRepository {
          });
          return { ack: true };
       } catch (error) {
-         console.log('error while createing user:', dto.id);
+         logger.error(`error while createing user:${dto.id}`);
+         logger.error(error);
+         console.log(error);
          return { ack: false };
       }
    };

@@ -27,7 +27,7 @@ export class UserGoogleAuth {
             firstName: user.firstName,
             email: user.email,
             lastName: user.lastName || null,
-            createdAt: new Date().toUTCString(),
+            createdAt: new Date().toISOString(),
             isBlocked: user.isBlocked,
             isHotUser: user.isHotUser,
          };
