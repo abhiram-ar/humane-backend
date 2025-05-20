@@ -16,19 +16,19 @@ spec:
         service: elasticsearch-proxy
         type: web-server
     spec:
-      # initContainers:
-      #   - name: wait-for-es
-      #     image: busybox
-      #     command:
-      #       - sh
-      #       - -c
-      #       - |
-      #         echo "Waiting for Elasticsearch...";
-      #         until nc -z elasticsearch 9200; do
-      #           echo "Elasticsearch is not up yet...";
-      #           sleep 2;
-      #         done
-      #         echo "Elasticsearch is up!";
+      initContainers:
+        - name: wait-for-es
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for Elasticsearch...";
+              until nc -z elasticsearch 9200; do
+                echo "Elasticsearch is not up yet...";
+                sleep 2;
+              done
+              echo "Elasticsearch is up!";
       containers:
         - name: elasticsearch-proxy
           image: abhiramar/humane-elasticsearch-proxy
