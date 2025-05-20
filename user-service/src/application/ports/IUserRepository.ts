@@ -4,13 +4,18 @@ import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
 import { AdminGetUserResponseDTO, GetUserDTO } from '@dtos/admin/getUsers.dto';
 
 export interface IUserRepository {
-   create(dto: createUserDTO): Promise<Pick<User, 'firstName' | 'lastName' | 'email'>>;
+   create(
+      dto: createUserDTO
+   ): Promise<Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'isBlocked' | 'isHotUser'>>;
 
    emailExists(email: string): Promise<boolean>;
 
    retriveUserByEmail(
       email: string
-   ): Promise<Pick<User, 'id' | 'email' | 'passwordHash' | 'isBlocked'> | null>;
+   ): Promise<Pick<
+      User,
+      'id' | 'email' | 'passwordHash' | 'isBlocked' | 'firstName' | 'lastName' | 'isHotUser'
+   > | null>;
 
    getUserStatusById(userId: string): Promise<Pick<User, 'id' | 'isBlocked'> | null>;
 
@@ -18,7 +23,7 @@ export interface IUserRepository {
 
    googleAuthCreate(
       dto: googleAuthDTO
-   ): Promise<Pick<User, 'id' | 'isBlocked' | 'firstName' | 'email'>>;
+   ): Promise<Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'isBlocked' | 'isHotUser'>>;
 
    getUserList(dto: GetUserDTO & { skip: number }): Promise<{
       users: AdminGetUserResponseDTO[];

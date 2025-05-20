@@ -28,7 +28,12 @@ export const singupUser = new SignupUser(
 );
 
 // auth
-export const verifyUser = new VerifyUser(userRepository, jwtService, bcryptHashService);
+export const verifyUser = new VerifyUser(
+   userRepository,
+   jwtService,
+   bcryptHashService,
+   kafkaPubliserService
+);
 
 export const userEmailLogin = new UserEmailLogin(userRepository, bcryptHashService, jwtService);
 
@@ -38,7 +43,7 @@ export const forgotPassoword = new ForgotPassword(userRepository, jwtService, ka
 
 export const recoverPassword = new RecoverPassword(userRepository, jwtService, bcryptHashService);
 
-export const userGooglgAuth = new UserGoogleAuth(userRepository, jwtService);
+export const userGooglgAuth = new UserGoogleAuth(userRepository, jwtService, kafkaPubliserService);
 
 // profile
 

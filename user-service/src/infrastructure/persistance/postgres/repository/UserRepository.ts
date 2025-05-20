@@ -6,7 +6,11 @@ import { IUserRepository } from '@ports/IUserRepository';
 import db from '../prisma-client';
 
 export class PostresUserRepository implements IUserRepository {
-   create = async (dto: createUserDTO): Promise<Pick<User, 'firstName' | 'lastName' | 'email'>> => {
+   create = async (
+      dto: createUserDTO
+   ): Promise<
+      Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'isBlocked' | 'isHotUser'>
+   > => {
       const res = await db.user.create({
          data: {
             firstName: dto.firstName,
@@ -15,13 +19,23 @@ export class PostresUserRepository implements IUserRepository {
             passwordHash: dto.passwordHash,
          },
          select: {
+            id: true,
             firstName: true,
             lastName: true,
             email: true,
+            isBlocked: true,
+            isHotUser: true,
          },
       });
 
-      return { firstName: res.firstName, lastName: res.lastName ?? undefined, email: res.email };
+      return {
+         id: res.id,
+         firstName: res.firstName,
+         lastName: res.lastName ?? undefined,
+         email: res.email,
+         isBlocked: res.isBlocked,
+         isHotUser: res.isHotUser,
+      };
    };
 
    emailExists = async (email: string): Promise<boolean> => {
@@ -31,19 +45,33 @@ export class PostresUserRepository implements IUserRepository {
 
    retriveUserByEmail = async (
       email: string
-   ): Promise<Pick<User, 'id' | 'email' | 'passwordHash' | 'isBlocked'> | null> => {
+   ): Promise<Pick<
+      User,
+      'id' | 'firstName' | 'lastName' | 'email' | 'passwordHash' | 'isBlocked' | 'isHotUser'
+   > | null> => {
       const res = await db.user.findUnique({
          where: { email },
-         select: { id: true, email: true, passwordHash: true, isBlocked: true },
+         select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            passwordHash: true,
+            isBlocked: true,
+            isHotUser: true,
+         },
       });
 
       if (!res) return null;
 
       return {
          id: res.id,
+         firstName: res.firstName,
+         lastName: res.lastName ?? undefined,
          email: res.email,
          passwordHash: res.passwordHash ?? undefined,
          isBlocked: res.isBlocked,
+         isHotUser: res.isHotUser,
       };
    };
    getUserStatusById = async (userId: string): Promise<Pick<User, 'id' | 'isBlocked'> | null> => {
@@ -73,9 +101,18 @@ export class PostresUserRepository implements IUserRepository {
 
    googleAuthCreate = async (
       dto: googleAuthDTO
-   ): Promise<Pick<User, 'id' | 'isBlocked' | 'firstName' | 'email'>> => {
+   ): Promise<
+      Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'isBlocked' | 'isHotUser'>
+   > => {
       const res = await db.user.create({ data: { firstName: dto.firstName, email: dto.email } });
-      return res;
+      return {
+         id: res.id,
+         firstName: res.firstName,
+         lastName: res.lastName ?? undefined,
+         email: res.email,
+         isBlocked: res.isBlocked,
+         isHotUser: res.isHotUser,
+      };
    };
 
    getUserList = async (

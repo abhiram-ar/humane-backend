@@ -5,11 +5,15 @@ import { IJWTService } from '@ports/IJWTService';
 import { ENV } from '@config/env';
 import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS, JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 import { UserJWTTokenPayload } from '@application/types/JWTTokenPayload.type';
+import { AppEventsTypes, createEvent, KafkaTopics, UserCreatedEventPayload } from 'humane-common';
+import { IEventPublisher } from '@ports/IEventProducer';
+import { EventBusError } from '@application/errors/EventbusError';
 
 export class UserGoogleAuth {
    constructor(
       private readonly _userRepository: IUserRepository,
-      private readonly _jetService: IJWTService
+      private readonly _jetService: IJWTService,
+      private readonly _eventPublisher: IEventPublisher
    ) {}
 
    execute = async (dto: googleAuthDTO): Promise<{ accessToken: string; refreshToken: string }> => {
@@ -17,6 +21,26 @@ export class UserGoogleAuth {
 
       if (!user) {
          user = await this._userRepository.googleAuthCreate(dto);
+
+         const eventPayload: UserCreatedEventPayload = {
+            id: user.id,
+            firstName: user.firstName,
+            email: user.email,
+            lastName: user.lastName || null,
+            createdAt: new Date().toUTCString(),
+            isBlocked: user.isBlocked,
+            isHotUser: user.isHotUser,
+         };
+
+         const userCreatedEvent = createEvent(AppEventsTypes.USER_CREATED, eventPayload);
+         const { ack } = await this._eventPublisher.send(
+            KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
+            userCreatedEvent
+         );
+
+         if (!ack) {
+            throw new EventBusError('failed to send user created Event');
+         }
       }
 
       if (user.isBlocked) {
