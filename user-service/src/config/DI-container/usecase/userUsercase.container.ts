@@ -49,7 +49,7 @@ export const userGooglgAuth = new UserGoogleAuth(userRepository, jwtService, kaf
 
 export const getCurrentUserProfile = new GetCurrentUserProfile(userRepository, awsStorageService);
 
-export const updateUserProfile = new UpdateUserProfile(userRepository);
+export const updateUserProfile = new UpdateUserProfile(userRepository, kafkaPubliserService);
 
 export const generatePresignedURL = new GeneratePresignedURL(awsStorageService);
 
