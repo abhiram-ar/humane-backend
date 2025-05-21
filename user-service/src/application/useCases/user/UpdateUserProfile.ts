@@ -40,7 +40,6 @@ export class UpdateUserProfile {
          firstName: updatedUserProfile.firstName,
          lastName: updatedUserProfile.lastName || '',
          bio: updatedUserProfile.bio || '',
-         createdAt: new Date().toISOString(),
       };
 
       //

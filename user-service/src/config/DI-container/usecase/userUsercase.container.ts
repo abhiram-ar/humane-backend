@@ -53,6 +53,6 @@ export const updateUserProfile = new UpdateUserProfile(userRepository, kafkaPubl
 
 export const generatePresignedURL = new GeneratePresignedURL(awsStorageService);
 
-export const updateUserAvatar = new UpdateUserAvatar(userRepository, awsStorageService);
+export const updateUserAvatar = new UpdateUserAvatar(userRepository, awsStorageService, kafkaPubliserService);
 
 export const updateUserCoverPhoto = new UpdateUserCoverPhoto(userRepository, awsStorageService);

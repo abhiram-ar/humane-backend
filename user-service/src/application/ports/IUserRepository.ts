@@ -6,7 +6,12 @@ import { AdminGetUserResponseDTO, GetUserDTO } from '@dtos/admin/getUsers.dto';
 export interface IUserRepository {
    create(
       dto: createUserDTO
-   ): Promise<Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'isBlocked' | 'isHotUser'>>;
+   ): Promise<
+      Pick<
+         User,
+         'id' | 'firstName' | 'lastName' | 'email' | 'isBlocked' | 'isHotUser' | 'createdAt'
+      >
+   >;
 
    emailExists(email: string): Promise<boolean>;
 

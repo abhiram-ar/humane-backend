@@ -42,7 +42,7 @@ export class VerifyUser {
          firstName: newUser.firstName,
          email: newUser.email,
          lastName: newUser.lastName || null,
-         createdAt: new Date().toISOString(),
+         createdAt: newUser.createdAt,
          isBlocked: newUser.isBlocked,
          isHotUser: newUser.isHotUser,
       };

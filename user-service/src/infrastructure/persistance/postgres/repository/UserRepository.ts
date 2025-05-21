@@ -9,7 +9,10 @@ export class PostresUserRepository implements IUserRepository {
    create = async (
       dto: createUserDTO
    ): Promise<
-      Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'isBlocked' | 'isHotUser'>
+      Pick<
+         User,
+         'id' | 'firstName' | 'lastName' | 'email' | 'isBlocked' | 'isHotUser' | 'createdAt'
+      >
    > => {
       const res = await db.user.create({
          data: {
@@ -25,6 +28,7 @@ export class PostresUserRepository implements IUserRepository {
             email: true,
             isBlocked: true,
             isHotUser: true,
+            createdAt: true,
          },
       });
 
@@ -35,6 +39,7 @@ export class PostresUserRepository implements IUserRepository {
          email: res.email,
          isBlocked: res.isBlocked,
          isHotUser: res.isHotUser,
+         createdAt: res.createdAt.toISOString(),
       };
    };
 

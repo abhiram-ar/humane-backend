@@ -2,11 +2,21 @@ import { IUserRepository } from '@ports/IUserRepository';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { UpdateUserCoverPhotoInputDTO } from '@dtos/user/updateUserCoverPhoto.input.dto';
 import { IStorageService } from '@ports/IStorageService';
+import {
+   AppEventsTypes,
+   createEvent,
+   EventBusError,
+   KafkaTopics,
+   UpdateUserCoverPhotoKeyEventPayload,
+   UserPasswordRecoveryEventPaylaod,
+} from 'humane-common';
+import { IEventPublisher } from '@ports/IEventProducer';
 
 export class UpdateUserCoverPhoto {
    constructor(
       private readonly _userRepository: IUserRepository,
-      private readonly _storageService: IStorageService
+      private readonly _storageService: IStorageService,
+      private readonly _eventPublisher: IEventPublisher
    ) {}
 
    execute = async (
@@ -24,6 +34,23 @@ export class UpdateUserCoverPhoto {
       let newCoverPhotoURL: string | undefined;
       if (update.updatedCoverPhotoKey) {
          newCoverPhotoURL = this._storageService.getPublicCDNURL(update.updatedCoverPhotoKey);
+      }
+
+      const eventPayload: UpdateUserCoverPhotoKeyEventPayload = {
+         id: userId,
+         coverPhotoKey: update.updatedCoverPhotoKey || null,
+      };
+      const userAvatarURLUpdatedEvent = createEvent(
+         AppEventsTypes.USER_COVER_PHOTO_UPDATED,
+         eventPayload
+      );
+
+      const { ack } = await this._eventPublisher.send(
+         KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
+         userAvatarURLUpdatedEvent
+      );
+      if (!ack) {
+         throw new EventBusError('error while publishing user avatar updated event');
       }
 
       return { updatedCoverPhotoKey: update.updatedCoverPhotoKey, newCoverPhotoURL };
