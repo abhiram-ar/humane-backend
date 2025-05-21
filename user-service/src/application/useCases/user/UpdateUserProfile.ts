@@ -47,7 +47,7 @@ export class UpdateUserProfile {
 
       //
       const userNameBioUpdatedEvent = createEvent(AppEventsTypes.USER_UPDATED, eventPayload);
-
+      console.log(AppEventsTypes);
       const { ack } = await this._eventPublisher.send(
          KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
          userNameBioUpdatedEvent
