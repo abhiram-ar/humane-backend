@@ -40,11 +40,16 @@ export class VerifyUser {
       const eventPayload: UserCreatedEventPayload = {
          id: newUser.id,
          firstName: newUser.firstName,
-         email: newUser.email,
          lastName: newUser.lastName || null,
+         email: newUser.email,
          createdAt: newUser.createdAt,
          isBlocked: newUser.isBlocked,
          isHotUser: newUser.isHotUser,
+         bio: newUser.bio ?? null,
+         avatarKey: newUser.avatar ?? null,
+         coverPhotoKey: newUser.coverPhoto ?? null,
+         lastLoginTime: newUser.lastLoginTime ?? null,
+         humaneScore: newUser.humaneScore,
       };
 
       const userCreatedEvent = createEvent(AppEventsTypes.USER_CREATED, eventPayload);
@@ -57,6 +62,10 @@ export class VerifyUser {
          throw new EventBusError('failed to send user created Event');
       }
 
-      return newUser;
+      return {
+         firstName: newUser.firstName,
+         lastName: newUser.lastName ?? undefined,
+         email: newUser.email,
+      };
    };
 }

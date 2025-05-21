@@ -1,12 +1,7 @@
 import { IUserRepository } from '@ports/IUserRepository';
 import { UpdateUserProfileInputDTO } from '@dtos/user/updateUserProfile.input.dto';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
-import {
-   AppEventsTypes,
-   createEvent,
-   KafkaTopics,
-   UserNameBioUpdatedEventPayload,
-} from 'humane-common';
+import { AppEventsTypes, createEvent, KafkaTopics, UserUpdatedEventPayload } from 'humane-common';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { EventBusError } from '@application/errors/EventbusError';
 
@@ -35,18 +30,23 @@ export class UpdateUserProfile {
          throw new UserNotFoundError('user does not exist');
       }
 
-      const eventPayload: UserNameBioUpdatedEventPayload = {
+      const eventPayload: UserUpdatedEventPayload = {
          id: updatedUserProfile.id,
          firstName: updatedUserProfile.firstName,
-         lastName: updatedUserProfile.lastName || '',
-         bio: updatedUserProfile.bio || '',
+         lastName: updatedUserProfile.lastName || null,
+         email: updatedUserProfile.email,
+         bio: updatedUserProfile.bio || null,
+         avatarKey: updatedUserProfile.avatar || null,
+         coverPhotoKey: updatedUserProfile.coverPhoto || null,
+         createdAt: updatedUserProfile.createdAt,
+         lastLoginTime: updatedUserProfile.lastLoginTime || null,
+         isBlocked: updatedUserProfile.isBlocked,
+         isHotUser: updatedUserProfile.isHotUser,
+         humaneScore: updatedUserProfile.humaneScore,
       };
 
       //
-      const userNameBioUpdatedEvent = createEvent(
-         AppEventsTypes.USER_NAME_BIO_UPDATED,
-         eventPayload
-      );
+      const userNameBioUpdatedEvent = createEvent(AppEventsTypes.USER_UPDATED, eventPayload);
 
       const { ack } = await this._eventPublisher.send(
          KafkaTopics.USER_PROFILE_EVENTS_TOPIC,

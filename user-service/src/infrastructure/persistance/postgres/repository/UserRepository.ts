@@ -6,14 +6,7 @@ import { IUserRepository } from '@ports/IUserRepository';
 import db from '../prisma-client';
 
 export class PostresUserRepository implements IUserRepository {
-   create = async (
-      dto: createUserDTO
-   ): Promise<
-      Pick<
-         User,
-         'id' | 'firstName' | 'lastName' | 'email' | 'isBlocked' | 'isHotUser' | 'createdAt'
-      >
-   > => {
+   create = async (dto: createUserDTO): Promise<Omit<User, 'passwordHash'>> => {
       const res = await db.user.create({
          data: {
             firstName: dto.firstName,
@@ -21,25 +14,12 @@ export class PostresUserRepository implements IUserRepository {
             email: dto.email,
             passwordHash: dto.passwordHash,
          },
-         select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            isBlocked: true,
-            isHotUser: true,
-            createdAt: true,
-         },
       });
 
       return {
-         id: res.id,
-         firstName: res.firstName,
-         lastName: res.lastName ?? undefined,
-         email: res.email,
-         isBlocked: res.isBlocked,
-         isHotUser: res.isHotUser,
+         ...res,
          createdAt: res.createdAt.toISOString(),
+         lastLoginTime: res.lastLoginTime.toISOString(),
       };
    };
 
@@ -204,20 +184,18 @@ export class PostresUserRepository implements IUserRepository {
       firstName: string,
       lastName: string,
       bio: string
-   ): Promise<Pick<User, 'id' | 'firstName' | 'lastName' | 'bio'> | null> => {
+   ): Promise<Omit<User, 'passwordHash'> | null> => {
       const res = await db.user.update({
          where: { id: userId },
          data: { firstName, lastName, bio },
-         select: { id: true, firstName: true, lastName: true, bio: true },
       });
 
       if (!res) return null;
 
       return {
-         id: res.id,
-         firstName: res.firstName,
-         lastName: res.lastName ?? undefined,
-         bio: res.bio,
+         ...res,
+         createdAt: res.createdAt.toISOString(),
+         lastLoginTime: res.lastLoginTime.toISOString(),
       };
    };
    updateAvatar = async (

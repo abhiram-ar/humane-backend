@@ -4,15 +4,7 @@ import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
 import { AdminGetUserResponseDTO, GetUserDTO } from '@dtos/admin/getUsers.dto';
 
 export interface IUserRepository {
-   create(
-      dto: createUserDTO
-   ): Promise<
-      Pick<
-         User,
-         'id' | 'firstName' | 'lastName' | 'email' | 'isBlocked' | 'isHotUser' | 'createdAt'
-      >
-   >;
-
+   create(dto: createUserDTO): Promise<User>;
    emailExists(email: string): Promise<boolean>;
 
    retriveUserByEmail(
@@ -44,7 +36,7 @@ export interface IUserRepository {
       firstName: string,
       lastName: string,
       bio: string
-   ): Promise<Pick<User, 'id' | 'firstName' | 'lastName' | 'bio'> | null>;
+   ): Promise<User | null>;
 
    updateAvatar(userId: string, newAvatarKey: string): Promise<{ updatedAvatarKey: string } | null>;
 
