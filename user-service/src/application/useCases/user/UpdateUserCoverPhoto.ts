@@ -8,7 +8,6 @@ import {
    EventBusError,
    KafkaTopics,
    UpdateUserCoverPhotoKeyEventPayload,
-   UserPasswordRecoveryEventPaylaod,
 } from 'humane-common';
 import { IEventPublisher } from '@ports/IEventProducer';
 
@@ -40,14 +39,14 @@ export class UpdateUserCoverPhoto {
          id: userId,
          coverPhotoKey: update.updatedCoverPhotoKey || null,
       };
-      const userAvatarURLUpdatedEvent = createEvent(
+      const userCoverPhotoKeyUpdatedEvent = createEvent(
          AppEventsTypes.USER_COVER_PHOTO_UPDATED,
          eventPayload
       );
 
       const { ack } = await this._eventPublisher.send(
          KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
-         userAvatarURLUpdatedEvent
+         userCoverPhotoKeyUpdatedEvent
       );
       if (!ack) {
          throw new EventBusError('error while publishing user avatar updated event');
