@@ -9,4 +9,6 @@ export interface IUserRepository {
    updateNameAndBioCommand(updatedAt: string, dto: UpdateNameAndBioDTO): Promise<void>;
    
    updateUserAvatarKeyCommand(updatedAt: string, docId: string, avatarKey: string | null): Promise<void>;
+   
+   updateUserCoverPhotoKeyCommand(updatedAt: string, docId: string, coverPhotoKey: string | null): Promise<void>;
 }

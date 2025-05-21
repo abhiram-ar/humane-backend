@@ -81,4 +81,19 @@ export class UserRepository implements IUserRepository {
          doc: { avatarKey, updatedAt } as UserDocument,
       });
    };
+
+   updateUserCoverPhotoKeyCommand = async (
+      updatedAt: string,
+      docId: string,
+      coverPhotoKey: string | null
+   ): Promise<void> => {
+      await this._client.update({
+         index: this._index,
+         id: docId,
+         doc: {
+            coverPhotoKey,
+            updatedAt,
+         } as UserDocument,
+      });
+   };
 }

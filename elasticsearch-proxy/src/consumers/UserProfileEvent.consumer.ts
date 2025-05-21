@@ -1,6 +1,7 @@
 import { logger } from '@config/logger';
 import { createUserSchema } from '@dtos/createUser.dto';
 import { updateUserAvatarKeySchema } from '@dtos/updateUserAvatarKey.dto';
+import { updateUserCoverPhotokeySchema } from '@dtos/updateUserCoverPhotokey';
 import { updateUserNameAndBioSchema } from '@dtos/updateUserNameBio.dto';
 import { UserServices } from '@services/user.services';
 import { AppEvent, AppEventsTypes, KafkaTopics } from 'humane-common';
@@ -60,6 +61,14 @@ export class UserProfileEventsConsumer {
                   }
 
                   await this._userServices.updateUserAvatarKey(event.timestamp, parsed.data);
+               } else if (event.eventType === AppEventsTypes.USER_COVER_PHOTO_UPDATED) {
+                  const parsed = updateUserCoverPhotokeySchema.safeParse(event.payload);
+
+                  if (!parsed.success) {
+                     throw new Error('Invalid event payload');
+                  }
+
+                  this._userServices.updateUserCoverPhotoKey(event.timestamp, parsed.data);
                } else {
                   throw new Error('Event not configured for this consumer');
                }
