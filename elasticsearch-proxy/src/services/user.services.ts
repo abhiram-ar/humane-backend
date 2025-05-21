@@ -1,5 +1,6 @@
 import { logger } from '@config/logger';
 import { UpdateUserAvatarKeyDTO } from '@dtos/updateUserAvatarKey.dto';
+import { UpdaeteUserBlockStautsDTO } from '@dtos/updateUserBlockStatus.dto';
 import { UpdateUserCoverPhotoKeyDTO } from '@dtos/updateUserCoverPhotokey';
 import { UpdateNameAndBioDTO } from '@dtos/updateUserNameBio.dto';
 import { CreateUserDTO } from 'dto/createUser.dto';
@@ -53,9 +54,28 @@ export class UserServices {
       }
       const currnentTimeStamp = new Date(res.updatedAt ?? 0);
       if (incommingTimestamp > currnentTimeStamp) {
-         this._userRepository.updateUserCoverPhotoKeyCommand(eventTimestamp, dto.id, dto.coverPhotoKey);
+         this._userRepository.updateUserCoverPhotoKeyCommand(
+            eventTimestamp,
+            dto.id,
+            dto.coverPhotoKey
+         );
       } else {
          logger.warn('Skipping coverPhotoKey update. Reason: old event');
+      }
+   };
+
+   updateBlockStatus = async (eventTimestamp: string, dto: UpdaeteUserBlockStautsDTO) => {
+      const incommingTimestamp = new Date(eventTimestamp);
+
+      const res = await this._userRepository.updatedAtQuery(dto.id);
+      if (!res) {
+         throw new Error('user doc does not exist to update');
+      }
+      const currnentTimeStamp = new Date(res.updatedAt ?? 0);
+      if (incommingTimestamp > currnentTimeStamp) {
+         this._userRepository.updateUserBlockStatusCommand(eventTimestamp, dto.id, dto.isBlocked);
+      } else {
+         logger.warn('Skipping blockstatus update. Reason: old event');
       }
    };
 }

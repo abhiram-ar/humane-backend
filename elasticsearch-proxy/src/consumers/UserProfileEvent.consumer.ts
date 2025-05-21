@@ -1,6 +1,7 @@
 import { logger } from '@config/logger';
 import { createUserSchema } from '@dtos/createUser.dto';
 import { updateUserAvatarKeySchema } from '@dtos/updateUserAvatarKey.dto';
+import { updateUserBlockStatusSchema } from '@dtos/updateUserBlockStatus.dto';
 import { updateUserCoverPhotokeySchema } from '@dtos/updateUserCoverPhotokey';
 import { updateUserNameAndBioSchema } from '@dtos/updateUserNameBio.dto';
 import { UserServices } from '@services/user.services';
@@ -69,6 +70,13 @@ export class UserProfileEventsConsumer {
                   }
 
                   this._userServices.updateUserCoverPhotoKey(event.timestamp, parsed.data);
+               } else if (event.eventType === AppEventsTypes.USER_BLOCK_STATUS_UPDATED) {
+                  const parsed = updateUserBlockStatusSchema.safeParse(event.payload);
+
+                  if (!parsed.success) {
+                     throw new Error('Invalid event payload');
+                  }
+                  this._userServices.updateBlockStatus(event.timestamp, parsed.data);
                } else {
                   throw new Error('Event not configured for this consumer');
                }

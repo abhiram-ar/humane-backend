@@ -96,4 +96,19 @@ export class UserRepository implements IUserRepository {
          } as UserDocument,
       });
    };
+
+   updateUserBlockStatusCommand = async (
+      updatedAt: string,
+      docId: string,
+      newBlockStatus: boolean
+   ): Promise<void> => {
+      this._client.update({
+         index: this._index,
+         id: docId,
+         doc: {
+            isBlocked: newBlockStatus,
+            updatedAt,
+         } as UserDocument,
+      });
+   };
 }
