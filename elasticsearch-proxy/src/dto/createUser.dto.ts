@@ -1,10 +1,11 @@
+import { UserCreatedEventPayload } from 'humane-common';
 import { z } from 'zod';
 
 export const createUserSchema = z.object({
    id: z.string().nonempty(),
 
    firstName: z.string().nonempty(),
-   lastName: z.string().nullish(),
+   lastName: z.string().nullable(),
    bio: z.string().nullish(),
 
    avatarURL: z.string().nullish(),
@@ -20,3 +21,5 @@ export const createUserSchema = z.object({
 });
 
 export type CreateUserDTO = z.infer<typeof createUserSchema>;
+const assertTypeCompatibility: <T extends UserCreatedEventPayload>() => void = () => {};
+assertTypeCompatibility<CreateUserDTO>();

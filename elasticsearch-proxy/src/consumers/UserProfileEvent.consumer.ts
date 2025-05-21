@@ -1,5 +1,6 @@
 import { logger } from '@config/logger';
 import { createUserSchema } from '@dtos/createUser.dto';
+import { updateUserAvatarKeySchema } from '@dtos/updateUserAvatarKey.dto';
 import { updateUserNameAndBioSchema } from '@dtos/updateUserNameBio.dto';
 import { UserServices } from '@services/user.services';
 import { AppEvent, AppEventsTypes, KafkaTopics } from 'humane-common';
@@ -22,7 +23,7 @@ export class UserProfileEventsConsumer {
 
       await this.consumer.subscribe({
          topic: KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
-         fromBeginning: true
+         fromBeginning: true,
       });
 
       await this.consumer.run({
@@ -51,9 +52,18 @@ export class UserProfileEventsConsumer {
                      throw new Error('Invalid event payload');
                   }
                   await this._userServices.updateNameAndBio(event.timestamp, parsed.data);
+               } else if (event.eventType === AppEventsTypes.USER_AVATAR_UPDATED) {
+                  const parsed = updateUserAvatarKeySchema.safeParse(event.payload);
+
+                  if (!parsed.success) {
+                     throw new Error('Invalid event payload');
+                  }
+
+                  await this._userServices.updateUserAvatarKey(event.timestamp, parsed.data);
                } else {
                   throw new Error('Event not configured for this consumer');
                }
+
                logger.info(`processed-> ${tempTraceId}`);
             } catch (e) {
                logger.error(`error processing: ${tempTraceId}`);

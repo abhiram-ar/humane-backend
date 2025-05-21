@@ -7,4 +7,6 @@ export interface IUserRepository {
    updatedAtQuery(id: string): Promise<{ updatedAt: string | undefined } | null>;
 
    updateNameAndBioCommand(updatedAt: string, dto: UpdateNameAndBioDTO): Promise<void>;
+   
+   updateUserAvatarKeyCommand(updatedAt: string, docId: string, avatarKey: string | null): Promise<void>;
 }

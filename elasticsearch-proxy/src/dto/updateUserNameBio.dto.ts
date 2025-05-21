@@ -1,3 +1,4 @@
+import { UserNameBioUpdatedEventPayload } from 'humane-common';
 import { z } from 'zod';
 
 export const updateUserNameAndBioSchema = z.object({
@@ -8,3 +9,5 @@ export const updateUserNameAndBioSchema = z.object({
 });
 
 export type UpdateNameAndBioDTO = z.infer<typeof updateUserNameAndBioSchema>;
+const assertTypeCompatibility: <T extends UserNameBioUpdatedEventPayload>() => void = () => {};
+assertTypeCompatibility<UpdateNameAndBioDTO>();

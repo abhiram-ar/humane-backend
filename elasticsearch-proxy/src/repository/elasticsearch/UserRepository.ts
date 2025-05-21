@@ -3,7 +3,7 @@ import { Client } from '@elastic/elasticsearch';
 import { CreateUserDTO } from 'dto/createUser.dto';
 import { IUserRepository } from 'repository/Interfaces/IUserRepository';
 import { ES_INDEXES } from './ES_INDEXES';
-import { UserDocument } from './UserDocument';
+import { UserDocument } from './UserDocument.type';
 import { UpdateNameAndBioDTO } from '@dtos/updateUserNameBio.dto';
 
 export class UserRepository implements IUserRepository {
@@ -28,13 +28,14 @@ export class UserRepository implements IUserRepository {
                   lastName: { type: 'text', fields: { keyword: { type: 'keyword' } } },
                   bio: { type: 'text', index: false },
                   email: { type: 'keyword' },
-                  avatarURL: { type: 'keyword', index: false },
-                  coverPhotoURL: { type: 'keyword', index: false },
+                  avatarKey: { type: 'keyword', index: false },
+                  coverPhotoKey: { type: 'keyword', index: false },
                   createdAt: { type: 'date' }, // this is interpreated as iso data string in elastic search, covert the toISODataString() before injesting
                   updatedAt: { type: 'date' },
                   lastLoginTime: { type: 'date' },
                   isBlocked: { type: 'boolean' },
                   isHotUser: { type: 'boolean' },
+                  humaneScore: { type: 'integer' },
                },
             },
          });
@@ -67,6 +68,17 @@ export class UserRepository implements IUserRepository {
          index: this._index,
          id: id,
          doc: { ...data, updatedAt } as PartialDoc,
+      });
+   };
+   updateUserAvatarKeyCommand = async (
+      updatedAt: string,
+      docId: string,
+      avatarKey: string | null
+   ): Promise<void> => {
+      await this._client.update({
+         index: this._index,
+         id: docId,
+         doc: { avatarKey, updatedAt } as UserDocument,
       });
    };
 }

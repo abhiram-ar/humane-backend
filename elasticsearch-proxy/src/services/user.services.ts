@@ -1,4 +1,5 @@
 import { logger } from '@config/logger';
+import { UpdateUserAvatarKeyDTO } from '@dtos/updateUserAvatarKey.dto';
 import { UpdateNameAndBioDTO } from '@dtos/updateUserNameBio.dto';
 import { CreateUserDTO } from 'dto/createUser.dto';
 import { IUserRepository } from 'repository/Interfaces/IUserRepository';
@@ -26,4 +27,19 @@ export class UserServices {
          logger.warn('Skipping name/bio update. Reason: old event');
       }
    };
+
+   updateUserAvatarKey = async (eventTimestamp:string, dto: UpdateUserAvatarKeyDTO) => {
+      const incommingTimestamp = new Date(eventTimestamp)
+
+      const res= await this._userRepository.updatedAtQuery(dto.id)
+      if (!res) {
+         throw new Error('user doc does not exist to update');
+      }
+      const currnentTimeStamp = new Date(res.updatedAt ?? 0)
+      if (incommingTimestamp > currnentTimeStamp) {
+         this._userRepository.updateUserAvatarKeyCommand(eventTimestamp, dto.id, dto.avatarKey);
+      } else {
+         logger.warn('Skipping avatarKey update. Reason: old event');
+      }
+   }
 }
