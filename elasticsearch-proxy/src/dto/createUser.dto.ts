@@ -13,11 +13,12 @@ export const createUserSchema = z.object({
    coverPhotoKey: z.string().nullable(),
 
    createdAt: z.string(),
-   lastLoginTime:z.string().nullable(),
+   lastLoginTime: z.string().nullable(),
 
    isBlocked: z.boolean(),
    isHotUser: z.boolean(),
 
+   email: z.string().nonempty(),
    humaneScore: z.number(),
 });
 
