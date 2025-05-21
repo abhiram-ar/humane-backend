@@ -1,7 +1,7 @@
-import { UserCreatedEventPayload } from 'humane-common';
+import { UserUpdatedEventPayload } from 'humane-common';
 import { z } from 'zod';
 
-export const createUserSchema = z.object({
+export const updateUserSchema = z.object({
    id: z.string().nonempty(),
 
    firstName: z.string().nonempty(),
@@ -13,7 +13,7 @@ export const createUserSchema = z.object({
    coverPhotoKey: z.string().nullable(),
 
    createdAt: z.string(),
-   lastLoginTime:z.string().nullable(),
+   lastLoginTime: z.string().nullable(),
 
    isBlocked: z.boolean(),
    isHotUser: z.boolean(),
@@ -21,6 +21,6 @@ export const createUserSchema = z.object({
    humaneScore: z.number(),
 });
 
-export type CreateUserDTO = z.infer<typeof createUserSchema>;
-const assertTypeCompatibility: <T extends CreateUserDTO>() => void = () => {};
-assertTypeCompatibility<UserCreatedEventPayload>();
+export type UpdateUserDTO = z.infer<typeof updateUserSchema>;
+const assertTypeCompatibility: <T extends UpdateUserDTO>() => void = () => {};
+assertTypeCompatibility<UserUpdatedEventPayload>();

@@ -1,9 +1,9 @@
 import { logger } from '@config/logger';
 import { createUserSchema } from '@dtos/createUser.dto';
+import { updateUserSchema } from '@dtos/updateUser.dto';
 import { updateUserAvatarKeySchema } from '@dtos/updateUserAvatarKey.dto';
 import { updateUserBlockStatusSchema } from '@dtos/updateUserBlockStatus.dto';
 import { updateUserCoverPhotokeySchema } from '@dtos/updateUserCoverPhotokey';
-import { updateUserNameAndBioSchema } from '@dtos/updateUserNameBio.dto';
 import { UserServices } from '@services/user.services';
 import { AppEvent, AppEventsTypes, KafkaTopics } from 'humane-common';
 import KafkaSingleton from 'kafka/KafkaSingleton';
@@ -47,13 +47,13 @@ export class UserProfileEventsConsumer {
                   }
 
                   await this._userServices.create(parsed.data);
-               } else if (event.eventType === AppEventsTypes.USER_NAME_BIO_UPDATED) {
-                  const parsed = updateUserNameAndBioSchema.safeParse(event.payload);
+               } else if (event.eventType === AppEventsTypes.USER_UPDATED) {
+                  const parsed = updateUserSchema.safeParse(event.payload);
 
                   if (!parsed.success) {
                      throw new Error('Invalid event payload');
                   }
-                  await this._userServices.updateNameAndBio(event.timestamp, parsed.data);
+                  await this._userServices.update(event.timestamp, parsed.data);
                } else if (event.eventType === AppEventsTypes.USER_AVATAR_UPDATED) {
                   const parsed = updateUserAvatarKeySchema.safeParse(event.payload);
 

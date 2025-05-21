@@ -9,4 +9,5 @@ export interface UserDocument {
    lastLoginTime?: string | null;
    isBlocked: boolean;
    isHotUser: boolean;
+   humaneScore: number
 }

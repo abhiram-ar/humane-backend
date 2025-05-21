@@ -1,4 +1,4 @@
-import { UpdateNameAndBioDTO } from '@dtos/updateUserNameBio.dto';
+import { UpdateUserDTO } from '@dtos/updateUser.dto';
 import { CreateUserDTO } from 'dto/createUser.dto';
 
 export interface IUserRepository {
@@ -6,7 +6,7 @@ export interface IUserRepository {
 
    updatedAtQuery(id: string): Promise<{ updatedAt: string | undefined } | null>;
 
-   updateNameAndBioCommand(updatedAt: string, dto: UpdateNameAndBioDTO): Promise<void>;
+   updateCommand(updatedAt: string, dto: UpdateUserDTO): Promise<void>;
 
    updateUserAvatarKeyCommand(
       updatedAt: string,

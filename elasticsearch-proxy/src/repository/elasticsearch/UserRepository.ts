@@ -4,7 +4,7 @@ import { CreateUserDTO } from 'dto/createUser.dto';
 import { IUserRepository } from 'repository/Interfaces/IUserRepository';
 import { ES_INDEXES } from './ES_INDEXES';
 import { UserDocument } from './UserDocument.type';
-import { UpdateNameAndBioDTO } from '@dtos/updateUserNameBio.dto';
+import { UpdateUserDTO } from '@dtos/updateUser.dto';
 
 export class UserRepository implements IUserRepository {
    private readonly _client;
@@ -60,14 +60,13 @@ export class UserRepository implements IUserRepository {
       return { updatedAt: res._source?.updatedAt };
    };
 
-   updateNameAndBioCommand = async (updatedAt: string, dto: UpdateNameAndBioDTO): Promise<void> => {
-      type PartialDoc = Pick<UserDocument, 'firstName' | 'lastName' | 'bio' | 'updatedAt'>;
+   updateCommand = async (updatedAt: string, dto: UpdateUserDTO): Promise<void> => {
       const { id, ...data } = dto;
 
       await this._client.update({
          index: this._index,
          id: id,
-         doc: { ...data, updatedAt } as PartialDoc,
+         doc: { ...data, updatedAt } as UserDocument,
       });
    };
    updateUserAvatarKeyCommand = async (

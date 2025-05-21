@@ -1,4 +1,4 @@
-import { UpdateUserAvatarKeyEventPayload } from 'humane-common';
+import { UpdateUserAvatarKeyEventPayload, } from 'humane-common';
 import { z } from 'zod';
 
 export const updateUserAvatarKeySchema = z.object({
@@ -8,5 +8,5 @@ export const updateUserAvatarKeySchema = z.object({
 
 export type UpdateUserAvatarKeyDTO = z.infer<typeof updateUserAvatarKeySchema>;
 
-const assertTypeCompatibility: <T extends UpdateUserAvatarKeyEventPayload>() => void = () => {};
-assertTypeCompatibility<UpdateUserAvatarKeyDTO>();
+const assertTypeCompatibility: <T extends UpdateUserAvatarKeyDTO>() => void = () => {};
+assertTypeCompatibility<UpdateUserAvatarKeyEventPayload>();

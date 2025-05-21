@@ -1,8 +1,8 @@
 import { logger } from '@config/logger';
+import { UpdateUserDTO } from '@dtos/updateUser.dto';
 import { UpdateUserAvatarKeyDTO } from '@dtos/updateUserAvatarKey.dto';
 import { UpdaeteUserBlockStautsDTO } from '@dtos/updateUserBlockStatus.dto';
 import { UpdateUserCoverPhotoKeyDTO } from '@dtos/updateUserCoverPhotokey';
-import { UpdateNameAndBioDTO } from '@dtos/updateUserNameBio.dto';
 import { CreateUserDTO } from 'dto/createUser.dto';
 import { IUserRepository } from 'repository/Interfaces/IUserRepository';
 
@@ -13,20 +13,21 @@ export class UserServices {
       await this._userRepository.createCommand(dto);
    };
 
-   updateNameAndBio = async (eventTimeStamp: string, dto: UpdateNameAndBioDTO) => {
+   update = async (eventTimeStamp: string, dto: UpdateUserDTO) => {
       const incomingTimestamp = new Date(eventTimeStamp);
 
       const res = await this._userRepository.updatedAtQuery(dto.id);
       if (!res) {
-         throw new Error('user doc does not exist to update');
+         await this.create(dto);
+         return;
       }
 
       const currnentTimeStamp = new Date(res.updatedAt ?? 0); // in case updateAT does not exist
 
       if (incomingTimestamp > currnentTimeStamp) {
-         this._userRepository.updateNameAndBioCommand(eventTimeStamp, dto);
+         this._userRepository.updateCommand(eventTimeStamp, dto);
       } else {
-         logger.warn('Skipping name/bio update. Reason: old event');
+         logger.warn('Skipping user update. Reason: old event');
       }
    };
 
