@@ -38,8 +38,8 @@ export class GetCurrentUserProfile {
 
       return {
          firstName: currentUser.firstName,
-         lastName: currentUser.lastName,
-         bio: currentUser.bio,
+         lastName: currentUser.lastName ?? undefined,
+         bio: currentUser.bio ?? undefined,
          avatarURL,
          coverPhotoURL,
          createdAt: currentUser.createdAt,

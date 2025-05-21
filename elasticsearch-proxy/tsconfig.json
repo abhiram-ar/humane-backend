@@ -1,0 +1,16 @@
+{
+   "extends": "@tsconfig/node22/tsconfig.json",
+   "include": ["src/**/*"],
+   "exclude": ["node_modules"],
+   "compilerOptions": {
+      "noUnusedLocals": true,
+      "baseUrl": "src",
+      "paths": {
+         "@dtos/*": ["dto/*"],
+         "@di/*": ["config/DI-container/*"],
+         "@services/*": ["services/*"],
+         "@repository/*": ["repository/*"],
+         "@config/*": ["config/*"]
+      }
+   }
+}

@@ -28,7 +28,12 @@ export const singupUser = new SignupUser(
 );
 
 // auth
-export const verifyUser = new VerifyUser(userRepository, jwtService, bcryptHashService);
+export const verifyUser = new VerifyUser(
+   userRepository,
+   jwtService,
+   bcryptHashService,
+   kafkaPubliserService
+);
 
 export const userEmailLogin = new UserEmailLogin(userRepository, bcryptHashService, jwtService);
 
@@ -38,16 +43,24 @@ export const forgotPassoword = new ForgotPassword(userRepository, jwtService, ka
 
 export const recoverPassword = new RecoverPassword(userRepository, jwtService, bcryptHashService);
 
-export const userGooglgAuth = new UserGoogleAuth(userRepository, jwtService);
+export const userGooglgAuth = new UserGoogleAuth(userRepository, jwtService, kafkaPubliserService);
 
 // profile
 
 export const getCurrentUserProfile = new GetCurrentUserProfile(userRepository, awsStorageService);
 
-export const updateUserProfile = new UpdateUserProfile(userRepository);
+export const updateUserProfile = new UpdateUserProfile(userRepository, kafkaPubliserService);
 
 export const generatePresignedURL = new GeneratePresignedURL(awsStorageService);
 
-export const updateUserAvatar = new UpdateUserAvatar(userRepository, awsStorageService);
+export const updateUserAvatar = new UpdateUserAvatar(
+   userRepository,
+   awsStorageService,
+   kafkaPubliserService
+);
 
-export const updateUserCoverPhoto = new UpdateUserCoverPhoto(userRepository, awsStorageService);
+export const updateUserCoverPhoto = new UpdateUserCoverPhoto(
+   userRepository,
+   awsStorageService,
+   kafkaPubliserService
+);

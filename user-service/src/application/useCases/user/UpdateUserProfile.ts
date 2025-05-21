@@ -1,9 +1,15 @@
 import { IUserRepository } from '@ports/IUserRepository';
 import { UpdateUserProfileInputDTO } from '@dtos/user/updateUserProfile.input.dto';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
+import { AppEventsTypes, createEvent, KafkaTopics, UserUpdatedEventPayload } from 'humane-common';
+import { IEventPublisher } from '@ports/IEventProducer';
+import { EventBusError } from '@application/errors/EventbusError';
 
 export class UpdateUserProfile {
-   constructor(private readonly _userRepository: IUserRepository) {}
+   constructor(
+      private readonly _userRepository: IUserRepository,
+      private readonly _eventPublisher: IEventPublisher
+   ) {}
 
    execute = async (
       userId: string,
@@ -22,6 +28,33 @@ export class UpdateUserProfile {
 
       if (!updatedUserProfile) {
          throw new UserNotFoundError('user does not exist');
+      }
+
+      const eventPayload: UserUpdatedEventPayload = {
+         id: updatedUserProfile.id,
+         firstName: updatedUserProfile.firstName,
+         lastName: updatedUserProfile.lastName || null,
+         email: updatedUserProfile.email,
+         bio: updatedUserProfile.bio || null,
+         avatarKey: updatedUserProfile.avatar || null,
+         coverPhotoKey: updatedUserProfile.coverPhoto || null,
+         createdAt: updatedUserProfile.createdAt,
+         lastLoginTime: updatedUserProfile.lastLoginTime || null,
+         isBlocked: updatedUserProfile.isBlocked,
+         isHotUser: updatedUserProfile.isHotUser,
+         humaneScore: updatedUserProfile.humaneScore,
+      };
+
+      //
+      const userNameBioUpdatedEvent = createEvent(AppEventsTypes.USER_UPDATED, eventPayload);
+      console.log(AppEventsTypes);
+      const { ack } = await this._eventPublisher.send(
+         KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
+         userNameBioUpdatedEvent
+      );
+
+      if (!ack) {
+         throw new EventBusError('Unable to send user name/bio update event');
       }
 
       return {

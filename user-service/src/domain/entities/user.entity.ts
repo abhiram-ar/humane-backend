@@ -8,11 +8,11 @@ export class User {
       public humaneScore: number = 0,
       public isHotUser: boolean = false,
       public createdAt: string,
-      public lastLoginTime?: string,
-      public avatar?: string,
-      public coverPhoto?: string,
-      public lastName?: string,
+      public lastLoginTime?: string | null,
+      public avatar?: string | null,
+      public coverPhoto?: string | null,
+      public lastName?: string | null,
       public passwordHash?: string,
-      public bio?: string
+      public bio?: string | null
    ) {}
 }

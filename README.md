@@ -17,6 +17,11 @@ postgres
 kubectl port-forward svc/user-postgres-srv 5432:5432
 ```
 
+elasticsearhc
+```bash
+kubectl port-forward service/elasticsearch 9200:9200
+```
+
 production change
 
 -  kafka ui nodePort need to be closed
@@ -25,3 +30,7 @@ production change
 ## doubts
 
 -  where to keep the instace config files - like for s3 and kafka
+
+
+## learning
+- clean/delte the pv/pvc when changing the version of pods in services to avoid conflit

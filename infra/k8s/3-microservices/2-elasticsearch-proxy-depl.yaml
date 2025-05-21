@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch-proxy-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: humane
+      service: elasticsearch-proxy
+      type: web-server
+  template:
+    metadata:
+      labels:
+        app: humane
+        service: elasticsearch-proxy
+        type: web-server
+    spec:
+      initContainers:
+        - name: wait-for-es
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for Elasticsearch...";
+              until nc -z elasticsearch 9200; do
+                echo "Elasticsearch is not up yet...";
+                sleep 2;
+              done
+              echo "Elasticsearch is up!";
+      containers:
+        - name: elasticsearch-proxy
+          image: abhiramar/humane-elasticsearch-proxy
+          envFrom:
+            - secretRef:
+                name: elasticsearch-proxy-pod-secret
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-proxy-srv
+spec:
+  selector:
+    app: humane
+    service: elasticsearch-proxy
+    type: web-server
+  ports:
+    - name: user
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
