@@ -27,7 +27,6 @@ export class UserRepository implements IUserRepository {
                   firstName: { type: 'text', fields: { keyword: { type: 'keyword' } } },
                   lastName: { type: 'text', fields: { keyword: { type: 'keyword' } } },
                   bio: { type: 'text', index: false },
-                  email: { type: 'keyword' },
                   avatarKey: { type: 'keyword', index: false },
                   coverPhotoKey: { type: 'keyword', index: false },
                   createdAt: { type: 'date' }, // this is interpreated as iso data string in elastic search, covert the toISODataString() before injesting
