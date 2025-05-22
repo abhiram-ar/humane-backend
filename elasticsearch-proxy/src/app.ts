@@ -1,10 +1,12 @@
-import express from 'express'
-import cors from 'cors'
-import morgan from 'morgan'
-import cookieParse from 'cookie-parser'
-import userQueryRouter from 'routes/userQuery.router'
+import express from 'express';
+import cors from 'cors';
+import morgan from 'morgan';
+import cookieParse from 'cookie-parser';
+import internalQueryRouter from 'routes/internalUserQuery.router';
+import publicQueryRouter from 'routes/publicUserQuery.router';
 
-const app = express()
+
+const app = express();
 
 app.use(
    cors({
@@ -20,7 +22,7 @@ app.get('/api/v1/query/health', (req, res) => {
    res.status(200).json({ status: 'OK' });
 });
 
+app.use('/api/v1/query/public', publicQueryRouter);
+app.use('/api/v1/query/internal', internalQueryRouter);
 
-app.use("/api/v1/query/user", userQueryRouter)
-
-export default app
+export default app;

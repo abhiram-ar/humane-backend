@@ -5,7 +5,6 @@ import { IUserRepository } from 'repository/Interfaces/IUserRepository';
 import { ES_INDEXES } from './ES_INDEXES';
 import { UserDocument } from './UserDocument.type';
 import { UpdateUserDTO } from '@dtos/updateUser.dto';
-import { hrtime } from 'process';
 
 export class UserRepository implements IUserRepository {
    public readonly client;
@@ -156,7 +155,6 @@ export class UserRepository implements IUserRepository {
 
       const totalEntries = (res.hits.total as { value: number }).value;
 
-      console.log(res, parsedUserList, totalEntries);
 
       return { users: parsedUserList, totalEntries };
    };

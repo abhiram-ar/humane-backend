@@ -1,4 +1,4 @@
-import { InternalUserQueryController } from 'controllers/PublicUserQuery.controller';
+import { InternalUserQueryController } from 'controllers/InternalUserQuery.controller';
 import { userServices } from './services';
 
-export const publicUserQueryController = new InternalUserQueryController(userServices);
+export const internalUserQueryController = new InternalUserQueryController(userServices);
