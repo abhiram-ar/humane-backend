@@ -1,26 +1,30 @@
-import { esClient, pingES } from '@config/esClient';
 import { userRepository } from '@di/repository';
 import { startAllConsumers, stopAllConsumer } from '@config/kafka';
 import { logger } from '@config/logger';
+import app from 'app';
 
 const bootstrap = async () => {
    try {
       await userRepository.initializeUserIndex();
+
       await startAllConsumers();
       process.on('SIGINT', () => {
-         esClient.close();
+         userRepository.client.close();
          stopAllConsumer();
       });
       process.on('SIGTERM', () => {
-         esClient.close();
+         userRepository.client.close();
          stopAllConsumer();
       });
-      await pingES();
-      logger.info('es proxy-started');
+      await userRepository.pingES();
+
+      app.listen(3000, () => {
+         logger.info('es-proxy started');
+         console.log("hello")
+      });
    } catch (error) {
       logger.error('error starting es-proxy');
    }
 };
-
 
 bootstrap();

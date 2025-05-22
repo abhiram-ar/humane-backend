@@ -4,7 +4,12 @@ import { CreateAdmin } from '@application/useCases/admin/createNewAdmin.usercase
 import { AdminGetUserList } from '@application/useCases/admin/GetUserList.usecase';
 import { RefreshAdminAccessToken } from '@application/useCases/admin/RefreshAdminToken.usecase';
 import { adminRepository, userRepository } from '@di/repository.container';
-import { bcryptHashService, jwtService, kafkaPubliserService } from '@di/services.container';
+import {
+   bcryptHashService,
+   jwtService,
+   kafkaPubliserService,
+   userQueryService,
+} from '@di/services.container';
 
 export const createAdmin = new CreateAdmin(adminRepository, bcryptHashService);
 
@@ -12,7 +17,7 @@ export const adminEmailLogin = new AdminEmailLogin(adminRepository, bcryptHashSe
 
 export const refreshAccessToken = new RefreshAdminAccessToken(jwtService);
 
-export const adminGetUserList = new AdminGetUserList(userRepository);
+export const adminGetUserList = new AdminGetUserList(userRepository, userQueryService);
 
 export const adminUpdateUserBlockStatus = new AdminUpdateUserBlockStatus(
    userRepository,

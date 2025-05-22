@@ -26,6 +26,7 @@ production change
 
 -  kafka ui nodePort need to be closed
 -  convert kafka srv to stateful set
+- query service ingress rotues, close off internal routes
 
 ## doubts
 

@@ -1,9 +1,13 @@
 import { IPagination } from '@application/types/Pagination.type';
 import { AdminGetUserResponseDTO, GetUserDTO } from '@dtos/admin/getUsers.dto';
+import { IUserQueryService } from '@ports/IUserQueryService';
 import { IUserRepository } from '@ports/IUserRepository';
 
 export class AdminGetUserList {
-   constructor(private readonly _userRepository: IUserRepository) {}
+   constructor(
+      private readonly _userRepository: IUserRepository,
+      private readonly _userQueryService: IUserQueryService
+   ) {}
 
    execute = async (
       dto: GetUserDTO
@@ -11,19 +15,29 @@ export class AdminGetUserList {
       users: AdminGetUserResponseDTO[];
       pagination: IPagination;
    }> => {
-      const skip = (dto.page - 1) * dto.limit;
+      let retivedUser: AdminGetUserResponseDTO[];
+      let pagination: IPagination;
 
-      const result = await this._userRepository.getUserList({ ...dto, skip });
+      if (dto.searchQuery) {
+         const res = await this._userQueryService.searchUser(dto);
 
-      const totalPages = Math.ceil(result.totalEntries / dto.limit) || 1;
+         const userIDs = res.data.users.map((user) => user.id);
+         retivedUser = await this._userRepository.getUserListByIds(userIDs);
+         pagination = res.data.pagination;
+      } else {
+         const skip = (dto.page - 1) * dto.limit;
+         const result = await this._userRepository.getUserList({ ...dto, skip });
+         retivedUser = result.users;
 
-      const pagination: IPagination = {
-         page: dto.page,
-         limit: dto.limit,
-         totalItems: result.totalEntries,
-         totalPages,
-      };
+         const totalPages = Math.ceil(result.totalEntries / dto.limit) || 1;
+         pagination = {
+            page: dto.page,
+            limit: dto.limit,
+            totalItems: result.totalEntries,
+            totalPages,
+         };
+      }
 
-      return { users: result.users, pagination };
+      return { users: retivedUser, pagination };
    };
 }

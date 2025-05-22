@@ -9,18 +9,29 @@
    "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1",
       "dev": "tsx watch --include \"./src/**/*\" ./src/main.ts",
-      "uc": "npm update humane-common"
+      "uc": "npm uninstall humane-common && npm i humane-common"
    },
    "dependencies": {
+      "cookie-parser": "^1.4.7",
+      "cors": "^2.8.5",
       "date-fns": "^4.1.0",
-      "humane-common": "^1.0.46",
+      "express": "^5.1.0",
+      "humane-common": "^1.0.55",
+      "jsonwebtoken": "^9.0.2",
       "kafkajs": "^2.2.4",
+      "morgan": "^1.10.0",
       "winston": "^3.17.0",
       "zod": "^3.24.4"
    },
    "devDependencies": {
       "@elastic/elasticsearch": "^9.0.1",
       "@tsconfig/node22": "^22.0.1",
+      "@types/cookie-parser": "^1.4.8",
+      "@types/cors": "^2.8.18",
+      "@types/express": "^5.0.2",
+      "@types/jsonwebtoken": "^9.0.9",
+      "@types/morgan": "^1.9.9",
+      "@types/node": "^22.15.21",
       "tsx": "^4.19.4",
       "typescript": "^5.8.3"
    }
