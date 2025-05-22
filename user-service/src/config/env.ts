@@ -15,6 +15,7 @@ type ENVConfig = {
    readonly AWS_REGION: ENVValue;
    readonly AWS_S3_BUCKET_NAME: ENVValue;
    readonly AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME: ENVValue;
+   readonly ELASTICSEARCH_PROXY_BASE_URL: ENVValue
 };
 
 export const ENV: ENVConfig = {
@@ -32,6 +33,7 @@ export const ENV: ENVConfig = {
    AWS_REGION: process.env.AWS_REGION,
    AWS_S3_BUCKET_NAME: process.env.AWS_S3_BUCKET_NAME,
    AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME: process.env.AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME,
+   ELASTICSEARCH_PROXY_BASE_URL: process.env.ELASTICSEARCH_PROXY_BASE_URL
 };
 
 function checkEnv() {
