@@ -139,6 +139,36 @@ export class PostresUserRepository implements IUserRepository {
       return { users: parsedUserList, totalEntries };
    };
 
+   getUserListByIds = async (userIds: string[]): Promise<AdminGetUserResponseDTO[]> => {
+      const res = await db.user.findMany({
+         where: {
+            id: { in: userIds },
+         },
+         select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            isBlocked: true,
+            isHotUser: true,
+            createdAt: true,
+            humaneScore: true,
+         },
+      });
+      const parsedUserList: AdminGetUserResponseDTO[] = res.map((user) => ({
+         email: user.email,
+         id: user.id,
+         firstName: user.firstName,
+         lastName: user.lastName ?? undefined,
+         isBlocked: user.isBlocked,
+         isHotUser: user.isHotUser,
+         createdAt: user.createdAt.toISOString(),
+         humaneScore: user.humaneScore,
+      }));
+
+      return parsedUserList;
+   };
+
    updateBlockStatus = async (
       userId: string,
       newStatus: boolean

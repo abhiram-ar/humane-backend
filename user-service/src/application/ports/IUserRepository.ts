@@ -27,6 +27,8 @@ export interface IUserRepository {
       totalEntries: number;
    }>;
 
+   getUserListByIds(userIds: string[]): Promise<AdminGetUserResponseDTO[]>;
+
    updateBlockStatus(userId: string, newStatus: boolean): Promise<AdminGetUserResponseDTO | null>;
 
    retriveUserById(userId: string): Promise<User | null>;
