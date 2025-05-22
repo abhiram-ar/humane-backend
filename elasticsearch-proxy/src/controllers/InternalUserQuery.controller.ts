@@ -7,21 +7,25 @@ export class InternalUserQueryController {
 
    searchUser = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         const { search = '', page = 1, limit = 10 } = req.query;
+         const { searchQuery = '', page = 1, limit = 10 } = req.query;
 
-         const dto = { search, limit: parseInt(limit as string), page: parseInt(page as string) };
+         const dto = {
+            search: searchQuery,
+            limit: parseInt(limit as string),
+            page: parseInt(page as string),
+         };
          const parsedDTO = paginatedSearchSchema.safeParse(dto);
          if (!parsedDTO.success) {
             console.log(parsedDTO.error);
             throw new ZodValidationError(parsedDTO.error);
          }
 
-         const result = await this._userSerives.privellegedSearch(parsedDTO.data);
+         const { users, pagination } = await this._userSerives.paginatedSearch(parsedDTO.data);
 
          res.status(200).json({
             success: true,
             message: 'userlist successfully fetched',
-            data: { users: result.users, pagination: result.pagination },
+            data: { users, pagination },
          });
       } catch (error) {
          next(error);

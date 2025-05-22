@@ -4,7 +4,7 @@ import morgan from 'morgan';
 import cookieParse from 'cookie-parser';
 import internalQueryRouter from 'routes/internalUserQuery.router';
 import publicQueryRouter from 'routes/publicUserQuery.router';
-
+import { errorHandler } from 'humane-common';
 
 const app = express();
 
@@ -24,5 +24,7 @@ app.get('/api/v1/query/health', (req, res) => {
 
 app.use('/api/v1/query/public', publicQueryRouter);
 app.use('/api/v1/query/internal', internalQueryRouter);
+
+app.use(errorHandler);
 
 export default app;

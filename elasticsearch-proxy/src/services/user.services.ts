@@ -84,7 +84,7 @@ export class UserServices {
       }
    };
 
-   privellegedSearch = async (dto: PaginatedSearchDTO): Promise<PrivillegedUserSearchOutputDTO> => {
+   paginatedSearch = async (dto: PaginatedSearchDTO): Promise<PrivillegedUserSearchOutputDTO> => {
       const from = (dto.page - 1) * dto.limit;
 
       const { users, totalEntries } = await this._userRepository.paginatedSearchQuery(
@@ -106,8 +106,6 @@ export class UserServices {
          id: user.id,
          firstName: user.firstName,
          lastName: user.lastName,
-         createdAt: user.createdAt,
-         humaneScore: user.humaneScore,
       }));
 
       return { users: parsedUser, pagination };
