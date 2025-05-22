@@ -12,7 +12,7 @@ spec:
       http:
         paths:
           - pathType: ImplementationSpecific #required for regex pattern matching
-            path: /api/v[0-9]+/(admin|user|anon|global)/.*
+            path: /api/v[0-9]+/(admin|user|global)/.*
             backend:
               service:
                 name: user-srv
@@ -23,5 +23,12 @@ spec:
             backend:
               service:
                 name: notification-srv
+                port:
+                  number: 3000
+          - pathType: ImplementationSpecific
+            path: /api/v[0-9]+/query/.*
+            backend:
+              service:
+                name: elasticsearch-proxy-srv
                 port:
                   number: 3000
