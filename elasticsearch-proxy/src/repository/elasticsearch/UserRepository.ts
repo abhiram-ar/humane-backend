@@ -5,20 +5,21 @@ import { IUserRepository } from 'repository/Interfaces/IUserRepository';
 import { ES_INDEXES } from './ES_INDEXES';
 import { UserDocument } from './UserDocument.type';
 import { UpdateUserDTO } from '@dtos/updateUser.dto';
+import { hrtime } from 'process';
 
 export class UserRepository implements IUserRepository {
-   private readonly _client;
+   public readonly client;
    private readonly _index = ES_INDEXES.USER_PROFILE_INDEX;
    constructor() {
-      this._client = new Client({ node: ENV.ELASTICSEARCH_URI });
+      this.client = new Client({ node: ENV.ELASTICSEARCH_URI });
    }
 
    initializeUserIndex = async () => {
-      const indexExists = await this._client.indices.exists({
+      const indexExists = await this.client.indices.exists({
          index: ES_INDEXES.USER_PROFILE_INDEX,
       });
       if (!indexExists)
-         await this._client.indices.create({
+         await this.client.indices.create({
             index: ES_INDEXES.USER_PROFILE_INDEX,
             mappings: {
                // prevent dynamic filed creation in production, improve query performance and better resouce utilization
@@ -40,16 +41,25 @@ export class UserRepository implements IUserRepository {
          });
    };
 
+   pingES = async () => {
+      try {
+         const health = await this.client.cluster.health();
+         console.log('cluster health', health);
+      } catch (error) {
+         console.log('error pingitg es cluster', error);
+      }
+   };
+
    createCommand = async (dto: CreateUserDTO): Promise<void> => {
       const { id, ...data } = dto;
-      await this._client.index({
+      await this.client.index({
          index: ES_INDEXES.USER_PROFILE_INDEX,
          id: dto.id,
          document: { ...data, updatedAt: dto.createdAt },
       });
    };
    updatedAtQuery = async (id: string): Promise<{ updatedAt: string | undefined } | null> => {
-      const res = await this._client.get<Pick<UserDocument, 'updatedAt'>>({
+      const res = await this.client.get<Pick<UserDocument, 'updatedAt'>>({
          index: this._index,
          id,
          _source: ['updatedAt'],
@@ -62,7 +72,7 @@ export class UserRepository implements IUserRepository {
    updateCommand = async (updatedAt: string, dto: UpdateUserDTO): Promise<void> => {
       const { id, ...data } = dto;
 
-      await this._client.update({
+      await this.client.update({
          index: this._index,
          id: id,
          doc: { ...data, updatedAt } as UserDocument,
@@ -73,7 +83,7 @@ export class UserRepository implements IUserRepository {
       docId: string,
       avatarKey: string | null
    ): Promise<void> => {
-      await this._client.update({
+      await this.client.update({
          index: this._index,
          id: docId,
          doc: { avatarKey, updatedAt } as UserDocument,
@@ -85,7 +95,7 @@ export class UserRepository implements IUserRepository {
       docId: string,
       coverPhotoKey: string | null
    ): Promise<void> => {
-      await this._client.update({
+      await this.client.update({
          index: this._index,
          id: docId,
          doc: {
@@ -100,7 +110,7 @@ export class UserRepository implements IUserRepository {
       docId: string,
       newBlockStatus: boolean
    ): Promise<void> => {
-      this._client.update({
+      this.client.update({
          index: this._index,
          id: docId,
          doc: {
@@ -109,4 +119,47 @@ export class UserRepository implements IUserRepository {
          } as UserDocument,
       });
    };
+
+   paginatedSearchQuery = async (
+      search: string,
+      from: number,
+      size: number
+   ): Promise<{ users: (UserDocument & { id: string })[]; totalEntries: number }> => {
+      type Query = NonNullable<Parameters<typeof this.client.search>[0]>['query'];
+
+      const query: Query = search
+         ? {
+              multi_match: {
+                 query: search,
+                 fields: ['firstName', 'lastName'] as (keyof UserDocument)[],
+                 fuzziness: 'AUTO',
+              },
+           }
+         : {
+              match_all: {},
+           };
+
+      const res = await this.client.search<UserDocument>({
+         index: this._index,
+         from,
+         size,
+         query,
+         track_total_hits: true, // Without track_total_hits, elasticsearch defaults to a cap of 10,000.
+      });
+
+      const parsedUserList = res.hits.hits
+         .map((hit) => ({ ...hit._source, id: hit._id }))
+         .filter(
+            (user): user is UserDocument & { id: string } =>
+               user !== undefined && typeof user.id === 'string'
+         );
+
+      const totalEntries = (res.hits.total as { value: number }).value;
+
+      console.log(res, parsedUserList, totalEntries);
+
+      return { users: parsedUserList, totalEntries };
+   };
+
+   // infiniteScrollSearchQuery =
 }

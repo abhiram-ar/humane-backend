@@ -1,10 +1,14 @@
 import { logger } from '@config/logger';
+import { PaginatedSearchDTO } from '@dtos/paginatedSearch.dto';
+import { PrivillegedUserSearchOutputDTO } from '@dtos/privillegedSearch.output.dto';
 import { UpdateUserDTO } from '@dtos/updateUser.dto';
 import { UpdateUserAvatarKeyDTO } from '@dtos/updateUserAvatarKey.dto';
 import { UpdaeteUserBlockStautsDTO } from '@dtos/updateUserBlockStatus.dto';
 import { UpdateUserCoverPhotoKeyDTO } from '@dtos/updateUserCoverPhotokey';
+import { UserDocument } from '@repository/elasticsearch/UserDocument.type';
 import { CreateUserDTO } from 'dto/createUser.dto';
 import { IUserRepository } from 'repository/Interfaces/IUserRepository';
+import { IPagination } from 'Types/Pagination.type';
 
 export class UserServices {
    constructor(private readonly _userRepository: IUserRepository) {}
@@ -78,5 +82,34 @@ export class UserServices {
       } else {
          logger.warn('Skipping blockstatus update. Reason: old event');
       }
+   };
+
+   privellegedSearch = async (dto: PaginatedSearchDTO): Promise<PrivillegedUserSearchOutputDTO> => {
+      const from = (dto.page - 1) * dto.limit;
+
+      const { users, totalEntries } = await this._userRepository.paginatedSearchQuery(
+         dto.search,
+         from,
+         dto.limit
+      );
+
+      const totalPages = Math.ceil(totalEntries / dto.limit) || 1;
+
+      const pagination: IPagination = {
+         page: dto.page,
+         limit: dto.limit,
+         totalItems: totalEntries,
+         totalPages,
+      };
+
+      const parsedUser = users.map((user) => ({
+         id: user.id,
+         firstName: user.firstName,
+         lastName: user.lastName,
+         createdAt: user.createdAt,
+         humaneScore: user.humaneScore,
+      }));
+
+      return { users: parsedUser, pagination };
    };
 }

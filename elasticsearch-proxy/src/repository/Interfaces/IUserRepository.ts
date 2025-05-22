@@ -1,4 +1,5 @@
 import { UpdateUserDTO } from '@dtos/updateUser.dto';
+import { UserDocument } from '@repository/elasticsearch/UserDocument.type';
 import { CreateUserDTO } from 'dto/createUser.dto';
 
 export interface IUserRepository {
@@ -25,4 +26,10 @@ export interface IUserRepository {
       docId: string,
       newBlockStatus: boolean
    ): Promise<void>;
+
+   paginatedSearchQuery(
+      search: string,
+      from: number,
+      size: number
+   ): Promise<{ users: (UserDocument & { id: string })[]; totalEntries: number }>;
 }
