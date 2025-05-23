@@ -1,12 +1,14 @@
 import { logger } from '@config/logger';
-import { InfiniteScrollSearchDTO } from '@dtos/infiniteScrollSearch.dto';
+import {
+   InfiniteScrollSearchDTO,
+   InfiniteScrollSearchOutputDTO,
+} from '@dtos/infiniteScrollSearch.dto';
 import { PaginatedSearchDTO } from '@dtos/paginatedSearch.dto';
 import { PrivillegedUserSearchOutputDTO } from '@dtos/privillegedSearch.output.dto';
 import { UpdateUserDTO } from '@dtos/updateUser.dto';
 import { UpdateUserAvatarKeyDTO } from '@dtos/updateUserAvatarKey.dto';
 import { UpdaeteUserBlockStautsDTO } from '@dtos/updateUserBlockStatus.dto';
 import { UpdateUserCoverPhotoKeyDTO } from '@dtos/updateUserCoverPhotokey';
-import { UserDocument } from '@repository/elasticsearch/UserDocument.type';
 import { CreateUserDTO } from 'dto/createUser.dto';
 import { IUserRepository } from 'repository/Interfaces/IUserRepository';
 import { IPagination } from 'Types/Pagination.type';
@@ -120,16 +122,24 @@ export class UserServices {
 
    infiniteScollSearch = async (
       dto: InfiniteScrollSearchDTO
-   ): Promise<{
-      users: (UserDocument & {
-         id: string;
-      })[];
-   }> => {
-      return await this._userRepository.infiniteScrollSearchQuery(
+   ): Promise<InfiniteScrollSearchOutputDTO> => {
+      const res = await this._userRepository.infiniteScrollSearchQuery(
          dto.searchQuery,
          dto.searchAfter,
          dto.limit
       );
+
+      const sanitizedAndURLHydratedUserlist = res.users.map((user) => ({
+         id: user.id,
+         firstName: user.firstName,
+         lastName: user.lastName ?? null,
+         avatarURL: user.avatarKey ? this._cdnService.getPublicCDNURL(user.avatarKey) : null,
+      }));
+
+      return {
+         users: sanitizedAndURLHydratedUserlist,
+         scroll: { hasMore: res.hasMore, cursor: res.searchAfter ? res.searchAfter[0] : null },
+      };
    };
 
    getUserProfile = async (userId: string): Promise<GetUserProfileOutputDTO> => {
