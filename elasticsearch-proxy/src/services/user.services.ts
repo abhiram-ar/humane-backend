@@ -125,4 +125,8 @@ export class UserServices {
          dto.limit
       );
    };
+
+   getUserProfile = async (userId: string) => {
+      const userDoc = this._userRepository.getUserById(userId);
+   };
 }

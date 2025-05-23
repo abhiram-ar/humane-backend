@@ -194,4 +194,12 @@ export class UserRepository implements IUserRepository {
 
       return { users: parsedUserList, searchAfter, hasMore: hits.length === size };
    };
+
+   getUserById = async (userId: string): Promise<(UserDocument & { id: string }) | null> => {
+      const res = await this.client.get<UserDocument>({ index: this._index, id: userId });
+
+      if (!res.found || !res._source) return null;
+
+      return { ...res._source, id: res._id };
+   };
 }

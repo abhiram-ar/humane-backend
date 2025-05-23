@@ -42,4 +42,6 @@ export interface IUserRepository {
       searchAfter: [number] | null;
       hasMore: boolean;
    }>;
+
+   getUserById(userId: string): Promise<(UserDocument & { id: string }) | null>;
 }

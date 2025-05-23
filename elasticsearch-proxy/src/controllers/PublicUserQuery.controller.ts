@@ -1,12 +1,22 @@
-import {
-   InfiniteScrollSearchDTO,
-   infiniteScrollSearchSchema,
-} from '@dtos/infiniteScrollSearch.dto';
+import { getUserProfileSchema } from '@dtos/GetUserProfile.dto';
+import { infiniteScrollSearchSchema } from '@dtos/infiniteScrollSearch.dto';
 import { UserServices } from '@services/user.services';
 import { Request, Response, NextFunction } from 'express';
 import { ZodValidationError } from 'humane-common';
 export class PublicUserQueryController {
    constructor(private readonly _userSerives: UserServices) {}
+
+   getUserProfile = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const { userId } = req.query;
+         const parsed = getUserProfileSchema.safeParse(userId);
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
+         }
+      } catch (error) {
+         next(error);
+      }
+   };
 
    searchUser = async (req: Request, res: Response, next: NextFunction) => {
       try {
