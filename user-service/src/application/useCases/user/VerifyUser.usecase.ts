@@ -41,7 +41,6 @@ export class VerifyUser {
          id: newUser.id,
          firstName: newUser.firstName,
          lastName: newUser.lastName || null,
-         email: newUser.email,
          createdAt: newUser.createdAt,
          isBlocked: newUser.isBlocked,
          isHotUser: newUser.isHotUser,

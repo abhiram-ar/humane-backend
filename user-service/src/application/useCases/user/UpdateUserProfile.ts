@@ -34,7 +34,6 @@ export class UpdateUserProfile {
          id: updatedUserProfile.id,
          firstName: updatedUserProfile.firstName,
          lastName: updatedUserProfile.lastName || null,
-         email: updatedUserProfile.email,
          bio: updatedUserProfile.bio || null,
          avatarKey: updatedUserProfile.avatar || null,
          coverPhotoKey: updatedUserProfile.coverPhoto || null,
