@@ -10,9 +10,16 @@ import { UserDocument } from '@repository/elasticsearch/UserDocument.type';
 import { CreateUserDTO } from 'dto/createUser.dto';
 import { IUserRepository } from 'repository/Interfaces/IUserRepository';
 import { IPagination } from 'Types/Pagination.type';
+import { CDNService } from './CDN.services';
+import { UserNotFoundError } from 'humane-common';
+import { string } from 'zod/v4';
+import { GetUserProfileOutputDTO } from '@dtos/GetUserProfile.dto';
 
 export class UserServices {
-   constructor(private readonly _userRepository: IUserRepository) {}
+   constructor(
+      private readonly _userRepository: IUserRepository,
+      private readonly _cdnService: CDNService
+   ) {}
 
    create = async (dto: CreateUserDTO): Promise<void> => {
       await this._userRepository.createCommand(dto);
@@ -126,7 +133,31 @@ export class UserServices {
       );
    };
 
-   getUserProfile = async (userId: string) => {
-      const userDoc = this._userRepository.getUserById(userId);
+   getUserProfile = async (userId: string): Promise<GetUserProfileOutputDTO> => {
+      const userDoc = await this._userRepository.getUserById(userId);
+
+      if (!userDoc) {
+         throw new UserNotFoundError('User does not exists in read model');
+      }
+
+      let avatarURL: string | undefined;
+      if (userDoc.avatarKey) {
+         avatarURL = this._cdnService.getPublicCDNURL(userDoc.avatarKey);
+      }
+
+      let coverPhotoURL: string | undefined;
+      if (userDoc.coverPhotoKey) {
+         coverPhotoURL = this._cdnService.getPublicCDNURL(userDoc.coverPhotoKey);
+      }
+
+      return {
+         id: userDoc.id,
+         firstName: userDoc.firstName,
+         lastName: userDoc.lastName,
+         bio: userDoc.bio,
+         createdAt: userDoc.createdAt,
+         avatarURL,
+         coverPhotoURL,
+      };
    };
 }

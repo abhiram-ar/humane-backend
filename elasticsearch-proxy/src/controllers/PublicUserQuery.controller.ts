@@ -1,6 +1,6 @@
 import { getUserProfileSchema } from '@dtos/GetUserProfile.dto';
 import { infiniteScrollSearchSchema } from '@dtos/infiniteScrollSearch.dto';
-import { UserServices } from '@services/user.services';
+import { UserServices } from '@services/User.services';
 import { Request, Response, NextFunction } from 'express';
 import { ZodValidationError } from 'humane-common';
 export class PublicUserQueryController {
@@ -8,11 +8,20 @@ export class PublicUserQueryController {
 
    getUserProfile = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         const { userId } = req.query;
+         const { userId } = req.params;
+
          const parsed = getUserProfileSchema.safeParse(userId);
          if (!parsed.success) {
             throw new ZodValidationError(parsed.error);
          }
+
+         const user = await this._userSerives.getUserProfile(parsed.data);
+
+         res.status(200).json({
+            success: true,
+            message: 'user successfully fetched',
+            data: { user },
+         });
       } catch (error) {
          next(error);
       }

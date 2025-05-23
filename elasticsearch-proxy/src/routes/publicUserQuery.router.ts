@@ -3,5 +3,7 @@ import { Router } from 'express';
 
 const publicQueryRouter = Router();
 
-publicQueryRouter.get('/', publicUserQueryController.searchUser);
+publicQueryRouter.get('/user', publicUserQueryController.searchUser);
+publicQueryRouter.get('/user/:userId', publicUserQueryController.getUserProfile);
+
 export default publicQueryRouter;

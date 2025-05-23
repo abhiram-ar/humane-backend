@@ -1,5 +1,5 @@
 import { paginatedSearchSchema } from '@dtos/paginatedSearch.dto';
-import { UserServices } from '@services/user.services';
+import { UserServices } from '@services/User.services';
 import { Request, Response, NextFunction } from 'express';
 import { ZodValidationError } from 'humane-common';
 export class InternalUserQueryController {

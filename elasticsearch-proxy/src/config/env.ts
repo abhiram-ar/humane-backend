@@ -8,6 +8,7 @@ type ENVConfig = {
    readonly KAFKA_CLIENT_ID: ENVValue;
    readonly KAFKA_BROKER_URI: ENVValue;
    readonly ELASTICSEARCH_URI: ENVValue;
+   readonly AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME: ENVValue;
 };
 
 export const ENV: ENVConfig = {
@@ -18,6 +19,7 @@ export const ENV: ENVConfig = {
    KAFKA_CLIENT_ID: process.env.KAFKA_CLIENT_ID,
    KAFKA_BROKER_URI: process.env.KAFKA_BROKER_URI,
    ELASTICSEARCH_URI: process.env.ELASTICSEARCH_URI,
+   AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME: process.env.AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME,
 };
 
 function checkEnv() {

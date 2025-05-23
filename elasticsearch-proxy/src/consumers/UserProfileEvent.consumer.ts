@@ -4,7 +4,7 @@ import { updateUserSchema } from '@dtos/updateUser.dto';
 import { updateUserAvatarKeySchema } from '@dtos/updateUserAvatarKey.dto';
 import { updateUserBlockStatusSchema } from '@dtos/updateUserBlockStatus.dto';
 import { updateUserCoverPhotokeySchema } from '@dtos/updateUserCoverPhotokey';
-import { UserServices } from '@services/user.services';
+import { UserServices } from '@services/User.services';
 import { AppEvent, AppEventsTypes, KafkaTopics } from 'humane-common';
 import KafkaSingleton from 'kafka/KafkaSingleton';
 import { Consumer } from 'kafkajs';
