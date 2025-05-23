@@ -18,7 +18,6 @@ export const createUserSchema = z.object({
    isBlocked: z.boolean(),
    isHotUser: z.boolean(),
 
-   email: z.string().nonempty(),
    humaneScore: z.number(),
 });
 
