@@ -12,7 +12,6 @@ import { IUserRepository } from 'repository/Interfaces/IUserRepository';
 import { IPagination } from 'Types/Pagination.type';
 import { CDNService } from './CDN.services';
 import { UserNotFoundError } from 'humane-common';
-import { string } from 'zod/v4';
 import { GetUserProfileOutputDTO } from '@dtos/GetUserProfile.dto';
 
 export class UserServices {

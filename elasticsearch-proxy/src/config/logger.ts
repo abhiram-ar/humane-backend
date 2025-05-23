@@ -1,6 +1,6 @@
 import winston from 'winston';
 import { formatDate } from 'date-fns';
-const { combine, errors, timestamp, colorize, simple, printf } = winston.format;
+const { combine, errors, timestamp, colorize, printf } = winston.format;
 
 export const logger = winston.createLogger({
    level: 'silly',
