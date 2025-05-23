@@ -1,4 +1,5 @@
 import { logger } from '@config/logger';
+import { InfiniteScrollSearchDTO } from '@dtos/infiniteScrollSearch.dto';
 import { PaginatedSearchDTO } from '@dtos/paginatedSearch.dto';
 import { PrivillegedUserSearchOutputDTO } from '@dtos/privillegedSearch.output.dto';
 import { UpdateUserDTO } from '@dtos/updateUser.dto';
@@ -109,5 +110,19 @@ export class UserServices {
       }));
 
       return { users: parsedUser, pagination };
+   };
+
+   infiniteScollSearch = async (
+      dto: InfiniteScrollSearchDTO
+   ): Promise<{
+      users: (UserDocument & {
+         id: string;
+      })[];
+   }> => {
+      return await this._userRepository.infiniteScrollSearchQuery(
+         dto.searchQuery,
+         dto.searchAfter,
+         dto.limit
+      );
    };
 }
