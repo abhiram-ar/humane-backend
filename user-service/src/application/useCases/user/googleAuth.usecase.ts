@@ -25,11 +25,15 @@ export class UserGoogleAuth {
          const eventPayload: UserCreatedEventPayload = {
             id: user.id,
             firstName: user.firstName,
-            email: user.email,
             lastName: user.lastName || null,
             createdAt: new Date().toISOString(),
             isBlocked: user.isBlocked,
             isHotUser: user.isHotUser,
+            bio: user.bio ?? null,
+            avatarKey: user.avatar ?? null,
+            coverPhotoKey: user.coverPhoto ?? null,
+            lastLoginTime: user.lastLoginTime ?? null,
+            humaneScore: user.humaneScore,
          };
 
          const userCreatedEvent = createEvent(AppEventsTypes.USER_CREATED, eventPayload);
