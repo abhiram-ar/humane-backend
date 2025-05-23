@@ -101,13 +101,14 @@ const names = [
    'Caroline',
 ];
 
-export const demoUsers = Array.from({ length: 20 }, (_, i) => ({
-   firstName: names[Math.floor(Math.random() * names.length)],
-   lastName: names[Math.floor(Math.random() * names.length)],
+const spread = 3 // max: 3
+export const demoUsers = Array.from({ length: 40 }, (_, i) => ({
+   firstName: names[Math.floor(Math.random() * spread)],
+   lastName: names[Math.floor(Math.random() * spread)],
    bio: `This is a bio for user ${i + 1}`,
    avatarKey: `avatars/user${i + 1}.jpg`,
    coverPhotoKey: `covers/user${i + 1}.jpg`,
-   email: `${names[Math.floor(Math.random() * names.length)]}-seed-${i + 1}@emai.com`,
+   email: `${names[Math.floor(Math.random() * spread)]}-seed-${i + 1}@emai.com`,
    isBlocked: i % 7 === 0, // Every 7th user is blocked
    isHotUser: i % 3 === 0, // Every 3rd user is a hot user
 }));
