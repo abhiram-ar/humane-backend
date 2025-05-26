@@ -1,3 +1,4 @@
+import { GetFriendRequestList } from '@application/useCases/friendship/GetFriendRequestList.usercase';
 import { SendFriendRequest } from '@application/useCases/friendship/SendFriendRequest.usecase';
 import {
    blockedRelationshipRepository,
@@ -10,3 +11,5 @@ export const sendFriendRequest = new SendFriendRequest(
    blockedRelationshipRepository,
    userRepository
 );
+
+export const getFriendRequestList = new GetFriendRequestList(friendshipRepository);

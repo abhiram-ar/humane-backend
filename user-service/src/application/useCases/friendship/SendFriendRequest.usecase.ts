@@ -3,7 +3,7 @@ import { RelationshipBlockedError } from '@application/errors/RelationshipBlocke
 import { UserBlockedError } from '@application/errors/UserBlockedError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { Friendship } from '@domain/entities/friendship.entity';
-import { SendFriendRequestInputDTO } from '@dtos/friendship/addFriendInput.dto';
+import { SendFriendRequestInputDTO } from '@dtos/friendship/SendFriendRequestInput.dto';
 import { IBlockedRelationshipRepository } from '@ports/IBlockedRelationshipRepository';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IUserRepository } from '@ports/IUserRepository';

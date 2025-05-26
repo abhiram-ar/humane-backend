@@ -16,7 +16,7 @@ import {
 import { googleOAuth2Client } from '@infrastructure/service/GoogleOAuth2Service';
 import { UserProfileController } from '@presentation/controllers/userProfile.controller';
 import { UserRelationshipController } from '@presentation/controllers/userRelationship.controller';
-import { sendFriendRequest } from '@di/usecase/friendshipUsercase.container';
+import { getFriendRequestList, sendFriendRequest } from '@di/usecase/friendshipUsercase.container';
 
 export const userAuthController = new UserAuthController(
    singupUser,
@@ -37,4 +37,7 @@ export const userProfileController = new UserProfileController(
    updateUserCoverPhoto
 );
 
-export const userRelationshipController = new UserRelationshipController(sendFriendRequest);
+export const userRelationshipController = new UserRelationshipController(
+   sendFriendRequest,
+   getFriendRequestList
+);
