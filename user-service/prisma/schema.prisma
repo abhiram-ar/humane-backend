@@ -37,8 +37,8 @@ model User {
   FriendRequestSend    FriendShip[] @relation("FriendRequestSend")
   FriendRequestRecived FriendShip[] @relation("FriendRequestReceived")
 
-  UserBlocks   BlockedUser[] @relation("UserBlocks")
-  UsersBlocked BlockedUser[] @relation("UsersBlocked")
+  UserBlockedBy BlockedUser[] @relation("UserBlockedBy")
+  UsersBlocked  BlockedUser[] @relation("UsersBlocked")
 
   @@index(fields: [email])
 }
@@ -70,7 +70,7 @@ model BlockedUser {
   blockedId String
   createdAt DateTime @default(now())
 
-  blocker User @relation("UserBlocks", fields: [blockerId], references: [id])
+  blocker User @relation("UserBlockedBy", fields: [blockerId], references: [id])
   blocked User @relation("UsersBlocked", fields: [blockedId], references: [id])
 
   @@id([blockerId, blockedId])
