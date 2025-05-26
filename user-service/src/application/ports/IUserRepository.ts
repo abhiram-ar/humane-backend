@@ -7,20 +7,13 @@ export interface IUserRepository {
    create(dto: createUserDTO): Promise<User>;
    emailExists(email: string): Promise<boolean>;
 
-   retriveUserByEmail(
-      email: string
-   ): Promise<Pick<
-      User,
-      'id' | 'email' | 'passwordHash' | 'isBlocked' | 'firstName' | 'lastName' | 'isHotUser'
-   > | null>;
+   retriveUserByEmail(email: string): Promise<User | null>;
 
    getUserStatusById(userId: string): Promise<Pick<User, 'id' | 'isBlocked'> | null>;
 
    changePassword(email: string, newPasswordHash: string): Promise<Pick<User, 'email'> | null>;
 
-   googleAuthCreate(
-      dto: googleAuthDTO
-   ): Promise<Pick<User, 'id' | 'firstName' | 'lastName' | 'email' | 'isBlocked' | 'isHotUser'>>;
+   googleAuthCreate(dto: googleAuthDTO): Promise<Omit<User, 'passwordHash'>>;
 
    getUserList(dto: GetUserDTO & { skip: number }): Promise<{
       users: AdminGetUserResponseDTO[];

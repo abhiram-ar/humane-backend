@@ -32,4 +32,16 @@ export interface IUserRepository {
       from: number,
       size: number
    ): Promise<{ users: (UserDocument & { id: string })[]; totalEntries: number }>;
+
+   infiniteScrollSearchQuery(
+      searchQuery: string,
+      sortAfter: [number] | null,
+      size: number
+   ): Promise<{
+      users: (UserDocument & { id: string })[];
+      searchAfter: [number] | null;
+      hasMore: boolean;
+   }>;
+
+   getUserById(userId: string): Promise<(UserDocument & { id: string }) | null>;
 }

@@ -1,10 +1,11 @@
 import { ENV } from '@config/env';
-import { Client } from '@elastic/elasticsearch';
+import { Client, errors } from '@elastic/elasticsearch';
 import { CreateUserDTO } from 'dto/createUser.dto';
 import { IUserRepository } from 'repository/Interfaces/IUserRepository';
 import { ES_INDEXES } from './ES_INDEXES';
 import { UserDocument } from './UserDocument.type';
 import { UpdateUserDTO } from '@dtos/updateUser.dto';
+import { logger } from '@config/logger';
 
 export class UserRepository implements IUserRepository {
    public readonly client;
@@ -155,9 +156,61 @@ export class UserRepository implements IUserRepository {
 
       const totalEntries = (res.hits.total as { value: number }).value;
 
-
       return { users: parsedUserList, totalEntries };
    };
 
-   // infiniteScrollSearchQuery =
+   infiniteScrollSearchQuery = async (
+      searchQuery: string,
+      sortAfter: [number] | null,
+      size: number
+   ): Promise<{
+      users: (UserDocument & { id: string })[];
+      searchAfter: [number] | null;
+      hasMore: boolean;
+   }> => {
+      const res = await this.client.search<UserDocument>({
+         index: this._index,
+         size,
+         sort: [{ createdAt: 'desc' }], // this changes to type of searchAfter array
+         search_after: sortAfter ? sortAfter : undefined,
+         query: {
+            multi_match: {
+               query: searchQuery,
+               fields: ['firstName', 'lastName'] as (keyof UserDocument)[],
+               fuzziness: 'AUTO',
+            },
+         },
+      });
+
+      const hits = res.hits.hits;
+
+      const parsedUserList = hits
+         .map((hit) => ({ ...hit._source, id: hit._id }))
+         .filter(
+            (user): user is UserDocument & { id: string } =>
+               user !== undefined && typeof user.id === 'string'
+         );
+
+      const searchAfter = hits.length > 0 ? (hits[hits.length - 1].sort as [number]) : null;
+
+      return { users: parsedUserList, searchAfter, hasMore: hits.length === size };
+   };
+
+   getUserById = async (userId: string): Promise<(UserDocument & { id: string }) | null> => {
+      try {
+         const res = await this.client.get<UserDocument>({ index: this._index, id: userId });
+
+         if (!res.found || !res._source) return null;
+
+         return { ...res._source, id: res._id };
+      } catch (error) {
+         logger.error(`error while retiving id:${userId} from ES`);
+         if (error instanceof errors.ResponseError) {
+            error.meta.statusCode === 404;
+            return null;
+         }
+         logger.verbose(error);
+         return null;
+      }
+   };
 }

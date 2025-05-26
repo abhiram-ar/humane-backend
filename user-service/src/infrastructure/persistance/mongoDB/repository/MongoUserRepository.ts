@@ -1,12 +1,11 @@
 import { User } from '../../../../domain/entities/user.entity';
-import { IUserRepository } from '../../../../application/ports/IUserRepository';
 import userModel, { IUser } from '../models/user.model';
 import { createUserDTO } from '../../../../application/DTOs/user/createUser.dto';
 import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
 import { AdminGetUserResponseDTO, GetUserDTO } from '@dtos/admin/getUsers.dto';
 import { FilterQuery } from 'mongoose';
 
-export class MongoUserRepository implements IUserRepository {
+export class MongoUserRepository {
    constructor() {}
 
    create = async (dto: createUserDTO): Promise<Pick<User, 'firstName' | 'lastName' | 'email'>> => {

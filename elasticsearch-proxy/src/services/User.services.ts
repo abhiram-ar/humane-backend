@@ -1,17 +1,26 @@
 import { logger } from '@config/logger';
+import {
+   InfiniteScrollSearchDTO,
+   InfiniteScrollSearchOutputDTO,
+} from '@dtos/infiniteScrollSearch.dto';
 import { PaginatedSearchDTO } from '@dtos/paginatedSearch.dto';
 import { PrivillegedUserSearchOutputDTO } from '@dtos/privillegedSearch.output.dto';
 import { UpdateUserDTO } from '@dtos/updateUser.dto';
 import { UpdateUserAvatarKeyDTO } from '@dtos/updateUserAvatarKey.dto';
 import { UpdaeteUserBlockStautsDTO } from '@dtos/updateUserBlockStatus.dto';
 import { UpdateUserCoverPhotoKeyDTO } from '@dtos/updateUserCoverPhotokey';
-import { UserDocument } from '@repository/elasticsearch/UserDocument.type';
 import { CreateUserDTO } from 'dto/createUser.dto';
 import { IUserRepository } from 'repository/Interfaces/IUserRepository';
 import { IPagination } from 'Types/Pagination.type';
+import { CDNService } from './CDN.services';
+import { UserNotFoundError } from 'humane-common';
+import { GetUserProfileOutputDTO } from '@dtos/GetUserProfile.dto';
 
 export class UserServices {
-   constructor(private readonly _userRepository: IUserRepository) {}
+   constructor(
+      private readonly _userRepository: IUserRepository,
+      private readonly _cdnService: CDNService
+   ) {}
 
    create = async (dto: CreateUserDTO): Promise<void> => {
       await this._userRepository.createCommand(dto);
@@ -109,5 +118,55 @@ export class UserServices {
       }));
 
       return { users: parsedUser, pagination };
+   };
+
+   infiniteScollSearch = async (
+      dto: InfiniteScrollSearchDTO
+   ): Promise<InfiniteScrollSearchOutputDTO> => {
+      const res = await this._userRepository.infiniteScrollSearchQuery(
+         dto.searchQuery,
+         dto.searchAfter,
+         dto.limit
+      );
+
+      const sanitizedAndURLHydratedUserlist = res.users.map((user) => ({
+         id: user.id,
+         firstName: user.firstName,
+         lastName: user.lastName ?? null,
+         avatarURL: user.avatarKey ? this._cdnService.getPublicCDNURL(user.avatarKey) : null,
+      }));
+
+      return {
+         users: sanitizedAndURLHydratedUserlist,
+         scroll: { hasMore: res.hasMore, cursor: res.searchAfter ? res.searchAfter[0] : null },
+      };
+   };
+
+   getUserProfile = async (userId: string): Promise<GetUserProfileOutputDTO> => {
+      const userDoc = await this._userRepository.getUserById(userId);
+
+      if (!userDoc) {
+         throw new UserNotFoundError('User does not exists in read model');
+      }
+
+      let avatarURL: string | undefined;
+      if (userDoc.avatarKey) {
+         avatarURL = this._cdnService.getPublicCDNURL(userDoc.avatarKey);
+      }
+
+      let coverPhotoURL: string | undefined;
+      if (userDoc.coverPhotoKey) {
+         coverPhotoURL = this._cdnService.getPublicCDNURL(userDoc.coverPhotoKey);
+      }
+
+      return {
+         id: userDoc.id,
+         firstName: userDoc.firstName,
+         lastName: userDoc.lastName,
+         bio: userDoc.bio,
+         createdAt: userDoc.createdAt,
+         avatarURL,
+         coverPhotoURL,
+      };
    };
 }

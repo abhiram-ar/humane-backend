@@ -10,6 +10,7 @@ import adminUserManagementRouter from './routes/adminUserManagement.router';
 import { isAuthenticated } from './middlewares/isAuthenticated.middleware';
 import { authorizedRoles } from './middlewares/authorization.middleware';
 import userProfileRouter from './routes/userProfile.router';
+import { seedUser } from 'shared/seedController';
 
 const app = express();
 
@@ -30,6 +31,8 @@ app.get('/', (req, res) => {
 app.get('/api/v1/user/health', (req, res) => {
    res.status(200).json({ status: 'OK' });
 });
+
+app.post('/api/v1/user/seed', seedUser);
 
 app.use('/api/v1/global/auth/refresh', globalRefreshRouter);
 app.use('/api/v1/user/auth', authRouter);

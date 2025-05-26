@@ -1,8 +1,9 @@
+import { publicUserQueryController } from '@di/controllers';
 import { Router } from 'express';
 
 const publicQueryRouter = Router();
 
-publicQueryRouter.get('/',(req,res)=>{
-   res.send("not implemented")
-});
-export default publicQueryRouter
+publicQueryRouter.get('/user', publicUserQueryController.searchUser);
+publicQueryRouter.get('/user/:userId', publicUserQueryController.getUserProfile);
+
+export default publicQueryRouter;
