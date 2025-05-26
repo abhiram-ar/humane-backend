@@ -14,9 +14,9 @@ export class UserRelationshipController {
             throw new ZodValidationError(parsed.error);
          }
 
-         const {} = this._sendFriendRequest.execute(parsed.data);
+         const result = await this._sendFriendRequest.execute(parsed.data);
 
-         res.status(200).json({ success: true, message: 'Friend request send' });
+         res.status(200).json({ success: true, message: 'Friend request send', data: result });
       } catch (error) {
          next(error);
       }

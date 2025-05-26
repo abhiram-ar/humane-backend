@@ -1,11 +1,12 @@
 import { FriendshipError } from '@application/errors/FriendshipError';
 import { RelationshipBlockedError } from '@application/errors/RelationshipBlockedError';
+import { UserBlockedError } from '@application/errors/UserBlockedError';
+import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { Friendship } from '@domain/entities/friendship.entity';
 import { SendFriendRequestInputDTO } from '@dtos/friendship/addFriendInput.dto';
 import { IBlockedRelationshipRepository } from '@ports/IBlockedRelationshipRepository';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IUserRepository } from '@ports/IUserRepository';
-import { UserBlockedError, UserNotFoundError } from 'humane-common';
 
 export class SendFriendRequest {
    constructor(
@@ -14,7 +15,9 @@ export class SendFriendRequest {
       private readonly _userRepository: IUserRepository
    ) {}
 
-   execute = async (dto: SendFriendRequestInputDTO) => {
+   execute = async (
+      dto: SendFriendRequestInputDTO
+   ): Promise<{ receiverId: string; status: string }> => {
       // todo: optimize DB call. Consolidate into one if possible
 
       const recipient = await this._userRepository.getUserStatusById(dto.recieverId);

@@ -9,7 +9,7 @@ export class UserNotFoundError extends AppError {
    serialize(): { message: string; field?: string }[] {
       return [
          {
-            message: 'Invalid user',
+            message: this.message ?? 'Invalid user',
          },
       ];
    }
