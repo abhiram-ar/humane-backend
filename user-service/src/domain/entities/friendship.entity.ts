@@ -2,17 +2,25 @@ type FriendshipStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED';
 
 export class Friendship {
    constructor(
-      public userId1: string,
-      public userId2: string,
+      public user1Id: string,
+      public user2Id: string,
       public status: FriendshipStatus,
       public requesterId?: string,
-      public recieverId?: string,
+      public receiverId?: string,
       public createdAt?: string,
       public updatedAt?: string
    ) {
-      if (userId1 === userId2) throw new Error('UserIds must be different');
-      if (userId1 > userId2) {
-         [this.userId2, this.userId1] = [userId1, userId2];
+      if (user1Id === user2Id) throw new Error('UserIds must be different');
+      if (user1Id > user2Id) {
+         [this.user2Id, this.user1Id] = [user1Id, user2Id];
+      }
+   }
+
+   public static sortUserId(user1Id: string, user2Id: string): [string, string] {
+      if (user1Id > user2Id) {
+         return [user2Id, user1Id];
+      } else {
+         return [user1Id, user2Id];
       }
    }
 }

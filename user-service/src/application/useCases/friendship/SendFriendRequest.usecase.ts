@@ -4,15 +4,28 @@ import { Friendship } from '@domain/entities/friendship.entity';
 import { SendFriendRequestInputDTO } from '@dtos/friendship/addFriendInput.dto';
 import { IBlockedRelationshipRepository } from '@ports/IBlockedRelationshipRepository';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
+import { IUserRepository } from '@ports/IUserRepository';
+import { UserBlockedError, UserNotFoundError } from 'humane-common';
 
 export class SendFriendRequest {
    constructor(
       private readonly _friendShipRepository: IFriendshipRepository,
-      private _blockedRelationshipRepository: IBlockedRelationshipRepository
+      private readonly _blockedRelationshipRepository: IBlockedRelationshipRepository,
+      private readonly _userRepository: IUserRepository
    ) {}
 
    execute = async (dto: SendFriendRequestInputDTO) => {
-      
+      // todo: optimize DB call. Consolidate into one if possible
+
+      const recipient = await this._userRepository.getUserStatusById(dto.recieverId);
+
+      if (!recipient) {
+         throw new UserNotFoundError('Invalid reciverId');
+      }
+      if (recipient.isBlocked) {
+         throw new UserBlockedError('cannot send friendrequest to a blocked user');
+      }
+
       const isBlocked = await this._blockedRelationshipRepository.isBlockedBy(
          dto.requesterId,
          dto.recieverId
@@ -25,8 +38,7 @@ export class SendFriendRequest {
       }
 
       const existingFriendship = await this._friendShipRepository.retriveFriendship(
-         dto.requesterId,
-         dto.recieverId
+         ...Friendship.sortUserId(dto.recieverId, dto.requesterId)
       );
 
       if (existingFriendship) {
@@ -46,6 +58,6 @@ export class SendFriendRequest {
 
       // todo: throw the event to event bus
 
-      return { receiverId: newFriendRequest.recieverId, status: newFriendRequest.status };
+      return { receiverId: newFriendRequest.receiverId, status: newFriendRequest.status };
    };
 }

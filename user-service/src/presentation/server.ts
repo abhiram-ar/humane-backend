@@ -11,6 +11,7 @@ import { isAuthenticated } from './middlewares/isAuthenticated.middleware';
 import { authorizedRoles } from './middlewares/authorization.middleware';
 import userProfileRouter from './routes/userProfile.router';
 import { seedUser } from 'shared/seedController';
+import userRelationshipRouter from './routes/userRelationship.router';
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api/v1/user/auth', authRouter);
 app.use('/api/v1/admin/auth', adminAuthRouter);
 
 app.use('/api/v1/user/profile', isAuthenticated, authorizedRoles('user'), userProfileRouter);
+app.use('/api/v1/user/social', userRelationshipRouter);
 
 app.use(
    '/api/v1/admin/manage/user',
