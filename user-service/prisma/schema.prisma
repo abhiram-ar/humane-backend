@@ -63,7 +63,8 @@ model FriendShip {
 }
 
 // why cant we keep this in friendship model?
-// null hell: most of the fields will be null -> wastage of storage
+// 1. null hell: most of the fields will be null -> wastage of storage
+// 2. A user can still be blocked if they dont have a friendship, so this will be outside the scope of friendship
 model BlockedUser {
   blockerId String
   blockedId String
