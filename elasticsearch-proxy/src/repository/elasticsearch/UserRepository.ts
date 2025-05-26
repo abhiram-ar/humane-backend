@@ -207,7 +207,7 @@ export class UserRepository implements IUserRepository {
          logger.error(`error while retiving id:${userId} from ES`);
          if (error instanceof errors.ResponseError) {
             error.meta.statusCode === 404;
-            return null
+            return null;
          }
          logger.verbose(error);
          return null;
