@@ -5,6 +5,7 @@ import {
    friendshipRepository,
    userRepository,
 } from '@di/repository.container';
+import { awsStorageService } from '@di/services.container';
 
 export const sendFriendRequest = new SendFriendRequest(
    friendshipRepository,
@@ -12,4 +13,7 @@ export const sendFriendRequest = new SendFriendRequest(
    userRepository
 );
 
-export const getFriendRequestList = new GetFriendRequestList(friendshipRepository);
+export const getFriendRequestList = new GetFriendRequestList(
+   friendshipRepository,
+   awsStorageService
+);

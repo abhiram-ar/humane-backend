@@ -1,3 +1,4 @@
+import { User } from '@domain/entities/user.entity';
 import { z } from 'zod';
 
 export const getFriendRequestInputSchema = z.object({
@@ -7,3 +8,8 @@ export const getFriendRequestInputSchema = z.object({
 });
 
 export type GetFriendRequestListInputDTO = z.infer<typeof getFriendRequestInputSchema>;
+
+export type FriendRequestList = (Pick<User, 'id' | 'firstName' | 'lastName'> & {
+   createdAt: string;
+   avatarURL: string | null;
+})[];
