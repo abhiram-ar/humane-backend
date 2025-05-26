@@ -44,15 +44,15 @@ model User {
 }
 
 model FriendShip {
-  user1Id  String // should be < user2Id, enforce in DB level and app level
-  user2Id  String
-  user1 User   @relation("User1Friendships", fields: [user1Id], references: [id], onDelete: Cascade)
-  user2 User   @relation("User2Friendships", fields: [user2Id], references: [id], onDelete: Cascade)
+  user1Id String // should be < user2Id, enforce in DB level and app level
+  user2Id String
+  user1   User   @relation("User1Friendships", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2   User   @relation("User2Friendships", fields: [user2Id], references: [id], onDelete: Cascade)
 
-  requesterId String //Must be either user1Id or user2Id
-  recipientId String
-  UserRequested   User   @relation("FriendRequestSend", fields: [requesterId], references: [id])
-  UserReceived    User   @relation("FriendRequestReceived", fields: [recipientId], references: [id])
+  requesterId   String //Must be either user1Id or user2Id
+  receiverId    String
+  UserRequested User   @relation("FriendRequestSend", fields: [requesterId], references: [id])
+  UserReceived  User   @relation("FriendRequestReceived", fields: [receiverId], references: [id])
 
   status    FriendShipStatus @default(PENDING)
   createdAt DateTime         @default(now())
