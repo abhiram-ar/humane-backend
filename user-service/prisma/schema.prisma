@@ -31,7 +31,48 @@ model User {
   lastLoginTime   DateTime @default(now())
   humaneScore     Int      @default(0)
 
+  FriendShipsAsUser1 FriendShip[] @relation("User1Friendships")
+  FriendShipsAsUser2 FriendShip[] @relation("User2Friendships")
+
+  FriendRequestSend    FriendShip[] @relation("FriendRequestSend")
+  FriendRequestRecived FriendShip[] @relation("FriendRequestReceived")
+
+  UserBlocks   BlockedUser[] @relation("UserBlocks")
+  UsersBlocked BlockedUser[] @relation("UsersBlocked")
+
   @@index(fields: [email])
+}
+
+model FriendShip {
+  user1Id  String // should be < user2Id, enforce in DB level and app level
+  user2Id  String
+  user1Ref User   @relation("User1Friendships", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2Ref User   @relation("User2Friendships", fields: [user2Id], references: [id], onDelete: Cascade)
+
+  requesterId String //Must be either user1Id or user2Id
+  recipientId String
+  requested   User   @relation("FriendRequestSend", fields: [requesterId], references: [id])
+  received    User   @relation("FriendRequestReceived", fields: [recipientId], references: [id])
+
+  status    FriendShipStatus @default(PENDING)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @default(now())
+
+  @@id([user1Id, user2Id])
+  @@index([status])
+}
+
+// why cant we keep this in friendship model?
+// null hell: most of the fields will be null -> wastage of storage
+model BlockedUser {
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+
+  blocker User @relation("UserBlocks", fields: [blockerId], references: [id])
+  blocked User @relation("UsersBlocked", fields: [blockedId], references: [id])
+
+  @@id([blockerId, blockedId])
 }
 
 model Admin {
@@ -42,4 +83,10 @@ model Admin {
   passwordHash String
 
   @@index(fields: [email])
+}
+
+enum FriendShipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
 }
