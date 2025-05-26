@@ -51,8 +51,8 @@ model FriendShip {
 
   requesterId   String //Must be either user1Id or user2Id
   receiverId    String
-  UserRequested User   @relation("FriendRequestSend", fields: [requesterId], references: [id])
-  UserReceived  User   @relation("FriendRequestReceived", fields: [receiverId], references: [id])
+  RequestedUser User   @relation("FriendRequestSend", fields: [requesterId], references: [id])
+  ReceivingUser User   @relation("FriendRequestReceived", fields: [receiverId], references: [id])
 
   status    FriendShipStatus @default(PENDING)
   createdAt DateTime         @default(now())
