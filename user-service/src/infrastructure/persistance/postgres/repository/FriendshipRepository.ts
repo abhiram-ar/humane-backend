@@ -44,6 +44,19 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       };
    };
 
+   updateFriendRequest = async (friendship: Friendship): Promise<Required<Friendship> | null> => {
+      const res = await db.friendShip.update({
+         where: { user1Id_user2Id: { user1Id: friendship.user1Id, user2Id: friendship.user2Id } },
+         data: { status: friendship.status, updatedAt: new Date() },
+      });
+      if (!res) return null;
+      return {
+         ...res,
+         createdAt: res.createdAt.toISOString(),
+         updatedAt: res.updatedAt.toISOString(),
+      };
+   };
+
    getUserFriendRequestList = async (
       userId: string,
       from: UserListInfinityScollParams,

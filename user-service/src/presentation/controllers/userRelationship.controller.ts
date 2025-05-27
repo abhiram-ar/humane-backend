@@ -8,11 +8,14 @@ import {
    getFriendRequestInputSchema,
    GetFriendRequestListInputDTO,
 } from '@dtos/friendship/GetFriendRequests.dto';
+import { acceptFriendRequestSchema } from '@dtos/friendship/AcceptFriendRequset.dto';
+import { AcceptFriendRequest } from '@application/useCases/friendship/AcceptFriendRequest.usercase';
 
 export class UserRelationshipController {
    constructor(
       private readonly _sendFriendRequest: SendFriendRequest,
-      private readonly _getFriendRequestList: GetFriendRequestList
+      private readonly _getFriendRequestList: GetFriendRequestList,
+      private readonly _acceptFriendReq: AcceptFriendRequest
    ) {}
 
    sendFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
@@ -60,6 +63,20 @@ export class UserRelationshipController {
             message: 'Friend request list fetcehed successful',
             data: result,
          });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   acceptFriendRequest = async(req: Request, res: Response, next: NextFunction) => {
+      try {
+         const parsed  = acceptFriendRequestSchema.safeParse(req.body)
+         if(!parsed.success){
+            throw new ZodValidationError(parsed.error)
+         }
+         const result = await this._acceptFriendReq.execute(parsed.data)
+
+         res.status(201).json({success: true, message: "friend req accepted", data: result})
       } catch (error) {
          next(error);
       }

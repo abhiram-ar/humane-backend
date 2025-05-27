@@ -1,9 +1,23 @@
 import { userRelationshipController } from '@di/controller/userController.container';
+import { authorizedRoles } from '@presentation/middlewares/authorization.middleware';
+import { isAuthenticated } from '@presentation/middlewares/isAuthenticated.middleware';
 import express from 'express';
 
 const relationshipRouter = express.Router();
 
-relationshipRouter.post('/send-friend-req', userRelationshipController.sendFriendRequest);
-relationshipRouter.get('/friend-req', userRelationshipController.getFriendRequestList);
+relationshipRouter.post(
+   '/friend-req',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.sendFriendRequest
+);
+relationshipRouter.get(
+   '/friend-req',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getFriendRequestList
+);
+
+relationshipRouter.patch('/friend-req', userRelationshipController.acceptFriendRequest);
 
 export default relationshipRouter;

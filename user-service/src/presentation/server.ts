@@ -39,8 +39,8 @@ app.use('/api/v1/global/auth/refresh', globalRefreshRouter);
 app.use('/api/v1/user/auth', authRouter);
 app.use('/api/v1/admin/auth', adminAuthRouter);
 
+app.use('/api/v1/user/social', userRelationshipRouter);
 app.use('/api/v1/user/profile', isAuthenticated, authorizedRoles('user'), userProfileRouter);
-app.use('/api/v1/user/social', isAuthenticated, authorizedRoles('user'), userRelationshipRouter);
 
 app.use(
    '/api/v1/admin/manage/user',
