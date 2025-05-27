@@ -21,7 +21,7 @@ import {
    GetFriendCountInputDTO,
    getFriendsCountInputSchema,
 } from '@dtos/friendship/GetFriends.dto';
-import { GetFriends } from '@application/useCases/friendship/Friends.usercase';
+import { GetFriends } from '@application/useCases/friendship/GetFriends.usercase';
 import {
    cancelFriendRequestInputDTO,
    cancelFriendRequestInputSchema,
@@ -38,6 +38,11 @@ import {
    mutualFriendsListInputSchema,
 } from '@dtos/friendship/MutualFriends.dto';
 import { MutualFriends } from '@application/useCases/friendship/MutualFriends.usecase';
+import { RemoveFriendship } from '@application/useCases/friendship/RemoveFriendship.usecase';
+import {
+   RemoveFriendshipInputDTO,
+   removeFriendshipInputSchema,
+} from '@dtos/friendship/RemoveFriendshipInput.dto';
 
 export class UserRelationshipController {
    constructor(
@@ -45,7 +50,8 @@ export class UserRelationshipController {
       private readonly _getFriendRequestList: GetFriendRequestList,
       private readonly _getFriends: GetFriends,
       private readonly _getRelationshipStatus: GetRelationShipStatus,
-      private readonly _mutualFriends: MutualFriends
+      private readonly _mutualFriends: MutualFriends,
+      private readonly _removeFriendship: RemoveFriendship
    ) {}
 
    sendFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
@@ -104,6 +110,38 @@ export class UserRelationshipController {
          next(error);
       }
    };
+
+   removeFriendship = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new UnAuthenticatedError('No userId in auth header');
+         }
+
+         const { targetUserId } = req.params;
+
+         const dto: RemoveFriendshipInputDTO = {
+            currenUserId: req.user.userId,
+            targetUserId: targetUserId,
+         };
+
+         const parsed = removeFriendshipInputSchema.safeParse(dto);
+
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
+         }
+
+         const result = await this._removeFriendship.execute(parsed.data);
+
+         res.status(201).json({
+            success: true,
+            messasge: 'friendship removed successfully',
+            data: result,
+         });
+      } catch (error) {
+         next(error);
+      }
+   };
+
    getFriendRequestList = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {

@@ -22,6 +22,7 @@ import {
    getRelationshipStatus,
    mutualFriends,
    sendFriendRequest,
+   removeFriendship,
 } from '@di/usecase/friendshipUsercase.container';
 
 export const userAuthController = new UserAuthController(
@@ -48,5 +49,6 @@ export const userRelationshipController = new UserRelationshipController(
    getFriendRequestList,
    getFriends,
    getRelationshipStatus,
-   mutualFriends
+   mutualFriends,
+   removeFriendship
 );

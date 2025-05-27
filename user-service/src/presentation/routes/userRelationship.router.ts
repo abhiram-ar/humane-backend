@@ -45,6 +45,13 @@ relationshipRouter.get(
    authorizedRoles('user'),
    userRelationshipController.getFriendList
 );
+relationshipRouter.delete(
+   '/friend/:targetUserId',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.removeFriendship
+);
+
 relationshipRouter.get(
    '/friend/count',
    isAuthenticated,
