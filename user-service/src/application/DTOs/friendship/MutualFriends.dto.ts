@@ -20,3 +20,9 @@ export type MutualFriendsListOutputDTO = {
    })[];
    from: UserListInfinityScollParams;
 };
+
+export const mutualFriendsCountInputSchema = z.object({
+   currentUserId: z.string().nonempty(),
+   targetUserId: z.string().nonempty(),
+});
+export type MutualFriendsCountInputDTO = z.infer<typeof mutualFriendsCountInputSchema>;

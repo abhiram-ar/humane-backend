@@ -8,6 +8,7 @@ import {
 } from '@di/repository.container';
 import { awsStorageService } from '@di/services.container';
 import { GetRelationShipStatus } from '@application/useCases/friendship/GetRelationshipStatus';
+import { MutualFriends } from '@application/useCases/friendship/MutualFriends';
 
 export const sendFriendRequest = new FriendRequest(
    friendshipRepository,
@@ -26,4 +27,10 @@ export const getRelationshipStatus = new GetRelationShipStatus(
    userRepository,
    blockedRelationshipRepository,
    friendshipRepository
+);
+
+export const mutualFriends = new MutualFriends(
+   userRepository,
+   friendshipRepository,
+   awsStorageService
 );

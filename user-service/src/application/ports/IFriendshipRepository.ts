@@ -39,7 +39,7 @@ export interface IFriendshipRepository {
       from: UserListInfinityScollParams;
    }>;
 
-   findMutual(
+   findMutualFriends(
       currentUserId: string,
       targetUserId: string,
       from: UserListInfinityScollParams,
@@ -51,4 +51,6 @@ export interface IFriendshipRepository {
       })[];
       from: UserListInfinityScollParams;
    }>;
+
+   countMutualFriends(currentUserId: string, targetUserId: string): Promise<number>;
 }

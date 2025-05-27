@@ -17,13 +17,21 @@ import {
    GetRelationShipStatusInputDTO,
    getRelationshipStatusSchema,
 } from '@dtos/friendship/GetRelationshipStatus.dto';
+import {
+   MutualFriendsCountInputDTO,
+   mutualFriendsCountInputSchema,
+   MutualFriendsListInputDTO,
+   mutualFriendsListInputSchema,
+} from '@dtos/friendship/MutualFriends.dto';
+import { MutualFriends } from '@application/useCases/friendship/MutualFriends';
 
 export class UserRelationshipController {
    constructor(
       private readonly _friendRequest: FriendRequest,
       private readonly _getFriendRequestList: GetFriendRequestList,
       private readonly _getFriendList: GetFriendList,
-      private readonly _getRelationshipStatus: GetRelationShipStatus
+      private readonly _getRelationshipStatus: GetRelationShipStatus,
+      private readonly _mutualFriends: MutualFriends
    ) {}
 
    sendFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
@@ -157,6 +165,71 @@ export class UserRelationshipController {
             success: true,
             message: 'Relationship status fetched',
             data: { status },
+         });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getMutualFriendsList = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new UnAuthenticatedError('User not found in request header');
+         }
+         const { size = 10, createdAt, lastId, targetUserId } = req.query;
+
+         const dto: MutualFriendsListInputDTO = {
+            targetUserId: targetUserId as string,
+            currentUserId: req.user.userId,
+            from:
+               createdAt && lastId
+                  ? { createdAt: createdAt as string, lastId: lastId as string }
+                  : null,
+            size: parseInt(size as string),
+         };
+
+         const parsed = mutualFriendsListInputSchema.safeParse(dto);
+
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
+         }
+
+         const result = await this._mutualFriends.list(parsed.data);
+
+         res.status(200).json({
+            success: true,
+            message: 'Mutual friends list fetched',
+            data: result,
+         });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getMutualFriendsCount = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new UnAuthenticatedError('User not found in request header');
+         }
+         const { targetUserId } = req.query;
+
+         const dto: MutualFriendsCountInputDTO = {
+            targetUserId: targetUserId as string,
+            currentUserId: req.user.userId,
+         };
+
+         const parsed = mutualFriendsCountInputSchema.safeParse(dto);
+
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
+         }
+
+         const result = await this._mutualFriends.count(parsed.data);
+
+         res.status(200).json({
+            success: true,
+            message: 'Mutual friends count fetched',
+            data: result,
          });
       } catch (error) {
          next(error);

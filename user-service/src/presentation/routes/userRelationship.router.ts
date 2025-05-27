@@ -46,4 +46,17 @@ relationshipRouter.get(
    userRelationshipController.getFriendList
 );
 
+relationshipRouter.get(
+   '/friend/mutual',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getMutualFriendsList
+);
+relationshipRouter.get(
+   '/friend/mutual/count',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getMutualFriendsCount
+);
+
 export default relationshipRouter;

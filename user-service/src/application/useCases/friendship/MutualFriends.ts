@@ -1,13 +1,13 @@
 import { UserBlockedError } from '@application/errors/UserBlockedError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import {
+   MutualFriendsCountInputDTO,
    MutualFriendsListInputDTO,
    MutualFriendsListOutputDTO,
 } from '@dtos/friendship/MutualFriends.dto';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IStorageService } from '@ports/IStorageService';
 import { IUserRepository } from '@ports/IUserRepository';
-import { dot } from 'node:test/reporters';
 
 export class MutualFriends {
    constructor(
@@ -26,7 +26,7 @@ export class MutualFriends {
          throw new UserBlockedError('Taget user is blocked by the platform');
       }
 
-      const result = await this._friendshipRepo.findMutual(
+      const result = await this._friendshipRepo.findMutualFriends(
          dto.currentUserId,
          dto.targetUserId,
          dto.from,
@@ -46,5 +46,21 @@ export class MutualFriends {
       return { mutualFriends: urlHydratedFriendReqList, from: result.from };
    };
 
-   count = async (currentUserId: string, targetUserId: string) => {};
+   count = async (dto: MutualFriendsCountInputDTO): Promise<number> => {
+      const targetUser = await this._userRepo.getUserStatusById(dto.targetUserId);
+
+      if (!targetUser) {
+         throw new UserNotFoundError('Target user does not exist');
+      }
+      if (targetUser.isBlocked) {
+         throw new UserBlockedError('Taget user is blocked by the platform');
+      }
+
+      const count = await this._friendshipRepo.countMutualFriends(
+         dto.currentUserId,
+         dto.targetUserId
+      );
+
+      return count;
+   };
 }

@@ -161,7 +161,7 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       };
    };
 
-   findMutual = async (
+   findMutualFriends = async (
       currentUserId: string,
       targetUserId: string,
       from: UserListInfinityScollParams,
@@ -221,5 +221,31 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
          mutualUsers: parsedUserList,
          from: lastElem ? { createdAt: lastElem.createdAt, lastId: lastElem.id } : null,
       };
+   };
+
+   countMutualFriends = async (currentUserId: string, targetUserId: string): Promise<number> => {
+      const res = await db.friendShip.count({
+         where: {
+            AND: [
+               // and ensure that we will get the interseaction of both friend list
+               {
+                  OR: [
+                     // friends of current user
+                     { user1Id: currentUserId, status: 'ACCEPTED' },
+                     { user2Id: currentUserId, status: 'ACCEPTED' },
+                  ],
+               },
+               {
+                  OR: [
+                     // frinds of target user
+                     { user1Id: targetUserId, status: 'ACCEPTED' },
+                     { user2Id: targetUserId, status: 'ACCEPTED' },
+                  ],
+               },
+            ],
+         },
+      });
+
+      return res;
    };
 }
