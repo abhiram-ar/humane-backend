@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { SendFriendRequest } from '@application/useCases/friendship/SendFriendRequest.usecase';
+import { FriendRequest } from '@application/useCases/friendship/FriendRequest.usecase';
 import { sendFriendRequestInputSchema } from '@dtos/friendship/SendFriendRequestInput.dto';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
 import { GetFriendRequestList } from '@application/useCases/friendship/GetFriendRequestList.usercase';
@@ -9,15 +9,14 @@ import {
    GetFriendRequestListInputDTO,
 } from '@dtos/friendship/GetFriendRequests.dto';
 import { acceptFriendRequestSchema } from '@dtos/friendship/AcceptFriendRequset.dto';
-import { AcceptFriendRequest } from '@application/useCases/friendship/AcceptFriendRequest.usercase';
 import { getFriendInputSchema, GetFriendListInputDTO } from '@dtos/friendship/GetFriends.dto';
 import { GetFriendList } from '@application/useCases/friendship/GetFriendList.usercase';
+import { cancelFriendRequestInputSchema } from '@dtos/friendship/cancelFriendRequestInput.dto';
 
 export class UserRelationshipController {
    constructor(
-      private readonly _sendFriendRequest: SendFriendRequest,
+      private readonly _friendRequest: FriendRequest,
       private readonly _getFriendRequestList: GetFriendRequestList,
-      private readonly _acceptFriendReq: AcceptFriendRequest,
       private readonly _getFriendList: GetFriendList
    ) {}
 
@@ -29,7 +28,7 @@ export class UserRelationshipController {
             throw new ZodValidationError(parsed.error);
          }
 
-         const result = await this._sendFriendRequest.execute(parsed.data);
+         const result = await this._friendRequest.send(parsed.data);
 
          res.status(200).json({ success: true, message: 'Friend request send', data: result });
       } catch (error) {
@@ -37,6 +36,24 @@ export class UserRelationshipController {
       }
    };
 
+   cancelFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const parsed = cancelFriendRequestInputSchema.safeParse(req.body);
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
+         }
+
+         const result = await this._friendRequest.cancel(parsed.data);
+
+         res.status(201).json({
+            success: true,
+            message: 'friend request cancelled successfully',
+            data: result,
+         });
+      } catch (error) {
+         next(error);
+      }
+   };
    getFriendRequestList = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
@@ -77,7 +94,7 @@ export class UserRelationshipController {
          if (!parsed.success) {
             throw new ZodValidationError(parsed.error);
          }
-         const result = await this._acceptFriendReq.execute(parsed.data);
+         const result = await this._friendRequest.accept(parsed.data);
 
          res.status(201).json({ success: true, message: 'friend req accepted', data: result });
       } catch (error) {

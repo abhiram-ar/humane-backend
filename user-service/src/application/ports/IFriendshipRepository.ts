@@ -13,6 +13,8 @@ export interface IFriendshipRepository {
 
    updateFriendRequest(friendship: Friendship): Promise<Required<Friendship> | null>;
 
+   deleteFriendship(friendship: Friendship): Promise<Required<Friendship>>;
+
    getUserFriendRequestList(
       userId: string,
       from: UserListInfinityScollParams,

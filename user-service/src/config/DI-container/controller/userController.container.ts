@@ -17,7 +17,6 @@ import { googleOAuth2Client } from '@infrastructure/service/GoogleOAuth2Service'
 import { UserProfileController } from '@presentation/controllers/userProfile.controller';
 import { UserRelationshipController } from '@presentation/controllers/userRelationship.controller';
 import {
-   acceptFriendRequest,
    getFriendList,
    getFriendRequestList,
    sendFriendRequest,
@@ -45,6 +44,5 @@ export const userProfileController = new UserProfileController(
 export const userRelationshipController = new UserRelationshipController(
    sendFriendRequest,
    getFriendRequestList,
-   acceptFriendRequest,
    getFriendList
 );

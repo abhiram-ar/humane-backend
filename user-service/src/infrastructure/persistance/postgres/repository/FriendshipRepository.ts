@@ -35,8 +35,6 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
          where: { user1Id_user2Id: { user1Id: user1Id, user2Id: user2Id } },
       });
 
-      console.log(res);
-
       if (!res) return null;
 
       return {
@@ -52,6 +50,18 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
          data: { status: friendship.status, updatedAt: new Date() },
       });
       if (!res) return null;
+      return {
+         ...res,
+         createdAt: res.createdAt.toISOString(),
+         updatedAt: res.updatedAt.toISOString(),
+      };
+   };
+
+   deleteFriendship = async (friendship: Friendship): Promise<Required<Friendship>> => {
+      const res = await db.friendShip.delete({
+         where: { user1Id_user2Id: { user1Id: friendship.user1Id, user2Id: friendship.user2Id } },
+      });
+
       return {
          ...res,
          createdAt: res.createdAt.toISOString(),

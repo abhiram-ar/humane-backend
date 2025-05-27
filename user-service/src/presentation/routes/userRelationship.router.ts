@@ -18,6 +18,7 @@ relationshipRouter.get(
    userRelationshipController.getFriendRequestList
 );
 relationshipRouter.patch('/friend-req', userRelationshipController.acceptFriendRequest);
+relationshipRouter.delete('/friend-req', userRelationshipController.cancelFriendRequest);
 
 relationshipRouter.get('/friend', isAuthenticated, userRelationshipController.getFriendList);
 
