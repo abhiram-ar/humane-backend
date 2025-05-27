@@ -20,6 +20,8 @@ export class GetRelationShipStatus {
    execute = async (
       dto: GetRelationShipStatusInputDTO
    ): Promise<GetRelationShipStatusOutputDTO> => {
+      if (dto.currentUserId === dto.targetUserId) return 'sameUser';
+
       // check target user exists
       // TODO: can be refacored to a seperate usecase: same logic can be reused to enfore DRY
       const targetUser = await this._userRepo.getUserStatusById(dto.targetUserId);

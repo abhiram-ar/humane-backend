@@ -1,3 +1,4 @@
+import { RelationshipStatus } from '@application/types/RelationshipStatus';
 import { z } from 'zod';
 
 export const getRelationshipStatusSchema = z.object({
@@ -7,9 +8,4 @@ export const getRelationshipStatusSchema = z.object({
 
 export type GetRelationShipStatusInputDTO = z.infer<typeof getRelationshipStatusSchema>;
 
-export type GetRelationShipStatusOutputDTO =
-   | 'strangers'
-   | 'friends'
-   | 'friendreqSend'
-   | 'friendReqWaitingApproval'
-   | 'blocked';
+export type GetRelationShipStatusOutputDTO = RelationshipStatus;

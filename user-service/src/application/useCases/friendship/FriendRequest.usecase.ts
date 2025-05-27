@@ -3,7 +3,8 @@ import { GenericError } from '@application/errors/GenericError';
 import { RelationshipBlockedError } from '@application/errors/RelationshipBlockedError';
 import { UserBlockedError } from '@application/errors/UserBlockedError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
-import { Friendship, FriendshipStatus } from '@domain/entities/friendship.entity';
+import { RelationshipStatus } from '@application/types/RelationshipStatus';
+import { Friendship } from '@domain/entities/friendship.entity';
 import { AcceptFriendshipInputDTO } from '@dtos/friendship/AcceptFriendRequset.dto';
 import { cancelFriendRequestInputDTO } from '@dtos/friendship/cancelFriendRequestInput.dto';
 import { SendFriendRequestInputDTO } from '@dtos/friendship/SendFriendRequestInput.dto';
@@ -20,7 +21,7 @@ export class FriendRequest {
 
    send = async (
       dto: SendFriendRequestInputDTO
-   ): Promise<{ receiverId: string; status: string }> => {
+   ): Promise<{ receiverId: string; status: RelationshipStatus }> => {
       // todo: optimize DB call. Consolidate into one if possible
 
       const recipient = await this._userRepository.getUserStatusById(dto.recieverId);
@@ -64,12 +65,12 @@ export class FriendRequest {
 
       // TODO: throw the event to event bus
 
-      return { receiverId: newFriendRequest.receiverId, status: newFriendRequest.status };
+      return { receiverId: newFriendRequest.receiverId, status: 'friendreqSend' };
    };
 
    accept = async (
       dto: AcceptFriendshipInputDTO
-   ): Promise<{ result: string; status: FriendshipStatus }> => {
+   ): Promise<{ requesterId: string; status: RelationshipStatus }> => {
       //make sure rerqusterId exists
       const requestedUser = await this._userRepository.getUserStatusById(dto.requesterId);
       if (!requestedUser) {
@@ -111,12 +112,12 @@ export class FriendRequest {
 
       // TODO: pubblish event
 
-      return { result: result.requesterId, status: result.status };
+      return { requesterId: result.requesterId, status: 'friends' };
    };
 
    cancel = async (
       dto: cancelFriendRequestInputDTO
-   ): Promise<{ receiverId: string; status: null }> => {
+   ): Promise<{ receiverId: string; status: RelationshipStatus }> => {
       const reciver = await this._userRepository.getUserStatusById(dto.recieverId);
 
       if (!reciver) {
@@ -146,6 +147,6 @@ export class FriendRequest {
 
       // TODO:emit cancelled event
 
-      return { receiverId: res.receiverId, status: null };
+      return { receiverId: res.receiverId, status: 'strangers' };
    };
 }

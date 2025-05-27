@@ -26,7 +26,7 @@ relationshipRouter.post(
    userRelationshipController.sendFriendRequest
 );
 relationshipRouter.patch(
-   '/friend-req',
+   '/friend-req/status',
    isAuthenticated,
    authorizedRoles('user'),
    userRelationshipController.acceptFriendRequest

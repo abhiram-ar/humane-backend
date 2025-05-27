@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { FriendRequest } from '@application/useCases/friendship/FriendRequest.usecase';
-import { sendFriendRequestInputSchema } from '@dtos/friendship/SendFriendRequestInput.dto';
+import {
+   SendFriendRequestInputDTO,
+   sendFriendRequestInputSchema,
+} from '@dtos/friendship/SendFriendRequestInput.dto';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
 import { GetFriendRequestList } from '@application/useCases/friendship/GetFriendRequestList.usercase';
 import { UnAuthenticatedError } from '@application/errors/UnAuthenticatedError';
@@ -8,7 +11,10 @@ import {
    getFriendRequestInputSchema,
    GetFriendRequestListInputDTO,
 } from '@dtos/friendship/GetFriendRequests.dto';
-import { acceptFriendRequestSchema } from '@dtos/friendship/AcceptFriendRequset.dto';
+import {
+   acceptFriendRequestSchema,
+   AcceptFriendshipInputDTO,
+} from '@dtos/friendship/AcceptFriendRequset.dto';
 import {
    getFriendsListInputSchema,
    GetFriendListInputDTO,
@@ -16,7 +22,10 @@ import {
    getFriendsCountInputSchema,
 } from '@dtos/friendship/GetFriends.dto';
 import { GetFriends } from '@application/useCases/friendship/Friends.usercase';
-import { cancelFriendRequestInputSchema } from '@dtos/friendship/cancelFriendRequestInput.dto';
+import {
+   cancelFriendRequestInputDTO,
+   cancelFriendRequestInputSchema,
+} from '@dtos/friendship/cancelFriendRequestInput.dto';
 import { GetRelationShipStatus } from '@application/useCases/friendship/GetRelationshipStatus';
 import {
    GetRelationShipStatusInputDTO,
@@ -41,7 +50,18 @@ export class UserRelationshipController {
 
    sendFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         const parsed = sendFriendRequestInputSchema.safeParse(req.body);
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new UnAuthenticatedError('No userId in auth header');
+         }
+
+         const { recieverId } = req.body;
+
+         const dto: SendFriendRequestInputDTO = {
+            requesterId: req.user.userId,
+            recieverId: recieverId,
+         };
+
+         const parsed = sendFriendRequestInputSchema.safeParse(dto);
 
          if (!parsed.success) {
             throw new ZodValidationError(parsed.error);
@@ -57,7 +77,18 @@ export class UserRelationshipController {
 
    cancelFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         const parsed = cancelFriendRequestInputSchema.safeParse(req.body);
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new UnAuthenticatedError('No userId in auth header');
+         }
+
+         const { recieverId } = req.body;
+
+         const dto: cancelFriendRequestInputDTO = {
+            requesterId: req.user.userId,
+            recieverId: recieverId,
+         };
+
+         const parsed = cancelFriendRequestInputSchema.safeParse(dto);
          if (!parsed.success) {
             throw new ZodValidationError(parsed.error);
          }
@@ -109,10 +140,23 @@ export class UserRelationshipController {
 
    acceptFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         const parsed = acceptFriendRequestSchema.safeParse(req.body);
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new UnAuthenticatedError('No userId in auth header');
+         }
+
+         const { requesterId } = req.body;
+
+         const dto: AcceptFriendshipInputDTO = {
+            userId: req.user.userId,
+            requesterId,
+         };
+
+         const parsed = acceptFriendRequestSchema.safeParse(dto);
+
          if (!parsed.success) {
             throw new ZodValidationError(parsed.error);
          }
+
          const result = await this._friendRequest.accept(parsed.data);
 
          res.status(201).json({ success: true, message: 'friend req accepted', data: result });
