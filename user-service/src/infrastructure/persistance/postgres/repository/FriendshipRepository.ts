@@ -133,6 +133,7 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
             createdAt: true,
             status: true,
          },
+         take: size,
       });
 
       const parsedUserList = res.map((entry) => {

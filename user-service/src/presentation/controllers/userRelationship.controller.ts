@@ -42,13 +42,13 @@ export class UserRelationshipController {
          if (req.user?.type !== 'user' || !req.user.userId) {
             throw new UnAuthenticatedError('No userId in auth header');
          }
-         const { size = 10, createdAt, lastUserId } = req.query;
+         const { size = 10, createdAt, lastId } = req.query;
 
          const dto: GetFriendRequestListInputDTO = {
             userId: req.user.userId,
             from:
-               createdAt && lastUserId
-                  ? { createdAt: createdAt as string, lastId: lastUserId as string }
+               createdAt && lastId
+                  ? { createdAt: createdAt as string, lastId: lastId as string }
                   : null,
             size: parseInt(size as string),
          };
@@ -90,13 +90,13 @@ export class UserRelationshipController {
          if (req.user?.type !== 'user' || !req.user.userId) {
             throw new UnAuthenticatedError('No userId in auth header');
          }
-         const { size = 10, createdAt, lastUserId } = req.query;
+         const { size = 10, createdAt, lastId } = req.query;
 
          const dto: GetFriendListInputDTO = {
             userId: req.user.userId,
             from:
-               createdAt && lastUserId
-                  ? { createdAt: createdAt as string, lastId: lastUserId as string }
+               createdAt && lastId
+                  ? { createdAt: createdAt as string, lastId: lastId as string }
                   : null,
             size: parseInt(size as string),
          };
