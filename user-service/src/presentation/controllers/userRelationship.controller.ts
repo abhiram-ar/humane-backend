@@ -12,12 +12,18 @@ import { acceptFriendRequestSchema } from '@dtos/friendship/AcceptFriendRequset.
 import { getFriendInputSchema, GetFriendListInputDTO } from '@dtos/friendship/GetFriends.dto';
 import { GetFriendList } from '@application/useCases/friendship/GetFriendList.usercase';
 import { cancelFriendRequestInputSchema } from '@dtos/friendship/cancelFriendRequestInput.dto';
+import { GetRelationShipStatus } from '@application/useCases/friendship/GetRelationshipStatus';
+import {
+   GetRelationShipStatusInputDTO,
+   getRelationshipStatusSchema,
+} from '@dtos/friendship/GetRelationshipStatus.dto';
 
 export class UserRelationshipController {
    constructor(
       private readonly _friendRequest: FriendRequest,
       private readonly _getFriendRequestList: GetFriendRequestList,
-      private readonly _getFriendList: GetFriendList
+      private readonly _getFriendList: GetFriendList,
+      private readonly _getRelationshipStatus: GetRelationShipStatus
    ) {}
 
    sendFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
@@ -123,6 +129,35 @@ export class UserRelationshipController {
 
          const result = await this._getFriendList.execute(parsed.data);
          res.status(200).json({ success: true, message: 'friend list fetched', data: result });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getRelationshipStatus = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new UnAuthenticatedError('User not found in request header');
+         }
+         const { tartgetUserId } = req.params;
+
+         const dto: GetRelationShipStatusInputDTO = {
+            tartgetUserId,
+            currentUserId: req.user.userId,
+         };
+         const parsed = getRelationshipStatusSchema.safeParse(dto);
+
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
+         }
+
+         const status = await this._getRelationshipStatus.execute(parsed.data);
+
+         res.status(200).json({
+            success: true,
+            message: 'Relationship status fetched',
+            data: { status },
+         });
       } catch (error) {
          next(error);
       }

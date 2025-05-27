@@ -5,21 +5,45 @@ import express from 'express';
 
 const relationshipRouter = express.Router();
 
-relationshipRouter.post(
-   '/friend-req',
+relationshipRouter.get(
+   '/rel-status',
    isAuthenticated,
    authorizedRoles('user'),
-   userRelationshipController.sendFriendRequest
+   userRelationshipController.getRelationshipStatus
 );
+
+// ---- friend-req
 relationshipRouter.get(
    '/friend-req',
    isAuthenticated,
    authorizedRoles('user'),
    userRelationshipController.getFriendRequestList
 );
-relationshipRouter.patch('/friend-req', userRelationshipController.acceptFriendRequest);
-relationshipRouter.delete('/friend-req', userRelationshipController.cancelFriendRequest);
+relationshipRouter.post(
+   '/friend-req',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.sendFriendRequest
+);
+relationshipRouter.patch(
+   '/friend-req',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.acceptFriendRequest
+);
+relationshipRouter.delete(
+   '/friend-req',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.cancelFriendRequest
+);
 
-relationshipRouter.get('/friend', isAuthenticated, userRelationshipController.getFriendList);
+//-----friend
+relationshipRouter.get(
+   '/friend',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getFriendList
+);
 
 export default relationshipRouter;

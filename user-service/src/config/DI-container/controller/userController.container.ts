@@ -19,6 +19,7 @@ import { UserRelationshipController } from '@presentation/controllers/userRelati
 import {
    getFriendList,
    getFriendRequestList,
+   getRelationshipStatus,
    sendFriendRequest,
 } from '@di/usecase/friendshipUsercase.container';
 
@@ -44,5 +45,6 @@ export const userProfileController = new UserProfileController(
 export const userRelationshipController = new UserRelationshipController(
    sendFriendRequest,
    getFriendRequestList,
-   getFriendList
+   getFriendList,
+   getRelationshipStatus
 );
