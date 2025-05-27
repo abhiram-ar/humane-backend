@@ -25,10 +25,10 @@ export class GetFriendRequestList {
       );
 
       const urlHydratedFriendReqList = res.friendReqs.map((user) => {
-         const { avatar, ...data } = user;
+         const { avatarKey, ...data } = user;
          let avatarURL: string | null = null;
-         if (user.avatar) {
-            avatarURL = this._storageService.getPublicCDNURL(user.avatar);
+         if (user.avatarKey) {
+            avatarURL = this._storageService.getPublicCDNURL(user.avatarKey);
          }
          return { ...data, avatarURL };
       });

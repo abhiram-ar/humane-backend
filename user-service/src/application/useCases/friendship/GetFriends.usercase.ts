@@ -16,10 +16,12 @@ export class GetFriends {
       const res = await this._friendshipRepo.getUserFriendList(dto.userId, dto.from, dto.size);
 
       const urlHydratedFriendReqList = res.friendReqs.map((user) => {
-         const { avatar, ...data } = user;
+         const { avatarKey, ...data } = user;
+         
          let avatarURL: string | null = null;
-         if (user.avatar) {
-            avatarURL = this._storageService.getPublicCDNURL(user.avatar);
+         
+         if (avatarKey) {
+            avatarURL = this._storageService.getPublicCDNURL(avatarKey);
          }
          return { ...data, avatarURL };
       });

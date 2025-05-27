@@ -77,6 +77,7 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       friendReqs: (Pick<User, 'id' | 'firstName' | 'lastName'> & {
          createdAt: string;
          status: FriendshipStatus;
+         avatarKey: string | null;
       })[];
       from: UserListInfinityScollParams;
    }> => {
@@ -117,9 +118,10 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       from: UserListInfinityScollParams,
       size?: number
    ): Promise<{
-      friendReqs: (Pick<User, 'id' | 'firstName' | 'lastName' | 'avatar'> & {
+      friendReqs: (Pick<User, 'id' | 'firstName' | 'lastName'> & {
          createdAt: string;
          status: FriendshipStatus;
+         avatarKey: string | null;
       })[];
       from: UserListInfinityScollParams;
    }> => {
@@ -180,9 +182,10 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       from: UserListInfinityScollParams,
       size: number
    ): Promise<{
-      mutualUsers: (Pick<User, 'id' | 'firstName' | 'lastName' | 'avatar'> & {
+      mutualUsers: (Pick<User, 'id' | 'firstName' | 'lastName'> & {
          createdAt: string;
          status: FriendshipStatus;
+         avatarKey: string | null;
       })[];
       from: UserListInfinityScollParams;
    }> => {
