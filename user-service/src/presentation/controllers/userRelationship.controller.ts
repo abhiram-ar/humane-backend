@@ -161,9 +161,9 @@ export class UserRelationshipController {
          const parsed = getFriendsCountInputSchema.safeParse(dto);
          if (!parsed.success) throw new ZodValidationError(parsed.error);
 
-         const result = await this._getFriends.count(parsed.data);
+         const count = await this._getFriends.count(parsed.data);
 
-         res.status(200).json({ success: true, message: 'friend list fetched', data: result });
+         res.status(200).json({ success: true, message: 'friend list fetched', data: { count } });
       } catch (error) {
          next(error);
       }
@@ -251,12 +251,12 @@ export class UserRelationshipController {
             throw new ZodValidationError(parsed.error);
          }
 
-         const result = await this._mutualFriends.count(parsed.data);
+         const count = await this._mutualFriends.count(parsed.data);
 
          res.status(200).json({
             success: true,
             message: 'Mutual friends count fetched',
-            data: result,
+            data: { count },
          });
       } catch (error) {
          next(error);
