@@ -160,4 +160,66 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
          from: lastElem ? { createdAt: lastElem.createdAt, lastId: lastElem.id } : null,
       };
    };
+
+   findMutual = async (
+      currentUserId: string,
+      targetUserId: string,
+      from: UserListInfinityScollParams,
+      size: number
+   ): Promise<{
+      mutualUsers: (Pick<User, 'id' | 'firstName' | 'lastName' | 'avatar'> & {
+         createdAt: string;
+         status: FriendshipStatus;
+      })[];
+      from: UserListInfinityScollParams;
+   }> => {
+      const res = await db.friendShip.findMany({
+         orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+         where: {
+            AND: [
+               // and ensure that we will get the interseaction of both friend list
+               {
+                  OR: [
+                     // friends of current user
+                     { user1Id: currentUserId, status: 'ACCEPTED' },
+                     { user2Id: currentUserId, status: 'ACCEPTED' },
+                  ],
+               },
+               {
+                  OR: [
+                     // frinds of target user
+                     { user1Id: targetUserId, status: 'ACCEPTED' },
+                     { user2Id: targetUserId, status: 'ACCEPTED' },
+                  ],
+               },
+            ],
+            createdAt: { lte: from?.createdAt },
+            id: { gt: from?.lastId },
+         },
+         take: size,
+         select: {
+            user1: { select: { id: true, firstName: true, lastName: true, avatarKey: true } },
+            user2: { select: { id: true, firstName: true, lastName: true, avatarKey: true } },
+            createdAt: true,
+            status: true,
+         },
+      });
+
+      const parsedUserList = res.map((entry) => {
+         // friend can be either of user1 or user2
+         const friend =
+            entry.user1.id === currentUserId || entry.user1.id === targetUserId
+               ? entry.user2
+               : entry.user1;
+
+         return { ...friend, createdAt: entry.createdAt.toISOString(), status: entry.status };
+      });
+
+      const lastElem = parsedUserList[parsedUserList.length - 1];
+
+      return {
+         mutualUsers: parsedUserList,
+         from: lastElem ? { createdAt: lastElem.createdAt, lastId: lastElem.id } : null,
+      };
+   };
 }

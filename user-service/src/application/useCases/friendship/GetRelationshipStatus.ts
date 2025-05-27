@@ -21,6 +21,7 @@ export class GetRelationShipStatus {
       dto: GetRelationShipStatusInputDTO
    ): Promise<GetRelationShipStatusOutputDTO> => {
       // check target user exists
+      // TODO: can be refacored to a seperate usecase: same logic can be reused to enfore DRY
       const targetUser = await this._userRepo.getUserStatusById(dto.targetUserId);
 
       if (!targetUser) {

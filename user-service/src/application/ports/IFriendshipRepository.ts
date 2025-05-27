@@ -38,4 +38,17 @@ export interface IFriendshipRepository {
       })[];
       from: UserListInfinityScollParams;
    }>;
+
+   findMutual(
+      currentUserId: string,
+      targetUserId: string,
+      from: UserListInfinityScollParams,
+      size: number
+   ): Promise<{
+      mutualUsers: (Pick<User, 'id' | 'firstName' | 'lastName' | 'avatar'> & {
+         createdAt: string;
+         status: FriendshipStatus;
+      })[];
+      from: UserListInfinityScollParams;
+   }>;
 }
