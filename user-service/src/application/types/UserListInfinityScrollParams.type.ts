@@ -1,4 +1,4 @@
 export type UserListInfinityScollParams = {
    createdAt: string;
-   lastUserId: string;
+   lastId: string;
 } | null;

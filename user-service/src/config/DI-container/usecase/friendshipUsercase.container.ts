@@ -1,4 +1,5 @@
 import { AcceptFriendRequest } from '@application/useCases/friendship/AcceptFriendRequest.usercase';
+import { GetFriendList } from '@application/useCases/friendship/GetFriendList.usercase';
 import { GetFriendRequestList } from '@application/useCases/friendship/GetFriendRequestList.usercase';
 import { SendFriendRequest } from '@application/useCases/friendship/SendFriendRequest.usecase';
 import {
@@ -24,3 +25,5 @@ export const acceptFriendRequest = new AcceptFriendRequest(
    blockedRelationshipRepository,
    friendshipRepository
 );
+
+export const getFriendList = new GetFriendList(friendshipRepository, awsStorageService);

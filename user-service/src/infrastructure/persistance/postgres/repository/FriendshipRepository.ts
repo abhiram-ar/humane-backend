@@ -1,4 +1,4 @@
-import { Friendship } from '@domain/entities/friendship.entity';
+import { Friendship, FriendshipStatus } from '@domain/entities/friendship.entity';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import db from '../prisma-client';
 import { User } from '@domain/entities/user.entity';
@@ -35,6 +35,8 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
          where: { user1Id_user2Id: { user1Id: user1Id, user2Id: user2Id } },
       });
 
+      console.log(res);
+
       if (!res) return null;
 
       return {
@@ -64,6 +66,7 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
    ): Promise<{
       friendReqs: (Pick<User, 'id' | 'firstName' | 'lastName'> & {
          createdAt: string;
+         status: FriendshipStatus;
       })[];
       from: UserListInfinityScollParams;
    }> => {
@@ -73,13 +76,14 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
             receiverId: userId,
             status: 'PENDING',
             createdAt: { lte: from?.createdAt },
-            requesterId: { lt: from?.lastUserId },
+            requesterId: { gt: from?.lastId },
          },
          select: {
             RequestedUser: {
                select: { id: true, firstName: true, lastName: true, avatarKey: true },
             },
             createdAt: true,
+            status: true,
          },
          take: size,
       });
@@ -87,13 +91,62 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       let parsedFriendRequestList = res.map((entry) => ({
          ...entry.RequestedUser,
          createdAt: entry.createdAt.toISOString(),
+         status: entry.status,
       }));
 
       const lastElem = parsedFriendRequestList[parsedFriendRequestList.length - 1];
 
       return {
          friendReqs: parsedFriendRequestList,
-         from: lastElem ? { createdAt: lastElem.createdAt, lastUserId: lastElem.id } : null,
+         from: lastElem ? { createdAt: lastElem.createdAt, lastId: lastElem.id } : null,
+      };
+   };
+
+   getUserFriendList = async (
+      userId: string,
+      from: UserListInfinityScollParams,
+      size?: number
+   ): Promise<{
+      friendReqs: (Pick<User, 'id' | 'firstName' | 'lastName' | 'avatar'> & {
+         createdAt: string;
+         status: FriendshipStatus;
+      })[];
+      from: UserListInfinityScollParams;
+   }> => {
+      const res = await db.friendShip.findMany({
+         orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+         where: {
+            OR: [
+               { requesterId: userId, status: 'ACCEPTED' },
+               { receiverId: userId, status: 'ACCEPTED' },
+            ],
+            createdAt: { lte: from?.createdAt },
+            id: { gt: from?.lastId },
+         },
+         select: {
+            user1: {
+               select: { id: true, firstName: true, lastName: true, avatarKey: true },
+            },
+            user2: {
+               select: { id: true, firstName: true, lastName: true, avatarKey: true },
+            },
+            createdAt: true,
+            status: true,
+         },
+      });
+
+      const parsedUserList = res.map((entry) => {
+         // friend can be either of user1 or user2
+         const friend = entry.user1.id === userId ? entry.user2 : entry.user1;
+
+         return { ...friend, createdAt: entry.createdAt.toISOString(), status: entry.status };
+      });
+
+      const lastElem = parsedUserList[parsedUserList.length - 1];
+
+      return {
+         friendReqs: parsedUserList,
+         from: lastElem ? { createdAt: lastElem.createdAt, lastId: lastElem.id } : null,
       };
    };
 }

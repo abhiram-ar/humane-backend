@@ -1,16 +1,16 @@
+import { FriendshipStatus } from '@domain/entities/friendship.entity';
 import { User } from '@domain/entities/user.entity';
 import { z } from 'zod';
-import { FriendshipStatus } from '@domain/entities/friendship.entity';
 
-export const getFriendRequestInputSchema = z.object({
+export const getFriendInputSchema = z.object({
    userId: z.string().nonempty(),
    from: z.object({ createdAt: z.string(), lastId: z.string() }).nullable(),
    size: z.number().nonnegative(),
 });
 
-export type GetFriendRequestListInputDTO = z.infer<typeof getFriendRequestInputSchema>;
+export type GetFriendListInputDTO = z.infer<typeof getFriendInputSchema>;
 
-export type FriendRequestList = (Pick<User, 'id' | 'firstName' | 'lastName'> & {
+export type FriendList = (Pick<User, 'id' | 'firstName' | 'lastName'> & {
    createdAt: string;
    status: FriendshipStatus;
    avatarURL: string | null;

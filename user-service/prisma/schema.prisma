@@ -44,6 +44,7 @@ model User {
 }
 
 model FriendShip {
+  id      String @default(uuid())
   user1Id String // should be < user2Id, enforce in DB level and app level
   user2Id String
   user1   User   @relation("User1Friendships", fields: [user1Id], references: [id], onDelete: Cascade)
@@ -60,6 +61,7 @@ model FriendShip {
 
   @@id([user1Id, user2Id])
   @@index([status])
+  @@index([id])
 }
 
 // why cant we keep this in friendship model?

@@ -17,7 +17,8 @@ relationshipRouter.get(
    authorizedRoles('user'),
    userRelationshipController.getFriendRequestList
 );
-
 relationshipRouter.patch('/friend-req', userRelationshipController.acceptFriendRequest);
+
+relationshipRouter.get('/friend', isAuthenticated, userRelationshipController.getFriendList);
 
 export default relationshipRouter;

@@ -10,12 +10,15 @@ import {
 } from '@dtos/friendship/GetFriendRequests.dto';
 import { acceptFriendRequestSchema } from '@dtos/friendship/AcceptFriendRequset.dto';
 import { AcceptFriendRequest } from '@application/useCases/friendship/AcceptFriendRequest.usercase';
+import { getFriendInputSchema, GetFriendListInputDTO } from '@dtos/friendship/GetFriends.dto';
+import { GetFriendList } from '@application/useCases/friendship/GetFriendList.usercase';
 
 export class UserRelationshipController {
    constructor(
       private readonly _sendFriendRequest: SendFriendRequest,
       private readonly _getFriendRequestList: GetFriendRequestList,
-      private readonly _acceptFriendReq: AcceptFriendRequest
+      private readonly _acceptFriendReq: AcceptFriendRequest,
+      private readonly _getFriendList: GetFriendList
    ) {}
 
    sendFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
@@ -45,7 +48,7 @@ export class UserRelationshipController {
             userId: req.user.userId,
             from:
                createdAt && lastUserId
-                  ? { createdAt: createdAt as string, lastUserId: lastUserId as string }
+                  ? { createdAt: createdAt as string, lastId: lastUserId as string }
                   : null,
             size: parseInt(size as string),
          };
@@ -68,15 +71,41 @@ export class UserRelationshipController {
       }
    };
 
-   acceptFriendRequest = async(req: Request, res: Response, next: NextFunction) => {
+   acceptFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         const parsed  = acceptFriendRequestSchema.safeParse(req.body)
-         if(!parsed.success){
-            throw new ZodValidationError(parsed.error)
+         const parsed = acceptFriendRequestSchema.safeParse(req.body);
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
          }
-         const result = await this._acceptFriendReq.execute(parsed.data)
+         const result = await this._acceptFriendReq.execute(parsed.data);
 
-         res.status(201).json({success: true, message: "friend req accepted", data: result})
+         res.status(201).json({ success: true, message: 'friend req accepted', data: result });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getFriendList = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new UnAuthenticatedError('No userId in auth header');
+         }
+         const { size = 10, createdAt, lastUserId } = req.query;
+
+         const dto: GetFriendListInputDTO = {
+            userId: req.user.userId,
+            from:
+               createdAt && lastUserId
+                  ? { createdAt: createdAt as string, lastId: lastUserId as string }
+                  : null,
+            size: parseInt(size as string),
+         };
+
+         const parsed = getFriendInputSchema.safeParse(dto);
+         if (!parsed.success) throw new ZodValidationError(parsed.error);
+
+         const result = await this._getFriendList.execute(parsed.data);
+         res.status(200).json({ success: true, message: 'friend list fetched', data: result });
       } catch (error) {
          next(error);
       }

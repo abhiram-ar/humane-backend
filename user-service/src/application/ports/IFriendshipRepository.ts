@@ -1,5 +1,5 @@
 import { UserListInfinityScollParams } from '@application/types/UserListInfinityScrollParams.type';
-import { Friendship } from '@domain/entities/friendship.entity';
+import { Friendship, FriendshipStatus } from '@domain/entities/friendship.entity';
 import { User } from '@domain/entities/user.entity';
 
 export interface IFriendshipRepository {
@@ -20,6 +20,19 @@ export interface IFriendshipRepository {
    ): Promise<{
       friendReqs: (Pick<User, 'id' | 'firstName' | 'lastName' | 'avatar'> & {
          createdAt: string;
+         status: FriendshipStatus;
+      })[];
+      from: UserListInfinityScollParams;
+   }>;
+
+   getUserFriendList(
+      userId: string,
+      from: UserListInfinityScollParams,
+      size?: number
+   ): Promise<{
+      friendReqs: (Pick<User, 'id' | 'firstName' | 'lastName' | 'avatar'> & {
+         createdAt: string;
+         status: FriendshipStatus;
       })[];
       from: UserListInfinityScollParams;
    }>;
