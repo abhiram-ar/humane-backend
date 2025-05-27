@@ -45,6 +45,12 @@ relationshipRouter.get(
    authorizedRoles('user'),
    userRelationshipController.getFriendList
 );
+relationshipRouter.get(
+   '/friend/count',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getFriendsCount
+);
 
 relationshipRouter.get(
    '/friend/mutual',

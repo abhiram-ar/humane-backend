@@ -1,20 +1,18 @@
-import { UserListInfinityScollParams } from '@application/types/UserListInfinityScrollParams.type';
-import { FriendList, GetFriendListInputDTO } from '@dtos/friendship/GetFriends.dto';
+import {
+   GetFriendCountInputDTO,
+   GetFriendListInputDTO,
+   GetFriendListOutputDTO,
+} from '@dtos/friendship/GetFriends.dto';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IStorageService } from '@ports/IStorageService';
 
-export class GetFriendList {
+export class GetFriends {
    constructor(
       private readonly _friendshipRepo: IFriendshipRepository,
       private readonly _storageService: IStorageService
    ) {}
 
-   execute = async (
-      dto: GetFriendListInputDTO
-   ): Promise<{
-      friends: FriendList;
-      from: UserListInfinityScollParams;
-   }> => {
+   list = async (dto: GetFriendListInputDTO): Promise<GetFriendListOutputDTO> => {
       const res = await this._friendshipRepo.getUserFriendList(dto.userId, dto.from, dto.size);
 
       const urlHydratedFriendReqList = res.friendReqs.map((user) => {
@@ -27,5 +25,9 @@ export class GetFriendList {
       });
 
       return { friends: urlHydratedFriendReqList, from: res.from };
+   };
+
+   count = async (dto: GetFriendCountInputDTO): Promise<number> => {
+      return await this._friendshipRepo.getUserFriendCount(dto.userId);
    };
 }

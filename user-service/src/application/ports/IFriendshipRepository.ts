@@ -38,6 +38,7 @@ export interface IFriendshipRepository {
       })[];
       from: UserListInfinityScollParams;
    }>;
+   getUserFriendCount(userId: string): Promise<number>;
 
    findMutualFriends(
       currentUserId: string,

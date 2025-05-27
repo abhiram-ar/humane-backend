@@ -9,8 +9,13 @@ import {
    GetFriendRequestListInputDTO,
 } from '@dtos/friendship/GetFriendRequests.dto';
 import { acceptFriendRequestSchema } from '@dtos/friendship/AcceptFriendRequset.dto';
-import { getFriendInputSchema, GetFriendListInputDTO } from '@dtos/friendship/GetFriends.dto';
-import { GetFriendList } from '@application/useCases/friendship/GetFriendList.usercase';
+import {
+   getFriendsListInputSchema,
+   GetFriendListInputDTO,
+   GetFriendCountInputDTO,
+   getFriendsCountInputSchema,
+} from '@dtos/friendship/GetFriends.dto';
+import { GetFriends } from '@application/useCases/friendship/Friends.usercase';
 import { cancelFriendRequestInputSchema } from '@dtos/friendship/cancelFriendRequestInput.dto';
 import { GetRelationShipStatus } from '@application/useCases/friendship/GetRelationshipStatus';
 import {
@@ -23,13 +28,13 @@ import {
    MutualFriendsListInputDTO,
    mutualFriendsListInputSchema,
 } from '@dtos/friendship/MutualFriends.dto';
-import { MutualFriends } from '@application/useCases/friendship/MutualFriends';
+import { MutualFriends } from '@application/useCases/friendship/MutualFriends.usecase';
 
 export class UserRelationshipController {
    constructor(
       private readonly _friendRequest: FriendRequest,
       private readonly _getFriendRequestList: GetFriendRequestList,
-      private readonly _getFriendList: GetFriendList,
+      private readonly _getFriends: GetFriends,
       private readonly _getRelationshipStatus: GetRelationShipStatus,
       private readonly _mutualFriends: MutualFriends
    ) {}
@@ -132,10 +137,32 @@ export class UserRelationshipController {
             size: parseInt(size as string),
          };
 
-         const parsed = getFriendInputSchema.safeParse(dto);
+         const parsed = getFriendsListInputSchema.safeParse(dto);
          if (!parsed.success) throw new ZodValidationError(parsed.error);
 
-         const result = await this._getFriendList.execute(parsed.data);
+         const result = await this._getFriends.list(parsed.data);
+
+         res.status(200).json({ success: true, message: 'friend list fetched', data: result });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getFriendsCount = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new UnAuthenticatedError('No userId in auth header');
+         }
+
+         const dto: GetFriendCountInputDTO = {
+            userId: req.user.userId,
+         };
+
+         const parsed = getFriendsCountInputSchema.safeParse(dto);
+         if (!parsed.success) throw new ZodValidationError(parsed.error);
+
+         const result = await this._getFriends.count(parsed.data);
+
          res.status(200).json({ success: true, message: 'friend list fetched', data: result });
       } catch (error) {
          next(error);

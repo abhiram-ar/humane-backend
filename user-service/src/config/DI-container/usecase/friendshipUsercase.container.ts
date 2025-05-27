@@ -1,4 +1,4 @@
-import { GetFriendList } from '@application/useCases/friendship/GetFriendList.usercase';
+import { GetFriends } from '@application/useCases/friendship/Friends.usercase';
 import { GetFriendRequestList } from '@application/useCases/friendship/GetFriendRequestList.usercase';
 import { FriendRequest } from '@application/useCases/friendship/FriendRequest.usecase';
 import {
@@ -8,7 +8,7 @@ import {
 } from '@di/repository.container';
 import { awsStorageService } from '@di/services.container';
 import { GetRelationShipStatus } from '@application/useCases/friendship/GetRelationshipStatus';
-import { MutualFriends } from '@application/useCases/friendship/MutualFriends';
+import { MutualFriends } from '@application/useCases/friendship/MutualFriends.usecase';
 
 export const sendFriendRequest = new FriendRequest(
    friendshipRepository,
@@ -21,7 +21,7 @@ export const getFriendRequestList = new GetFriendRequestList(
    awsStorageService
 );
 
-export const getFriendList = new GetFriendList(friendshipRepository, awsStorageService);
+export const getFriends = new GetFriends(friendshipRepository, awsStorageService);
 
 export const getRelationshipStatus = new GetRelationShipStatus(
    userRepository,

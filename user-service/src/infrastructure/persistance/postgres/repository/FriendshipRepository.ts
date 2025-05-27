@@ -161,6 +161,19 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       };
    };
 
+   getUserFriendCount = async (userId: string): Promise<number> => {
+      const res = await db.friendShip.count({
+         where: {
+            OR: [
+               { requesterId: userId, status: 'ACCEPTED' },
+               { receiverId: userId, status: 'ACCEPTED' },
+            ],
+         },
+      });
+
+      return res;
+   };
+
    findMutualFriends = async (
       currentUserId: string,
       targetUserId: string,
