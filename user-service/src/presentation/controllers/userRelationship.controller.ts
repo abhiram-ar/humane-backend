@@ -139,10 +139,10 @@ export class UserRelationshipController {
          if (req.user?.type !== 'user' || !req.user.userId) {
             throw new UnAuthenticatedError('User not found in request header');
          }
-         const { tartgetUserId } = req.params;
+         const { targetUserId } = req.query;
 
          const dto: GetRelationShipStatusInputDTO = {
-            tartgetUserId,
+            targetUserId: targetUserId as string,
             currentUserId: req.user.userId,
          };
          const parsed = getRelationshipStatusSchema.safeParse(dto);

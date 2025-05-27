@@ -21,7 +21,7 @@ export class GetRelationShipStatus {
       dto: GetRelationShipStatusInputDTO
    ): Promise<GetRelationShipStatusOutputDTO> => {
       // check target user exists
-      const targetUser = await this._userRepo.getUserStatusById(dto.tartgetUserId);
+      const targetUser = await this._userRepo.getUserStatusById(dto.targetUserId);
 
       if (!targetUser) {
          throw new UserNotFoundError('Target user does not exist');
@@ -33,7 +33,7 @@ export class GetRelationShipStatus {
       // check if a user bloced the other
       const isCurrentUserBlokedByTargetUser = await this._blockedRelatioshipRepo.isBlockedBy(
          dto.currentUserId,
-         dto.tartgetUserId
+         dto.targetUserId
       );
 
       if (isCurrentUserBlokedByTargetUser) {
@@ -42,7 +42,7 @@ export class GetRelationShipStatus {
 
       // check friendship exits
       const friendship = await this._friendshipRepo.retriveFriendship(
-         ...Friendship.sortUserId(dto.currentUserId, dto.tartgetUserId)
+         ...Friendship.sortUserId(dto.currentUserId, dto.targetUserId)
       );
 
       if (!friendship) {
