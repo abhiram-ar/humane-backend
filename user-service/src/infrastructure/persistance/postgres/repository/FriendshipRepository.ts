@@ -82,12 +82,12 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       from: UserListInfinityScollParams;
    }> => {
       const res = await db.friendShip.findMany({
-         orderBy: [{ createdAt: 'desc' }, { requesterId: 'asc' }],
+         orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
          where: {
             receiverId: userId,
             status: 'PENDING',
             createdAt: { lte: from?.createdAt },
-            requesterId: { gt: from?.lastId },
+            id: { gt: from?.lastId },
          },
          select: {
             RequestedUser: {
@@ -95,6 +95,7 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
             },
             createdAt: true,
             status: true,
+            id: true,
          },
          take: size,
       });
@@ -105,11 +106,60 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
          status: entry.status,
       }));
 
-      const lastElem = parsedFriendRequestList[parsedFriendRequestList.length - 1];
+      const lastElem = res[res.length - 1];
 
       return {
          friendReqs: parsedFriendRequestList,
-         from: lastElem ? { createdAt: lastElem.createdAt, lastId: lastElem.id } : null,
+         from: lastElem
+            ? { createdAt: lastElem.createdAt.toISOString(), lastId: lastElem.id }
+            : null,
+      };
+   };
+
+   getUserSendFriendRequestList = async (
+      userId: string,
+      from: UserListInfinityScollParams,
+      size?: number
+   ): Promise<{
+      friendReqs: (Pick<User, 'id' | 'firstName' | 'lastName'> & {
+         createdAt: string;
+         status: FriendshipStatus;
+         avatarKey: string | null;
+      })[];
+      from: UserListInfinityScollParams;
+   }> => {
+      console.log(from);
+      const res = await db.friendShip.findMany({
+         orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+         where: {
+            requesterId: userId,
+            status: 'PENDING',
+            ...(from?.lastId && { id: { gt: from.lastId } }),
+         },
+         select: {
+            ReceivingUser: {
+               select: { id: true, firstName: true, lastName: true, avatarKey: true },
+            },
+            createdAt: true,
+            status: true,
+            id: true,
+         },
+         take: size,
+      });
+
+      let parsedFriendRequestList = res.map((entry) => ({
+         ...entry.ReceivingUser,
+         createdAt: entry.createdAt.toISOString(),
+         status: entry.status,
+      }));
+
+      const lastElem = res[res.length - 1];
+
+      return {
+         friendReqs: parsedFriendRequestList,
+         from: lastElem
+            ? { createdAt: lastElem.createdAt.toISOString(), lastId: lastElem.id }
+            : null,
       };
    };
 
@@ -194,7 +244,7 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
                { FriendShipsAsUser1: { some: { user2Id: currentUserId, status: 'ACCEPTED' } } },
                { FriendShipsAsUser2: { some: { user1Id: currentUserId, status: 'ACCEPTED' } } },
             ],
-            // AND also friends with targetUserId
+            //  users who are friends of targetUserId
             AND: [
                {
                   OR: [
@@ -207,7 +257,8 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
                   ],
                },
             ],
-            // Exclude current and target users
+
+            // exclude current and target users
             id: { notIn: [currentUserId, targetUserId] },
          },
          select: {
@@ -216,13 +267,11 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
             lastName: true,
             avatarKey: true,
          },
-         orderBy: { createdAt: 'desc' },
+         orderBy: { id: 'asc' },
          take: size,
-         skip: from?.lastId ? 1 : 0, // For cursor pagination
-         cursor: from?.lastId ? { id: from.lastId } : undefined,
+         skip: from?.lastId ? 1 : 0, // skip the cursor record issend
+         cursor: from?.lastId ? { id: from.lastId } : undefined, // equivalenet to = where lastId > id + order by asc
       });
-
-      console.log(res);
 
       const lastElem = res[res.length - 1];
 
@@ -253,7 +302,7 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
                   ],
                },
             ],
-            // Exclude current and target users
+            // exclude current and target users
             id: { notIn: [currentUserId, targetUserId] },
          },
       });

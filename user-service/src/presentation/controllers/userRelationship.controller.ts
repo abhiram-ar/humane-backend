@@ -43,6 +43,11 @@ import {
    RemoveFriendshipInputDTO,
    removeFriendshipInputSchema,
 } from '@dtos/friendship/RemoveFriendshipInput.dto';
+import { GetUserSendFriendRequestList } from '@application/useCases/friendship/GetUserSendFriendRequestList.usercase';
+import {
+   getUserSendFriendRequestInputSchema,
+   GetUserSendFriendRequestListInputDTO,
+} from '@dtos/friendship/GetUserSendFriendRequests.dto';
 
 export class UserRelationshipController {
    constructor(
@@ -51,7 +56,8 @@ export class UserRelationshipController {
       private readonly _getFriends: GetFriends,
       private readonly _getRelationshipStatus: GetRelationShipStatus,
       private readonly _mutualFriends: MutualFriends,
-      private readonly _removeFriendship: RemoveFriendship
+      private readonly _removeFriendship: RemoveFriendship,
+      private readonly _getUserSendFriendReq: GetUserSendFriendRequestList
    ) {}
 
    sendFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
@@ -169,6 +175,40 @@ export class UserRelationshipController {
          res.status(200).json({
             sucess: true,
             message: 'Friend request list fetcehed successful',
+            data: result,
+         });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getUserSendFriendRequestList = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new UnAuthenticatedError('No userId in auth header');
+         }
+         const { size = 10, createdAt, lastId } = req.query;
+
+         const dto: GetUserSendFriendRequestListInputDTO = {
+            userId: req.user.userId,
+            from:
+               createdAt && lastId
+                  ? { createdAt: createdAt as string, lastId: lastId as string }
+                  : null,
+            size: parseInt(size as string),
+         };
+
+         const parsed = getUserSendFriendRequestInputSchema.safeParse(dto);
+
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
+         }
+
+         const result = await this._getUserSendFriendReq.execute(parsed.data);
+
+         res.status(200).json({
+            sucess: true,
+            message: 'user send Friend request list fetcehed successful',
             data: result,
          });
       } catch (error) {

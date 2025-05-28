@@ -7,7 +7,7 @@ import {
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IStorageService } from '@ports/IStorageService';
 
-export class GetFriendRequestList {
+export class GetUserSendFriendRequestList {
    constructor(
       private readonly _friendshipRepo: IFriendshipRepository,
       private readonly _storageService: IStorageService
@@ -19,7 +19,7 @@ export class GetFriendRequestList {
       friendReqs: FriendRequestList;
       from: UserListInfinityScollParams;
    }> => {
-      const res = await this._friendshipRepo.getUserFriendRequestList(
+      const res = await this._friendshipRepo.getUserSendFriendRequestList(
          dto.userId,
          dto.from,
          dto.size
@@ -32,7 +32,8 @@ export class GetFriendRequestList {
             avatarURL = this._storageService.getPublicCDNURL(user.avatarKey);
          }
          const outputStatus: RelationshipStatus =
-            status === 'PENDING' ? 'friendReqWaitingApproval' : 'friends';
+            status === 'PENDING' ? 'friendreqSend' : 'friends';
+
          return { ...data, status: outputStatus, avatarURL };
       });
 

@@ -91,5 +91,4 @@ model Admin {
 enum FriendShipStatus {
   PENDING
   ACCEPTED
-  DECLINED
 }

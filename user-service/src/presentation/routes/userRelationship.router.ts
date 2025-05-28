@@ -12,6 +12,13 @@ relationshipRouter.get(
    userRelationshipController.getRelationshipStatus
 );
 
+relationshipRouter.get(
+   '/friend-req/sent',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getUserSendFriendRequestList
+);
+
 // ---- friend-req
 relationshipRouter.get(
    '/friend-req',

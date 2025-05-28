@@ -10,6 +10,7 @@ import { awsStorageService } from '@di/services.container';
 import { GetRelationShipStatus } from '@application/useCases/friendship/GetRelationshipStatus';
 import { MutualFriends } from '@application/useCases/friendship/MutualFriends.usecase';
 import { RemoveFriendship } from '@application/useCases/friendship/RemoveFriendship.usecase';
+import { GetUserSendFriendRequestList } from '@application/useCases/friendship/GetUserSendFriendRequestList.usercase';
 
 export const sendFriendRequest = new FriendRequest(
    friendshipRepository,
@@ -37,3 +38,8 @@ export const mutualFriends = new MutualFriends(
 );
 
 export const removeFriendship = new RemoveFriendship(friendshipRepository);
+
+export const getUserSendFriendReq = new GetUserSendFriendRequestList(
+   friendshipRepository,
+   awsStorageService
+);

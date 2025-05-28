@@ -28,6 +28,19 @@ export interface IFriendshipRepository {
       from: UserListInfinityScollParams;
    }>;
 
+   getUserSendFriendRequestList(
+      userId: string,
+      from: UserListInfinityScollParams,
+      size?: number
+   ): Promise<{
+      friendReqs: (Pick<User, 'id' | 'firstName' | 'lastName'> & {
+         createdAt: string;
+         status: FriendshipStatus;
+         avatarKey: string | null;
+      })[];
+      from: UserListInfinityScollParams;
+   }>;
+
    getUserFriendList(
       userId: string,
       from: UserListInfinityScollParams,
