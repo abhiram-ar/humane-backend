@@ -49,8 +49,6 @@ export interface IFriendshipRepository {
       size: number
    ): Promise<{
       mutualUsers: (Pick<User, 'id' | 'firstName' | 'lastName'> & {
-         createdAt: string;
-         status: FriendshipStatus;
          avatarKey: string | null;
       })[];
       from: UserListInfinityScollParams;

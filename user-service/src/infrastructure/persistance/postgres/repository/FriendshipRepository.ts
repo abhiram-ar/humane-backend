@@ -129,8 +129,8 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
          orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
          where: {
             OR: [
-               { requesterId: userId, status: 'ACCEPTED' },
-               { receiverId: userId, status: 'ACCEPTED' },
+               { user1Id: userId, status: 'ACCEPTED' },
+               { user2Id: userId, status: 'ACCEPTED' },
             ],
             createdAt: { lte: from?.createdAt },
             id: { gt: from?.lastId },
@@ -183,82 +183,78 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       size: number
    ): Promise<{
       mutualUsers: (Pick<User, 'id' | 'firstName' | 'lastName'> & {
-         createdAt: string;
-         status: FriendshipStatus;
          avatarKey: string | null;
       })[];
       from: UserListInfinityScollParams;
    }> => {
-      const res = await db.friendShip.findMany({
-         orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+      const res = await db.user.findMany({
          where: {
+            // Users who are friends with currentUserId
+            OR: [
+               { FriendShipsAsUser1: { some: { user2Id: currentUserId, status: 'ACCEPTED' } } },
+               { FriendShipsAsUser2: { some: { user1Id: currentUserId, status: 'ACCEPTED' } } },
+            ],
+            // AND also friends with targetUserId
             AND: [
-               // and ensure that we will get the interseaction of both friend list
                {
                   OR: [
-                     // friends of current user
-                     { user1Id: currentUserId, status: 'ACCEPTED' },
-                     { user2Id: currentUserId, status: 'ACCEPTED' },
-                  ],
-               },
-               {
-                  OR: [
-                     // frinds of target user
-                     { user1Id: targetUserId, status: 'ACCEPTED' },
-                     { user2Id: targetUserId, status: 'ACCEPTED' },
+                     {
+                        FriendShipsAsUser1: { some: { user2Id: targetUserId, status: 'ACCEPTED' } },
+                     },
+                     {
+                        FriendShipsAsUser2: { some: { user1Id: targetUserId, status: 'ACCEPTED' } },
+                     },
                   ],
                },
             ],
-            createdAt: { lte: from?.createdAt },
-            id: { gt: from?.lastId },
+            // Exclude current and target users
+            id: { notIn: [currentUserId, targetUserId] },
          },
-         take: size,
          select: {
-            user1: { select: { id: true, firstName: true, lastName: true, avatarKey: true } },
-            user2: { select: { id: true, firstName: true, lastName: true, avatarKey: true } },
-            createdAt: true,
-            status: true,
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatarKey: true,
          },
+         orderBy: { createdAt: 'desc' },
+         take: size,
+         skip: from?.lastId ? 1 : 0, // For cursor pagination
+         cursor: from?.lastId ? { id: from.lastId } : undefined,
       });
 
-      const parsedUserList = res.map((entry) => {
-         // friend can be either of user1 or user2
-         const friend =
-            entry.user1.id === currentUserId || entry.user1.id === targetUserId
-               ? entry.user2
-               : entry.user1;
+      console.log(res);
 
-         return { ...friend, createdAt: entry.createdAt.toISOString(), status: entry.status };
-      });
-
-      const lastElem = parsedUserList[parsedUserList.length - 1];
+      const lastElem = res[res.length - 1];
 
       return {
-         mutualUsers: parsedUserList,
-         from: lastElem ? { createdAt: lastElem.createdAt, lastId: lastElem.id } : null,
+         mutualUsers: res,
+         from: lastElem ? { createdAt: '', lastId: lastElem.id } : null,
       };
    };
 
    countMutualFriends = async (currentUserId: string, targetUserId: string): Promise<number> => {
-      const res = await db.friendShip.count({
+      const res = await db.user.count({
          where: {
+            // Users who are friends with currentUserId
+            OR: [
+               { FriendShipsAsUser1: { some: { user2Id: currentUserId, status: 'ACCEPTED' } } },
+               { FriendShipsAsUser2: { some: { user1Id: currentUserId, status: 'ACCEPTED' } } },
+            ],
+            // AND also friends with targetUserId
             AND: [
-               // and ensure that we will get the interseaction of both friend list
                {
                   OR: [
-                     // friends of current user
-                     { user1Id: currentUserId, status: 'ACCEPTED' },
-                     { user2Id: currentUserId, status: 'ACCEPTED' },
-                  ],
-               },
-               {
-                  OR: [
-                     // frinds of target user
-                     { user1Id: targetUserId, status: 'ACCEPTED' },
-                     { user2Id: targetUserId, status: 'ACCEPTED' },
+                     {
+                        FriendShipsAsUser1: { some: { user2Id: targetUserId, status: 'ACCEPTED' } },
+                     },
+                     {
+                        FriendShipsAsUser2: { some: { user1Id: targetUserId, status: 'ACCEPTED' } },
+                     },
                   ],
                },
             ],
+            // Exclude current and target users
+            id: { notIn: [currentUserId, targetUserId] },
          },
       });
 

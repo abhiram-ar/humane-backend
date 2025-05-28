@@ -17,9 +17,7 @@ export class GetFriends {
 
       const urlHydratedFriendReqList = res.friendReqs.map((user) => {
          const { avatarKey, ...data } = user;
-         
          let avatarURL: string | null = null;
-         
          if (avatarKey) {
             avatarURL = this._storageService.getPublicCDNURL(avatarKey);
          }
