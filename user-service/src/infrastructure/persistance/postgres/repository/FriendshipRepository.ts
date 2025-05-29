@@ -3,7 +3,6 @@ import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import db from '../prisma-client';
 import { User } from '@domain/entities/user.entity';
 import { UserListInfinityScollParams } from '@application/types/UserListInfinityScrollParams.type';
-import { length } from 'zod/v4';
 
 export class PostgresFriendshipRepository implements IFriendshipRepository {
    addFriendRequest = async (
@@ -195,15 +194,28 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       })[];
       from: UserListInfinityScollParams;
    }> => {
+      console.log(from);
+
+      const cursorParams =
+         from?.createdAt && from.lastId
+            ? [
+                 { createdAt: { lt: from.createdAt } },
+                 { createdAt: from.createdAt, id: { lt: from.createdAt } },
+              ]
+            : undefined;
+
       const res = await db.friendShip.findMany({
-         orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
          where: {
-            OR: [
-               { user1Id: userId, status: 'ACCEPTED' },
-               { user2Id: userId, status: 'ACCEPTED' },
+            status: 'ACCEPTED',
+            AND: [
+               {
+                  OR: [{ user1Id: userId }, { user2Id: userId }],
+               },
+               {
+                  OR: cursorParams,
+               },
             ],
-            createdAt: { lte: from?.createdAt },
-            id: { gt: from?.lastId },
          },
          select: {
             user1: {
@@ -214,6 +226,7 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
             },
             createdAt: true,
             status: true,
+            id: true,
          },
          take: size,
       });
@@ -225,12 +238,16 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
          return { ...friend, createdAt: entry.createdAt.toISOString(), status: entry.status };
       });
 
-      const lastElem = parsedUserList[parsedUserList.length - 1];
+      const lastElem = res[res.length - 1];
 
       return {
          friendReqs: parsedUserList,
          from: lastElem
-            ? { createdAt: lastElem.createdAt, lastId: lastElem.id, hasMore: res.length === size }
+            ? {
+                 createdAt: lastElem.createdAt.toISOString(),
+                 lastId: lastElem.id,
+                 hasMore: res.length === size,
+              }
             : null,
       };
    };
