@@ -3,6 +3,7 @@ import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import db from '../prisma-client';
 import { User } from '@domain/entities/user.entity';
 import { UserListInfinityScollParams } from '@application/types/UserListInfinityScrollParams.type';
+import { length } from 'zod/v4';
 
 export class PostgresFriendshipRepository implements IFriendshipRepository {
    addFriendRequest = async (
@@ -111,7 +112,11 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       return {
          friendReqs: parsedFriendRequestList,
          from: lastElem
-            ? { createdAt: lastElem.createdAt.toISOString(), lastId: lastElem.id }
+            ? {
+                 createdAt: lastElem.createdAt.toISOString(),
+                 lastId: lastElem.id,
+                 hasMore: res.length === size,
+              }
             : null,
       };
    };
@@ -130,11 +135,17 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
    }> => {
       console.log(from);
       const res = await db.friendShip.findMany({
-         orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
          where: {
             requesterId: userId,
             status: 'PENDING',
-            ...(from?.lastId && { id: { gt: from.lastId } }),
+            OR:
+               from?.createdAt && from.lastId
+                  ? [
+                       { createdAt: { lt: from.createdAt } },
+                       { createdAt: from.createdAt, id: { lt: from.createdAt } },
+                    ]
+                  : undefined,
          },
          select: {
             ReceivingUser: {
@@ -158,7 +169,11 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       return {
          friendReqs: parsedFriendRequestList,
          from: lastElem
-            ? { createdAt: lastElem.createdAt.toISOString(), lastId: lastElem.id }
+            ? {
+                 createdAt: lastElem.createdAt.toISOString(),
+                 lastId: lastElem.id,
+                 hasMore: res.length === size,
+              }
             : null,
       };
    };
@@ -209,7 +224,9 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
 
       return {
          friendReqs: parsedUserList,
-         from: lastElem ? { createdAt: lastElem.createdAt, lastId: lastElem.id } : null,
+         from: lastElem
+            ? { createdAt: lastElem.createdAt, lastId: lastElem.id, hasMore: res.length === size }
+            : null,
       };
    };
 
@@ -277,7 +294,9 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
 
       return {
          mutualUsers: res,
-         from: lastElem ? { createdAt: '', lastId: lastElem.id } : null,
+         from: lastElem
+            ? { createdAt: '', lastId: lastElem.id, hasMore: res.length === size }
+            : null,
       };
    };
 
