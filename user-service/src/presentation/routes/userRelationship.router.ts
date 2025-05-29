@@ -1,0 +1,88 @@
+import { userRelationshipController } from '@di/controller/userController.container';
+import { authorizedRoles } from '@presentation/middlewares/authorization.middleware';
+import { isAuthenticated } from '@presentation/middlewares/isAuthenticated.middleware';
+import express from 'express';
+
+const relationshipRouter = express.Router();
+
+relationshipRouter.get(
+   '/rel-status',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getRelationshipStatus
+);
+
+relationshipRouter.get(
+   '/friend-req/sent',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getUserSendFriendRequestList
+);
+
+// ---- friend-req
+relationshipRouter.get(
+   '/friend-req',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getFriendRequestList
+);
+relationshipRouter.get(
+   '/friend-req/count',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getFriendsRequestCount
+);
+relationshipRouter.post(
+   '/friend-req',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.sendFriendRequest
+);
+relationshipRouter.patch(
+   '/friend-req/status',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.acceptFriendRequest
+);
+relationshipRouter.delete(
+   '/friend-req',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.cancelFriendRequest
+);
+
+//-----friend
+relationshipRouter.get(
+   '/friend',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getFriendList
+);
+relationshipRouter.delete(
+   '/friend/:targetUserId',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.removeFriendship
+);
+
+relationshipRouter.get(
+   '/friend/count',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getFriendsCount
+);
+
+relationshipRouter.get(
+   '/friend/mutual',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getMutualFriendsList
+);
+relationshipRouter.get(
+   '/friend/mutual/count',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getMutualFriendsCount
+);
+
+export default relationshipRouter;

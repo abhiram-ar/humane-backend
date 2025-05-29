@@ -10,7 +10,9 @@ import adminUserManagementRouter from './routes/adminUserManagement.router';
 import { isAuthenticated } from './middlewares/isAuthenticated.middleware';
 import { authorizedRoles } from './middlewares/authorization.middleware';
 import userProfileRouter from './routes/userProfile.router';
-import { seedUser } from 'shared/seedController';
+import { seedUser } from 'test/seedController';
+import userRelationshipRouter from './routes/userRelationship.router';
+import { sendBulkFriendReq } from 'test/sendBulkFriendReq';
 
 const app = express();
 
@@ -33,10 +35,13 @@ app.get('/api/v1/user/health', (req, res) => {
 });
 
 app.post('/api/v1/user/seed', seedUser);
+app.post('/api/v1/user/test/send-friend-req', sendBulkFriendReq);
 
 app.use('/api/v1/global/auth/refresh', globalRefreshRouter);
 app.use('/api/v1/user/auth', authRouter);
 app.use('/api/v1/admin/auth', adminAuthRouter);
+
+app.use('/api/v1/user/social', userRelationshipRouter);
 
 app.use('/api/v1/user/profile', isAuthenticated, authorizedRoles('user'), userProfileRouter);
 

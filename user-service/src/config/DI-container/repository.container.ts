@@ -1,4 +1,6 @@
 import { PostgresAdminRepository } from '@infrastructure/persistance/postgres/repository/AdminRepository';
+import { PostgresBlockedRelationshipRepository } from '@infrastructure/persistance/postgres/repository/BlockedRelationshipRepository';
+import { PostgresFriendshipRepository } from '@infrastructure/persistance/postgres/repository/FriendshipRepository';
 import { PostresUserRepository } from '@infrastructure/persistance/postgres/repository/UserRepository';
 
 // const mongoUserRespository = new MongoUserRepository();
@@ -7,5 +9,7 @@ import { PostresUserRepository } from '@infrastructure/persistance/postgres/repo
 
 const userRepository = new PostresUserRepository();
 const adminRepository = new PostgresAdminRepository();
+const friendshipRepository = new PostgresFriendshipRepository();
+const blockedRelationshipRepository = new PostgresBlockedRelationshipRepository();
 
-export { userRepository, adminRepository };
+export { userRepository, adminRepository, friendshipRepository, blockedRelationshipRepository };
