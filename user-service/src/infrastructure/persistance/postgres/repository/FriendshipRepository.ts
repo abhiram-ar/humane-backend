@@ -83,12 +83,17 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       from: UserListInfinityScollParams;
    }> => {
       const res = await db.friendShip.findMany({
-         orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
          where: {
             receiverId: userId,
             status: 'PENDING',
-            createdAt: { lte: from?.createdAt },
-            id: { gt: from?.lastId },
+            OR:
+               from?.createdAt && from.lastId
+                  ? [
+                       { createdAt: { lt: from.createdAt } },
+                       { createdAt: from.createdAt, id: { lt: from.createdAt } },
+                    ]
+                  : undefined,
          },
          select: {
             RequestedUser: {
