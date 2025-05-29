@@ -100,8 +100,6 @@ export class FriendRequest {
 
       if (friendship.status === 'ACCEPTED') {
          throw new FriendshipError('Friend request alreay accepted');
-      } else if (friendship.status === 'DECLINED') {
-         throw new FriendshipError('You already declined this friend request');
       }
 
       // accetpt friend request

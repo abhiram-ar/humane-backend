@@ -1,5 +1,4 @@
 import { UserListInfinityScollParams } from '@application/types/UserListInfinityScrollParams.type';
-import { FriendshipStatus } from '@domain/entities/friendship.entity';
 import { User } from '@domain/entities/user.entity';
 import { z } from 'zod';
 
@@ -14,8 +13,6 @@ export type MutualFriendsListInputDTO = z.infer<typeof mutualFriendsListInputSch
 
 export type MutualFriendsListOutputDTO = {
    mutualFriends: (Pick<User, 'id' | 'firstName' | 'lastName'> & {
-      createdAt: string;
-      status: FriendshipStatus;
       avatarURL: string | null;
    })[];
    from: UserListInfinityScollParams;

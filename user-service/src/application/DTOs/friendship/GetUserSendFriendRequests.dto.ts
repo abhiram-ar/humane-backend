@@ -8,7 +8,9 @@ export const getUserSendFriendRequestInputSchema = z.object({
    size: z.number().nonnegative(),
 });
 
-export type GetUserSendFriendRequestListInputDTO = z.infer<typeof getUserSendFriendRequestInputSchema>;
+export type GetUserSendFriendRequestListInputDTO = z.infer<
+   typeof getUserSendFriendRequestInputSchema
+>;
 
 export type FriendRequestList = (Pick<User, 'id' | 'firstName' | 'lastName'> & {
    createdAt: string;

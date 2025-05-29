@@ -1,5 +1,10 @@
-export type UserListInfinityScollParams = {
+export type UserListInfinityScollFromParam = {
    createdAt: string;
    lastId: string;
-   hasMore: boolean;
 } | null;
+
+export type UserListInfinityScollParams =
+   | (UserListInfinityScollFromParam & {
+        hasMore: boolean;
+     })
+   | null;

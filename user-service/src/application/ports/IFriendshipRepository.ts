@@ -1,4 +1,7 @@
-import { UserListInfinityScollParams } from '@application/types/UserListInfinityScrollParams.type';
+import {
+   UserListInfinityScollFromParam,
+   UserListInfinityScollParams,
+} from '@application/types/UserListInfinityScrollParams.type';
 import { Friendship, FriendshipStatus } from '@domain/entities/friendship.entity';
 import { User } from '@domain/entities/user.entity';
 
@@ -17,7 +20,7 @@ export interface IFriendshipRepository {
 
    getUserFriendRequestList(
       userId: string,
-      from: UserListInfinityScollParams,
+      from: UserListInfinityScollFromParam,
       size?: number
    ): Promise<{
       friendReqs: (Pick<User, 'id' | 'firstName' | 'lastName'> & {
@@ -30,7 +33,7 @@ export interface IFriendshipRepository {
 
    getUserSendFriendRequestList(
       userId: string,
-      from: UserListInfinityScollParams,
+      from: UserListInfinityScollFromParam,
       size?: number
    ): Promise<{
       friendReqs: (Pick<User, 'id' | 'firstName' | 'lastName'> & {
@@ -43,7 +46,7 @@ export interface IFriendshipRepository {
 
    getUserFriendList(
       userId: string,
-      from: UserListInfinityScollParams,
+      from: UserListInfinityScollFromParam,
       size?: number
    ): Promise<{
       friendReqs: (Pick<User, 'id' | 'firstName' | 'lastName'> & {
@@ -58,7 +61,7 @@ export interface IFriendshipRepository {
    findMutualFriends(
       currentUserId: string,
       targetUserId: string,
-      from: UserListInfinityScollParams,
+      from: UserListInfinityScollFromParam,
       size: number
    ): Promise<{
       mutualUsers: (Pick<User, 'id' | 'firstName' | 'lastName'> & {
