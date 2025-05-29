@@ -323,11 +323,11 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       });
 
       const lastElem = res[res.length - 1];
-
+      // TODO: this funcion does not use createdAt, might as well as remove from DTO and output
       return {
          mutualUsers: res,
          from: lastElem
-            ? { createdAt: '', lastId: lastElem.id, hasMore: res.length === size }
+            ? { createdAt: 'no-date', lastId: lastElem.id, hasMore: res.length === size }
             : null,
       };
    };
