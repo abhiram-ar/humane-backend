@@ -30,6 +30,7 @@ export interface IFriendshipRepository {
       })[];
       from: UserListInfinityScollParams;
    }>;
+   getUserFriendRequsetCount(userId: string): Promise<number>;
 
    getUserSendFriendRequestList(
       userId: string,

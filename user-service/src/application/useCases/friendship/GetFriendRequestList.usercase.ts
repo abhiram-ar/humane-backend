@@ -2,18 +2,19 @@ import { RelationshipStatus } from '@application/types/RelationshipStatus';
 import { UserListInfinityScollParams } from '@application/types/UserListInfinityScrollParams.type';
 import {
    FriendRequestList,
+   GetFriendRequestCountInputDTO,
    GetFriendRequestListInputDTO,
 } from '@dtos/friendship/GetFriendRequests.dto';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IStorageService } from '@ports/IStorageService';
 
-export class GetFriendRequestList {
+export class GetFriendRequest {
    constructor(
       private readonly _friendshipRepo: IFriendshipRepository,
       private readonly _storageService: IStorageService
    ) {}
 
-   execute = async (
+   list = async (
       dto: GetFriendRequestListInputDTO
    ): Promise<{
       friendReqs: FriendRequestList;
@@ -37,5 +38,9 @@ export class GetFriendRequestList {
       });
 
       return { friendReqs: urlHydratedFriendReqList, from: res.from };
+   };
+
+   count = async (dto: GetFriendRequestCountInputDTO): Promise<number> => {
+      return this._friendshipRepo.getUserFriendRequsetCount(dto.userId);
    };
 }

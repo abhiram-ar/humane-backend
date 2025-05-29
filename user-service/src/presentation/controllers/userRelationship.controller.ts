@@ -5,11 +5,12 @@ import {
    sendFriendRequestInputSchema,
 } from '@dtos/friendship/SendFriendRequestInput.dto';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
-import { GetFriendRequestList } from '@application/useCases/friendship/GetFriendRequestList.usercase';
 import { UnAuthenticatedError } from '@application/errors/UnAuthenticatedError';
 import {
+   GetFriendRequestCountInputDTO,
    getFriendRequestInputSchema,
    GetFriendRequestListInputDTO,
+   getFriendsRequestCountInputSchema,
 } from '@dtos/friendship/GetFriendRequests.dto';
 import {
    acceptFriendRequestSchema,
@@ -48,11 +49,12 @@ import {
    getUserSendFriendRequestInputSchema,
    GetUserSendFriendRequestListInputDTO,
 } from '@dtos/friendship/GetUserSendFriendRequests.dto';
+import { GetFriendRequest } from '@application/useCases/friendship/GetFriendRequestList.usercase';
 
 export class UserRelationshipController {
    constructor(
       private readonly _friendRequest: FriendRequest,
-      private readonly _getFriendRequestList: GetFriendRequestList,
+      private readonly _getFriendRequest: GetFriendRequest,
       private readonly _getFriends: GetFriends,
       private readonly _getRelationshipStatus: GetRelationShipStatus,
       private readonly _mutualFriends: MutualFriends,
@@ -170,13 +172,33 @@ export class UserRelationshipController {
             throw new ZodValidationError(parsed.error);
          }
 
-         const result = await this._getFriendRequestList.execute(parsed.data);
+         const result = await this._getFriendRequest.list(parsed.data);
 
          res.status(200).json({
             sucess: true,
             message: 'Friend request list fetcehed successful',
             data: result,
          });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getFriendsRequestCount = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new UnAuthenticatedError('No userId in auth header');
+         }
+         const dto: GetFriendRequestCountInputDTO = {
+            userId: req.user.userId,
+         };
+
+         const parsed = getFriendsRequestCountInputSchema.safeParse(dto);
+         if (!parsed.success) throw new ZodValidationError(parsed.error);
+
+         const count = await this._getFriendRequest.count(parsed.data);
+
+         res.status(200).json({ success: true, message: 'friend list fetched', data: { count } });
       } catch (error) {
          next(error);
       }

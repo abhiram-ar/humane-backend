@@ -26,6 +26,12 @@ relationshipRouter.get(
    authorizedRoles('user'),
    userRelationshipController.getFriendRequestList
 );
+relationshipRouter.get(
+   '/friend-req/count',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.getFriendsRequestCount
+);
 relationshipRouter.post(
    '/friend-req',
    isAuthenticated,

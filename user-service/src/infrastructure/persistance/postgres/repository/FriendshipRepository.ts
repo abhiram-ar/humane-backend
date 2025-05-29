@@ -125,6 +125,17 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       };
    };
 
+   getUserFriendRequsetCount = async (userId: string): Promise<number> => {
+      const res = await db.friendShip.count({
+         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+         where: {
+            receiverId: userId,
+            status: 'PENDING',
+         },
+      });
+      return res;
+   };
+
    getUserSendFriendRequestList = async (
       userId: string,
       from: UserListInfinityScollParams,
@@ -137,7 +148,6 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       })[];
       from: UserListInfinityScollParams;
    }> => {
-      console.log(from);
       const res = await db.friendShip.findMany({
          orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
          where: {
