@@ -17,15 +17,17 @@ export const sendBulkFriendReq = async (req: Request, res: Response, next: NextF
       const users = await userRepository.getUserList({ ...dto, skip: 0 });
       const stats = { sentCount: 0, failed: 0, total: users.users.length };
 
-      users.users.forEach(async (user, idx) => {
-         try {
-            console.log(`sending: ${idx + 1}/${stats.total}`);
-            const frindship = new Friendship(targetUserId, user.id, 'PENDING');
-            await friendshipRepository.addFriendRequest(frindship, user.id, targetUserId);
-            stats.sentCount++;
-         } catch (error) {
-            stats.failed++;
-         }
+      const promises = users.users.map(async (user, idx) => {
+         console.log(`sending friend req: ${idx + 1}/${stats.total}`);
+         const frindship = new Friendship(targetUserId, user.id, 'PENDING');
+         return friendshipRepository.addFriendRequest(frindship, user.id, targetUserId);
+      });
+
+      const result = await Promise.allSettled(promises);
+
+      result.forEach((result) => {
+         if (result.status === 'fulfilled') stats.sentCount = stats.sentCount + 1;
+         else stats.failed = stats.sentCount + 1;
       });
 
       res.status(200).json({ success: true, messsage: 'req send', stats, requestedUsers: users });
