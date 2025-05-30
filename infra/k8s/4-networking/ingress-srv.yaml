@@ -18,13 +18,13 @@ spec:
                 name: user-srv
                 port:
                   number: 3000
-          - pathType: ImplementationSpecific
-            path: /api/v[0-9]+/notification/.*
-            backend:
-              service:
-                name: notification-srv
-                port:
-                  number: 3000
+          # - pathType: ImplementationSpecific
+          #   path: /api/v[0-9]+/notification/.*
+          #   backend:
+          #     service:
+          #       name: notification-srv
+          #       port:
+          #         number: 3000
           - pathType: ImplementationSpecific
             path: /api/v[0-9]+/query/.*
             backend:

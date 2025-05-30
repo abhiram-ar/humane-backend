@@ -1,27 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: notification-depl
+  name: email-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: humane
-      service: notification
+      service: email
       type: web-server
   template:
     metadata:
       labels:
         app: humane
-        service: notification
+        service: email
         type: web-server
     spec:
       containers:
-        - name: notification-server
-          image: abhiramar/humane-notification
+        - name: email-server
+          image: abhiramar/humane-email
           envFrom:
             - secretRef:
-                name: notification-pod-secret
+                name: email-pod-secret
           resources:
             requests:
               memory: "128Mi"
@@ -33,14 +33,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: notification-srv
+  name: email-srv
 spec:
   selector:
     app: humane
-    service: notification
+    service: email
     type: web-server
-  ports:
-    - name: notification
+  ports:                # might not need service for this usecase
+    - name: email
       protocol: TCP
       port: 3000
       targetPort: 3000

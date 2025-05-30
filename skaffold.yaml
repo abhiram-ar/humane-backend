@@ -20,8 +20,8 @@ build:
         manual:
           - dest: .
             src: "src/**/*.ts"
-    - image: abhiramar/humane-notification
-      context: notification-service
+    - image: abhiramar/humane-email
+      context: email-service
       docker:
         dockerfile: Dockerfile
       sync:
