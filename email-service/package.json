@@ -1,0 +1,39 @@
+{
+   "name": "notification-service",
+   "version": "1.0.0",
+   "description": "",
+   "main": "index.js",
+   "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "dev": "tsx watch --include \"./src/**/*\" ./src/main.ts",
+      "uc": "npm update humane-common"
+   },
+   "keywords": [],
+   "author": "",
+   "license": "ISC",
+   "type": "commonjs",
+   "devDependencies": {
+      "@tsconfig/node22": "^22.0.1",
+      "@types/cookie-parser": "^1.4.8",
+      "@types/ejs": "^3.1.5",
+      "@types/express": "^5.0.1",
+      "@types/jsonwebtoken": "^9.0.9",
+      "@types/morgan": "^1.9.9",
+      "@types/node": "^22.15.16",
+      "@types/nodemailer": "^6.4.17",
+      "tsx": "^4.19.4",
+      "typescript": "^5.8.3"
+   },
+   "dependencies": {
+      "cookie-parser": "^1.4.7",
+      "cors": "^2.8.5",
+      "ejs": "^3.1.10",
+      "express": "^5.1.0",
+      "humane-common": "^1.0.33",
+      "jsonwebtoken": "^9.0.2",
+      "kafkajs": "^2.2.4",
+      "morgan": "^1.10.0",
+      "nodemailer": "^7.0.2",
+      "zod": "^3.25.42"
+   }
+}
