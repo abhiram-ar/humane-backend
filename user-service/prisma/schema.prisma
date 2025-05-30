@@ -61,7 +61,7 @@ model FriendShip {
 
   @@id([user1Id, user2Id])
   @@index([status])
-  @@index([id])
+  @@index([createdAt, id])
 }
 
 // why cant we keep this in friendship model?
