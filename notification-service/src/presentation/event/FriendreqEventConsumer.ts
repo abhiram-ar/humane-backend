@@ -5,7 +5,7 @@ import { logger } from '@config/logger';
 export class FriendReqEventConsumer {
    private _consumer: Consumer;
    constructor(private readonly _kafka: KafkaSingleton) {
-      this._consumer = this._kafka.createConsumer('friend-req-event-consumer-5');
+      this._consumer = this._kafka.createConsumer('friend-req-event-consumer-6');
    }
 
    start = async () => {

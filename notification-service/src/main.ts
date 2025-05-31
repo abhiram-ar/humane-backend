@@ -1,8 +1,10 @@
 import { startAllConsumers, stopAllConsumer } from '@config/kafka';
 import { logger } from '@config/logger';
+import checkEnv from '@di/env';
 
 const bootstrap = async () => {
    try {
+      checkEnv()
       await startAllConsumers();
       process.on('SIGINT', async () => {
          await stopAllConsumer();

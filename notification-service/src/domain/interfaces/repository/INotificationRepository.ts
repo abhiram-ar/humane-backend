@@ -1,3 +1,7 @@
+import { FriendReqNotification } from '@domain/entities/FriendReqNotification.entity';
 
+export interface INotificationRepository {
+   retriveFriendReq(friendshipId: string): Promise<FriendReqNotification | null>;
 
-export interface INotificationRepository {}
+   create(friendReq: FriendReqNotification): Promise<Required<FriendReqNotification>>;
+}

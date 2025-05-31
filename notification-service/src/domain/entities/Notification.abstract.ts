@@ -1,10 +1,9 @@
 export abstract class Notification {
-   constructor(
-      public readonly id: string,
-      public readonly createdAt: Date,
-      public readonly reciverId: string,
-      public isRead: boolean,
-      public type: string,
-      public readonly updatedAt: Date
-   ) {}
+   public readonly id: string | undefined;
+   public readonly createdAt: String | undefined;
+   public readonly reciverId: string | undefined;
+   public isRead: boolean | undefined;
+   public type: string | undefined;
+   public readonly updatedAt: string | undefined;
+   constructor() {}
 }
