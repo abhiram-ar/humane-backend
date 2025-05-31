@@ -5,6 +5,7 @@ export class Friendship {
       public user1Id: string,
       public user2Id: string,
       public status: FriendshipStatus,
+      public id?: string,
       public requesterId?: string,
       public receiverId?: string,
       public createdAt?: string,
