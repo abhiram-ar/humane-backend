@@ -5,7 +5,7 @@ import {
    friendshipRepository,
    userRepository,
 } from '@di/repository.container';
-import { awsStorageService } from '@di/services.container';
+import { awsStorageService, kafkaPubliserService } from '@di/services.container';
 import { GetRelationShipStatus } from '@application/useCases/friendship/GetRelationshipStatus';
 import { MutualFriends } from '@application/useCases/friendship/MutualFriends.usecase';
 import { RemoveFriendship } from '@application/useCases/friendship/RemoveFriendship.usecase';
@@ -15,13 +15,11 @@ import { GetFriendRequest } from '@application/useCases/friendship/GetFriendRequ
 export const sendFriendRequest = new FriendRequest(
    friendshipRepository,
    blockedRelationshipRepository,
-   userRepository
+   userRepository,
+   kafkaPubliserService
 );
 
-export const getFriendRequest = new GetFriendRequest(
-   friendshipRepository,
-   awsStorageService
-);
+export const getFriendRequest = new GetFriendRequest(friendshipRepository, awsStorageService);
 
 export const getFriends = new GetFriends(friendshipRepository, awsStorageService);
 
@@ -37,7 +35,11 @@ export const mutualFriends = new MutualFriends(
    awsStorageService
 );
 
-export const removeFriendship = new RemoveFriendship(friendshipRepository);
+export const removeFriendship = new RemoveFriendship(
+   friendshipRepository,
+   userRepository,
+   kafkaPubliserService
+);
 
 export const getUserSendFriendReq = new GetUserSendFriendRequestList(
    friendshipRepository,
