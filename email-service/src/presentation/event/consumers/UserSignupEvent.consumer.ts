@@ -1,7 +1,7 @@
 import KafkaSingleton from '@infrastructure/event-bus/KafkaSingleton';
 import { Consumer } from 'kafkajs';
 import { SendUserVerificationMail } from '@application/usecases/email/SendVerificationMail';
-import { KafkaTopics, UserSignupEvent } from 'humane-common';
+import { MessageBrokerTopics, UserSignupEvent } from 'humane-common';
 import {
    SendUserVerificationMailDTO,
    sendUserVerificationMailInputSchema,
@@ -20,7 +20,7 @@ export class UserSingupEventConsumer {
       await this._consumer.connect();
       console.log('User signup consumer connected');
 
-      await this._consumer.subscribe({ topic: KafkaTopics.USER_SINGUP_EVENTS_TOPIC });
+      await this._consumer.subscribe({ topic: MessageBrokerTopics.USER_SINGUP_EVENTS_TOPIC });
 
       await this._consumer.run({
          eachMessage: async ({ message }) => {

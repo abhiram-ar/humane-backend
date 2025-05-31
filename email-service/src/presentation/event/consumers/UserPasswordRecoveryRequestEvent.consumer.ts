@@ -1,6 +1,6 @@
 import { SendPasswordRecoveryMail } from '@application/usecases/email/SendPasswordRecoveryMail';
 import KafkaSingleton from '@infrastructure/event-bus/KafkaSingleton';
-import { KafkaTopics, UserPasswordRecoveryRequestEvent } from 'humane-common';
+import { MessageBrokerTopics, UserPasswordRecoveryRequestEvent } from 'humane-common';
 import { Consumer } from 'kafkajs';
 import {
    SendPasswordRecoveryMailInputDTO,
@@ -21,7 +21,9 @@ export class UserPasswordRecoveryRequestEventConsumer {
       await this.consumer.connect();
       console.log('User password recovery event consumer connected ');
 
-      await this.consumer.subscribe({ topic: KafkaTopics.USER_PASSWORD_RECOVERY_EVENTS_TOPIC });
+      await this.consumer.subscribe({
+         topic: MessageBrokerTopics.USER_PASSWORD_RECOVERY_EVENTS_TOPIC,
+      });
 
       await this.consumer.run({
          eachMessage: async ({ message }) => {
