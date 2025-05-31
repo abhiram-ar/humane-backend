@@ -4,7 +4,12 @@ import { verifedUserToken, verifyUserDTO } from '../../DTOs/user/verifyUser.dto'
 import { OTPError } from '../../errors/OTPError';
 import { IHashService } from '../../ports/IHashService';
 import { IUserRepository } from '../../ports/IUserRepository';
-import { AppEventsTypes, createEvent, KafkaTopics, UserCreatedEventPayload } from 'humane-common';
+import {
+   AppEventsTypes,
+   createEvent,
+   MessageBrokerTopics,
+   UserCreatedEventPayload,
+} from 'humane-common';
 import { EventBusError } from '@application/errors/EventbusError';
 
 export class VerifyUser {
@@ -53,7 +58,7 @@ export class VerifyUser {
 
       const userCreatedEvent = createEvent(AppEventsTypes.USER_CREATED, eventPayload);
       const { ack } = await this._eventPubliser.send(
-         KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
+         MessageBrokerTopics.USER_PROFILE_EVENTS_TOPIC,
          userCreatedEvent
       );
 

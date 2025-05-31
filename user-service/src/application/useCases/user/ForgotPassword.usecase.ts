@@ -6,7 +6,12 @@ import { forgotPasswordDTO } from '@dtos/user/forgotPassword.dto';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IJWTService } from '@ports/IJWTService';
 import { IUserRepository } from '@ports/IUserRepository';
-import { UserPasswordRecoveryEventPaylaod, createEvent, AppEventsTypes, KafkaTopics } from 'humane-common';
+import {
+   UserPasswordRecoveryEventPaylaod,
+   createEvent,
+   AppEventsTypes,
+   MessageBrokerTopics,
+} from 'humane-common';
 
 export class ForgotPassword {
    constructor(
@@ -46,7 +51,7 @@ export class ForgotPassword {
       );
 
       const { ack } = await this._eventPublisher.send(
-         KafkaTopics.USER_PASSWORD_RECOVERY_EVENTS_TOPIC,
+         MessageBrokerTopics.USER_PASSWORD_RECOVERY_EVENTS_TOPIC,
          passwordRevoveryEvent
       );
       if (!ack) {

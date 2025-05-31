@@ -7,7 +7,7 @@ import {
    AppEventsTypes,
    createEvent,
    EventBusError,
-   KafkaTopics,
+   MessageBrokerTopics,
    UpdateUserAvatarKeyEventPayload,
 } from 'humane-common';
 
@@ -46,7 +46,7 @@ export class UpdateUserAvatar {
       );
 
       const { ack } = await this._eventPublisher.send(
-         KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
+         MessageBrokerTopics.USER_PROFILE_EVENTS_TOPIC,
          userAvatarURLUpdatedEvent
       );
       if (!ack) {

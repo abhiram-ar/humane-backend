@@ -6,7 +6,12 @@ import { signupUserDTO } from '@dtos/user/signupUser.dto';
 import { verifedUserToken } from '@dtos/user/verifyUser.dto';
 import { EmailError } from '@application/errors/EmailError';
 import { IEventPublisher } from '@application/ports/IEventProducer';
-import { UserSignupEventPayload, createEvent, AppEventsTypes, KafkaTopics } from 'humane-common';
+import {
+   UserSignupEventPayload,
+   createEvent,
+   AppEventsTypes,
+   MessageBrokerTopics,
+} from 'humane-common';
 import { EventBusError } from '@application/errors/EventbusError';
 
 export class SignupUser {
@@ -43,7 +48,7 @@ export class SignupUser {
       const verifyUserEvent = createEvent(AppEventsTypes.USER_SINGUP, userSignuoEventPayload);
 
       const { ack } = await this._eventPublisher.send(
-         KafkaTopics.USER_SINGUP_EVENTS_TOPIC,
+         MessageBrokerTopics.USER_SINGUP_EVENTS_TOPIC,
          verifyUserEvent
       );
       if (!ack) {

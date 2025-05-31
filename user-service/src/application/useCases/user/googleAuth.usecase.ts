@@ -5,7 +5,12 @@ import { IJWTService } from '@ports/IJWTService';
 import { ENV } from '@config/env';
 import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS, JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 import { UserJWTTokenPayload } from '@application/types/JWTTokenPayload.type';
-import { AppEventsTypes, createEvent, KafkaTopics, UserCreatedEventPayload } from 'humane-common';
+import {
+   AppEventsTypes,
+   createEvent,
+   MessageBrokerTopics,
+   UserCreatedEventPayload,
+} from 'humane-common';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { EventBusError } from '@application/errors/EventbusError';
 
@@ -38,7 +43,7 @@ export class UserGoogleAuth {
 
          const userCreatedEvent = createEvent(AppEventsTypes.USER_CREATED, eventPayload);
          const { ack } = await this._eventPublisher.send(
-            KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
+            MessageBrokerTopics.USER_PROFILE_EVENTS_TOPIC,
             userCreatedEvent
          );
 

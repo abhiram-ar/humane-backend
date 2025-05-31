@@ -7,7 +7,7 @@ import {
    AppEventsTypes,
    createEvent,
    EventBusError,
-   KafkaTopics,
+   MessageBrokerTopics,
    UpdateUserBlockStatusEventPaylaod,
 } from 'humane-common';
 
@@ -35,7 +35,7 @@ export class AdminUpdateUserBlockStatus {
       );
 
       const { ack } = await this._eventPublisher.send(
-         KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
+         MessageBrokerTopics.USER_PROFILE_EVENTS_TOPIC,
          userAvatarURLUpdatedEvent
       );
       if (!ack) {

@@ -2,7 +2,12 @@ import { userRepository } from '@di/repository.container';
 import { Request, Response, NextFunction } from 'express';
 import { demoUsers } from './seedUsers';
 import { createUserDTO } from '@dtos/user/createUser.dto';
-import { AppEventsTypes, createEvent, KafkaTopics, UserCreatedEventPayload } from 'humane-common';
+import {
+   AppEventsTypes,
+   createEvent,
+   MessageBrokerTopics,
+   UserCreatedEventPayload,
+} from 'humane-common';
 import { kafkaPubliserService } from '@di/services.container';
 
 export const seedUser = (req: Request, res: Response, next: NextFunction) => {
@@ -32,7 +37,7 @@ export const seedUser = (req: Request, res: Response, next: NextFunction) => {
 
          const userCreatedEvent = createEvent(AppEventsTypes.USER_CREATED, eventPayload);
          const { ack } = await kafkaPubliserService.send(
-            KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
+            MessageBrokerTopics.USER_PROFILE_EVENTS_TOPIC,
             userCreatedEvent
          );
 

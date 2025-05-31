@@ -7,7 +7,7 @@ import { RemoveFriendshipInputDTO } from '@dtos/friendship/RemoveFriendshipInput
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IUserRepository } from '@ports/IUserRepository';
-import { AppEventsTypes, createEvent, KafkaTopics, UserNotFoundError } from 'humane-common';
+import { AppEventsTypes, createEvent, MessageBrokerTopics, UserNotFoundError } from 'humane-common';
 
 export class RemoveFriendship {
    constructor(
@@ -43,7 +43,7 @@ export class RemoveFriendship {
          deletedFriendship
       );
       const { ack } = await this._eventPublisher.send(
-         KafkaTopics.FRIENDSHIP_EVENTS_TOPIC,
+         MessageBrokerTopics.FRIENDSHIP_EVENTS_TOPIC,
          friendshipDeletedEvent
       );
       if (!ack) {

@@ -13,7 +13,7 @@ import { IBlockedRelationshipRepository } from '@ports/IBlockedRelationshipRepos
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IUserRepository } from '@ports/IUserRepository';
-import { AppEventsTypes, createEvent, KafkaTopics } from 'humane-common';
+import { AppEventsTypes, createEvent, MessageBrokerTopics } from 'humane-common';
 
 export class FriendRequest {
    constructor(
@@ -69,7 +69,7 @@ export class FriendRequest {
 
       const friendReqSendEvent = createEvent(AppEventsTypes.FRIEND_REQ_SENT, newFriendRequest);
       const { ack } = await this._eventPublisher.send(
-         KafkaTopics.FRIENDSHIP_EVENTS_TOPIC,
+         MessageBrokerTopics.FRIENDSHIP_EVENTS_TOPIC,
          friendReqSendEvent
       );
 
@@ -126,7 +126,7 @@ export class FriendRequest {
          updatedFriendsip
       );
       const { ack } = await this._eventPublisher.send(
-         KafkaTopics.FRIENDSHIP_EVENTS_TOPIC,
+         MessageBrokerTopics.FRIENDSHIP_EVENTS_TOPIC,
          friendShipAcceptedEvent
       );
       if (!ack) {
@@ -172,7 +172,7 @@ export class FriendRequest {
          deletedFriendship
       );
       const { ack } = await this._eventPublisher.send(
-         KafkaTopics.FRIENDSHIP_EVENTS_TOPIC,
+         MessageBrokerTopics.FRIENDSHIP_EVENTS_TOPIC,
          friendReqCancelledEvent
       );
 
