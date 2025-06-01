@@ -33,19 +33,23 @@ export class FriendReqEventConsumer {
             const event = JSON.parse(message.value.toString()) as AppEvent;
             logger.verbose(JSON.stringify(event, null, 2));
 
+            const dto = {
+               friendship: event.payload,
+               eventCreatedAt: event.timestamp,
+            } as FriendReqNotificationInputDTO;
+
             try {
+               const parsed = friendReqNotificationInputSchema.safeParse(dto);
+               if (!parsed.success) {
+                  throw new ZodValidationError(parsed.error);
+               }
+
                if (event.eventType === AppEventsTypes.FRIEND_REQ_SENT) {
-                  const dto: FriendReqNotificationInputDTO = {
-                     friendship: event.payload,
-                     eventCreatedAt: event.timestamp,
-                  };
-
-                  const parsed = friendReqNotificationInputSchema.safeParse(dto);
-                  if (!parsed.success) {
-                     throw new ZodValidationError(parsed.error);
-                  }
-
                   await this._friendReqNotificationService.create(parsed.data);
+               } else if (event.eventType === AppEventsTypes.FRIEND_REQ_CANCELLED) {
+                  await this._friendReqNotificationService.delete(parsed.data);
+               } else {
+                  throw new Error('Invalid event type for notificaion-srv:frendreqNoti consumer');
                }
             } catch (error) {
                logger.error(`Error while processing ${event.eventId}`);

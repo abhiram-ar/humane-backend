@@ -5,8 +5,11 @@ import {
 import { INotificationRepository } from '@domain/interfaces/repository/INotificationRepository';
 import { friendReqNotificationModel } from '../models/Notification.model';
 
+
+// TODO: refactor createing frindReqNoti every time with a mapper
 export class MongoNotificationRepository implements INotificationRepository {
    constructor() {}
+
    retriveFriendReq = async (
       friendshipId: string
    ): Promise<Required<FriendReqNotification> | null> => {
@@ -49,5 +52,26 @@ export class MongoNotificationRepository implements INotificationRepository {
       };
 
       return friendReqNoti;
+   };
+
+   delete = async (friendshipId: string): Promise<Required<FriendReqNotification> | null> => {
+      const res = await friendReqNotificationModel.findOneAndDelete({ friendshipId: friendshipId });
+
+      if(!res) return null
+
+      const friendReqNoti: Required<FriendReqNotification> = {
+         type: res.type,
+         id: res.id,
+         isRead: res.isRead,
+         updatedAt: res.updatedAt.toISOString(),
+         friendshipId: res.friendshipId,
+         reciverId: res.reciverId,
+         requesterId: res.requesterId,
+         createdAt: res.createdAt.toISOString(),
+         status: res.status,
+      };
+
+      return friendReqNoti;
+
    };
 }

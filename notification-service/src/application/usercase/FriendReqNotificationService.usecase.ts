@@ -1,5 +1,6 @@
 import { FriendReqNotificationInputDTO } from '@application/dtos/FriendReqNotification.dto';
 import { FriendReqNotificationError } from '@application/Errors/FriendReqNotificaionError';
+import { logger } from '@config/logger';
 import { FriendReqNotification } from '@domain/entities/FriendReqNotification.entity';
 import { INotificationRepository } from '@domain/interfaces/repository/INotificationRepository';
 
@@ -24,6 +25,18 @@ export class FriendReqNotificationService {
       );
 
       await this._notificationRepo.create(newFriendReqNotication);
-      // if the user is online write to therir socket/let consumer do it
+      // TODO: if the user is online write to therir socket/let consumer do it
+   };
+
+   delete = async ({ friendship }: FriendReqNotificationInputDTO) => {
+      const deltedFriendReq = await this._notificationRepo.delete(friendship.id);
+      if (!deltedFriendReq) {
+         logger.warn(
+            `cannot delete non-existing friendreq notification, friendshipId:${friendship.id}`
+         );
+      }
+      logger.info(`friendReq nofiticaion deleted, friendreqId${friendship.id}`);
+
+      //TODO: websockets
    };
 }
