@@ -31,7 +31,7 @@ export class MongoNotificationRepository implements INotificationRepository {
       const res = await friendReqNotificationModel.create({
          reciverId: friendReq.reciverId,
          type: FRIEND_REQ_NOTIFICATION_TYPE,
-         friendshipId: friendReq.id,
+         friendshipId: friendReq.friendshipId,
          requesterId: friendReq.requesterId,
          status: friendReq.status,
       });

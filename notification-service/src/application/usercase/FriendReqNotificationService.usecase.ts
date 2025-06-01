@@ -14,7 +14,6 @@ export class FriendReqNotificationService {
       if (existingFriendReqNotificaion) {
          throw new FriendReqNotificationError('Request(id) exists, cannot add duplicate entry');
       }
-
       // create a frindreqNotificaion
       const newFriendReqNotication = new FriendReqNotification(
          friendship.id,
@@ -23,6 +22,7 @@ export class FriendReqNotificationService {
          friendship.createdAt,
          friendship.status
       );
+
       await this._notificationRepo.create(newFriendReqNotication);
       // if the user is online write to therir socket/let consumer do it
    };
