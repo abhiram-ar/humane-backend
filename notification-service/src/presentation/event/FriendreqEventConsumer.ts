@@ -37,7 +37,7 @@ export class FriendReqEventConsumer {
                friendship: event.payload,
                eventCreatedAt: event.timestamp,
             } as FriendReqNotificationInputDTO;
-
+            // note: we dont want to dete the notification in the repositroy. if two people have been infriended
             try {
                const parsed = friendReqNotificationInputSchema.safeParse(dto);
                if (!parsed.success) {
