@@ -1,10 +1,12 @@
 import { startAllConsumers, stopAllConsumer } from '@config/kafka';
 import { logger } from '@config/logger';
 import checkEnv from '@di/env';
+import connectDB from '@infrastructure/persistance/mongo/client';
 
 const bootstrap = async () => {
    try {
-      checkEnv()
+      checkEnv();
+      await connectDB();
       await startAllConsumers();
       process.on('SIGINT', async () => {
          await stopAllConsumer();

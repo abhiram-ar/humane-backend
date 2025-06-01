@@ -1,4 +1,7 @@
-import { FriendReqNotification } from '@domain/entities/FriendReqNotification.entity';
+import {
+   FRIEND_REQ_NOTIFICATION_TYPE,
+   FriendReqNotification,
+} from '@domain/entities/FriendReqNotification.entity';
 import { INotificationRepository } from '@domain/interfaces/repository/INotificationRepository';
 import { friendReqNotificationModel } from '../models/Notification.model';
 
@@ -24,7 +27,27 @@ export class MongoNotificationRepository implements INotificationRepository {
 
       return friendReqNoti;
    };
-   create(friendReq: FriendReqNotification): Promise<Required<FriendReqNotification>> {
-      throw new Error('Method not implemented.');
-   }
+   create = async (friendReq: FriendReqNotification): Promise<Required<FriendReqNotification>> => {
+      const res = await friendReqNotificationModel.create({
+         reciverId: friendReq.reciverId,
+         type: FRIEND_REQ_NOTIFICATION_TYPE,
+         friendshipId: friendReq.id,
+         requesterId: friendReq.requesterId,
+         status: friendReq.status,
+      });
+
+      const friendReqNoti: Required<FriendReqNotification> = {
+         type: res.type,
+         id: res.id,
+         isRead: res.isRead,
+         updatedAt: res.updatedAt.toISOString(),
+         friendshipId: res.friendshipId,
+         reciverId: res.reciverId,
+         requesterId: res.requesterId,
+         createdAt: res.createdAt.toISOString(),
+         status: res.status,
+      };
+
+      return friendReqNoti;
+   };
 }

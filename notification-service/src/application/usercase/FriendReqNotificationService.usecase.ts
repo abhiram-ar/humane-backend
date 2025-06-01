@@ -2,7 +2,6 @@ import { FriendReqNotificationInputDTO } from '@application/dtos/FriendReqNotifi
 import { FriendReqNotificationError } from '@application/Errors/FriendReqNotificaionError';
 import { FriendReqNotification } from '@domain/entities/FriendReqNotification.entity';
 import { INotificationRepository } from '@domain/interfaces/repository/INotificationRepository';
-import { fr } from 'date-fns/locale';
 
 export class FriendReqNotificationService {
    constructor(private readonly _notificationRepo: INotificationRepository) {}
