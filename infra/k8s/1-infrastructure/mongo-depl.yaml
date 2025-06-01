@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-mongo-depl
+  name: mongo-depl
 spec:
   selector:
     matchLabels:
       app: humane
-      service: user
+      service: mongo
       type: db
   template:
     metadata:
       labels:
         app: humane
-        service: user
+        service: mongo
         type: db
     spec:
       containers:
-      - name: user-mongo
+      - name: mongo
         image: mongo
         volumeMounts:
-        - name: user-mongo-storage
+        - name: mongo-storage
           mountPath: /data/db 
         resources:
           requests:
@@ -29,18 +29,18 @@ spec:
             memory: "512Mi"
             cpu: "500m"
       volumes: 
-      - name: user-mongo-storage
+      - name: mongo-storage
         persistentVolumeClaim: 
-          claimName: user-mongo-pvc
+          claimName: mongo-pvc
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-mongo-srv
+  name: mongo-srv
 spec:
   selector:
     app: humane
-    service: user
+    service: mongo
     type: db
   ports:
   - name: db
