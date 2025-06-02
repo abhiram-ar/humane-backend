@@ -39,4 +39,34 @@ export class FriendReqNotificationService {
 
       //TODO: websockets
    };
+
+   updateFriendReqStatus = async (dto: FriendReqNotificationInputDTO) => {
+      const existingFriendReqNotification = await this._notificationRepo.retriveFriendReq(
+         dto.friendship.id
+      );
+
+      if (!existingFriendReqNotification) {
+         throw new FriendReqNotificationError(
+            'Cannot update status of non-existant frindReq notifcation'
+         );
+      }
+
+      if (existingFriendReqNotification.updatedAt > dto.eventCreatedAt) {
+         throw new FriendReqNotificationError('Cannt update friendReqNoticaltion with old data');
+      }
+
+      existingFriendReqNotification.status = dto.friendship.status;
+
+      const updatedFriendReqNoti = await this._notificationRepo.updateFriendReqStatus(
+         existingFriendReqNotification.friendshipId,
+         existingFriendReqNotification.status
+      );
+
+      if (!updatedFriendReqNoti) {
+         throw new Error('Cannot update a exisitng friendReq noti');
+      }
+
+      // websocket
+      return updatedFriendReqNoti;
+   };
 }

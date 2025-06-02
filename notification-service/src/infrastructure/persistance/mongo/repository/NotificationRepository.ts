@@ -1,10 +1,10 @@
 import {
    FRIEND_REQ_NOTIFICATION_TYPE,
    FriendReqNotification,
+   FriendReqStatus,
 } from '@domain/entities/FriendReqNotification.entity';
 import { INotificationRepository } from '@domain/interfaces/repository/INotificationRepository';
 import { friendReqNotificationModel } from '../models/Notification.model';
-
 
 // TODO: refactor createing frindReqNoti every time with a mapper
 export class MongoNotificationRepository implements INotificationRepository {
@@ -57,7 +57,7 @@ export class MongoNotificationRepository implements INotificationRepository {
    delete = async (friendshipId: string): Promise<Required<FriendReqNotification> | null> => {
       const res = await friendReqNotificationModel.findOneAndDelete({ friendshipId: friendshipId });
 
-      if(!res) return null
+      if (!res) return null;
 
       const friendReqNoti: Required<FriendReqNotification> = {
          type: res.type,
@@ -72,6 +72,32 @@ export class MongoNotificationRepository implements INotificationRepository {
       };
 
       return friendReqNoti;
+   };
 
+   updateFriendReqStatus = async (
+      friendshipId: string,
+      newStatus: FriendReqStatus
+   ): Promise<Required<FriendReqNotification> | null> => {
+      const res = await friendReqNotificationModel.findOneAndUpdate(
+         { friendshipId: friendshipId },
+         { status: newStatus },
+         { new: true }
+      );
+
+      if (!res) return null;
+
+      const friendReqNoti: Required<FriendReqNotification> = {
+         type: res.type,
+         id: res.id,
+         isRead: res.isRead,
+         updatedAt: res.updatedAt.toISOString(),
+         friendshipId: res.friendshipId,
+         reciverId: res.reciverId,
+         requesterId: res.requesterId,
+         createdAt: res.createdAt.toISOString(),
+         status: res.status,
+      };
+
+      return friendReqNoti;
    };
 }

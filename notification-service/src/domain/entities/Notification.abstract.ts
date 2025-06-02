@@ -4,6 +4,6 @@ export abstract class Notification {
    public readonly reciverId: string | undefined;
    public isRead: boolean | undefined;
    public type: string | undefined;
-   public readonly updatedAt: string | undefined;
+   public readonly updatedAt?: string;
    constructor() {}
 }

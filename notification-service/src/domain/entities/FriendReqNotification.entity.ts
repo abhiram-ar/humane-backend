@@ -7,7 +7,7 @@ export class FriendReqNotification implements Notification {
    public readonly type = FRIEND_REQ_NOTIFICATION_TYPE;
    public readonly id: string | undefined;
    public isRead: boolean | undefined;
-   public readonly updatedAt: string | undefined;
+   public readonly updatedAt?: string;
    constructor(
       public readonly friendshipId: string,
       public readonly reciverId: string,
