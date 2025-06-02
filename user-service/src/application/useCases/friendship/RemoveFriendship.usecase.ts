@@ -37,7 +37,7 @@ export class RemoveFriendship {
          throw new GenericError('Unable to cancel friend requset');
       }
 
-      // TODO:emit cancelled event
+      // emit cancelled event
       const friendshipDeletedEvent = createEvent(
          AppEventsTypes.FRIENDSHIP_DELETED,
          deletedFriendship

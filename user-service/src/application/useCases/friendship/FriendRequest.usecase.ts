@@ -8,6 +8,7 @@ import { RelationshipStatus } from '@application/types/RelationshipStatus';
 import { Friendship } from '@domain/entities/friendship.entity';
 import { AcceptFriendshipInputDTO } from '@dtos/friendship/AcceptFriendRequset.dto';
 import { cancelFriendRequestInputDTO } from '@dtos/friendship/cancelFriendRequestInput.dto';
+import { RemoveFriendshipInputDTO } from '@dtos/friendship/RemoveFriendshipInput.dto';
 import { SendFriendRequestInputDTO } from '@dtos/friendship/SendFriendRequestInput.dto';
 import { IBlockedRelationshipRepository } from '@ports/IBlockedRelationshipRepository';
 import { IEventPublisher } from '@ports/IEventProducer';
@@ -181,5 +182,45 @@ export class FriendRequest {
       }
 
       return { receiverId: deletedFriendship.receiverId, status: 'strangers' };
+   };
+
+   decline = async (
+      dto: RemoveFriendshipInputDTO
+   ): Promise<{ targetUserId: string; status: RelationshipStatus }> => {
+      const targetUser = await this._userRepository.getUserStatusById(dto.targetUserId);
+      if (!targetUser) {
+         throw new UserNotFoundError('Invalid/NonExistant targetUserId');
+      }
+
+      const friendShip = await this._friendShipRepository.retriveFriendship(
+         ...Friendship.sortUserId(dto.currenUserId, dto.targetUserId)
+      );
+
+      if (!friendShip) {
+         throw new FriendshipError('friendship does not exist to decline');
+      }
+
+      if (friendShip.status === 'ACCEPTED') {
+         throw new FriendshipError('Cannot decline a accepted request. Try unfriending');
+      }
+
+      const deletedFriendship = await this._friendShipRepository.deleteFriendship(friendShip);
+      if (!deletedFriendship) {
+         throw new GenericError('Unable to cancel friend requset');
+      }
+
+      const friendshipDeletedEvent = createEvent(AppEventsTypes.FRIEND_REQ_DECLIED, {
+         ...deletedFriendship,
+         status: 'DECLIEND',
+      });
+      const { ack } = await this._eventPublisher.send(
+         MessageBrokerTopics.FRIENDSHIP_EVENTS_TOPIC,
+         friendshipDeletedEvent
+      );
+      if (!ack) {
+         throw new EventBusError('error while publishing friendship deleted event');
+      }
+
+      return { targetUserId: targetUser.id, status: 'strangers' };
    };
 }
