@@ -37,7 +37,6 @@ export class FriendReqEventConsumer {
                friendship: event.payload,
                eventCreatedAt: event.timestamp,
             } as FriendReqNotificationInputDTO;
-            // note: we dont want to dete the notification in the repositroy. if two people have been infriended
             try {
                const parsed = friendReqNotificationInputSchema.safeParse(dto);
                if (!parsed.success) {
@@ -46,11 +45,21 @@ export class FriendReqEventConsumer {
 
                if (event.eventType === AppEventsTypes.FRIEND_REQ_SENT) {
                   await this._friendReqNotificationService.create(parsed.data);
+               } else if (event.eventType === AppEventsTypes.FRIEND_REQ_ACCEPTED) {
+                  await this._friendReqNotificationService.updateFriendReqStatus(parsed.data);
                } else if (event.eventType === AppEventsTypes.FRIEND_REQ_CANCELLED) {
                   await this._friendReqNotificationService.delete(parsed.data);
+               } else if (event.eventType === AppEventsTypes.FRIEND_REQ_DECLIED) {
+                  await this._friendReqNotificationService.updateFriendReqStatus(parsed.data);
+               } else if (event.eventType === AppEventsTypes.FRIENDSHIP_DELETED) {
+                  // note: we dont want to dete the notification in the repositroy. if two people have been infriended
+                  logger.warn('Skipping frindship Deleted event. Its better to keep this record');
                } else {
-                  throw new Error('Invalid event type for notificaion-srv:frendreqNoti consumer');
+                  throw new Error(
+                     `Invalid event type (${event.eventType}) for notificaion-srv:frendreqNoti consumer`
+                  );
                }
+               logger.info(`Processed ${event.eventType}: ${event.eventId}`);
             } catch (error) {
                logger.error(`Error while processing ${event.eventId}`);
                logger.error(error);

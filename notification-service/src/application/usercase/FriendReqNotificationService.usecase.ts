@@ -35,7 +35,6 @@ export class FriendReqNotificationService {
             `cannot delete non-existing friendreq notification, friendshipId:${friendship.id}`
          );
       }
-      logger.info(`friendReq nofiticaion deleted, friendreqId:${friendship.id}`);
 
       //TODO: websockets
    };

@@ -5,7 +5,7 @@ export const FriendhipSchema = z.object({
    id: z.string().nonempty(),
    user1Id: z.string().nonempty(),
    user2Id: z.string().nonempty(),
-   status: z.enum(['PENDING', 'ACCEPTED']),
+   status: z.enum(['PENDING', 'ACCEPTED', 'DECLINED']),
    requesterId: z.string().nonempty(),
    receiverId: z.string().nonempty(),
    createdAt: z.string().nonempty(),
