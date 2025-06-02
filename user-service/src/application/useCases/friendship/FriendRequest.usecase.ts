@@ -211,7 +211,7 @@ export class FriendRequest {
 
       const friendshipDeletedEvent = createEvent(AppEventsTypes.FRIEND_REQ_DECLIED, {
          ...deletedFriendship,
-         status: 'DECLIEND',
+         status: 'DECLINED',
       });
       const { ack } = await this._eventPublisher.send(
          MessageBrokerTopics.FRIENDSHIP_EVENTS_TOPIC,

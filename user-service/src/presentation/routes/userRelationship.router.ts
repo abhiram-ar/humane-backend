@@ -50,6 +50,12 @@ relationshipRouter.delete(
    authorizedRoles('user'),
    userRelationshipController.cancelFriendRequest
 );
+relationshipRouter.delete(
+   '/friend-req/decline/:targetUserId',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userRelationshipController.declineFriendReq
+);
 
 //-----friend
 relationshipRouter.get(
