@@ -1,4 +1,4 @@
-import { ENV } from '@di/env';
+import { ENV } from '@config/env';
 import { Consumer, Kafka, Producer } from 'kafkajs';
 
 class KafkaSingleton {
