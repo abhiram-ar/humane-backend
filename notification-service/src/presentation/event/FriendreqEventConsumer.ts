@@ -7,6 +7,7 @@ import {
    friendReqNotificationInputSchema,
 } from '@application/dtos/FriendReqNotification.dto';
 import { FriendReqNotificationService } from '@application/usercase/FriendReqNotificationService.usecase';
+import { io } from '@presentation/websocket/ws';
 export class FriendReqEventConsumer {
    private _consumer: Consumer;
    constructor(
@@ -44,13 +45,23 @@ export class FriendReqEventConsumer {
                }
 
                if (event.eventType === AppEventsTypes.FRIEND_REQ_SENT) {
-                  await this._friendReqNotificationService.create(parsed.data);
+                  const noti = await this._friendReqNotificationService.create(parsed.data);
+                  io.to(noti.reciverId).emit('push-noti', noti);
+                  //
                } else if (event.eventType === AppEventsTypes.FRIEND_REQ_ACCEPTED) {
-                  await this._friendReqNotificationService.updateFriendReqStatus(parsed.data);
+                  const noti = await this._friendReqNotificationService.updateFriendReqStatus(
+                     parsed.data
+                  );
+                  io.to(noti.requesterId).emit('push-noti', noti);
+                  //
                } else if (event.eventType === AppEventsTypes.FRIEND_REQ_CANCELLED) {
-                  await this._friendReqNotificationService.delete(parsed.data);
+                  const noti = await this._friendReqNotificationService.delete(parsed.data);
+                  if (noti) io.to(noti.reciverId).emit('remove-noti', noti);
+                  //
                } else if (event.eventType === AppEventsTypes.FRIEND_REQ_DECLIED) {
                   await this._friendReqNotificationService.updateFriendReqStatus(parsed.data);
+
+                  //dont what to push this noti
                } else if (event.eventType === AppEventsTypes.FRIENDSHIP_DELETED) {
                   // note: we dont want to dete the notification in the repositroy. if two people have been infriended
                   logger.warn('Skipping frindship Deleted event. Its better to keep this record');

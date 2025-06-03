@@ -1,15 +1,14 @@
-import { logger } from '@config/logger';
 import app from '@presentation/http/app';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { wsAuth } from './middleware/authMiddleware';
+import { onConnectionHandler } from './handlers/onConnectionHandler';
 import {
    ClientToServerEvents,
    InterServerEvents,
    ServerToClientEvents,
    SocketData,
 } from './Types/SocketIOConfig.types';
-import { onConnectionHandler } from './handlers/onConnectionHandler';
 
 const httpServer = createServer(app);
 
@@ -26,7 +25,6 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
 
 io.use(wsAuth);
 io.on('connection', onConnectionHandler);
-
 
 io.engine.on('connection_error', (err) => {
    console.log(err.req); // the request object

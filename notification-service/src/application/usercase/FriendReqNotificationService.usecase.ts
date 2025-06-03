@@ -7,7 +7,9 @@ import { INotificationRepository } from '@domain/interfaces/repository/INotifica
 export class FriendReqNotificationService {
    constructor(private readonly _notificationRepo: INotificationRepository) {}
 
-   create = async ({ friendship }: FriendReqNotificationInputDTO) => {
+   create = async ({
+      friendship,
+   }: FriendReqNotificationInputDTO): Promise<Required<FriendReqNotification>> => {
       // we dont what a old event overriding the existing doc in case of retry
       const existingFriendReqNotificaion = await this._notificationRepo.retriveFriendReq(
          friendship.id
@@ -24,22 +26,26 @@ export class FriendReqNotificationService {
          friendship.status
       );
 
-      await this._notificationRepo.create(newFriendReqNotication);
-      // TODO: if the user is online write to therir socket/let consumer do it
+      let result = await this._notificationRepo.create(newFriendReqNotication);
+      return result;
    };
 
-   delete = async ({ friendship }: FriendReqNotificationInputDTO) => {
+   delete = async ({
+      friendship,
+   }: FriendReqNotificationInputDTO): Promise<Required<FriendReqNotification> | null> => {
       const deltedFriendReq = await this._notificationRepo.delete(friendship.id);
       if (!deltedFriendReq) {
          logger.warn(
             `cannot delete non-existing friendreq notification, friendshipId:${friendship.id}`
          );
+         return null;
       }
-
-      //TODO: websockets
+      return deltedFriendReq;
    };
 
-   updateFriendReqStatus = async (dto: FriendReqNotificationInputDTO) => {
+   updateFriendReqStatus = async (
+      dto: FriendReqNotificationInputDTO
+   ): Promise<Required<FriendReqNotification>> => {
       const existingFriendReqNotification = await this._notificationRepo.retriveFriendReq(
          dto.friendship.id
       );
