@@ -4,7 +4,7 @@ import {
 } from '@application/dtos/GetRecentUserNotification.dto';
 import { INotificationRepository } from '@domain/interfaces/repository/INotificationRepository';
 
-export class NotificationUsecase {
+export class UserNotification {
    constructor(private readonly _notifiactionRepo: INotificationRepository) {}
 
    getRecentUserNotification = async (

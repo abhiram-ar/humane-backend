@@ -1,9 +1,9 @@
 import { CombinedNotification } from '@domain/entities/CombinedNotification';
-import { BasicUserDetails } from '@presentation/event/Types/GetUserBasicDetails Response';
+import { CombinedNotificationWithActionableUser } from '@presentation/Types/CombinedNotiWithActionableUser';
 
 export interface ServerToClientEvents {
    test: (msg: string) => void;
-   'push-noti': (noti: CombinedNotification & { originatedUser?: BasicUserDetails }) => void;
+   'push-noti': (noti: CombinedNotificationWithActionableUser) => void;
    'remove-noti': (noti: CombinedNotification) => void;
    withAck: (d: string, callback: (e: number) => void) => void;
 }
