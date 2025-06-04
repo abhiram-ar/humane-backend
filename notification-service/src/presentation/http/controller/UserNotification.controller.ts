@@ -2,7 +2,7 @@ import {
    GetRecentUserNoficationInputDTO,
    getRecentUserNotification,
 } from '@application/dtos/GetRecentUserNotification.dto';
-import { UserNotification } from '@application/usercase/UserNotification.usecase';
+import { UserNotificationService } from '@application/usercase/UserNotification.usecase';
 import { logger } from '@config/logger';
 import { axiosESproxyService } from '@infrastructure/http/axiosESproxy';
 import {
@@ -13,7 +13,7 @@ import { CombinedNotificationWithActionableUser } from '@presentation/Types/Comb
 import { Request, Response, NextFunction } from 'express';
 import { GenericError, UnAuthenticatedError, ZodValidationError } from 'humane-common';
 export class UserNotificationController {
-   constructor(private readonly _userNotification: UserNotification) {}
+   constructor(private readonly _userNotificationService: UserNotificationService) {}
 
    getRecentNotifications = async (req: Request, res: Response, next: NextFunction) => {
       try {
@@ -23,15 +23,16 @@ export class UserNotificationController {
 
          const dto: GetRecentUserNoficationInputDTO = {
             userId: req.user.userId,
-            limit: parseInt(req.query.limit as string),
+            limit: parseInt((req.query.limit as string) ?? 10),
             from: req.query.from as string,
          };
+
          const parsed = getRecentUserNotification.safeParse(dto);
          if (!parsed.success) {
             throw new ZodValidationError(parsed.error);
          }
 
-         const { noti, pagination } = await this._userNotification.getRecentUserNotification(
+         const { noti, pagination } = await this._userNotificationService.getRecentUserNotification(
             parsed.data
          );
 
@@ -57,20 +58,23 @@ export class UserNotificationController {
             });
 
          const actionableUserIds = Array.from(notiToActionableUserMap.values());
-         const actionableUserDetails = await axiosESproxyService
-            .get<GetUserBasicDetailsResponse>('/api/v1/query/public/user/basic', {
-               params: { userId: actionableUserIds },
-            })
-            .then((data) => data.data.data.user);
+         let actionableUserDetailsHydratedNoti: CombinedNotificationWithActionableUser[] = [];
 
-         const actionableUserDetailsMap = new Map<string, BasicUserDetails>();
-         actionableUserDetails.forEach((user) => {
-            if (!user) return;
-            actionableUserDetailsMap.set(user.id, user);
-         });
+         if (actionableUserIds.length > 0) {
+            // exproxy will throw an error if userIds is null
+            const actionableUserDetails = await axiosESproxyService
+               .get<GetUserBasicDetailsResponse>('/api/v1/query/public/user/basic', {
+                  params: { userId: actionableUserIds },
+                  paramsSerializer: { indexes: null }, // remove user1[]=fsfsdf&user2[]=fsdfsdf issue
+               })
+               .then((data) => data.data.data.user);
+            const actionableUserDetailsMap = new Map<string, BasicUserDetails>();
+            actionableUserDetails.forEach((user) => {
+               if (!user) return;
+               actionableUserDetailsMap.set(user.id, user);
+            });
 
-         const actionableUserDetailsHydratedNoti: CombinedNotificationWithActionableUser[] =
-            noti.map((noti) => {
+            actionableUserDetailsHydratedNoti = noti.map((noti) => {
                const actionableUserIdOfNoti = notiToActionableUserMap.get(noti.id as string);
                if (!actionableUserIdOfNoti) {
                   return noti;
@@ -85,13 +89,18 @@ export class UserNotificationController {
                logger.warn('cannot resolve actionable user of a noti');
                return noti;
             });
+         }
 
          res.status(200).json({
             success: true,
             message: 'user notification fetched',
-            data: { noti: actionableUserDetailsHydratedNoti, pagination },
+            data: {
+               noti: actionableUserIds.length > 0 ? actionableUserDetailsHydratedNoti : noti,
+               pagination,
+            },
          });
       } catch (error) {
+         res.json(error);
          next(error);
       }
    };

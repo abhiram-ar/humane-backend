@@ -107,12 +107,12 @@ export class MongoNotificationRepository implements INotificationRepository {
       limit: number,
       from: string | null
    ): Promise<{ noti: CombinedNotification[]; from: string | null; hasmore: boolean }> => {
+      const fromFilter = { _id: { $lt: from } };
+
       const res = await notificationModel
-         .find({ reciverId: userId, _id: from ? { $lt: from } : undefined })
+         .find({ reciverId: userId, ...(from && fromFilter) })
          .sort({ _id: -1 }) // some of first character of Id represent unix epoch of document created, so this can effectively used as a cursor
          .limit(limit);
-
-      console.log(res);
 
       // Map MongoDB documents to CombinedNotification objects
       const notifications: CombinedNotification[] = res.map((doc: any) => ({
