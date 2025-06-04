@@ -1,3 +1,4 @@
+import { CombinedNotification } from '@domain/entities/CombinedNotification';
 import {
    FriendReqNotification,
    FriendReqStatus,
@@ -14,4 +15,10 @@ export interface INotificationRepository {
       friendshipId: string,
       newStatus: FriendReqStatus
    ): Promise<Required<FriendReqNotification> | null>;
+
+   retriveRecentUserNotifications(
+      userId: string,
+      limit: number,
+      from?: string | null
+   ): Promise<{ noti: CombinedNotification[]; from: string | null; hasmore: boolean }>;
 }

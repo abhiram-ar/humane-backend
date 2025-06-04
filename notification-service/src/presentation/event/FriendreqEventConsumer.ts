@@ -1,11 +1,5 @@
 import { Consumer } from 'kafkajs';
-import {
-   AppEvent,
-   AppEventsTypes,
-   GenericError,
-   MessageBrokerTopics,
-   ZodValidationError,
-} from 'humane-common';
+import { AppEvent, AppEventsTypes, MessageBrokerTopics, ZodValidationError } from 'humane-common';
 import KafkaSingleton from '@infrastructure/event/KafkaSingleton';
 import { logger } from '@config/logger';
 import {
@@ -16,6 +10,7 @@ import { FriendReqNotificationService } from '@application/usercase/FriendReqNot
 import { io } from '@presentation/websocket/ws';
 import { axiosESproxyService } from '@infrastructure/http/axiosESproxy';
 import { GetUserBasicDetailsResponse } from './Types/GetUserBasicDetails Response';
+
 export class FriendReqEventConsumer {
    private _consumer: Consumer;
    constructor(
@@ -56,24 +51,21 @@ export class FriendReqEventConsumer {
                   const noti = await this._friendReqNotificationService.create(parsed.data);
 
                   const reciverSockets = await io.in(noti.reciverId).fetchSockets();
-                  console.log(`sock count: ${reciverSockets.length}`);
 
                   if (reciverSockets.length > 0) {
-                     try {
-                        const response = await axiosESproxyService.get<GetUserBasicDetailsResponse>(
-                           '/api/v1/query/public/user/basic',
-                           { params: { userId: noti.requesterId } }
-                        );
-                        console.log(response.data.data);
-                        const requesterDetails = response.data.data.user[0];
-                        if (!requesterDetails)
-                           throw new GenericError('No requester basic details from ES proxy');
+                     const response = await axiosESproxyService.get<GetUserBasicDetailsResponse>(
+                        '/api/v1/query/public/user/basic',
+                        { params: { userId: noti.requesterId } }
+                     );
+
+                     const requesterDetails = response.data.data.user[0];
+                     if (requesterDetails) {
                         io.to(noti.reciverId).emit('push-noti', {
                            ...noti,
                            actionableUser: requesterDetails,
                         });
-                     } catch (error) {
-                        console.log('error while fetching usre', error);
+                     } else {
+                        logger.warn('No requester basic details from ES proxy');
                      }
                   }
                   //

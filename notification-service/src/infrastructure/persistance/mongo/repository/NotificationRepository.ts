@@ -4,7 +4,12 @@ import {
    FriendReqStatus,
 } from '@domain/entities/FriendReqNotification.entity';
 import { INotificationRepository } from '@domain/interfaces/repository/INotificationRepository';
-import { friendReqNotificationModel } from '../models/Notification.model';
+import notificationModel, {
+   friendReqNotificationModel,
+   INotificationDocument,
+} from '../models/Notification.model';
+import { CombinedNotification } from '@domain/entities/CombinedNotification';
+import { Notification } from '@domain/entities/Notification.abstract';
 
 // TODO: refactor createing frindReqNoti every time with a mapper
 export class MongoNotificationRepository implements INotificationRepository {
@@ -99,5 +104,38 @@ export class MongoNotificationRepository implements INotificationRepository {
       };
 
       return friendReqNoti;
+   };
+
+   retriveRecentUserNotifications = async (
+      userId: string,
+      limit: number,
+      from: string | null
+   ): Promise<{ noti: CombinedNotification[]; from: string | null; hasmore: boolean }> => {
+      const res = await notificationModel
+         .find({ reciverId: userId, _id: from ? { $lt: from } : undefined })
+         .sort({ _id: -1 }) // some of first character of Id represent unix epoch of document created, so this can effectively used as a cursor
+         .limit(limit);
+
+      console.log(res);
+
+      
+      // Map MongoDB documents to CombinedNotification objects
+      const notifications: CombinedNotification[] = res.map((doc: any) => ({
+         id: doc.id,
+         type: doc.type,
+         isRead: doc.isRead,
+         updatedAt: doc.updatedAt.toISOString?.() ?? '',
+         createdAt: doc.createdAt.toISOString?.() ?? '',
+         reciverId: doc.reciverId,
+         // 
+         friendshipId: doc.friendshipId,
+         requesterId: doc.requesterId,
+         status: doc.status,
+         // Add any other fields needed for CombinedNotification
+      }));
+      
+      let hasmore = res.length === limit;
+      
+      return { noti: notifications, from: hasmore ? res[res.length - 1].id : null, hasmore };
    };
 }
