@@ -44,4 +44,6 @@ export interface IUserRepository {
    }>;
 
    getUserById(userId: string): Promise<(UserDocument & { id: string }) | null>;
+
+   getUsersById(userIds: string[]): Promise<((UserDocument & { id: string }) | null)[]>;
 }
