@@ -223,7 +223,6 @@ export class UserRepository implements IUserRepository {
          _source: true,
       });
 
-      console.log(res.docs);
       const parsedUserDocList = res.docs.map((doc) => {
          const typedDoc = doc as {
             _source: UserDocument;

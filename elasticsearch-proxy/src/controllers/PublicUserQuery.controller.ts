@@ -36,7 +36,7 @@ export class PublicUserQueryController {
          const { userId } = req.query;
 
          let ids: GetUserBasicProfileFromIdsInputDTO;
-         if (userId === 'string') {
+         if (typeof userId === 'string') {
             ids = [userId];
          } else if (Array.isArray(userId)) {
             ids = userId as string[];
