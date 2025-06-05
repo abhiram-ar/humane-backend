@@ -12,7 +12,7 @@ export class FriendReqNotificationService implements IFriendReqNotificationServi
       friendship,
    }: FriendReqNotificationInputDTO): Promise<Required<FriendReqNotification>> => {
       // we dont what a old event overriding the existing doc in case of retry
-      const existingFriendReqNotificaion = await this._notificationRepo.retriveFriendReq(
+      const existingFriendReqNotificaion = await this._notificationRepo.retriveFriendReqNoti(
          friendship.id
       );
       if (existingFriendReqNotificaion) {
@@ -26,14 +26,14 @@ export class FriendReqNotificationService implements IFriendReqNotificationServi
          { reqStatus: friendship.status }
       );
 
-      let result = await this._notificationRepo.create(newFriendReqNotication);
+      let result = await this._notificationRepo.createFriendReqNoti(newFriendReqNotication);
       return result;
    };
 
    delete = async ({
       friendship,
    }: FriendReqNotificationInputDTO): Promise<Required<FriendReqNotification> | null> => {
-      const deltedFriendReq = await this._notificationRepo.delete(friendship.id);
+      const deltedFriendReq = await this._notificationRepo.deleteFriendReqNoti(friendship.id);
       if (!deltedFriendReq) {
          logger.warn(
             `cannot delete non-existing friendreq notification, friendshipId:${friendship.id}`
@@ -46,7 +46,7 @@ export class FriendReqNotificationService implements IFriendReqNotificationServi
    updateFriendReqStatus = async (
       dto: FriendReqNotificationInputDTO
    ): Promise<Required<FriendReqNotification>> => {
-      const existingFriendReqNotification = await this._notificationRepo.retriveFriendReq(
+      const existingFriendReqNotification = await this._notificationRepo.retriveFriendReqNoti(
          dto.friendship.id
       );
 

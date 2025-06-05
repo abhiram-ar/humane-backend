@@ -1,15 +1,16 @@
 import { CombinedNotification } from '@domain/entities/CombinedNotification';
+import { FriendReqAcceptedNotification } from '@domain/entities/FriendReqAcceptedNotification.entity';
 import {
    FriendReqNotification,
    FriendReqStatus,
 } from '@domain/entities/FriendReqNotification.entity';
 
 export interface INotificationRepository {
-   retriveFriendReq(friendshipId: string): Promise<Required<FriendReqNotification> | null>;
+   retriveFriendReqNoti(friendshipId: string): Promise<Required<FriendReqNotification> | null>;
 
-   create(friendReq: FriendReqNotification): Promise<Required<FriendReqNotification>>;
+   createFriendReqNoti(friendReq: FriendReqNotification): Promise<Required<FriendReqNotification>>;
 
-   delete(friendshipId: string): Promise<Required<FriendReqNotification> | null>;
+   deleteFriendReqNoti(friendshipId: string): Promise<Required<FriendReqNotification> | null>;
 
    updateFriendReqStatus(
       friendshipId: string,
@@ -23,4 +24,15 @@ export interface INotificationRepository {
    ): Promise<{ noti: CombinedNotification[]; from: string | null; hasmore: boolean }>;
 
    markAsRead(userId: string, fromId: string): Promise<void>;
+
+   retriveFriendReqAcceptedNoti(
+      friendshipId: string
+   ): Promise<Required<FriendReqAcceptedNotification> | null>;
+   createFriendReqAcceptedNoti(
+      friendReqAcceptedNoti: FriendReqAcceptedNotification
+   ): Promise<Required<FriendReqAcceptedNotification>>;
+
+   deleteFriendReqAcceptedNoti(
+      friendshipId: string
+   ): Promise<Required<FriendReqAcceptedNotification> | null>;
 }

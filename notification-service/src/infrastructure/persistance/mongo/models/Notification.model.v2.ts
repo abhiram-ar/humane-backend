@@ -68,7 +68,7 @@ const friendReqNotificationModel =
 interface IFriendRequestAcceptedNotificationDocument extends IBaseNotificationDocument {
    actorId: string;
    metadata: { reqStatus: 'ACCEPTED' };
-   type: typeof FRIEND_REQ_NOTIFICATION_TYPE; // ensure type discriminator is included
+   type: typeof FRIEND_REQ_ACCEPTED_NOTIFICATION_TYPE; // ensure type discriminator is included
 }
 
 const friendReqAcceptedSchema = new mongoose.Schema<IFriendRequestAcceptedNotificationDocument>(

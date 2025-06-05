@@ -51,7 +51,6 @@ export class FriendReqEventConsumer {
                   const noti = await this._friendReqNotificationService.create(parsed.data);
 
                   const reciverSockets = await io.in(noti.reciverId).fetchSockets();
-
                   if (reciverSockets.length > 0) {
                      const response = await axiosESproxyService.get<GetUserBasicDetailsResponse>(
                         '/api/v1/query/public/user/basic',

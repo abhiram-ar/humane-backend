@@ -5,13 +5,20 @@ import {
 } from '@domain/entities/FriendReqNotification.entity';
 import { INotificationRepository } from '@domain/interfaces/repository/INotificationRepository';
 import { CombinedNotification } from '@domain/entities/CombinedNotification';
-import notificationModel, { friendReqNotificationModel } from '../models/Notification.model.v2';
+import notificationModel, {
+   friendReqAcceptedNotificationModel,
+   friendReqNotificationModel,
+} from '../models/Notification.model.v2';
+import {
+   FRIEND_REQ_ACCEPTED_NOTIFICATION_TYPE,
+   FriendReqAcceptedNotification,
+} from '@domain/entities/FriendReqAcceptedNotification.entity';
 
 // TODO: refactor createing frindReqNoti every time with a mapper
 export class MongoNotificationRepository implements INotificationRepository {
    constructor() {}
 
-   retriveFriendReq = async (
+   retriveFriendReqNoti = async (
       friendshipId: string
    ): Promise<Required<FriendReqNotification> | null> => {
       const res = await friendReqNotificationModel.findOne({ entityId: friendshipId });
@@ -33,7 +40,9 @@ export class MongoNotificationRepository implements INotificationRepository {
 
       return friendReqNoti;
    };
-   create = async (friendReq: FriendReqNotification): Promise<Required<FriendReqNotification>> => {
+   createFriendReqNoti = async (
+      friendReq: FriendReqNotification
+   ): Promise<Required<FriendReqNotification>> => {
       const res = await friendReqNotificationModel.create({
          reciverId: friendReq.reciverId,
          type: FRIEND_REQ_NOTIFICATION_TYPE,
@@ -59,7 +68,9 @@ export class MongoNotificationRepository implements INotificationRepository {
       return friendReqNoti;
    };
 
-   delete = async (friendshipId: string): Promise<Required<FriendReqNotification> | null> => {
+   deleteFriendReqNoti = async (
+      friendshipId: string
+   ): Promise<Required<FriendReqNotification> | null> => {
       const res = await friendReqNotificationModel.findOneAndDelete({ entityId: friendshipId });
 
       if (!res) return null;
@@ -98,6 +109,81 @@ export class MongoNotificationRepository implements INotificationRepository {
          reciverId: res.reciverId,
          isRead: res.isRead,
          type: 'friend-req',
+         actorId: res.actorId,
+         entityId: res.entityId,
+         metadata: {
+            reqStatus: res.metadata.reqStatus,
+         },
+         createdAt: res.createdAt.toISOString(),
+         updatedAt: res.updatedAt.toISOString(),
+      };
+
+      return friendReqNoti;
+   };
+
+   retriveFriendReqAcceptedNoti = async (
+      friendshipId: string
+   ): Promise<Required<FriendReqAcceptedNotification> | null> => {
+      const res = await friendReqAcceptedNotificationModel.findOne({ entityId: friendshipId });
+      if (!res) return null;
+
+      const friendReqNoti: Required<FriendReqAcceptedNotification> = {
+         id: res.id,
+         reciverId: res.reciverId,
+         isRead: res.isRead,
+         type: res.type,
+         actorId: res.actorId,
+         entityId: res.entityId,
+         metadata: {
+            reqStatus: res.metadata.reqStatus,
+         },
+         createdAt: res.createdAt.toISOString(),
+         updatedAt: res.updatedAt.toISOString(),
+      };
+
+      return friendReqNoti;
+   };
+   createFriendReqAcceptedNoti = async (
+      friendReqAcceptedNoti: FriendReqAcceptedNotification
+   ): Promise<Required<FriendReqAcceptedNotification>> => {
+      const res = await friendReqAcceptedNotificationModel.create({
+         reciverId: friendReqAcceptedNoti.reciverId,
+         type: FRIEND_REQ_ACCEPTED_NOTIFICATION_TYPE,
+         entityId: friendReqAcceptedNoti.entityId,
+         actorId: friendReqAcceptedNoti.actorId,
+         metadata: { reqStatus: friendReqAcceptedNoti.metadata.reqStatus },
+      });
+
+      const friendReqNoti: Required<FriendReqAcceptedNotification> = {
+         id: res.id,
+         reciverId: res.reciverId,
+         isRead: res.isRead,
+         type: res.type,
+         actorId: res.actorId,
+         entityId: res.entityId,
+         metadata: {
+            reqStatus: res.metadata.reqStatus,
+         },
+         createdAt: res.createdAt.toISOString(),
+         updatedAt: res.updatedAt.toISOString(),
+      };
+
+      return friendReqNoti;
+   };
+   deleteFriendReqAcceptedNoti = async (
+      friendshipId: string
+   ): Promise<Required<FriendReqAcceptedNotification> | null> => {
+      const res = await friendReqAcceptedNotificationModel.findOneAndDelete({
+         entityId: friendshipId,
+      });
+
+      if (!res) return null;
+
+      const friendReqNoti: Required<FriendReqAcceptedNotification> = {
+         id: res.id,
+         reciverId: res.reciverId,
+         isRead: res.isRead,
+         type: res.type,
          actorId: res.actorId,
          entityId: res.entityId,
          metadata: {
