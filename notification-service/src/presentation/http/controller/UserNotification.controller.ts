@@ -6,13 +6,11 @@ import {
    MarkNotificationAsReadInputDTO,
    markNotificationAsReadSchema,
 } from '@application/dtos/MarkNotificationAsReadFrom.dto';
+import { BasicUserDetails } from '@application/Types/BasicUserDetails';
 import { UserNotificationService } from '@application/usercase/UserNotification.usecase';
 import { logger } from '@config/logger';
 import { axiosESproxyService } from '@infrastructure/http/axiosESproxy';
-import {
-   BasicUserDetails,
-   GetUserBasicDetailsResponse,
-} from '@presentation/event/Types/GetUserBasicDetails Response';
+import { GetUserBasicDetailsResponse } from '@presentation/event/Types/GetUserBasicDetails Response';
 import { CombinedNotificationWithActionableUser } from '@presentation/Types/CombinedNotiWithActionableUser';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';

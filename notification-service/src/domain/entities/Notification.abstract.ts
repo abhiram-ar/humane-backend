@@ -6,6 +6,6 @@ export interface Notification {
    actorId?: string;
    entityId: string;
    metadata?: Object;
-   readonly createdAt: String;
+   readonly createdAt: string;
    readonly updatedAt: string;
 }

@@ -1,9 +1,5 @@
-export type BasicUserDetails = {
-   id: string;
-   firstName: string;
-   lastName?: string | null;
-   avatarURL?: string | null;
-};
+import { BasicUserDetails } from '@application/Types/BasicUserDetails';
+
 export type GetUserBasicDetailsResponse = {
    success: boolean;
    message: string;

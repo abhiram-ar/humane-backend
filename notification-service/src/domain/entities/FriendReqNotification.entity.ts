@@ -19,7 +19,7 @@ export class FriendReqNotification implements Partial<Notification> {
       public readonly type: typeof FRIEND_REQ_NOTIFICATION_TYPE = FRIEND_REQ_NOTIFICATION_TYPE,
       public readonly id?: string,
       public readonly isRead?: boolean,
-      public readonly createdAt?: String,
+      public readonly createdAt?: string,
       public readonly updatedAt?: string
    ) {}
 }
