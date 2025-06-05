@@ -6,7 +6,7 @@ import {
    AppEventsTypes,
    createEvent,
    EventBusError,
-   KafkaTopics,
+   MessageBrokerTopics,
    UpdateUserCoverPhotoKeyEventPayload,
 } from 'humane-common';
 import { IEventPublisher } from '@ports/IEventProducer';
@@ -45,7 +45,7 @@ export class UpdateUserCoverPhoto {
       );
 
       const { ack } = await this._eventPublisher.send(
-         KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
+         MessageBrokerTopics.USER_PROFILE_EVENTS_TOPIC,
          userCoverPhotoKeyUpdatedEvent
       );
       if (!ack) {

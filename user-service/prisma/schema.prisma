@@ -15,7 +15,7 @@ datasource db {
 }
 
 model User {
-  id              String   @id @default(uuid())
+  id              String   @id @default(ulid())
   firstName       String
   lastName        String?
   email           String   @unique
@@ -44,7 +44,7 @@ model User {
 }
 
 model FriendShip {
-  id      String @default(uuid())
+  id      String @default(ulid())
   user1Id String // should be < user2Id, enforce in DB level and app level
   user2Id String
   user1   User   @relation("User1Friendships", fields: [user1Id], references: [id], onDelete: Cascade)
@@ -79,13 +79,25 @@ model BlockedUser {
 }
 
 model Admin {
-  id           String  @id @default(uuid())
+  id           String  @id @default(ulid())
   firstName    String
   lastName     String?
   email        String  @unique
   passwordHash String
 
   @@index(fields: [email])
+}
+
+model OutBox {
+  id         String   @id
+  topic      String
+  eventType  String
+  event      String
+  createdAt  DateTime
+  retryCount Int      @default(0)
+  retryAfter DateTime
+
+  @@index([createdAt])
 }
 
 enum FriendShipStatus {

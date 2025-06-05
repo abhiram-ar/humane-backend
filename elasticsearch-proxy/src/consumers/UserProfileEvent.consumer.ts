@@ -5,7 +5,7 @@ import { updateUserAvatarKeySchema } from '@dtos/updateUserAvatarKey.dto';
 import { updateUserBlockStatusSchema } from '@dtos/updateUserBlockStatus.dto';
 import { updateUserCoverPhotokeySchema } from '@dtos/updateUserCoverPhotokey';
 import { UserServices } from '@services/User.services';
-import { AppEvent, AppEventsTypes, KafkaTopics } from 'humane-common';
+import { AppEvent, AppEventsTypes, MessageBrokerTopics } from 'humane-common';
 import KafkaSingleton from 'kafka/KafkaSingleton';
 import { Consumer } from 'kafkajs';
 
@@ -24,7 +24,7 @@ export class UserProfileEventsConsumer {
       logger.info('User profile event consumer connected ');
 
       await this.consumer.subscribe({
-         topic: KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
+         topic: MessageBrokerTopics.USER_PROFILE_EVENTS_TOPIC,
          fromBeginning: true,
       });
 

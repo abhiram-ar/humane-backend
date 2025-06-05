@@ -20,14 +20,16 @@
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "google-auth-library": "^9.15.1",
-    "humane-common": "^1.0.56",
+    "humane-common": "^1.0.62",
     "jsonwebtoken": "^9.0.2",
     "kafkajs": "^2.2.4",
     "morgan": "^1.10.0",
     "nodemailer": "^7.0.2",
+    "winston": "^3.17.0",
     "zod": "^3.24.3"
   },
   "devDependencies": {

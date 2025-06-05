@@ -119,6 +119,37 @@ export class UserRelationshipController {
       }
    };
 
+   declineFriendReq = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new UnAuthenticatedError('No userId in auth header');
+         }
+
+         const { targetUserId } = req.params;
+
+         const dto: RemoveFriendshipInputDTO = {
+            currenUserId: req.user.userId,
+            targetUserId: targetUserId,
+         };
+
+         const parsed = removeFriendshipInputSchema.safeParse(dto);
+
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
+         }
+
+         const result = await this._friendRequest.decline(parsed.data);
+
+         res.status(201).json({
+            success: true,
+            messasge: 'friendship removed successfully',
+            data: result,
+         });
+      } catch (error) {
+         next(error);
+      }
+   };
+
    removeFriendship = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {

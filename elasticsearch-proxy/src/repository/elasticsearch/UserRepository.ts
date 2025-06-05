@@ -213,4 +213,25 @@ export class UserRepository implements IUserRepository {
          return null;
       }
    };
+
+   getUsersById = async (
+      userIds: string[]
+   ): Promise<((UserDocument & { id: string }) | null)[]> => {
+      const res = await this.client.mget<UserDocument>({
+         index: this._index,
+         ids: userIds,
+         _source: true,
+      });
+
+      const parsedUserDocList = res.docs.map((doc) => {
+         const typedDoc = doc as {
+            _source: UserDocument;
+            found: boolean;
+            _id: string;
+            _index: string;
+         };
+         return typedDoc.found ? { ...typedDoc._source, id: doc._id } : null;
+      });
+      return parsedUserDocList;
+   };
 }

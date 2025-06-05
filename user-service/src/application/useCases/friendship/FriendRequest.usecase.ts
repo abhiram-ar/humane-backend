@@ -1,3 +1,4 @@
+import { EventBusError } from '@application/errors/EventbusError';
 import { FriendshipError } from '@application/errors/FriendshipError';
 import { GenericError } from '@application/errors/GenericError';
 import { RelationshipBlockedError } from '@application/errors/RelationshipBlockedError';
@@ -7,16 +8,20 @@ import { RelationshipStatus } from '@application/types/RelationshipStatus';
 import { Friendship } from '@domain/entities/friendship.entity';
 import { AcceptFriendshipInputDTO } from '@dtos/friendship/AcceptFriendRequset.dto';
 import { cancelFriendRequestInputDTO } from '@dtos/friendship/cancelFriendRequestInput.dto';
+import { RemoveFriendshipInputDTO } from '@dtos/friendship/RemoveFriendshipInput.dto';
 import { SendFriendRequestInputDTO } from '@dtos/friendship/SendFriendRequestInput.dto';
 import { IBlockedRelationshipRepository } from '@ports/IBlockedRelationshipRepository';
+import { IEventPublisher } from '@ports/IEventProducer';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IUserRepository } from '@ports/IUserRepository';
+import { AppEventsTypes, createEvent, MessageBrokerTopics } from 'humane-common';
 
 export class FriendRequest {
    constructor(
       private readonly _friendShipRepository: IFriendshipRepository,
       private readonly _blockedRelationshipRepository: IBlockedRelationshipRepository,
-      private readonly _userRepository: IUserRepository
+      private readonly _userRepository: IUserRepository,
+      private readonly _eventPublisher: IEventPublisher
    ) {}
 
    send = async (
@@ -63,7 +68,15 @@ export class FriendRequest {
          dto.recieverId
       );
 
-      // TODO: throw the event to event bus
+      const friendReqSendEvent = createEvent(AppEventsTypes.FRIEND_REQ_SENT, newFriendRequest);
+      const { ack } = await this._eventPublisher.send(
+         MessageBrokerTopics.FRIENDSHIP_EVENTS_TOPIC,
+         friendReqSendEvent
+      );
+
+      if (!ack) {
+         throw new EventBusError('Unable to send friendreq event');
+      }
 
       return { receiverId: newFriendRequest.receiverId, status: 'friendreqSend' };
    };
@@ -104,13 +117,24 @@ export class FriendRequest {
 
       // accetpt friend request
       friendship.status = 'ACCEPTED';
-      const result = await this._friendShipRepository.updateFriendRequest(friendship);
+      const updatedFriendsip = await this._friendShipRepository.updateFriendRequest(friendship);
 
-      if (!result) throw new FriendshipError('Cannot update a invalid friendship');
+      if (!updatedFriendsip) throw new FriendshipError('Cannot update a invalid friendship');
 
-      // TODO: pubblish event
+      // pubblish event
+      const friendShipAcceptedEvent = createEvent(
+         AppEventsTypes.FRIEND_REQ_ACCEPTED,
+         updatedFriendsip
+      );
+      const { ack } = await this._eventPublisher.send(
+         MessageBrokerTopics.FRIENDSHIP_EVENTS_TOPIC,
+         friendShipAcceptedEvent
+      );
+      if (!ack) {
+         throw new EventBusError('Error while publishing friendreq accepted event');
+      }
 
-      return { requesterId: result.requesterId, status: 'friends' };
+      return { requesterId: updatedFriendsip.requesterId, status: 'friends' };
    };
 
    cancel = async (
@@ -138,13 +162,65 @@ export class FriendRequest {
          }
       }
 
-      const res = await this._friendShipRepository.deleteFriendship(friendShip);
-      if (!res) {
+      const deletedFriendship = await this._friendShipRepository.deleteFriendship(friendShip);
+      if (!deletedFriendship) {
          throw new GenericError('Unable to cancel friend requset');
       }
 
-      // TODO:emit cancelled event
+      // emit cancelled event
+      const friendReqCancelledEvent = createEvent(
+         AppEventsTypes.FRIEND_REQ_CANCELLED,
+         deletedFriendship
+      );
+      const { ack } = await this._eventPublisher.send(
+         MessageBrokerTopics.FRIENDSHIP_EVENTS_TOPIC,
+         friendReqCancelledEvent
+      );
 
-      return { receiverId: res.receiverId, status: 'strangers' };
+      if (!ack) {
+         throw new EventBusError('Unable to send friendreq cancelled event');
+      }
+
+      return { receiverId: deletedFriendship.receiverId, status: 'strangers' };
+   };
+
+   decline = async (
+      dto: RemoveFriendshipInputDTO
+   ): Promise<{ targetUserId: string; status: RelationshipStatus }> => {
+      const targetUser = await this._userRepository.getUserStatusById(dto.targetUserId);
+      if (!targetUser) {
+         throw new UserNotFoundError('Invalid/NonExistant targetUserId');
+      }
+
+      const friendShip = await this._friendShipRepository.retriveFriendship(
+         ...Friendship.sortUserId(dto.currenUserId, dto.targetUserId)
+      );
+
+      if (!friendShip) {
+         throw new FriendshipError('friendship does not exist to decline');
+      }
+
+      if (friendShip.status === 'ACCEPTED') {
+         throw new FriendshipError('Cannot decline a accepted request. Try unfriending');
+      }
+
+      const deletedFriendship = await this._friendShipRepository.deleteFriendship(friendShip);
+      if (!deletedFriendship) {
+         throw new GenericError('Unable to cancel friend requset');
+      }
+
+      const friendshipDeletedEvent = createEvent(AppEventsTypes.FRIEND_REQ_DECLIED, {
+         ...deletedFriendship,
+         status: 'DECLINED',
+      });
+      const { ack } = await this._eventPublisher.send(
+         MessageBrokerTopics.FRIENDSHIP_EVENTS_TOPIC,
+         friendshipDeletedEvent
+      );
+      if (!ack) {
+         throw new EventBusError('error while publishing friendship deleted event');
+      }
+
+      return { targetUserId: targetUser.id, status: 'strangers' };
    };
 }

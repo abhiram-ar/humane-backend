@@ -15,6 +15,10 @@ import { IPagination } from 'Types/Pagination.type';
 import { CDNService } from './CDN.services';
 import { UserNotFoundError } from 'humane-common';
 import { GetUserProfileOutputDTO } from '@dtos/GetUserProfile.dto';
+import {
+   GetBasicUserProfileFromIdsOutputDTO,
+   GetUserBasicProfileFromIdsInputDTO,
+} from '@dtos/GetUserBasicProfileFromIDs';
 
 export class UserServices {
    constructor(
@@ -168,5 +172,31 @@ export class UserServices {
          avatarURL,
          coverPhotoURL,
       };
+   };
+
+   getBasicUserProfile = async (
+      dto: GetUserBasicProfileFromIdsInputDTO
+   ): Promise<GetBasicUserProfileFromIdsOutputDTO> => {
+      const userDoclist = await this._userRepository.getUsersById(dto);
+
+      const avatarURLHydratedUserList = userDoclist.map((userDoc) => {
+         if (!userDoc) {
+            return null;
+         }
+
+         let avatarURL: string | undefined;
+         if (userDoc.avatarKey) {
+            avatarURL = this._cdnService.getPublicCDNURL(userDoc.avatarKey);
+         }
+
+         return {
+            id: userDoc.id,
+            firstName: userDoc.firstName,
+            lastName: userDoc.lastName,
+            avatarURL: avatarURL,
+         };
+      });
+
+      return avatarURLHydratedUserList;
    };
 }

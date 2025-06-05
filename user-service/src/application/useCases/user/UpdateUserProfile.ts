@@ -1,7 +1,12 @@
 import { IUserRepository } from '@ports/IUserRepository';
 import { UpdateUserProfileInputDTO } from '@dtos/user/updateUserProfile.input.dto';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
-import { AppEventsTypes, createEvent, KafkaTopics, UserUpdatedEventPayload } from 'humane-common';
+import {
+   AppEventsTypes,
+   createEvent,
+   MessageBrokerTopics,
+   UserUpdatedEventPayload,
+} from 'humane-common';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { EventBusError } from '@application/errors/EventbusError';
 
@@ -48,7 +53,7 @@ export class UpdateUserProfile {
       const userNameBioUpdatedEvent = createEvent(AppEventsTypes.USER_UPDATED, eventPayload);
       console.log(AppEventsTypes);
       const { ack } = await this._eventPublisher.send(
-         KafkaTopics.USER_PROFILE_EVENTS_TOPIC,
+         MessageBrokerTopics.USER_PROFILE_EVENTS_TOPIC,
          userNameBioUpdatedEvent
       );
 

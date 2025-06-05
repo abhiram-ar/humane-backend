@@ -1,8 +1,12 @@
+import {
+   GetUserBasicProfileFromIdsInputDTO,
+   getUserBasicProfileFromIdsSchema,
+} from '@dtos/GetUserBasicProfileFromIDs';
 import { getUserProfileSchema } from '@dtos/GetUserProfile.dto';
 import { infiniteScrollSearchSchema } from '@dtos/infiniteScrollSearch.dto';
 import { UserServices } from '@services/User.services';
 import { Request, Response, NextFunction } from 'express';
-import { ZodValidationError } from 'humane-common';
+import { GenericError, ZodValidationError } from 'humane-common';
 export class PublicUserQueryController {
    constructor(private readonly _userSerives: UserServices) {}
 
@@ -23,6 +27,39 @@ export class PublicUserQueryController {
             data: { user },
          });
       } catch (error) {
+         next(error);
+      }
+   };
+
+   getUserBasicDetailsFromIds = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const { userId } = req.query;
+
+         let ids: GetUserBasicProfileFromIdsInputDTO;
+         if (typeof userId === 'string') {
+            ids = [userId];
+         } else if (Array.isArray(userId)) {
+            ids = userId as string[];
+         } else {
+            throw new GenericError('Invalid userId type for this query');
+         }
+
+         console.log(ids);
+
+         const parsed = getUserBasicProfileFromIdsSchema.safeParse(ids);
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
+         }
+
+         const user = await this._userSerives.getBasicUserProfile(parsed.data);
+
+         res.status(200).json({
+            success: true,
+            message: 'user list successfully fetched',
+            data: { user },
+         });
+      } catch (error) {
+         console.log(error);
          next(error);
       }
    };

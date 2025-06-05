@@ -1,0 +1,1 @@
+kubectl port-forward svc/mongo-srv 27017:27017
