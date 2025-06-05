@@ -4,7 +4,7 @@ import {
    FriendReqStatus,
 } from '@domain/entities/FriendReqNotification.entity';
 import { INotificationRepository } from '@domain/interfaces/repository/INotificationRepository';
-import notificationModel, { friendReqNotificationModel } from '../models/Notification.model';
+import notificationModel, { friendReqNotificationModel } from '../models/Notification.model.ts.bak';
 import { CombinedNotification } from '@domain/entities/CombinedNotification';
 
 // TODO: refactor createing frindReqNoti every time with a mapper
@@ -135,11 +135,9 @@ export class MongoNotificationRepository implements INotificationRepository {
    };
 
    markAsRead = async (userId: string, fromId: string): Promise<void> => {
-      const res = await notificationModel.updateMany(
+      await notificationModel.updateMany(
          { reciverId: userId, _id: { $lte: fromId } },
          { $set: { isRead: true } }
       );
-
-      console.log(res);
    };
 }

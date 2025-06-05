@@ -20,11 +20,10 @@ export class FriendReqNotificationService implements IFriendReqNotificationServi
       }
       // create a frindreqNotificaion
       const newFriendReqNotication = new FriendReqNotification(
-         friendship.id,
          friendship.receiverId,
          friendship.requesterId,
-         friendship.createdAt,
-         friendship.status
+         friendship.id,
+         { reqStatus: friendship.status }
       );
 
       let result = await this._notificationRepo.create(newFriendReqNotication);
@@ -61,11 +60,11 @@ export class FriendReqNotificationService implements IFriendReqNotificationServi
          throw new FriendReqNotificationError('Cannt update friendReqNoticaltion with old data');
       }
 
-      existingFriendReqNotification.status = dto.friendship.status;
+      existingFriendReqNotification.metadata.reqStatus = dto.friendship.status;
 
       const updatedFriendReqNoti = await this._notificationRepo.updateFriendReqStatus(
-         existingFriendReqNotification.friendshipId,
-         existingFriendReqNotification.status
+         existingFriendReqNotification.entityId,
+         existingFriendReqNotification.metadata.reqStatus
       );
 
       if (!updatedFriendReqNoti) {

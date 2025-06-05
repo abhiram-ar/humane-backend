@@ -13,7 +13,7 @@ export interface INotificationRepository {
 
    updateFriendReqStatus(
       friendshipId: string,
-      newStatus: FriendReqStatus
+      newStatus: (typeof FriendReqStatus)[keyof typeof FriendReqStatus]
    ): Promise<Required<FriendReqNotification> | null>;
 
    retriveRecentUserNotifications(

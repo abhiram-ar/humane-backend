@@ -1,18 +1,25 @@
 import { Notification } from './Notification.abstract';
 
 export const FRIEND_REQ_NOTIFICATION_TYPE = 'friend-req';
-export type FriendReqStatus = 'ACCEPTED' | 'PENDING' | 'DECLINED';
+export const FriendReqStatus = {
+   ACCEPTED: 'ACCEPTED',
+   PENDING: 'PENDING',
+   DECLINED: 'DECLINED',
+} as const;
 
-export class FriendReqNotification implements Notification {
-   public readonly type = FRIEND_REQ_NOTIFICATION_TYPE;
-   public readonly id: string | undefined;
-   public isRead: boolean | undefined;
-   public readonly updatedAt?: string;
+export class FriendReqNotification implements Partial<Notification> {
    constructor(
-      public readonly friendshipId: string,
       public readonly reciverId: string,
-      public readonly requesterId: string,
-      public readonly createdAt: string,
-      public status: FriendReqStatus
+      public readonly actorId: string,
+      public readonly entityId: string,
+      public readonly metadata: {
+         reqStatus: (typeof FriendReqStatus)[keyof typeof FriendReqStatus];
+      },
+      //
+      public readonly type: typeof FRIEND_REQ_NOTIFICATION_TYPE = FRIEND_REQ_NOTIFICATION_TYPE,
+      public readonly id?: string,
+      public readonly isRead?: boolean,
+      public readonly createdAt?: String,
+      public readonly updatedAt?: string
    ) {}
 }

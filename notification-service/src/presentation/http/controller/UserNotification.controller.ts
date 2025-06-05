@@ -16,7 +16,7 @@ import {
 import { CombinedNotificationWithActionableUser } from '@presentation/Types/CombinedNotiWithActionableUser';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
-import { GenericError, UnAuthenticatedError, ZodValidationError } from 'humane-common';
+import { UnAuthenticatedError, ZodValidationError } from 'humane-common';
 
 export class UserNotificationController {
    constructor(private readonly _userNotificationService: UserNotificationService) {}
@@ -43,25 +43,11 @@ export class UserNotificationController {
          );
 
          const notiToActionableUserMap = new Map<string, string>();
-         noti
-            .filter((entry) => entry.type === 'friend-req')
-            .forEach((friendReqNoti) => {
-               let notiId = friendReqNoti.id as string;
-
-               let actionableUserId: string | undefined;
-
-               if (friendReqNoti.reciverId === dto.userId) {
-                  actionableUserId = friendReqNoti.requesterId;
-               } else if (friendReqNoti.requesterId === dto.userId) {
-                  actionableUserId = friendReqNoti.reciverId; // incase of fiendReq accepted notificaion
-               } else {
-                  throw new GenericError(
-                     'currnet user is netiter requeser or reciver of a friend req notification'
-                  );
-               }
-
-               return notiToActionableUserMap.set(notiId, actionableUserId);
-            });
+         noti.forEach((combinedNoti) => {
+            if (combinedNoti.actorId) {
+               notiToActionableUserMap.set(combinedNoti.id!, combinedNoti.actorId);
+            }
+         });
 
          const actionableUserIds = Array.from(notiToActionableUserMap.values());
          let actionableUserDetailsHydratedNoti: CombinedNotificationWithActionableUser[] = [];
@@ -112,7 +98,7 @@ export class UserNotificationController {
    };
 
    markAsReadFrom = async (req: Request, res: Response, next: NextFunction) => {
-      console.log("hit1")
+      console.log('hit1');
       try {
          if (req.user?.type !== 'user') {
             throw new UnAuthenticatedError('No userId in request');

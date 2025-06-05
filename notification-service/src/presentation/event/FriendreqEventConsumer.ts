@@ -55,7 +55,7 @@ export class FriendReqEventConsumer {
                   if (reciverSockets.length > 0) {
                      const response = await axiosESproxyService.get<GetUserBasicDetailsResponse>(
                         '/api/v1/query/public/user/basic',
-                        { params: { userId: noti.requesterId } }
+                        { params: { userId: noti.actorId } }
                      );
 
                      const requesterDetails = response.data.data.user[0];
@@ -73,29 +73,12 @@ export class FriendReqEventConsumer {
                   const noti = await this._friendReqNotificationService.updateFriendReqStatus(
                      parsed.data
                   );
-                  const requesterSockets = await io.in(noti.reciverId).fetchSockets();
-                  if (requesterSockets.length > 0) {
-                     const response = await axiosESproxyService.get<GetUserBasicDetailsResponse>(
-                        '/api/v1/query/public/user/basic',
-                        { params: { userId: noti.reciverId } }
-                     );
-
-                     const reciverDetails = response.data.data.user[0];
-                     if (reciverDetails) {
-                        io.to(noti.requesterId).emit('push-noti', {
-                           ...noti,
-                           actionableUser: reciverDetails,
-                        });
-                     } else {
-                        logger.warn('No reciver basic details from ES proxy');
-                     }
-                  }
 
                   const reciverSockets = await io.in(noti.reciverId).fetchSockets();
                   if (reciverSockets.length > 0) {
                      const response = await axiosESproxyService.get<GetUserBasicDetailsResponse>(
                         '/api/v1/query/public/user/basic',
-                        { params: { userId: noti.requesterId } }
+                        { params: { userId: noti.actorId } }
                      );
 
                      const requesterDetails = response.data.data.user[0];
@@ -108,6 +91,7 @@ export class FriendReqEventConsumer {
                         logger.warn('No requester basic details from ES proxy');
                      }
                   }
+                  // TODO: crete new accceted req and write it to requester socket
 
                   //
                } else if (event.eventType === AppEventsTypes.FRIEND_REQ_CANCELLED) {
