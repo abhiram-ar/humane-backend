@@ -3,8 +3,9 @@ import { FriendReqNotificationError } from '@application/Errors/FriendReqNotific
 import { logger } from '@config/logger';
 import { FriendReqNotification } from '@domain/entities/FriendReqNotification.entity';
 import { INotificationRepository } from '@domain/interfaces/repository/INotificationRepository';
+import { IFriendReqNotificationService } from './interfaces/IFriendReqNotificationService.usercase';
 
-export class FriendReqNotificationService {
+export class FriendReqNotificationService implements IFriendReqNotificationService {
    constructor(private readonly _notificationRepo: INotificationRepository) {}
 
    create = async ({

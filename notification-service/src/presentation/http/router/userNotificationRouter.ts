@@ -11,4 +11,11 @@ userNotificationRouter.get(
    userNotificationController.getRecentNotifications
 );
 
+userNotificationRouter.patch(
+   '/isRead',
+   isAuthenticated,
+   authorizedRoles('user'),
+   userNotificationController.markAsReadFrom
+);
+
 export default userNotificationRouter;

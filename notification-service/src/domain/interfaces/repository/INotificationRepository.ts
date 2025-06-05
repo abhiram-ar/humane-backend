@@ -21,4 +21,6 @@ export interface INotificationRepository {
       limit: number,
       from?: string | null
    ): Promise<{ noti: CombinedNotification[]; from: string | null; hasmore: boolean }>;
+
+   markAsRead(userId: string, fromId: string): Promise<void>;
 }

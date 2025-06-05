@@ -2,6 +2,10 @@ import {
    GetRecentUserNoficationInputDTO,
    getRecentUserNotification,
 } from '@application/dtos/GetRecentUserNotification.dto';
+import {
+   MarkNotificationAsReadInputDTO,
+   markNotificationAsReadSchema,
+} from '@application/dtos/MarkNotificationAsReadFrom.dto';
 import { UserNotificationService } from '@application/usercase/UserNotification.usecase';
 import { logger } from '@config/logger';
 import { axiosESproxyService } from '@infrastructure/http/axiosESproxy';
@@ -10,8 +14,10 @@ import {
    GetUserBasicDetailsResponse,
 } from '@presentation/event/Types/GetUserBasicDetails Response';
 import { CombinedNotificationWithActionableUser } from '@presentation/Types/CombinedNotiWithActionableUser';
+import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 import { GenericError, UnAuthenticatedError, ZodValidationError } from 'humane-common';
+
 export class UserNotificationController {
    constructor(private readonly _userNotificationService: UserNotificationService) {}
 
@@ -91,7 +97,7 @@ export class UserNotificationController {
             });
          }
 
-         res.status(200).json({
+         res.status(HttpStatusCode.Ok).json({
             success: true,
             message: 'user notification fetched',
             data: {
@@ -101,6 +107,36 @@ export class UserNotificationController {
          });
       } catch (error) {
          res.json(error);
+         next(error);
+      }
+   };
+
+   markAsReadFrom = async (req: Request, res: Response, next: NextFunction) => {
+      console.log("hit1")
+      try {
+         if (req.user?.type !== 'user') {
+            throw new UnAuthenticatedError('No userId in request');
+         }
+
+         const dto: MarkNotificationAsReadInputDTO = {
+            userId: req.user.userId,
+            fromId: req.body.fromId,
+         };
+
+         const parsed = markNotificationAsReadSchema.safeParse(dto);
+         if (parsed.error) {
+            throw new ZodValidationError(parsed.error);
+         }
+
+         await this._userNotificationService.markNotificaionAsReadFrom(dto);
+
+         // TODO: wite the update to socket - to mark the notification form, since a user might be logged in from other devices
+
+         res.status(HttpStatusCode.Accepted).json({
+            success: true,
+            message: `user notifation marked as read from ${dto.fromId}`,
+         });
+      } catch (error) {
          next(error);
       }
    };

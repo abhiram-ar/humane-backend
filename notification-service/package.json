@@ -17,7 +17,7 @@
       "cors": "^2.8.5",
       "date-fns": "^4.1.0",
       "express": "^5.1.0",
-      "humane-common": "^1.0.68",
+      "humane-common": "^1.0.69",
       "kafkajs": "^2.2.4",
       "mongoose": "^8.15.1",
       "morgan": "^1.10.0",
@@ -30,6 +30,7 @@
       "@types/cookie-parser": "^1.4.8",
       "@types/cors": "^2.8.18",
       "@types/express": "^5.0.2",
+      "@types/morgan": "^1.9.9",
       "@types/node": "^22.15.29",
       "tsx": "^4.19.4",
       "typescript": "^5.8.3"

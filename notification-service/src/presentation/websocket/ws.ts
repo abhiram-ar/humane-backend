@@ -18,7 +18,6 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
       path: '/api/v1/notification/socket.io',
       cors: {
          origin: 'http://localhost:5173', //TODO: better cors in prod
-         methods: ['GET', 'POST'],
          credentials: true, // required
       },
    }

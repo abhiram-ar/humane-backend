@@ -133,4 +133,13 @@ export class MongoNotificationRepository implements INotificationRepository {
 
       return { noti: notifications, from: hasmore ? res[res.length - 1].id : null, hasmore };
    };
+
+   markAsRead = async (userId: string, fromId: string): Promise<void> => {
+      const res = await notificationModel.updateMany(
+         { reciverId: userId, _id: { $lte: fromId } },
+         { $set: { isRead: true } }
+      );
+
+      console.log(res);
+   };
 }
