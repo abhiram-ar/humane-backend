@@ -46,7 +46,7 @@ export class FriendReqEventConsumer {
                if (!parsed.success) {
                   throw new ZodValidationError(parsed.error);
                }
-
+               // TODO: reafaco
                if (event.eventType === AppEventsTypes.FRIEND_REQ_SENT) {
                   const noti = await this._friendReqNotificationService.create(parsed.data);
 
@@ -73,7 +73,41 @@ export class FriendReqEventConsumer {
                   const noti = await this._friendReqNotificationService.updateFriendReqStatus(
                      parsed.data
                   );
-                  io.to(noti.requesterId).emit('push-noti', noti);
+                  const requesterSockets = await io.in(noti.reciverId).fetchSockets();
+                  if (requesterSockets.length > 0) {
+                     const response = await axiosESproxyService.get<GetUserBasicDetailsResponse>(
+                        '/api/v1/query/public/user/basic',
+                        { params: { userId: noti.reciverId } }
+                     );
+
+                     const reciverDetails = response.data.data.user[0];
+                     if (reciverDetails) {
+                        io.to(noti.requesterId).emit('push-noti', {
+                           ...noti,
+                           actionableUser: reciverDetails,
+                        });
+                     } else {
+                        logger.warn('No reciver basic details from ES proxy');
+                     }
+                  }
+
+                  const reciverSockets = await io.in(noti.reciverId).fetchSockets();
+                  if (reciverSockets.length > 0) {
+                     const response = await axiosESproxyService.get<GetUserBasicDetailsResponse>(
+                        '/api/v1/query/public/user/basic',
+                        { params: { userId: noti.requesterId } }
+                     );
+
+                     const requesterDetails = response.data.data.user[0];
+                     if (requesterDetails) {
+                        io.to(noti.reciverId).emit('update-noti', {
+                           ...noti,
+                           actionableUser: requesterDetails,
+                        });
+                     } else {
+                        logger.warn('No requester basic details from ES proxy');
+                     }
+                  }
 
                   //
                } else if (event.eventType === AppEventsTypes.FRIEND_REQ_CANCELLED) {

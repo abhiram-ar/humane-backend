@@ -58,7 +58,7 @@ const friendReqNotificationModel =
       friendReqSchema
    );
 
-friendReqNotificationModel.schema.index({ type: 1, friendshipId: 1 }, { unique: true });
+friendReqNotificationModel.schema.index({ type: 1, friendshipId: 1 }, { unique: false });
 
 // ------------------ Type for Friend Request Documents --------------------
 export type FriendReqNotificationDocument = HydratedDocument<IFriendRequestNotificationDocument>;

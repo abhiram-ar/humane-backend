@@ -19,6 +19,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
       cors: {
          origin: 'http://localhost:5173', //TODO: better cors in prod
          methods: ['GET', 'POST'],
+         credentials: true, // required
       },
    }
 );
@@ -27,10 +28,7 @@ io.use(wsAuth);
 io.on('connection', onConnectionHandler);
 
 io.engine.on('connection_error', (err) => {
-   console.log(err.req); // the request object
-   console.log(err.code); // the error code, for example 1
-   console.log(err.message); // the error message, for example "Session ID unknown"
-   console.log(err.context); // some additional error context
+   console.log(err);
 });
 
 export { io };
