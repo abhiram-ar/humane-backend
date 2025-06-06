@@ -32,3 +32,10 @@ spec:
                 name: elasticsearch-proxy-srv
                 port:
                   number: 3000
+          - pathType: ImplementationSpecific
+            path: /api/v[0-9]+/feed/.*
+            backend:
+              service:
+                name: feed-srv
+                port:
+                  number: 3000
