@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: writer-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: humane
+      service: writer
+      type: web-server
+  template:
+    metadata:
+      labels:
+        app: humane
+        service: writer
+        type: web-server
+    spec:
+      containers:
+        - name: writer-server
+          image: abhiramar/humane-writer-service
+          envFrom:
+            - secretRef:
+                name: writer-pod-secret
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: writer-srv
+spec:
+  selector:
+    app: humane
+    service: writer
+    type: web-server
+  ports:
+    - name: writer
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

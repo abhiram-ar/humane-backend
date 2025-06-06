@@ -39,3 +39,10 @@ spec:
                 name: feed-srv
                 port:
                   number: 3000
+          - pathType: ImplementationSpecific
+            path: /api/v[0-9]+/(post|comment|writer)/.*
+            backend:
+              service:
+                name: writer-srv
+                port:
+                  number: 3000
