@@ -1,0 +1,26 @@
+import { CreatePostDTO } from '@application/dtos/CreatePost.dto';
+import { DeletePostDTO } from '@application/dtos/DeletePost.dto';
+import { EntityNotFound } from '@application/errors/EntityNotFoundError';
+import { Post } from '@domain/entities/Post.entity';
+import { IPostRepository } from '@domain/repository/IPostRepository';
+
+export class PostService {
+   constructor(private readonly _postRepo: IPostRepository) {}
+
+   create = async (dto: CreatePostDTO): Promise<Required<Post>> => {
+      const post = new Post(dto.authorId, dto.content, dto.visibility, dto.posterKey);
+
+      const savedPost = await this._postRepo.create(post);
+      // publish to kafka
+      return savedPost;
+   };
+
+   delete = async (dto: DeletePostDTO) => {
+      // note: userId is requesd for this request. Else any authenicated user can delte any post
+
+      const deletedPost = await this._postRepo.delete(dto.authorId, dto.postId);
+      if (!deletedPost) {
+         throw new EntityNotFound(`user does not have post my the provided postId ${dto.postId})`);
+      } else return deletedPost;
+   };
+}
