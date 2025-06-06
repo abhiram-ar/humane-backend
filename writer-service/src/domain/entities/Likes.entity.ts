@@ -3,12 +3,12 @@ export const EntityType = {
    COMMENT: 'comment',
 } as const;
 
-export class Likes {
+export class Like {
    public readonly createdAt?: Date;
    public updatedAt?: Date;
-   constructor(public entityType: (typeof EntityType)[keyof typeof EntityType], count: number) {
-      if (count < 0) {
-         throw new Error('post/comment likes cannot be negative ');
-      }
-   }
+   constructor(
+      public actorId: string,
+      public entityType: (typeof EntityType)[keyof typeof EntityType],
+      public entiryId: string
+   ) {}
 }
