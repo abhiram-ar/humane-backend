@@ -13,7 +13,7 @@ export class CommentService implements ICommentService {
    ) {}
 
    create = async (dto: CreateCommentDTO): Promise<Required<Comment>> => {
-      if (await this._postRepo.exists(dto.postId)) {
+      if (!(await this._postRepo.exists(dto.postId))) {
          throw new EntityNotFound('Post does not exists to add comment');
       }
 

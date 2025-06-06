@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const deleteCommentSchema = z.object({
+export const deleteCommentSchema = z.object({
    authorId: z.string().nonempty(),
    commentId: z.string().nonempty(),
 });

@@ -4,7 +4,7 @@ import { Post } from '@domain/entities/Post.entity';
 
 export const postAutoMapper = (
    doc: HydratedDocument<IPostDocumnet> | FlattenMaps<IPostDocumnet>
-) => {
+): Required<Post> => {
    const savedPost: Required<Post> = {
       id: doc.id || doc._id, // FlattedMaps will not have doc.id
       createdAt: doc.createdAt,

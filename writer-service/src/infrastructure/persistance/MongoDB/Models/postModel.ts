@@ -14,6 +14,6 @@ const postSchema = new mongoose.Schema<IPostDocumnet>(
 );
 postSchema.index({ authorId: 1, _id: -1 });
 
-const postModel = mongoose.model<IPostDocumnet>('post', postSchema);
+const postModel = mongoose.model<IPostDocumnet>('Post', postSchema);
 
 export default postModel;
