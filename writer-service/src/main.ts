@@ -1,10 +1,11 @@
 import { logger } from '@config/logget';
+import connectDB from '@infrastructure/persistance/MongoDB/mongoDBclient';
 import app from '@presentation/http/app';
 
-console.log('hello from writeer srv');
 
-const bootstrap = () => {
+const bootstrap = async () => {
    try {
+      await connectDB();
       app.listen(3000, () => {
          logger.info('writer server started on port 3000');
       });

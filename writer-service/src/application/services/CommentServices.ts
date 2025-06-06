@@ -3,14 +3,23 @@ import { DeleteCommentDTO } from '@application/dtos/DeleteComment.dto';
 import { EntityNotFound } from '@application/errors/EntityNotFoundError';
 import { Comment } from '@domain/entities/Comment.entity';
 import { ICommentRepository } from '@domain/repository/ICommentRepository';
+import { IPostRepository } from '@domain/repository/IPostRepository';
+import { ICommentService } from '@ports/ICommentServices';
 
-export class CommentService {
-   constructor(private readonly _commentRepo: ICommentRepository) {}
+export class CommentService implements ICommentService {
+   constructor(
+      private readonly _commentRepo: ICommentRepository,
+      private readonly _postRepo: IPostRepository
+   ) {}
 
    create = async (dto: CreateCommentDTO): Promise<Required<Comment>> => {
-      const post = new Comment(dto.authorId, dto.postId, dto.content);
+      if (await this._postRepo.exists(dto.postId)) {
+         throw new EntityNotFound('Post does not exists to add comment');
+      }
 
-      const savedPost = await this._commentRepo.create(post);
+      const comment = new Comment(dto.authorId, dto.postId, dto.content);
+
+      const savedPost = await this._commentRepo.create(comment);
       // publish to kafka
       return savedPost;
    };

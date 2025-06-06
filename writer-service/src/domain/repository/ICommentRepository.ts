@@ -1,4 +1,4 @@
-import { IBaseRepository } from './BaseRepository';
+import { IBaseRepository } from './IBaseRepository';
 import { Comment } from '@domain/entities/Comment.entity';
 
 export interface ICommentRepository extends IBaseRepository<Comment> {

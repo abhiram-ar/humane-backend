@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const deletePostSchema = z.object({
+export const deletePostSchema = z.object({
    postId: z.string().nonempty(),
    authorId: z.string().nonempty(),
 });

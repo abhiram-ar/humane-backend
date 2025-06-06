@@ -3,8 +3,9 @@ import { DeletePostDTO } from '@application/dtos/DeletePost.dto';
 import { EntityNotFound } from '@application/errors/EntityNotFoundError';
 import { Post } from '@domain/entities/Post.entity';
 import { IPostRepository } from '@domain/repository/IPostRepository';
+import { IPostService } from '@ports/IPostService';
 
-export class PostService {
+export class PostService implements IPostService {
    constructor(private readonly _postRepo: IPostRepository) {}
 
    create = async (dto: CreatePostDTO): Promise<Required<Post>> => {
@@ -15,12 +16,12 @@ export class PostService {
       return savedPost;
    };
 
-   delete = async (dto: DeletePostDTO) => {
+   delete = async (dto: DeletePostDTO): Promise<Required<Post>> => {
       // note: userId is requesd for this request. Else any authenicated user can delte any post
 
       const deletedPost = await this._postRepo.delete(dto.authorId, dto.postId);
       if (!deletedPost) {
-         throw new EntityNotFound(`user does not have post my the provided postId ${dto.postId})`);
+         throw new EntityNotFound(`user does not have post my postId ${dto.postId})`);
       } else return deletedPost;
    };
 }
