@@ -1,0 +1,37 @@
+{
+   "name": "writer-service",
+   "version": "1.0.0",
+   "description": "this service will handle post/commenet creation deletion",
+   "license": "ISC",
+   "author": "abhiram.ar",
+   "type": "commonjs",
+   "main": "./src/main.ts",
+   "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "dev": "tsx watch --include \"./src/**/*\" ./src/main.ts",
+      "uc": "npm uninstall humane-common && npm i humane-common"
+   },
+   "dependencies": {
+      "axios": "^1.9.0",
+      "cookie-parser": "^1.4.7",
+      "cors": "^2.8.5",
+      "date-fns": "^4.1.0",
+      "express": "^5.1.0",
+      "humane-common": "^1.0.69",
+      "kafkajs": "^2.2.4",
+      "mongoose": "^8.15.1",
+      "morgan": "^1.10.0",
+      "winston": "^3.17.0",
+      "zod": "^3.25.53"
+   },
+   "devDependencies": {
+      "@tsconfig/node22": "^22.0.2",
+      "@types/cookie-parser": "^1.4.8",
+      "@types/cors": "^2.8.18",
+      "@types/express": "^5.0.2",
+      "@types/morgan": "^1.9.9",
+      "@types/node": "^22.15.30",
+      "tsx": "^4.19.4",
+      "typescript": "^5.8.3"
+   }
+}
