@@ -1,12 +1,25 @@
 import { CreatePostDTO, createPostSchema } from '@application/dtos/CreatePost.dto';
 import { DeletePostDTO, deletePostSchema } from '@application/dtos/DeletePost.dto';
+import { logger } from '@config/logget';
+import { IEventPublisher } from '@ports/IEventProducer';
 import { IPostService } from '@ports/IPostService';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
-import { UnAuthenticatedError, ZodValidationError } from 'humane-common';
+import {
+   AppEventsTypes,
+   createEvent,
+   MessageBrokerTopics,
+   PostCreatedEvent,
+   PostEventPayload,
+   UnAuthenticatedError,
+   ZodValidationError,
+} from 'humane-common';
 
 export class PostController {
-   constructor(private readonly _postService: IPostService) {}
+   constructor(
+      private readonly _postService: IPostService,
+      private readonly _eventPubliser: IEventPublisher
+   ) {}
 
    createPost = async (req: Request, res: Response, next: NextFunction) => {
       try {
@@ -24,6 +37,17 @@ export class PostController {
             throw new ZodValidationError(parsed.error);
          }
          const createdPost = await this._postService.create(parsed.data);
+
+         const postCreatedEvent = createEvent(AppEventsTypes.POST_CREATED, createdPost);
+
+         const { ack } = await this._eventPubliser.send(
+            MessageBrokerTopics.POST_CREATE_EVENTS_TOPIC,
+            postCreatedEvent
+         );
+
+         if (!ack) {
+            logger.warn(`post ${createdPost.id} created event not publised in eventbus`);
+         }
 
          res.status(HttpStatusCode.Created).json({
             message: 'post created',
@@ -50,6 +74,16 @@ export class PostController {
             throw new ZodValidationError(parsed.error);
          }
          const deltedPost = await this._postService.delete(parsed.data);
+
+         const postDeltedEvent = createEvent(AppEventsTypes.POST_DELETED, deltedPost);
+         const { ack } = await this._eventPubliser.send(
+            MessageBrokerTopics.POST_DELETED_EVENTS_TOPIC,
+            postDeltedEvent
+         );
+
+         if (!ack) {
+            logger.warn(`post ${deltedPost.id} deleted event not publised in eventbus`);
+         }
 
          res.status(HttpStatusCode.Accepted).json({
             message: 'post deleted',

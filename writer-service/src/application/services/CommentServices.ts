@@ -30,7 +30,7 @@ export class CommentService implements ICommentService {
       const deletedComment = await this._commentRepo.delete(dto.authorId, dto.commentId);
       if (!deletedComment) {
          throw new EntityNotFound(
-            `user does not have post my the provided postId ${dto.commentId})`
+            `user does not have comment my the provided commentId ${dto.commentId})`
          );
       } else return deletedComment;
    };

@@ -10,11 +10,11 @@ export const ModerationStatus = {
 } as const;
 
 export class Post {
-   public readonly id: string | undefined;
-   public readonly createdAt: Date | undefined;
-   public updatedAt: Date | undefined;
+   public readonly id?: string;
+   public readonly createdAt?: Date;
+   public updatedAt?: Date;
 
-   public moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus] | undefined;
+   public moderationStatus?: (typeof ModerationStatus)[keyof typeof ModerationStatus];
    public moderationMetadata: any;
    constructor(
       public authorId: string,

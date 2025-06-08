@@ -1,3 +1,4 @@
+import { ENV } from '@config/env';
 import { Consumer, Kafka, Producer } from 'kafkajs';
 
 class KafkaSingleton {
@@ -9,8 +10,8 @@ class KafkaSingleton {
    // esures single instance throughout the app
    private constructor() {
       this._kafka = new Kafka({
-         clientId: 'humane-user-service-v1',
-         brokers: ['kafka:9092'],
+         clientId: ENV.KAFKA_CLIENT_ID,
+         brokers: [ENV.KAFKA_BROKER_URI as string],
       });
    }
 
