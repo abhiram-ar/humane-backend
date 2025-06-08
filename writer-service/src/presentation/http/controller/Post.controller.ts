@@ -9,8 +9,6 @@ import {
    AppEventsTypes,
    createEvent,
    MessageBrokerTopics,
-   PostCreatedEvent,
-   PostEventPayload,
    UnAuthenticatedError,
    ZodValidationError,
 } from 'humane-common';
