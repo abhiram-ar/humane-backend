@@ -35,3 +35,7 @@ production change
 
 ## learning
 - clean/delte the pv/pvc when changing the version of pods in services to avoid conflit
+
+
+choices;
+- why not moderating comments? Good commets are rewarded so people are forces to put good comments
