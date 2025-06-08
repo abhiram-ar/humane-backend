@@ -26,12 +26,12 @@ export class CommentService implements ICommentService {
 
    delete = async (dto: DeleteCommentDTO): Promise<Required<Comment>> => {
       // note: userId is requesd for this request. Else any authenicated user can delte any post
-
-      const deletedPost = await this._commentRepo.delete(dto.authorId, dto.commentId);
-      if (!deletedPost) {
+      //TODO:  check if the current commnet is of from the post   
+      const deletedComment = await this._commentRepo.delete(dto.authorId, dto.commentId);
+      if (!deletedComment) {
          throw new EntityNotFound(
             `user does not have post my the provided postId ${dto.commentId})`
          );
-      } else return deletedPost;
+      } else return deletedComment;
    };
 }

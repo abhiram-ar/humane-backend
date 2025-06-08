@@ -13,6 +13,8 @@ export const postAutoMapper = (
       content: doc.content,
       visibility: doc.visibility,
       posterKey: doc.posterKey,
+      moderationStatus: doc.moderationStatus,
+      moderationMetadata: doc.moderationMetadata,
    };
 
    return savedPost;
