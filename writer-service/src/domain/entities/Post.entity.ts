@@ -15,11 +15,11 @@ export class Post {
    public updatedAt?: Date;
 
    public moderationStatus?: (typeof ModerationStatus)[keyof typeof ModerationStatus];
-   public moderationMetadata: any;
+   public moderationMetadata: any | null;
    constructor(
       public authorId: string,
       public content: string,
       public visibility: (typeof PostVisibility)[keyof typeof PostVisibility],
-      public posterKey?: string
+      public posterKey?: string | null
    ) {}
 }

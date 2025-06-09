@@ -12,9 +12,9 @@ export const postAutoMapper = (
       authorId: doc.authorId,
       content: doc.content,
       visibility: doc.visibility,
-      posterKey: doc.posterKey,
+      posterKey: doc.posterKey || null,
       moderationStatus: doc.moderationStatus,
-      moderationMetadata: doc.moderationMetadata,
+      moderationMetadata: doc.moderationMetadata || null,
    };
 
    return savedPost;
