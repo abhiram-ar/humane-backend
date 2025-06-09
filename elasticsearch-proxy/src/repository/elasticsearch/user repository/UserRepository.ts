@@ -1,4 +1,3 @@
-import { ENV } from '@config/env';
 import { Client, errors } from '@elastic/elasticsearch';
 import { CreateUserDTO } from 'interfaces/dto/createUser.dto';
 import { IUserRepository } from '@repository/elasticsearch/user repository/IUserRepository';
@@ -8,18 +7,15 @@ import { UpdateUserDTO } from 'interfaces/dto/updateUser.dto';
 import { logger } from '@config/logger';
 
 export class UserRepository implements IUserRepository {
-   public readonly client;
    private readonly _index = ES_INDEXES.USER_PROFILE_INDEX;
-   constructor() {
-      this.client = new Client({ node: ENV.ELASTICSEARCH_URI });
-   }
+   constructor(public readonly _client: Client) {}
 
    initializeUserIndex = async () => {
-      const indexExists = await this.client.indices.exists({
+      const indexExists = await this._client.indices.exists({
          index: ES_INDEXES.USER_PROFILE_INDEX,
       });
       if (!indexExists)
-         await this.client.indices.create({
+         await this._client.indices.create({
             index: ES_INDEXES.USER_PROFILE_INDEX,
             mappings: {
                // prevent dynamic filed creation in production, improve query performance and better resouce utilization
@@ -43,7 +39,7 @@ export class UserRepository implements IUserRepository {
 
    pingES = async () => {
       try {
-         const health = await this.client.cluster.health();
+         const health = await this._client.cluster.health();
          console.log('cluster health', health);
       } catch (error) {
          console.log('error pingitg es cluster', error);
@@ -52,7 +48,7 @@ export class UserRepository implements IUserRepository {
 
    createCommand = async (dto: CreateUserDTO): Promise<void> => {
       const { id, ...data } = dto;
-      await this.client.index({
+      await this._client.index({
          index: ES_INDEXES.USER_PROFILE_INDEX,
          id: dto.id,
          document: { ...data, updatedAt: dto.createdAt },
@@ -60,7 +56,7 @@ export class UserRepository implements IUserRepository {
    };
    updatedAtQuery = async (id: string): Promise<{ updatedAt: string | undefined } | null> => {
       try {
-         const res = await this.client.get<Pick<UserDocument, 'updatedAt'>>({
+         const res = await this._client.get<Pick<UserDocument, 'updatedAt'>>({
             index: this._index,
             id,
             _source: ['updatedAt'],
@@ -69,7 +65,7 @@ export class UserRepository implements IUserRepository {
 
          return { updatedAt: res._source?.updatedAt };
       } catch (error) {
-          if (error instanceof errors.ResponseError) {
+         if (error instanceof errors.ResponseError) {
             error.statusCode === 404;
             return null;
          } else {
@@ -81,7 +77,7 @@ export class UserRepository implements IUserRepository {
    updateCommand = async (updatedAt: string, dto: UpdateUserDTO): Promise<void> => {
       const { id, ...data } = dto;
 
-      await this.client.update({
+      await this._client.update({
          index: this._index,
          id: id,
          doc: { ...data, updatedAt } as UserDocument,
@@ -92,7 +88,7 @@ export class UserRepository implements IUserRepository {
       docId: string,
       avatarKey: string | null
    ): Promise<void> => {
-      await this.client.update({
+      await this._client.update({
          index: this._index,
          id: docId,
          doc: { avatarKey, updatedAt } as UserDocument,
@@ -104,7 +100,7 @@ export class UserRepository implements IUserRepository {
       docId: string,
       coverPhotoKey: string | null
    ): Promise<void> => {
-      await this.client.update({
+      await this._client.update({
          index: this._index,
          id: docId,
          doc: {
@@ -119,7 +115,7 @@ export class UserRepository implements IUserRepository {
       docId: string,
       newBlockStatus: boolean
    ): Promise<void> => {
-      this.client.update({
+      this._client.update({
          index: this._index,
          id: docId,
          doc: {
@@ -134,7 +130,7 @@ export class UserRepository implements IUserRepository {
       from: number,
       size: number
    ): Promise<{ users: (UserDocument & { id: string })[]; totalEntries: number }> => {
-      type Query = NonNullable<Parameters<typeof this.client.search>[0]>['query'];
+      type Query = NonNullable<Parameters<typeof this._client.search>[0]>['query'];
 
       const query: Query = search
          ? {
@@ -148,7 +144,7 @@ export class UserRepository implements IUserRepository {
               match_all: {},
            };
 
-      const res = await this.client.search<UserDocument>({
+      const res = await this._client.search<UserDocument>({
          index: this._index,
          from,
          size,
@@ -177,7 +173,7 @@ export class UserRepository implements IUserRepository {
       searchAfter: [number] | null;
       hasMore: boolean;
    }> => {
-      const res = await this.client.search<UserDocument>({
+      const res = await this._client.search<UserDocument>({
          index: this._index,
          size,
          sort: [{ createdAt: 'desc' }], // this changes to type of searchAfter array
@@ -207,7 +203,7 @@ export class UserRepository implements IUserRepository {
 
    getUserById = async (userId: string): Promise<(UserDocument & { id: string }) | null> => {
       try {
-         const res = await this.client.get<UserDocument>({ index: this._index, id: userId });
+         const res = await this._client.get<UserDocument>({ index: this._index, id: userId });
 
          if (!res.found || !res._source) return null;
 
@@ -226,7 +222,7 @@ export class UserRepository implements IUserRepository {
    getUsersById = async (
       userIds: string[]
    ): Promise<((UserDocument & { id: string }) | null)[]> => {
-      const res = await this.client.mget<UserDocument>({
+      const res = await this._client.mget<UserDocument>({
          index: this._index,
          ids: userIds,
          _source: true,

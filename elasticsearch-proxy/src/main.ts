@@ -12,12 +12,10 @@ const bootstrap = async () => {
 
       await startAllConsumers();
       process.on('SIGINT', () => {
-         userRepository.client.close();
          esClient.close();
          stopAllConsumer();
       });
       process.on('SIGTERM', () => {
-         userRepository.client.close(); //TODO: remove this
          esClient.close();
          stopAllConsumer();
       });
