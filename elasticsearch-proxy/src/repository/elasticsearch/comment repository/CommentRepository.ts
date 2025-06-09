@@ -36,7 +36,7 @@ export class CommetRepository implements ICommenetRepository {
    deleteById = async (commentId: string): Promise<{ found: boolean; deleted: boolean }> => {
       const res = await this._client.delete({ index: this._index, id: commentId });
       return {
-         found: res.result === 'not_found' ? true : false,
+         found: res.result === 'not_found' ? false : true,
          deleted: res.result === 'deleted' ? true : false,
       };
    };
