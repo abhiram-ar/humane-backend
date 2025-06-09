@@ -18,7 +18,7 @@ export class PostDeletedEventConsumer {
       private readonly _kafka: KafkaSingleton,
       private readonly _PostServices: PostService
    ) {
-      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-post-deleted-v1');
+      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-post-deleted-v2');
    }
 
    start = async () => {

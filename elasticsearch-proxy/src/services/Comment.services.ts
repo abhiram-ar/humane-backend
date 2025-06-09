@@ -12,6 +12,7 @@ export class CommentService {
          await this._commentRepo.create(dto);
          return;
       }
+      logger.warn('Comment already exist, skipping upsert');
    };
 
    delete = async (commentId: string): Promise<void> => {
