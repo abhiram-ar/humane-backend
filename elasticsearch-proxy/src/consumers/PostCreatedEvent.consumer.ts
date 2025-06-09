@@ -18,7 +18,7 @@ export class PostCreatedEventConsumer {
       private readonly _kafka: KafkaSingleton,
       private readonly _PostServices: PostService
    ) {
-      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-post-v1');
+      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-post-created-v1');
    }
 
    start = async () => {

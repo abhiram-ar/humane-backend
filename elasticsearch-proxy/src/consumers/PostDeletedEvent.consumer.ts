@@ -18,7 +18,7 @@ export class PostDeletedEventConsumer {
       private readonly _kafka: KafkaSingleton,
       private readonly _PostServices: PostService
    ) {
-      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-post-v2');
+      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-post-deleted-v1');
    }
 
    start = async () => {
@@ -39,7 +39,7 @@ export class PostDeletedEventConsumer {
             logger.verbose(JSON.stringify(event, null, 2));
 
             try {
-               if (event.eventType != AppEventsTypes.POST_CREATED) {
+               if (event.eventType != AppEventsTypes.POST_DELETED) {
                   throw new EventBusError('Invalid event type for this comsumer');
                }
                const parsed = postSchema.safeParse(event.payload);
