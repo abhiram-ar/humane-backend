@@ -1,10 +1,10 @@
 import { ENV } from '@config/env';
 import { Client, errors } from '@elastic/elasticsearch';
-import { CreateUserDTO } from 'dto/createUser.dto';
-import { IUserRepository } from 'repository/Interfaces/IUserRepository';
-import { ES_INDEXES } from './ES_INDEXES';
+import { CreateUserDTO } from 'interfaces/dto/createUser.dto';
+import { IUserRepository } from '@repository/elasticsearch/user repository/IUserRepository';
+import { ES_INDEXES } from '../ES_INDEXES';
 import { UserDocument } from './UserDocument.type';
-import { UpdateUserDTO } from '@dtos/updateUser.dto';
+import { UpdateUserDTO } from 'interfaces/dto/updateUser.dto';
 import { logger } from '@config/logger';
 
 export class UserRepository implements IUserRepository {

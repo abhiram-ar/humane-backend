@@ -2,23 +2,23 @@ import { logger } from '@config/logger';
 import {
    InfiniteScrollSearchDTO,
    InfiniteScrollSearchOutputDTO,
-} from '@dtos/infiniteScrollSearch.dto';
-import { PaginatedSearchDTO } from '@dtos/paginatedSearch.dto';
-import { PrivillegedUserSearchOutputDTO } from '@dtos/privillegedSearch.output.dto';
-import { UpdateUserDTO } from '@dtos/updateUser.dto';
-import { UpdateUserAvatarKeyDTO } from '@dtos/updateUserAvatarKey.dto';
-import { UpdaeteUserBlockStautsDTO } from '@dtos/updateUserBlockStatus.dto';
-import { UpdateUserCoverPhotoKeyDTO } from '@dtos/updateUserCoverPhotokey';
-import { CreateUserDTO } from 'dto/createUser.dto';
-import { IUserRepository } from 'repository/Interfaces/IUserRepository';
+} from 'interfaces/dto/infiniteScrollSearch.dto';
+import { PaginatedSearchDTO } from 'interfaces/dto/paginatedSearch.dto';
+import { PrivillegedUserSearchOutputDTO } from 'interfaces/dto/privillegedSearch.output.dto';
+import { UpdateUserDTO } from 'interfaces/dto/updateUser.dto';
+import { UpdateUserAvatarKeyDTO } from 'interfaces/dto/updateUserAvatarKey.dto';
+import { UpdaeteUserBlockStautsDTO } from 'interfaces/dto/updateUserBlockStatus.dto';
+import { UpdateUserCoverPhotoKeyDTO } from 'interfaces/dto/updateUserCoverPhotokey';
+import { CreateUserDTO } from 'interfaces/dto/createUser.dto';
+import { IUserRepository } from '@repository/elasticsearch/user repository/IUserRepository';
 import { IPagination } from 'Types/Pagination.type';
 import { CDNService } from './CDN.services';
 import { UserNotFoundError } from 'humane-common';
-import { GetUserProfileOutputDTO } from '@dtos/GetUserProfile.dto';
+import { GetUserProfileOutputDTO } from 'interfaces/dto/GetUserProfile.dto';
 import {
    GetBasicUserProfileFromIdsOutputDTO,
    GetUserBasicProfileFromIdsInputDTO,
-} from '@dtos/GetUserBasicProfileFromIDs';
+} from 'interfaces/dto/GetUserBasicProfileFromIDs';
 
 export class UserServices {
    constructor(

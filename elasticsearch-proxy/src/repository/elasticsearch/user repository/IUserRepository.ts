@@ -1,6 +1,6 @@
-import { UpdateUserDTO } from '@dtos/updateUser.dto';
-import { UserDocument } from '@repository/elasticsearch/UserDocument.type';
-import { CreateUserDTO } from 'dto/createUser.dto';
+import { UpdateUserDTO } from 'interfaces/dto/updateUser.dto';
+import { UserDocument } from '@repository/elasticsearch/user repository/UserDocument.type';
+import { CreateUserDTO } from 'interfaces/dto/createUser.dto';
 
 export interface IUserRepository {
    createCommand(dto: CreateUserDTO): Promise<void>;

@@ -1,9 +1,9 @@
 import { logger } from '@config/logger';
-import { createUserSchema } from '@dtos/createUser.dto';
-import { updateUserSchema } from '@dtos/updateUser.dto';
-import { updateUserAvatarKeySchema } from '@dtos/updateUserAvatarKey.dto';
-import { updateUserBlockStatusSchema } from '@dtos/updateUserBlockStatus.dto';
-import { updateUserCoverPhotokeySchema } from '@dtos/updateUserCoverPhotokey';
+import { createUserSchema } from 'interfaces/dto/createUser.dto';
+import { updateUserSchema } from 'interfaces/dto/updateUser.dto';
+import { updateUserAvatarKeySchema } from 'interfaces/dto/updateUserAvatarKey.dto';
+import { updateUserBlockStatusSchema } from 'interfaces/dto/updateUserBlockStatus.dto';
+import { updateUserCoverPhotokeySchema } from 'interfaces/dto/updateUserCoverPhotokey';
 import { UserServices } from '@services/User.services';
 import { AppEvent, AppEventsTypes, MessageBrokerTopics } from 'humane-common';
 import KafkaSingleton from 'kafka/KafkaSingleton';

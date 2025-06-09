@@ -1,4 +1,4 @@
-import { paginatedSearchSchema } from '@dtos/paginatedSearch.dto';
+import { paginatedSearchSchema } from 'interfaces/dto/paginatedSearch.dto';
 import { UserServices } from '@services/User.services';
 import { Request, Response, NextFunction } from 'express';
 import { ZodValidationError } from 'humane-common';
