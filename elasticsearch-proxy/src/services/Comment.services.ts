@@ -1,3 +1,4 @@
+import { logger } from '@config/logger';
 import { CreateCommentInputDTO } from 'interfaces/dto/post/Comment.dto';
 import { ICommenetRepository } from 'interfaces/repository/ICommentRepository';
 
@@ -14,6 +15,12 @@ export class CommentService {
    };
 
    delete = async (commentId: string): Promise<void> => {
-      await this._commentRepo.deleteById(commentId);
+      const res = await this._commentRepo.deleteById(commentId);
+      if (!res.found) {
+         logger.warn(`Cannot find comment ${commentId} to delete`);
+      }
+      if (res.found && !res.deleted) {
+         logger.error(`Unable to delete comment ${commentId}`);
+      }
    };
 }

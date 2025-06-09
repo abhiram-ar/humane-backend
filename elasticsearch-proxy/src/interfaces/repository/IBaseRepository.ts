@@ -1,6 +1,6 @@
 export interface IBaseRepository<T> {
    create(entity: T): Promise<void>;
    deleteById(itemId: string): Promise<{ found: boolean; deleted: boolean }>;
-   getUpdatedAt(itemId: string): Promise<{ updatedAt: string } | null>;
+   getUpdatedAt(itemId: string): Promise<{ updatedAt: Date } | null>;
    getByIds(ids: string[]): Promise<(T | null)[]>;
 }

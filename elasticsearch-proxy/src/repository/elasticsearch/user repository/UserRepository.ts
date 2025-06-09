@@ -59,14 +59,23 @@ export class UserRepository implements IUserRepository {
       });
    };
    updatedAtQuery = async (id: string): Promise<{ updatedAt: string | undefined } | null> => {
-      const res = await this.client.get<Pick<UserDocument, 'updatedAt'>>({
-         index: this._index,
-         id,
-         _source: ['updatedAt'],
-      });
-      if (!res.found) return null;
+      try {
+         const res = await this.client.get<Pick<UserDocument, 'updatedAt'>>({
+            index: this._index,
+            id,
+            _source: ['updatedAt'],
+         });
+         if (!res.found) return null;
 
-      return { updatedAt: res._source?.updatedAt };
+         return { updatedAt: res._source?.updatedAt };
+      } catch (error) {
+          if (error instanceof errors.ResponseError) {
+            error.statusCode === 404;
+            return null;
+         } else {
+            throw error;
+         }
+      }
    };
 
    updateCommand = async (updatedAt: string, dto: UpdateUserDTO): Promise<void> => {

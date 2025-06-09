@@ -20,6 +20,12 @@ export class PostService {
    };
 
    delete = async (postId: string): Promise<void> => {
-      await this._postRepo.deleteById(postId);
+      const res = await this._postRepo.deleteById(postId);
+      if (!res.found) {
+         logger.warn(`Cannot find post ${postId} to delete`);
+      }
+      if (res.found && !res.deleted) {
+         logger.error(`Unable to delete post ${postId}`);
+      }
    };
 }

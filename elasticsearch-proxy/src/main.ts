@@ -1,4 +1,4 @@
-import { userRepository } from '@di/repository';
+import { postRepository, userRepository } from '@di/repository';
 import { startAllConsumers, stopAllConsumer } from '@config/kafka';
 import { logger } from '@config/logger';
 import app from 'app';
@@ -6,6 +6,7 @@ import app from 'app';
 const bootstrap = async () => {
    try {
       await userRepository.initializeUserIndex();
+      await postRepository.initializePostIndex();
 
       await startAllConsumers();
       process.on('SIGINT', () => {
@@ -20,7 +21,7 @@ const bootstrap = async () => {
 
       app.listen(3000, () => {
          logger.info('es-proxy started');
-         console.log("hello")
+         console.log('hello');
       });
    } catch (error) {
       logger.error('error starting es-proxy');

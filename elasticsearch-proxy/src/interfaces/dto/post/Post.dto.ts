@@ -24,10 +24,10 @@ export const postSchema = z.object({
       ModerationStatus.OK,
       ModerationStatus.NOT_APPROPRIATE,
    ]),
-   moderationMetadata: z.any(),
+   moderationMetadata: z.any().nullish().optional(),
 
-   createdAt: z.date(),
-   updatedAt: z.date(),
+   createdAt: z.coerce.date(),
+   updatedAt: z.coerce.date(),
 });
 
 export type PostInputDTO = z.infer<typeof postSchema>;
