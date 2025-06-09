@@ -36,12 +36,21 @@ export class PostRepository implements IPostRepository {
       await this._client.index({ index: this._index, id: post.id, document: post });
    };
    deleteById = async (itemId: string): Promise<{ found: boolean; deleted: boolean }> => {
-      const res = await this._client.delete({ index: this._index, id: itemId });
-      console.log('del', res);
-      return {
-         found: res.result === 'not_found' ? false : true,
-         deleted: res.result === 'deleted' ? true : false,
-      };
+      try {
+         const res = await this._client.delete({ index: this._index, id: itemId });
+         console.log('del', res);
+         return {
+            found: res.result === 'not_found' ? false : true,
+            deleted: res.result === 'deleted' ? true : false,
+         };
+      } catch (error) {
+         if (error instanceof errors.ResponseError) {
+            error.statusCode === 404;
+            return { found: false, deleted: false };
+         } else {
+            throw error;
+         }
+      }
    };
    getUpdatedAt = async (postId: string): Promise<{ updatedAt: Date } | null> => {
       try {
@@ -82,6 +91,6 @@ export class PostRepository implements IPostRepository {
       return parsedPostDocList;
    };
    replace = async (postId: string, doc: IPostDocument): Promise<void> => {
-      await this._client.update({ index: this._index, id: postId });
+      await this._client.update({ index: this._index, id: postId, doc });
    };
 }

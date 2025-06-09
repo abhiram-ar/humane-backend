@@ -18,7 +18,7 @@ export class CommentDeletedEventConsumer {
       private readonly _kafka: KafkaSingleton,
       private readonly _commentServices: CommentService
    ) {
-      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-comment-deleted-v1');
+      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-comment-deleted-v6');
    }
 
    start = async () => {

@@ -18,7 +18,7 @@ export class CommentCreatedEventConsumer {
       private readonly _kafka: KafkaSingleton,
       private readonly _CommentServices: CommentService
    ) {
-      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-comment-created-v3');
+      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-comment-created-v4');
    }
 
    start = async () => {
@@ -27,7 +27,6 @@ export class CommentCreatedEventConsumer {
 
       await this.consumer.subscribe({
          topic: MessageBrokerTopics.COMMENT_CREATED_EVENTS_TOPIC,
-         fromBeginning: true,
       });
 
       await this.consumer.run({
