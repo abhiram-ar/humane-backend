@@ -2,6 +2,7 @@ import { UserProfileEventsConsumer } from 'consumers/UserProfileEvent.consumer';
 import KafkaSingleton from 'kafka/KafkaSingleton';
 import { postServices, userServices } from './services';
 import { PostCreatedEventConsumer } from 'consumers/PostCreatedEvent.consumer';
+import { PostDeletedEventConsumer } from 'consumers/PostDeletedEvent.consumer';
 
 export const userProfileConsumer = new UserProfileEventsConsumer(
    KafkaSingleton.getInstance(),
@@ -9,6 +10,11 @@ export const userProfileConsumer = new UserProfileEventsConsumer(
 );
 
 export const postCreatedEventConsumer = new PostCreatedEventConsumer(
+   KafkaSingleton.getInstance(),
+   postServices
+);
+
+export const postDeletedEventConsumer = new PostDeletedEventConsumer(
    KafkaSingleton.getInstance(),
    postServices
 );

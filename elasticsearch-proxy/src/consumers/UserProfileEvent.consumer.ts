@@ -25,7 +25,6 @@ export class UserProfileEventsConsumer {
 
       await this.consumer.subscribe({
          topic: MessageBrokerTopics.USER_PROFILE_EVENTS_TOPIC,
-         fromBeginning: true,
       });
 
       await this.consumer.run({
