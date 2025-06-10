@@ -22,14 +22,10 @@ export class TimelineServices {
       from: string | null;
       limit: number;
    }): Promise<{
-      post: Pick<TimelinePost, 'postId' | 'createdAt'>[];
+      post: Omit<TimelinePost, 'authorId' | 'userId'>[];
       pagination: { from: string | null; hasMore: boolean };
    }> => {
-      const timeline = await this._timelineRepo.getUserTimeline(
-         dto.userId,
-         dto.from,
-         dto.limit
-      );
+      const timeline = await this._timelineRepo.getUserTimeline(dto.userId, dto.from, dto.limit);
 
       return {
          post: timeline.post,

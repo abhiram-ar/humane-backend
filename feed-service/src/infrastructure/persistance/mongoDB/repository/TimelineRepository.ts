@@ -25,7 +25,7 @@ export class TimelineRepository implements ITimelineRepository {
       from: string | null,
       limit: number
    ): Promise<{
-      post: Pick<TimelinePost, 'postId' | 'createdAt'>[];
+      post: Omit<TimelinePost, 'authorId' | 'userId'>[];
       from: string | null;
       hasMore: boolean;
    }> => {
@@ -35,6 +35,7 @@ export class TimelineRepository implements ITimelineRepository {
          .limit(limit);
 
       const parsedTimelinePosts = res.map((doc) => ({
+         id: doc.id,
          postId: doc.postId,
          createdAt: doc.createdAt,
       }));

@@ -9,7 +9,7 @@ export interface ITimelineRepository {
       from: string | null,
       limit: number
    ): Promise<{
-      post: Pick<TimelinePost, 'postId' | 'createdAt'>[];
+      post: Omit<TimelinePost, 'authorId' | 'userId'>[];
       from: string | null;
       hasMore: boolean;
    }>;
