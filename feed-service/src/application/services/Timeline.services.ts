@@ -4,14 +4,16 @@ import { TimelinePost } from '@domain/TimelinePost.entity';
 export class TimelineServices {
    constructor(private readonly _timelineRepo: ITimelineRepository) {}
 
-   appendPost = async (dto: {
-      userId: string;
+   appendPostToMultipleUserTimeline = async (dto: {
+      userIds: string[];
       postId: string;
       authorId: string;
-   }): Promise<Required<TimelinePost>> => {
-      const timelinePost = new TimelinePost(dto.userId, dto.postId, dto.authorId);
+   }) => {
+      const timelinePosts = dto.userIds.map(
+         (userId) => new TimelinePost(userId, dto.postId, dto.authorId)
+      );
 
-      return this._timelineRepo.upsertPost(timelinePost);
+      this._timelineRepo.bulkUpsertTimelinePost(timelinePosts);
    };
 
    removeAuthorPostsFromTimeline = (dto: { userId: string; authorId: string }) => {
