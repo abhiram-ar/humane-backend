@@ -22,7 +22,7 @@ export class FeedServices {
       from: string | null;
       limit: number;
    }): Promise<{
-      post: Omit<FeedPostEntity, 'authorId' | 'userId'>[];
+      post: Omit<Required<FeedPostEntity>, 'authorId' | 'userId'>[];
       pagination: { from: string | null; hasMore: boolean };
    }> => {
       const timeline = await this._timelineRepo.getUserTimeline(dto.userId, dto.from, dto.limit);

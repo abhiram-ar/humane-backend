@@ -25,7 +25,7 @@ export class FeedRepository implements IFeedRepository {
       from: string | null,
       limit: number
    ): Promise<{
-      post: Omit<FeedPostEntity, 'authorId' | 'userId'>[];
+      post: Omit<Required<FeedPostEntity>, 'authorId' | 'userId'>[];
       from: string | null;
       hasMore: boolean;
    }> => {

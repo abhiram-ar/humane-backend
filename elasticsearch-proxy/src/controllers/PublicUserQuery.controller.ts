@@ -44,8 +44,6 @@ export class PublicUserQueryController {
             throw new GenericError('Invalid userId type for this query');
          }
 
-         console.log(ids);
-
          const parsed = getUserBasicProfileFromIdsSchema.safeParse(ids);
          if (!parsed.success) {
             throw new ZodValidationError(parsed.error);

@@ -7,6 +7,6 @@ import { CommentService } from '@services/Comment.services';
 export const cdnService = new CDNService();
 export const userServices = new UserServices(userRepository, cdnService);
 
-export const postServices = new PostService(postRepository);
+export const postServices = new PostService(postRepository, cdnService);
 
 export const commentServices = new CommentService(commentRepository);

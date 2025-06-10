@@ -1,5 +1,5 @@
 export class FeedPostEntity {
-   public readonly id: string | undefined;
+   public readonly id?: string;
    constructor(
       public readonly userId: string,
       public readonly postId: string,

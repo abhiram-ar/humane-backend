@@ -79,6 +79,8 @@ export class PostRepository implements IPostRepository {
          _source: true,
       });
 
+      console.log('post found byids', res);
+
       const parsedPostDocList = res.docs.map((doc) => {
          const typedDoc = doc as {
             _source: IPostDocument;

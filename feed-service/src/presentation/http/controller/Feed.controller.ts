@@ -1,8 +1,9 @@
+import { ENV } from '@config/env';
 import { GetFeedInputDTO, getFeedInputSchema } from '@dtos/getFeed.dto';
 import { FeedServices } from '@services/feed.services';
-import { HttpStatusCode } from 'axios';
+import axios, { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
-import { UnAuthenticatedError, ZodValidationError } from 'humane-common';
+import { HttpStatusCodes, UnAuthenticatedError, ZodValidationError } from 'humane-common';
 export class FeedController {
    constructor(private readonly _timelineServies: FeedServices) {}
 
@@ -22,12 +23,28 @@ export class FeedController {
          if (!validatedInputDTO.success) {
             throw new ZodValidationError(validatedInputDTO.error);
          }
+         // TODO: read rawTimeline from cache
 
-         const rawTimeline = await this._timelineServies.getUserFeedPaginated(
-            validatedInputDTO.data
+         // on miss read from DB
+         const rawFeed = await this._timelineServies.getUserFeedPaginated(validatedInputDTO.data);
+         // TODO: populaate cache is it does not exsit only
+
+         // hydrate rawFeed with users and post details
+
+         const { data } = await axios.get(
+            `${ENV.ELASTICSEARCH_PROXY_BASE_URL}/api/v1/query/internal/post`,
+            {
+               params: { postId: rawFeed.post.map((post) => post.postId) },
+               paramsSerializer: { indexes: null },
+            }
          );
 
-         res.status(HttpStatusCode.Ok).json({ message: 'timelime fetched', data: rawTimeline });
+         // get hot friends
+
+         // get hot friends timeline in this timeframe - this should be a read tough cache, with pre hydrated post details // resethc on prehydration
+
+         // get hot users profile from read-through cache
+         res.status(HttpStatusCodes.OK).json({ message: 'timelime fetched', data: data.data });
       } catch (error) {
          next(error);
       }
