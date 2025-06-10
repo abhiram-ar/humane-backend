@@ -1,4 +1,4 @@
-import { TimelineController } from '@presentation/http/controller/Timeline.controller';
+import { FeedController } from '@presentation/http/controller/Feed.controller';
 import { timelineServices } from './services.container';
 
-export const timelineController = new TimelineController(timelineServices);
+export const timelineController = new FeedController(timelineServices);

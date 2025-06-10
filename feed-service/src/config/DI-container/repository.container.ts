@@ -1,3 +1,3 @@
-import { TimelineRepository } from '@infrastructure/persistance/mongoDB/repository/TimelineRepository';
+import { FeedRepository } from '@infrastructure/persistance/mongoDB/repository/FeedRepository';
 
-export const timelineRepository = new TimelineRepository();
+export const timelineRepository = new FeedRepository();

@@ -1,28 +1,28 @@
-import { ITimelineRepository } from '@domain/interfaces/ITimelineRepository';
-import { TimelinePost } from '@domain/TimelinePost.entity';
+import { IFeedRepository } from '@domain/interfaces/IFeedRepository';
+import { FeedPostEntity } from '@domain/FeedPost.entity';
 import { AppendPostToMultipleUserTimelineInputDTO } from '@dtos/AppendPostToMultipleUserTimeline.dto';
 
-export class TimelineServices {
-   constructor(private readonly _timelineRepo: ITimelineRepository) {}
+export class FeedServices {
+   constructor(private readonly _timelineRepo: IFeedRepository) {}
 
-   appendPostToMultipleUserTimeline = async (dto: AppendPostToMultipleUserTimelineInputDTO) => {
+   appendPostToMultipleUserFeed = async (dto: AppendPostToMultipleUserTimelineInputDTO) => {
       const timelinePosts = dto.userIds.map(
-         (userId) => new TimelinePost(userId, dto.postId, dto.authorId, dto.createdAt)
+         (userId) => new FeedPostEntity(userId, dto.postId, dto.authorId, dto.createdAt)
       );
 
       this._timelineRepo.bulkUpsertTimelinePost(timelinePosts);
    };
 
-   removeAuthorPostsUserFromTimeline = (dto: { userId: string; authorId: string }) => {
+   removeAuthorPostsUserFromFeed = (dto: { userId: string; authorId: string }) => {
       return this._timelineRepo.removeAuthorPostsFromUserTimeline(dto.userId, dto.authorId);
    };
 
-   getUserTimelinePaginated = async (dto: {
+   getUserFeedPaginated = async (dto: {
       userId: string;
       from: string | null;
       limit: number;
    }): Promise<{
-      post: Omit<TimelinePost, 'authorId' | 'userId'>[];
+      post: Omit<FeedPostEntity, 'authorId' | 'userId'>[];
       pagination: { from: string | null; hasMore: boolean };
    }> => {
       const timeline = await this._timelineRepo.getUserTimeline(dto.userId, dto.from, dto.limit);

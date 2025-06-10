@@ -3,7 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import cookieParse from 'cookie-parser';
 import { errorHandler } from 'humane-common';
-import timelineRouter from './router/timeline.rotuer';
+import feedRouter from './router/feed.rotuer';
 
 const app = express();
 
@@ -21,7 +21,7 @@ app.get('/api/v1/feed/health', (req, res) => {
    res.status(200).json({ status: 'OK', srv: 'feed' });
 });
 
-app.use('/api/v1/feed/', timelineRouter);
+app.use('/api/v1/feed/', feedRouter);
 
 app.use(errorHandler);
 

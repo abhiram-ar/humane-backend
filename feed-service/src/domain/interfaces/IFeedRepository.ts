@@ -1,7 +1,7 @@
-import { TimelinePost } from '@domain/TimelinePost.entity';
+import { FeedPostEntity } from '@domain/FeedPost.entity';
 
-export interface ITimelineRepository {
-   bulkUpsertTimelinePost(posts: TimelinePost[]): Promise<void>;
+export interface IFeedRepository {
+   bulkUpsertTimelinePost(posts: FeedPostEntity[]): Promise<void>;
    removeAuthorPostsFromUserTimeline(userId: string, authorId: string): Promise<void>;
 
    getUserTimeline(
@@ -9,7 +9,7 @@ export interface ITimelineRepository {
       from: string | null,
       limit: number
    ): Promise<{
-      post: Omit<TimelinePost, 'authorId' | 'userId'>[];
+      post: Omit<FeedPostEntity, 'authorId' | 'userId'>[];
       from: string | null;
       hasMore: boolean;
    }>;

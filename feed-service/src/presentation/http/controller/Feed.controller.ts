@@ -1,10 +1,10 @@
-import { GetTimelineInputDTO, getTimelineInputSchema } from '@dtos/getTimeline.dto';
-import { TimelineServices } from '@services/Timeline.services';
+import { GetFeedInputDTO, getFeedInputSchema } from '@dtos/getFeed.dto';
+import { FeedServices } from '@services/feed.services';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 import { UnAuthenticatedError, ZodValidationError } from 'humane-common';
-export class TimelineController {
-   constructor(private readonly _timelineServies: TimelineServices) {}
+export class FeedController {
+   constructor(private readonly _timelineServies: FeedServices) {}
 
    getTimeline = async (req: Request, res: Response, next: NextFunction) => {
       try {
@@ -12,18 +12,18 @@ export class TimelineController {
             throw new UnAuthenticatedError('user not found in request');
          }
 
-         const dto: GetTimelineInputDTO = {
+         const dto: GetFeedInputDTO = {
             userId: req.query.userId as string,
             from: (req.query.from as string) || null,
             limit: req.query.limit ? parseInt(req.query.limit as string) : 10,
          };
 
-         const validatedInputDTO = getTimelineInputSchema.safeParse(dto);
+         const validatedInputDTO = getFeedInputSchema.safeParse(dto);
          if (!validatedInputDTO.success) {
             throw new ZodValidationError(validatedInputDTO.error);
          }
 
-         const rawTimeline = await this._timelineServies.getUserTimelinePaginated(
+         const rawTimeline = await this._timelineServies.getUserFeedPaginated(
             validatedInputDTO.data
          );
 
