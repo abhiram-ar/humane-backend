@@ -3,6 +3,7 @@ export class TimelinePost {
    constructor(
       public readonly userId: string,
       public readonly postId: string,
-      public readonly authorId: string
+      public readonly authorId: string,
+      public readonly createdAt: Date
    ) {}
 }

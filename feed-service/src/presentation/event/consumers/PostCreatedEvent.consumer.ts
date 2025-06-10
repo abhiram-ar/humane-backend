@@ -1,4 +1,5 @@
 import { logger } from '@config/logger';
+import { AppendPostToMultipleUserTimelineInputDTO } from '@dtos/AppendPostToMultipleUserTimeline.dto';
 import { postSchema } from '@dtos/Post.dto';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
 import { IUserService } from '@ports/IUserService';
@@ -61,11 +62,13 @@ export class PostCreatedEventConsumer {
                   return;
                }
                // if user is normal -> write post to each friends timeline
-               const dto = {
+               const dto: AppendPostToMultipleUserTimelineInputDTO = {
                   userIds: result.friends,
                   authorId: validatedPost.data.authorId,
                   postId: validatedPost.data.id,
+                  createdAt: validatedPost.data.createdAt,
                };
+
                await this._timelineServies.appendPostToMultipleUserTimeline(dto);
 
                // update the cache
