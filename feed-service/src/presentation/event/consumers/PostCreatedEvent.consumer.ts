@@ -1,8 +1,8 @@
 import { logger } from '@config/logger';
 import { postSchema } from '@dtos/Post.dto';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
+import { IUserService } from '@ports/IUserService';
 import { TimelineServices } from '@services/Timeline.services';
-import axios from 'axios';
 import {
    AppEvent,
    AppEventsTypes,
@@ -17,7 +17,8 @@ export class PostCreatedEventConsumer {
 
    constructor(
       private readonly _kafka: KafkaSingleton,
-      private readonly _timelineServies: TimelineServices
+      private readonly _timelineServies: TimelineServices,
+      private readonly _userServices: IUserService
    ) {
       this.consumer = this._kafka.createConsumer('feed-srv-post-created-v3');
    }
@@ -50,22 +51,18 @@ export class PostCreatedEventConsumer {
                }
 
                // get friends list
-               type GetFullFriendsResponse = {
-                  message: string;
-                  data: { isHotUser: true } | { isHotUser: false; friends: string[] };
-               };
-               const res = await axios.get<GetFullFriendsResponse>(
-                  'http://user-srv:3000/api/v1/internal/user/5315c3dd-a5bc-4754-9ce7-817018f97f7d/friends'
+               const result = await this._userServices.getAllFriendsNonHotUser(
+                  validatedPost.data.authorId
                );
 
                // if user is hot user skip
-               if (res.data.data.isHotUser) {
+               if (result.isHotUser) {
                   logger.info('user is hot, skipping timeline update for friends');
                   return;
                }
                // if user is normal -> write post to each friends timeline
                const dto = {
-                  userIds: res.data.data.friends,
+                  userIds: result.friends,
                   authorId: validatedPost.data.authorId,
                   postId: validatedPost.data.id,
                };

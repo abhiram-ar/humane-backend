@@ -5,6 +5,7 @@ export const ENV = {
    KAFKA_BROKER_URI: process.env.KAFKA_BROKER_URI,
    ELASTICSEARCH_PROXY_BASE_URL: process.env.ELASTICSEARCH_PROXY_BASE_URL,
    MONGODB_URI: process.env.MONGODB_URI,
+   USER_SERVICE_BASE_URL: process.env.USER_SERVICE_BASE_URL,
 } as const;
 
 function checkEnv() {
