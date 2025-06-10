@@ -231,4 +231,13 @@ export class PostresUserRepository implements IUserRepository {
       if (!res) return null;
       return { updatedCoverPhotoKey: res.coverPhotoKey as string };
    };
+
+   isHotUser = async (userId: string): Promise<boolean | null> => {
+      const res = await db.user.findUnique({
+         where: { id: userId },
+         select: { isHotUser: true },
+      });
+
+      return res?.isHotUser ?? null;
+   };
 }

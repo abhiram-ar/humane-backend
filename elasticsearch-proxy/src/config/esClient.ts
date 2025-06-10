@@ -11,4 +11,3 @@ export const pingES = async () => {
       console.log('error pingitg es cluster', error);
    }
 };
-

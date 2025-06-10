@@ -1,9 +1,9 @@
 import {
    GetUserBasicProfileFromIdsInputDTO,
    getUserBasicProfileFromIdsSchema,
-} from '@dtos/GetUserBasicProfileFromIDs';
-import { getUserProfileSchema } from '@dtos/GetUserProfile.dto';
-import { infiniteScrollSearchSchema } from '@dtos/infiniteScrollSearch.dto';
+} from 'interfaces/dto/GetUserBasicProfileFromIDs';
+import { getUserProfileSchema } from 'interfaces/dto/GetUserProfile.dto';
+import { infiniteScrollSearchSchema } from 'interfaces/dto/infiniteScrollSearch.dto';
 import { UserServices } from '@services/User.services';
 import { Request, Response, NextFunction } from 'express';
 import { GenericError, ZodValidationError } from 'humane-common';

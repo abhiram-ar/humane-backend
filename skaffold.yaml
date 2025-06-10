@@ -44,6 +44,22 @@ build:
         manual:
           - dest: .
             src: "src/**/*.ts"
+    - image: abhiramar/humane-feed-service
+      context: feed-service
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: "src/**/*.ts"
+    - image: abhiramar/humane-writer-service
+      context: writer-service
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: "src/**/*.ts"
 
 deploy:
   kubectl: {}

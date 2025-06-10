@@ -1,4 +1,4 @@
-import { UserDocument } from '@repository/elasticsearch/UserDocument.type';
+import { UserDocument } from '@repository/elasticsearch/user repository/UserDocument.type';
 import { IPagination } from 'Types/Pagination.type';
 
 export type PrivillegedUserSearchOutputDTO = {

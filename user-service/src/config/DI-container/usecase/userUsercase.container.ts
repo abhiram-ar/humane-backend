@@ -18,6 +18,7 @@ import {
    kafkaPubliserService,
    otpService,
 } from '../services.container';
+import { IsHotUser } from '@application/useCases/user/isHotUser.usecase';
 
 export const singupUser = new SignupUser(
    userRepository,
@@ -64,3 +65,5 @@ export const updateUserCoverPhoto = new UpdateUserCoverPhoto(
    awsStorageService,
    kafkaPubliserService
 );
+
+export const isHotUser = new IsHotUser(userRepository);
