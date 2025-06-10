@@ -1,7 +1,7 @@
 import { ENV } from '@config/env';
 import { GetFeedInputDTO, getFeedInputSchema } from '@dtos/getFeed.dto';
 import { FeedServices } from '@services/feed.services';
-import axios, { HttpStatusCode } from 'axios';
+import axios from 'axios';
 import { Request, Response, NextFunction } from 'express';
 import { HttpStatusCodes, UnAuthenticatedError, ZodValidationError } from 'humane-common';
 export class FeedController {
