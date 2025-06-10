@@ -39,4 +39,6 @@ export interface IUserRepository {
       userId: string,
       newCoverPhotoKey: string
    ): Promise<{ updatedCoverPhotoKey: string } | null>;
+
+   isHotUser(userId: string): Promise<boolean | null>;
 }

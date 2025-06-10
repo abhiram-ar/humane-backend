@@ -59,6 +59,8 @@ export interface IFriendshipRepository {
    }>;
    getUserFriendCount(userId: string): Promise<number>;
 
+   getAllUserFriends(userId: string): Promise<string[]>;
+
    findMutualFriends(
       currentUserId: string,
       targetUserId: string,

@@ -30,4 +30,8 @@ export class GetFriends {
    count = async (dto: GetFriendCountInputDTO): Promise<number> => {
       return await this._friendshipRepo.getUserFriendCount(dto.userId);
    };
+
+   allFriends = async (userId: string): Promise<string[]> => {
+      return await this._friendshipRepo.getAllUserFriends(userId);
+   };
 }

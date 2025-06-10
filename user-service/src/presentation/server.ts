@@ -13,6 +13,7 @@ import userProfileRouter from './routes/userProfile.router';
 import { seedUser } from 'test/seedController';
 import userRelationshipRouter from './routes/userRelationship.router';
 import { sendBulkFriendReq } from 'test/sendBulkFriendReq';
+import internalRouter from './routes/internal.router';
 
 const app = express();
 
@@ -26,13 +27,11 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use(cookieParse());
 
-app.get('/', (req, res) => {
-   res.status(200).send('server live');
-});
-
 app.get('/api/v1/user/health', (req, res) => {
    res.status(200).json({ status: 'OK' });
 });
+
+app.use('/api/v1/internal', internalRouter);
 
 app.post('/api/v1/user/seed', seedUser);
 app.post('/api/v1/user/test/send-friend-req', sendBulkFriendReq);

@@ -275,6 +275,26 @@ export class PostgresFriendshipRepository implements IFriendshipRepository {
       return res;
    };
 
+   getAllUserFriends = async (userId: string): Promise<string[]> => {
+      const res = await db.friendShip.findMany({
+         where: {
+            OR: [
+               { user1Id: userId, status: 'ACCEPTED' },
+               { user2Id: userId, status: 'ACCEPTED' },
+            ],
+         },
+         select: { user1Id: true, user2Id: true },
+      });
+
+      const parsedfriendsList = res.map((entry) => {
+         // friend can be either of user1 or user2
+         const friend = entry.user1Id === userId ? entry.user2Id : entry.user1Id;
+         return friend;
+      });
+
+      return parsedfriendsList;
+   };
+
    findMutualFriends = async (
       currentUserId: string,
       targetUserId: string,
