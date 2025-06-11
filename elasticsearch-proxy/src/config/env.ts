@@ -1,17 +1,4 @@
-type ENVValue = string | undefined;
-
-type ENVConfig = {
-   readonly NODE_ENV: 'production' | 'development';
-   readonly SERVER_PORT: ENVValue;
-   readonly ACCESS_TOKEN_SECRET: ENVValue;
-   readonly REFRESH_TOKEN_SECRET: ENVValue;
-   readonly KAFKA_CLIENT_ID: ENVValue;
-   readonly KAFKA_BROKER_URI: ENVValue;
-   readonly ELASTICSEARCH_URI: ENVValue;
-   readonly AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME: ENVValue;
-};
-
-export const ENV: ENVConfig = {
+export const ENV = {
    NODE_ENV: process.env.NODE_ENV as 'production' | 'development',
    SERVER_PORT: '3000',
    ACCESS_TOKEN_SECRET: process.env.accessTokenSecret,
@@ -20,13 +7,14 @@ export const ENV: ENVConfig = {
    KAFKA_BROKER_URI: process.env.KAFKA_BROKER_URI,
    ELASTICSEARCH_URI: process.env.ELASTICSEARCH_URI,
    AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME: process.env.AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME,
-};
+   USER_SERVICE_BASE_URL: process.env.USER_SERVICE_BASE_URL,
+} as const;
 
 function checkEnv() {
    let errorCount = 0;
 
    for (let key in ENV) {
-      let typedKey = key as keyof ENVConfig;
+      let typedKey = key as keyof typeof ENV;
       if (ENV[typedKey] === undefined || ENV[typedKey] === null) {
          console.log(`${key} not found in environment`);
          errorCount++;

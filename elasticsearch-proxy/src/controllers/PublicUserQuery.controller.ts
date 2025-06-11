@@ -6,7 +6,18 @@ import { getUserProfileSchema } from 'interfaces/dto/GetUserProfile.dto';
 import { infiniteScrollSearchSchema } from 'interfaces/dto/infiniteScrollSearch.dto';
 import { UserServices } from '@services/User.services';
 import { Request, Response, NextFunction } from 'express';
-import { GenericError, ZodValidationError } from 'humane-common';
+import {
+   AuthorizationError,
+   GenericError,
+   PostVisibility,
+   ZodValidationError,
+} from 'humane-common';
+import {
+   GetUserTimelineInputDTO,
+   getUserTimelineSchema,
+} from 'interfaces/dto/post/GetUserTimeline.dto';
+import axios from 'axios';
+import { ENV } from '@config/env';
 export class PublicUserQueryController {
    constructor(private readonly _userSerives: UserServices) {}
 
@@ -84,6 +95,43 @@ export class PublicUserQueryController {
             message: 'userlist successfully fetched',
             data: result,
          });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getUserTimeline = async(req: Request, res: Response, next: NextFunction) => {
+      try {
+         let filter: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined;
+
+         const dto: GetUserTimelineInputDTO = {
+            targetUserId: req.params.targetUserId,
+            limit: parseInt((req.query.limit as string) || '10'),
+            from: req.query.from as string,
+         };
+         const validatedDTO = getUserTimelineSchema.safeParse(dto);
+         if (!validatedDTO.success) {
+            throw new ZodValidationError(validatedDTO.error);
+         }
+
+         if (!req.user || req.user.type !== 'user') {
+            filter = 'public'; // if no user get only the public posts of targetUser
+         } else {
+            type RelationshipStatus =
+               | 'sameUser'
+               | 'strangers'
+               | 'friends'
+               | 'friendreqSend'
+               | 'friendReqWaitingApproval'
+               | 'blocked';
+
+            type RelationshipStatusResponse = {
+               success: boolean;
+               message: string;
+               data: { status: RelationshipStatus };
+            };
+            // const res = await axios.get<RelationshipStatusResponse>();
+         }
       } catch (error) {
          next(error);
       }

@@ -67,7 +67,6 @@ export class InternalUserQueryController {
                authorIdsSet.add(post.authorId);
             }
          });
-         console.log('authset', authorIdsSet, parsed.data);
 
          const authorIdToBasicDetailsMap = new Map<
             string,
