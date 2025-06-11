@@ -3,7 +3,13 @@ import { GetFeedInputDTO, getFeedInputSchema } from '@dtos/getFeed.dto';
 import { FeedServices } from '@services/feed.services';
 import axios from 'axios';
 import { Request, Response, NextFunction } from 'express';
-import { HttpStatusCodes, UnAuthenticatedError, ZodValidationError } from 'humane-common';
+import {
+   HttpStatusCodes,
+   ModerationStatus,
+   PostVisibility,
+   UnAuthenticatedError,
+   ZodValidationError,
+} from 'humane-common';
 export class FeedController {
    constructor(private readonly _timelineServies: FeedServices) {}
 
@@ -14,7 +20,7 @@ export class FeedController {
          }
 
          const dto: GetFeedInputDTO = {
-            userId: req.query.userId as string,
+            userId: req.user.userId,
             from: (req.query.from as string) || null,
             limit: req.query.limit ? parseInt(req.query.limit as string) : 10,
          };
@@ -31,20 +37,49 @@ export class FeedController {
 
          // hydrate rawFeed with users and post details
 
-         const { data } = await axios.get(
+         type GetPostDetailsResponse = {
+            message: string;
+            data: {
+               posts: ({
+                  author:
+                     | {
+                          id: string;
+                          firstName: string;
+                          lastName?: string | null;
+                          avatarURL?: string;
+                       }
+                     | undefined;
+                  id: string;
+                  createdAt: Date;
+                  updatedAt: Date;
+                  authorId: string;
+                  content: string;
+                  visibility: (typeof PostVisibility)[keyof typeof PostVisibility];
+                  moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus];
+                  moderationMetadata?: any;
+                  posterURL: string | null;
+               } | null)[];
+            };
+         };
+
+         const { data } = await axios.get<GetPostDetailsResponse>(
             `${ENV.ELASTICSEARCH_PROXY_BASE_URL}/api/v1/query/internal/post`,
             {
                params: { postId: rawFeed.post.map((post) => post.postId) },
                paramsSerializer: { indexes: null },
             }
          );
+         // filterout null and no autor posts
 
          // get hot friends
 
          // get hot friends timeline in this timeframe - this should be a read tough cache, with pre hydrated post details // resethc on prehydration
 
          // get hot users profile from read-through cache
-         res.status(HttpStatusCodes.OK).json({ message: 'timelime fetched', data: data.data });
+         res.status(HttpStatusCodes.OK).json({
+            message: 'timelime fetched',
+            data: { posts: data.data.posts, pagination: rawFeed.pagination },
+         });
       } catch (error) {
          next(error);
       }
