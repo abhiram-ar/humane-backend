@@ -1,12 +1,22 @@
 import { GenericError } from '@application/errors/GenericError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { GetFriends } from '@application/useCases/friendship/GetFriends.usercase';
+import { GetRelationShipStatus } from '@application/useCases/friendship/GetRelationshipStatus';
 import { IsHotUser } from '@application/useCases/user/isHotUser.usecase';
+import {
+   GetRelationShipStatusInputDTO,
+   getRelationshipStatusSchema,
+} from '@dtos/friendship/GetRelationshipStatus.dto';
+import { ZodValidationError } from '@presentation/errors/ZodValidationError';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 
 export class InternalController {
-   constructor(private readonly _isHotUser: IsHotUser, private readonly _getFriends: GetFriends) {}
+   constructor(
+      private readonly _isHotUser: IsHotUser,
+      private readonly _getFriends: GetFriends,
+      private readonly _getRelationshipStatus: GetRelationShipStatus
+   ) {}
 
    getAllFriends = async (req: Request, res: Response, next: NextFunction) => {
       try {
@@ -30,6 +40,32 @@ export class InternalController {
          res.status(HttpStatusCode.Ok).json({
             message: 'non hot user, friendslist included',
             data: { isHotUser: false, friends },
+         });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getRelationshipStatus = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const { targetUserId, currentUserId } = req.query;
+
+         const dto: GetRelationShipStatusInputDTO = {
+            currentUserId: currentUserId as string,
+            targetUserId: targetUserId as string,
+         };
+         const parsed = getRelationshipStatusSchema.safeParse(dto);
+
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
+         }
+
+         const status = await this._getRelationshipStatus.execute(parsed.data);
+
+         res.status(200).json({
+            success: true,
+            message: 'Relationship status fetched',
+            data: { status },
          });
       } catch (error) {
          next(error);
