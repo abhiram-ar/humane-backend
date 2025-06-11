@@ -3,7 +3,8 @@ import { HydrartePostDetailsInputDTO } from 'interfaces/dto/post/HydratePostDeta
 import { PostInputDTO } from 'interfaces/dto/post/Post.dto';
 import { IPostRepository } from 'interfaces/repository/IPostRepository';
 import { CDNService } from './CDN.services';
-import { IPostDocument } from 'interfaces/IPostDocument';
+import { IPostDocument, PostVisibility } from 'interfaces/IPostDocument';
+import { GetUserTimelineInputDTO } from 'interfaces/dto/post/GetUserTimeline.dto';
 
 export class PostService {
    constructor(
@@ -54,5 +55,33 @@ export class PostService {
       });
 
       return MediaURLhydratedPosts;
+   };
+
+   getUserTimeline = async (
+      dto: GetUserTimelineInputDTO,
+      filter: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined = undefined
+   ): Promise<{
+      posts: (Omit<IPostDocument, 'posterKey'> & { posterURL: string | null })[];
+      pagination: { from: string | null; hasMore: boolean };
+   }> => {
+      const res = await this._postRepo.getUserPosts(
+         dto.targetUserId,
+         dto.from ?? null,
+         dto.limit,
+         filter
+      );
+
+      const postURLHydratedPosts = res.posts.map((post) => {
+         const { posterKey, ...data } = post;
+
+         let posterURL: string | null = null;
+         if (posterKey) {
+            posterURL = this._cdnService.getPublicCDNURL(posterKey);
+         }
+
+         return { ...data, posterURL };
+      });
+
+      return { posts: postURLHydratedPosts, pagination: { from: res.from, hasMore: res.hasMore } };
    };
 }

@@ -8,6 +8,8 @@ import {
 } from 'interfaces/dto/post/HydratePostDetails.dto';
 import { PostService } from '@services/Post.services';
 import { GetBasicUserProfileFromIdsOutputDTO } from 'interfaces/dto/GetUserBasicProfileFromIDs';
+
+// TODO: rename to common internal controller
 export class InternalUserQueryController {
    constructor(
       private readonly _userSerives: UserServices,

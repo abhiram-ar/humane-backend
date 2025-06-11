@@ -2,6 +2,7 @@ import { IPostDocument } from 'interfaces/IPostDocument';
 import { IPostRepository } from 'interfaces/repository/IPostRepository';
 import { ES_INDEXES } from '../ES_INDEXES';
 import { Client, errors } from '@elastic/elasticsearch';
+import { PostVisibility } from 'humane-common';
 
 export class PostRepository implements IPostRepository {
    private readonly _index = ES_INDEXES.POST_INDEX;
@@ -14,6 +15,9 @@ export class PostRepository implements IPostRepository {
       if (!indexExists)
          await this._client.indices.create({
             index: ES_INDEXES.POST_INDEX,
+            settings: {
+               number_of_replicas: 0, // 👈 Critical fix for single-node
+            },
             mappings: {
                // prevent dynamic filed creation in production, improve query performance and better resouce utilization
                dynamic: 'false',
@@ -79,8 +83,6 @@ export class PostRepository implements IPostRepository {
          _source: true,
       });
 
-      console.log('post found byids', res);
-
       const parsedPostDocList = res.docs.map((doc) => {
          const typedDoc = doc as {
             _source: IPostDocument;
@@ -91,6 +93,35 @@ export class PostRepository implements IPostRepository {
          return typedDoc.found ? { ...typedDoc._source } : null;
       });
       return parsedPostDocList;
+   };
+
+   getUserPosts = async (
+      userId: string,
+      from: string | null,
+      limit: number,
+      filter: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined
+   ): Promise<{ posts: IPostDocument[]; from: string | null; hasMore: boolean }> => {
+      console.log('f', userId === '5315c3dd-a5bc-4754-9ce7-817018f97f7d');
+
+      const res = await this._client.search<IPostDocument>({
+         index: ES_INDEXES.POST_INDEX,
+         size: limit,
+         query: {
+            match: {
+               authorId: '5315c3dd-a5bc-4754-9ce7-817018f97f7d',
+            },
+         },
+      });
+
+      const hits = res.hits.hits;
+      console.log(res);
+
+      const parsedPostList = hits.map((hit) => ({ ...hit._source } as IPostDocument));
+
+      const searchAfter =
+         hits.length > 0 ? (hits[hits.length - 1].sort?.[0] as string) ?? null : null;
+
+      return { posts: parsedPostList, from: searchAfter, hasMore: hits.length === limit };
    };
    replace = async (postId: string, doc: IPostDocument): Promise<void> => {
       await this._client.update({ index: this._index, id: postId, doc });
