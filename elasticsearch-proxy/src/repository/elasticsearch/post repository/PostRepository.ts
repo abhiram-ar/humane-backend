@@ -25,12 +25,12 @@ export class PostRepository implements IPostRepository {
                   id: { type: 'keyword' },
                   authorId: { type: 'keyword' },
                   content: { type: 'text' },
-                  posterKey: { type: 'keyword' },
-                  visibility: { type: 'constant_keyword' },
-                  moderationStatus: { type: 'constant_keyword' },
+                  posterKey: { type: 'keyword', index: false },
+                  visibility: { type: 'keyword' },
+                  moderationStatus: { type: 'keyword' },
                   moderationMetadata: { type: 'object' },
                   createdAt: { type: 'date' }, // this is interpreated as iso data string in elastic search, covert the toISODataString() before injesting
-                  updatedAt: { type: 'date' },
+                  updatedAt: { type: 'date', index: false },
                },
             },
          });
@@ -101,20 +101,20 @@ export class PostRepository implements IPostRepository {
       limit: number,
       filter: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined
    ): Promise<{ posts: IPostDocument[]; from: string | null; hasMore: boolean }> => {
-      console.log('f', userId === '5315c3dd-a5bc-4754-9ce7-817018f97f7d');
-
       const res = await this._client.search<IPostDocument>({
          index: ES_INDEXES.POST_INDEX,
          size: limit,
+
          query: {
-            match: {
-               authorId: '5315c3dd-a5bc-4754-9ce7-817018f97f7d',
+            bool: {
+               filter: filter
+                  ? [{ term: { authorId: userId } }, { term: { visibility: filter } }]
+                  : [{ term: { authorId: userId } }],
             },
          },
       });
 
       const hits = res.hits.hits;
-      console.log(res);
 
       const parsedPostList = hits.map((hit) => ({ ...hit._source } as IPostDocument));
 
