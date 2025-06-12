@@ -104,7 +104,7 @@ export class PostRepository implements IPostRepository {
       const res = await this._client.search<IPostDocument>({
          index: ES_INDEXES.POST_INDEX,
          size: limit,
-
+         sort: [{ id: 'desc' }],
          query: {
             bool: {
                filter: filter
