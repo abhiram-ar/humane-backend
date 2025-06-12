@@ -5,8 +5,9 @@ import { IPostRepository } from 'interfaces/repository/IPostRepository';
 import { CDNService } from './CDN.services';
 import { IPostDocument, PostVisibility } from 'interfaces/IPostDocument';
 import { GetUserTimelineInputDTO } from 'interfaces/dto/post/GetUserTimeline.dto';
+import { IPostService } from 'interfaces/services/IPost.services';
 
-export class PostService {
+export class PostService implements IPostService {
    constructor(
       private readonly _postRepo: IPostRepository,
       private readonly _cdnService: CDNService

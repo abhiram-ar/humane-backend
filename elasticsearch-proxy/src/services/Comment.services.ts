@@ -1,8 +1,9 @@
 import { logger } from '@config/logger';
 import { CreateCommentInputDTO } from 'interfaces/dto/post/Comment.dto';
 import { ICommenetRepository } from 'interfaces/repository/ICommentRepository';
+import { ICommentService } from 'interfaces/services/IComment.services';
 
-export class CommentService {
+export class CommentService implements ICommentService {
    constructor(private readonly _commentRepo: ICommenetRepository) {}
 
    upsert = async (dto: CreateCommentInputDTO): Promise<void> => {

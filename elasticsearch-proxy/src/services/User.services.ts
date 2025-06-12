@@ -19,8 +19,9 @@ import {
    GetBasicUserProfileFromIdsOutputDTO,
    GetUserBasicProfileFromIdsInputDTO,
 } from 'interfaces/dto/GetUserBasicProfileFromIDs';
+import { IUserServices } from 'interfaces/services/IUser.services';
 
-export class UserServices {
+export class UserServices implements IUserServices {
    constructor(
       private readonly _userRepository: IUserRepository,
       private readonly _cdnService: CDNService
