@@ -13,4 +13,6 @@ export interface IFeedRepository {
       from: string | null;
       hasMore: boolean;
    }>;
+
+   deletePostFromAllTimeline(postId: string): Promise<{ deletedCount: number }>;
 }

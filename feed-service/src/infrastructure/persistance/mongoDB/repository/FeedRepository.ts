@@ -44,4 +44,9 @@ export class FeedRepository implements IFeedRepository {
 
       return { post: parsedTimelinePosts, from: hasMore ? res[res.length - 1].id : null, hasMore };
    };
+
+   deletePostFromAllTimeline = async (postId: string): Promise<{ deletedCount: number }> => {
+      const res = await feedModel.deleteMany({ postId });
+      return { deletedCount: res.deletedCount };
+   };
 }

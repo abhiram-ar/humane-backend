@@ -1,6 +1,7 @@
 import { IFeedRepository } from '@domain/interfaces/IFeedRepository';
 import { FeedPostEntity } from '@domain/FeedPost.entity';
 import { AppendPostToMultipleUserTimelineInputDTO } from '@dtos/AppendPostToMultipleUserTimeline.dto';
+import { logger } from '@config/logger';
 
 export class FeedServices {
    constructor(private readonly _timelineRepo: IFeedRepository) {}
@@ -31,5 +32,15 @@ export class FeedServices {
          post: timeline.post,
          pagination: { from: timeline.from, hasMore: timeline.hasMore },
       };
+   };
+
+   deletePostFromAllTimeline = async (postId: string): Promise<void> => {
+      const res = await this._timelineRepo.deletePostFromAllTimeline(postId);
+      if (res.deletedCount === 0)
+         logger.warn(`no post(postId: ${postId}) deleted. Post may not exist in DB`);
+      else
+         logger.info(
+            `deleted ${res.deletedCount} entry of postId(${postId}) from multiple timeline`
+         );
    };
 }
