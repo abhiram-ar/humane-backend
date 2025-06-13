@@ -5,7 +5,7 @@ import { isAuthenticated } from 'humane-common';
 const postRouter = express.Router();
 
 postRouter.post('/', isAuthenticated, postController.createPost);
-postRouter.post('/:postId', isAuthenticated, postController.deletePost);
+postRouter.delete('/:postId', isAuthenticated, postController.deletePost);
 
 postRouter.post('/pre-signed-url/posterKey', isAuthenticated, postController.getPresingedPosterURL);
 
