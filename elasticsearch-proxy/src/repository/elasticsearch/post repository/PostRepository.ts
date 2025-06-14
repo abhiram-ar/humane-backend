@@ -42,7 +42,6 @@ export class PostRepository implements IPostRepository {
    deleteById = async (itemId: string): Promise<{ found: boolean; deleted: boolean }> => {
       try {
          const res = await this._client.delete({ index: this._index, id: itemId });
-         console.log('del', res);
          return {
             found: res.result === 'not_found' ? false : true,
             deleted: res.result === 'deleted' ? true : false,

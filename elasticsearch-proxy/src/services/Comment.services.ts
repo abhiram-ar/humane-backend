@@ -25,4 +25,9 @@ export class CommentService implements ICommentService {
          logger.error(`Unable to delete comment ${commentId}`);
       }
    };
+
+   deleteAllPostComments = async (postId: string): Promise<void> => {
+      const { deletedCount } = await this._commentRepo.deleteAllPostComments(postId);
+      logger.info(`deleted ${deletedCount} related to post(${postId})`);
+   };
 }

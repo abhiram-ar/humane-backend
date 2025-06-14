@@ -87,4 +87,12 @@ export class CommetRepository implements ICommenetRepository {
       });
       return parsedCommentDocList;
    };
+
+   deleteAllPostComments = async (postId: string): Promise<{ deletedCount: number }> => {
+      const res = await this._client.deleteByQuery({
+         index: this._index,
+         query: { term: { postId } },
+      });
+      return { deletedCount: res.deleted || 0 };
+   };
 }
