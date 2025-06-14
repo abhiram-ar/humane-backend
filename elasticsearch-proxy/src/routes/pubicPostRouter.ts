@@ -10,4 +10,6 @@ publicPostRouter.get(
    publicPostQueryController.getUserTimeline
 );
 
+publicPostRouter.get('/:postId', publicPostQueryController.postFullDetails);
+
 export default publicPostRouter;

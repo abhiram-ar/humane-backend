@@ -1,12 +1,14 @@
 import { PostService } from '@services/Post.services';
 import { UserServices } from '@services/User.services';
 import { HttpStatusCode } from 'axios';
+import { PostNotFoundError } from 'errors/PostNotFound.error';
 import { NextFunction, Request, Response } from 'express';
-import { ZodValidationError } from 'humane-common';
+import { HttpStatusCodes, ZodValidationError } from 'humane-common';
 import {
    GetUserTimelineInputDTO,
    getUserTimelineSchema,
 } from 'interfaces/dto/post/GetUserTimeline.dto';
+import { hydratePostDetailsSchema } from 'interfaces/dto/post/HydratePostDetails.dto';
 import { PostVisibility } from 'interfaces/dto/post/Post.dto';
 import { IExternalUserServices } from 'interfaces/services/IExternalUserService';
 
@@ -57,6 +59,33 @@ export class PublicPostQueryControllet {
          res.status(HttpStatusCode.Ok).json({
             message: 'user timemline fetcheed',
             data: { posts, targetUserDetails: targetUserDetails[0], pagination },
+         });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   postFullDetails = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const { postId } = req.params;
+
+         const parsed = hydratePostDetailsSchema.safeParse([postId]);
+         if (!parsed.success) {
+            throw new ZodValidationError(parsed.error);
+         }
+         const [postdetails] = await this._postServices.getPostByIds(parsed.data);
+
+         if (!postdetails) {
+            throw new PostNotFoundError();
+         }
+
+         const authorBasicDetails = await this._userSerives.getBasicUserProfile([
+            postdetails.authorId,
+         ]);
+
+         res.status(HttpStatusCodes.OK).json({
+            message: 'author details hydrated post',
+            data: { post: { ...postdetails, author: authorBasicDetails } },
          });
       } catch (error) {
          next(error);
