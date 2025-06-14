@@ -104,6 +104,7 @@ export class PostRepository implements IPostRepository {
          index: ES_INDEXES.POST_INDEX,
          size: limit,
          sort: [{ id: 'desc' }],
+         search_after: from ? [from] : undefined,
          query: {
             bool: {
                filter: filter
