@@ -6,6 +6,8 @@ import {
 } from '@application/dtos/generatePresingedURL.dto';
 import { StorageError } from '@application/errors/StorageError';
 import { logger } from '@config/logget';
+import { ICommentDocument } from '@infrastructure/persistance/MongoDB/Models/commentModel';
+import { ICommentService } from '@ports/ICommentServices';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IPostService } from '@ports/IPostService';
 import { IStorageService } from '@ports/IStorageService';
@@ -23,7 +25,8 @@ export class PostController {
    constructor(
       private readonly _postService: IPostService,
       private readonly _eventPubliser: IEventPublisher,
-      private readonly _storageService: IStorageService
+      private readonly _storageService: IStorageService,
+      private readonly _commentService: ICommentService,
    ) {}
 
    createPost = async (req: Request, res: Response, next: NextFunction) => {
@@ -85,6 +88,8 @@ export class PostController {
             MessageBrokerTopics.POST_DELETED_EVENTS_TOPIC,
             postDeltedEvent
          );
+
+         await this._commentService.deleteAllPostComments(deltedPost.id)
 
          if (!ack) {
             logger.warn(`post ${deltedPost.id} deleted event not publised in eventbus`);

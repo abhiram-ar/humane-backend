@@ -20,4 +20,9 @@ export class CommentRepository implements ICommentRepository {
 
       return commentAutoMapper(res);
    };
+
+   deleteAllPostComments = async (postId: string): Promise<{ deletedCount: number }> => {
+      const res = await commentModel.deleteMany({ postId });
+      return { deletedCount: res.deletedCount };
+   };
 }
