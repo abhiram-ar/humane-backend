@@ -62,13 +62,20 @@ export class FeedController {
             };
          };
 
-         const { data } = await axios.get<GetPostDetailsResponse>(
-            `${ENV.ELASTICSEARCH_PROXY_BASE_URL}/api/v1/query/internal/post`,
-            {
-               params: { postId: rawFeed.post.map((post) => post.postId) },
-               paramsSerializer: { indexes: null },
-            }
-         );
+         const postIds = rawFeed.post.map((post) => post.postId);
+
+         let hydratedPosts: GetPostDetailsResponse['data']['posts'] = [];
+
+         if (postIds && postIds.length > 0) {
+            const res = await axios.get<GetPostDetailsResponse>(
+               `${ENV.ELASTICSEARCH_PROXY_BASE_URL}/api/v1/query/internal/post`,
+               {
+                  params: { postId: postIds },
+                  paramsSerializer: { indexes: null },
+               }
+            );
+            hydratedPosts = res.data.data.posts;
+         }
          // filterout null and no autor posts
 
          // get hot friends
@@ -78,7 +85,7 @@ export class FeedController {
          // get hot users profile from read-through cache
          res.status(HttpStatusCodes.OK).json({
             message: 'timelime fetched',
-            data: { posts: data.data.posts, pagination: rawFeed.pagination },
+            data: { posts: hydratedPosts, pagination: rawFeed.pagination },
          });
       } catch (error) {
          next(error);
