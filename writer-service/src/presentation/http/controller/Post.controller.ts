@@ -6,7 +6,6 @@ import {
 } from '@application/dtos/generatePresingedURL.dto';
 import { StorageError } from '@application/errors/StorageError';
 import { logger } from '@config/logget';
-import { ICommentDocument } from '@infrastructure/persistance/MongoDB/Models/commentModel';
 import { ICommentService } from '@ports/ICommentServices';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IPostService } from '@ports/IPostService';
