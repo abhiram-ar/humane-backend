@@ -2,7 +2,6 @@ import { ICommenetRepository } from 'interfaces/repository/ICommentRepository';
 import { ES_INDEXES } from '../ES_INDEXES';
 import { Client, errors } from '@elastic/elasticsearch';
 import { ICommentDocument } from 'interfaces/ICommentDocument';
-import { size } from 'zod/v4';
 
 export class CommetRepository implements ICommenetRepository {
    private readonly _index = ES_INDEXES.COMMENT_INDEX;
