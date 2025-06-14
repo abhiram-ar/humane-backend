@@ -9,7 +9,9 @@ export class PostRepository implements IPostRepository {
          authorId: post.authorId,
          content: post.content,
          visibility: post.visibility,
+         posterKey: post.posterKey,
       });
+
       return postAutoMapper(res);
    };
    delete = async (authorId: string, postId: string): Promise<Required<Post> | null> => {

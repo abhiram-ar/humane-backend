@@ -1,5 +1,5 @@
-export class TimelinePost {
-   public readonly id: string | undefined;
+export class FeedPostEntity {
+   public readonly id?: string;
    constructor(
       public readonly userId: string,
       public readonly postId: string,

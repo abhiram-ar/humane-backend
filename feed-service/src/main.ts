@@ -1,4 +1,4 @@
-import checkEnv, { ENV } from '@config/env';
+import checkEnv from '@config/env';
 import { startAllConsumers, stopAllConsumer } from '@config/kafka';
 import { logger } from '@config/logger';
 import connectDB from '@infrastructure/persistance/mongoDB/mongoDBclient';

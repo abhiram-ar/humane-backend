@@ -16,7 +16,7 @@ export type IPostDocument = {
    posterKey?: string | null;
    visibility: (typeof PostVisibility)[keyof typeof PostVisibility];
 
-   moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus] | undefined;
+   moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus] | undefined; //TOTO: remove undfiend when mooderation service is implmented
    moderationMetadata?: any;
 
    createdAt: Date;

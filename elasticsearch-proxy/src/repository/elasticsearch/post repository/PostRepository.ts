@@ -2,6 +2,7 @@ import { IPostDocument } from 'interfaces/IPostDocument';
 import { IPostRepository } from 'interfaces/repository/IPostRepository';
 import { ES_INDEXES } from '../ES_INDEXES';
 import { Client, errors } from '@elastic/elasticsearch';
+import { PostVisibility } from 'humane-common';
 
 export class PostRepository implements IPostRepository {
    private readonly _index = ES_INDEXES.POST_INDEX;
@@ -14,6 +15,9 @@ export class PostRepository implements IPostRepository {
       if (!indexExists)
          await this._client.indices.create({
             index: ES_INDEXES.POST_INDEX,
+            settings: {
+               number_of_replicas: 0, // 👈 Critical fix for single-node
+            },
             mappings: {
                // prevent dynamic filed creation in production, improve query performance and better resouce utilization
                dynamic: 'false',
@@ -21,12 +25,12 @@ export class PostRepository implements IPostRepository {
                   id: { type: 'keyword' },
                   authorId: { type: 'keyword' },
                   content: { type: 'text' },
-                  posterKey: { type: 'keyword' },
-                  visibility: { type: 'constant_keyword' },
-                  moderationStatus: { type: 'constant_keyword' },
+                  posterKey: { type: 'keyword', index: false },
+                  visibility: { type: 'keyword' },
+                  moderationStatus: { type: 'keyword' },
                   moderationMetadata: { type: 'object' },
                   createdAt: { type: 'date' }, // this is interpreated as iso data string in elastic search, covert the toISODataString() before injesting
-                  updatedAt: { type: 'date' },
+                  updatedAt: { type: 'date', index: false },
                },
             },
          });
@@ -38,7 +42,6 @@ export class PostRepository implements IPostRepository {
    deleteById = async (itemId: string): Promise<{ found: boolean; deleted: boolean }> => {
       try {
          const res = await this._client.delete({ index: this._index, id: itemId });
-         console.log('del', res);
          return {
             found: res.result === 'not_found' ? false : true,
             deleted: res.result === 'deleted' ? true : false,
@@ -89,6 +92,36 @@ export class PostRepository implements IPostRepository {
          return typedDoc.found ? { ...typedDoc._source } : null;
       });
       return parsedPostDocList;
+   };
+
+   getUserPosts = async (
+      userId: string,
+      from: string | null,
+      limit: number,
+      filter: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined
+   ): Promise<{ posts: IPostDocument[]; from: string | null; hasMore: boolean }> => {
+      const res = await this._client.search<IPostDocument>({
+         index: ES_INDEXES.POST_INDEX,
+         size: limit,
+         sort: [{ id: 'desc' }],
+         search_after: from ? [from] : undefined,
+         query: {
+            bool: {
+               filter: filter
+                  ? [{ term: { authorId: userId } }, { term: { visibility: filter } }]
+                  : [{ term: { authorId: userId } }],
+            },
+         },
+      });
+
+      const hits = res.hits.hits;
+
+      const parsedPostList = hits.map((hit) => ({ ...hit._source } as IPostDocument));
+
+      const searchAfter =
+         hits.length > 0 ? (hits[hits.length - 1].sort?.[0] as string) ?? null : null;
+
+      return { posts: parsedPostList, from: searchAfter, hasMore: hits.length === limit };
    };
    replace = async (postId: string, doc: IPostDocument): Promise<void> => {
       await this._client.update({ index: this._index, id: postId, doc });

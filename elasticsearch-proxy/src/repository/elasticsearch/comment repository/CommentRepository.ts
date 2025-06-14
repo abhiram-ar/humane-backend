@@ -87,4 +87,37 @@ export class CommetRepository implements ICommenetRepository {
       });
       return parsedCommentDocList;
    };
+
+   deleteAllPostComments = async (postId: string): Promise<{ deletedCount: number }> => {
+      const res = await this._client.deleteByQuery({
+         index: this._index,
+         query: { term: { postId } },
+      });
+      return { deletedCount: res.deleted || 0 };
+   };
+
+   getPostComments = async (
+      postId: string,
+      from: string | null,
+      limit: number
+   ): Promise<{ comments: ICommentDocument[]; from: string | null; hasMore: boolean }> => {
+      console.log(from, limit);
+
+      const res = await this._client.search<ICommentDocument>({
+         index: this._index,
+         query: { term: { postId } },
+         sort: [{ id: 'desc' }],
+         search_after: from ? [from] : undefined,
+         size: limit,
+      });
+
+      const comments = res.hits.hits.map((hit) => hit._source as ICommentDocument);
+
+      const searchAfter =
+         comments.length > 0
+            ? (res.hits.hits[comments.length - 1].sort?.[0] as string) ?? null
+            : null;
+
+      return { comments: comments, from: searchAfter, hasMore: comments.length === limit };
+   };
 }

@@ -7,6 +7,7 @@ import { infiniteScrollSearchSchema } from 'interfaces/dto/infiniteScrollSearch.
 import { UserServices } from '@services/User.services';
 import { Request, Response, NextFunction } from 'express';
 import { GenericError, ZodValidationError } from 'humane-common';
+
 export class PublicUserQueryController {
    constructor(private readonly _userSerives: UserServices) {}
 
@@ -43,8 +44,6 @@ export class PublicUserQueryController {
          } else {
             throw new GenericError('Invalid userId type for this query');
          }
-
-         console.log(ids);
 
          const parsed = getUserBasicProfileFromIdsSchema.safeParse(ids);
          if (!parsed.success) {

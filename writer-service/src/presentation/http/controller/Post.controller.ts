@@ -1,8 +1,15 @@
 import { CreatePostDTO, createPostSchema } from '@application/dtos/CreatePost.dto';
 import { DeletePostDTO, deletePostSchema } from '@application/dtos/DeletePost.dto';
+import {
+   GeneratePresignedURLInputDTO,
+   generatePresignedURLSchema,
+} from '@application/dtos/generatePresingedURL.dto';
+import { StorageError } from '@application/errors/StorageError';
 import { logger } from '@config/logget';
+import { ICommentService } from '@ports/ICommentServices';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IPostService } from '@ports/IPostService';
+import { IStorageService } from '@ports/IStorageService';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 import {
@@ -16,7 +23,9 @@ import {
 export class PostController {
    constructor(
       private readonly _postService: IPostService,
-      private readonly _eventPubliser: IEventPublisher
+      private readonly _eventPubliser: IEventPublisher,
+      private readonly _storageService: IStorageService,
+      private readonly _commentService: ICommentService,
    ) {}
 
    createPost = async (req: Request, res: Response, next: NextFunction) => {
@@ -79,6 +88,8 @@ export class PostController {
             postDeltedEvent
          );
 
+         await this._commentService.deleteAllPostComments(deltedPost.id)
+
          if (!ack) {
             logger.warn(`post ${deltedPost.id} deleted event not publised in eventbus`);
          }
@@ -86,6 +97,38 @@ export class PostController {
          res.status(HttpStatusCode.Accepted).json({
             message: 'post deleted',
             data: { post: deltedPost },
+         });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getPresingedPosterURL = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         if (!req.user || req.user.type !== 'user') {
+            throw new UnAuthenticatedError('user not found in req header');
+         }
+
+         const dto: GeneratePresignedURLInputDTO = {
+            userId: req.user.userId,
+            fileName: req.body.fileName,
+            fileType: req.body.fileType,
+         };
+         const { data, success, error } = generatePresignedURLSchema.safeParse(dto);
+         if (!success) {
+            throw new ZodValidationError(error);
+         }
+
+         const result = await this._storageService.generatePreSignedURL(
+            data.userId,
+            data.fileName,
+            data.fileType
+         );
+         if (!result) throw new StorageError('unable to create pre-signedURL');
+
+         res.status(HttpStatusCode.Created).json({
+            message: 'post poster presignedURL genrated',
+            data: result,
          });
       } catch (error) {
          next(error);

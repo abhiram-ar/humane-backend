@@ -18,7 +18,8 @@ export const postCreatedEventConsumer = new PostCreatedEventConsumer(
 
 export const postDeletedEventConsumer = new PostDeletedEventConsumer(
    KafkaSingleton.getInstance(),
-   postServices
+   postServices,
+   commentServices
 );
 
 export const commentCreatedEventConsumer = new CommentCreatedEventConsumer(

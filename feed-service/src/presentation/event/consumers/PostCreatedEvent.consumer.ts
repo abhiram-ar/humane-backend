@@ -3,7 +3,7 @@ import { AppendPostToMultipleUserTimelineInputDTO } from '@dtos/AppendPostToMult
 import { postSchema } from '@dtos/Post.dto';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
 import { IUserService } from '@ports/IUserService';
-import { TimelineServices } from '@services/Timeline.services';
+import { FeedServices } from '@services/feed.services';
 import {
    AppEvent,
    AppEventsTypes,
@@ -18,7 +18,7 @@ export class PostCreatedEventConsumer {
 
    constructor(
       private readonly _kafka: KafkaSingleton,
-      private readonly _timelineServies: TimelineServices,
+      private readonly _timelineServies: FeedServices,
       private readonly _userServices: IUserService
    ) {
       this.consumer = this._kafka.createConsumer('feed-srv-post-created-v3');
@@ -69,7 +69,7 @@ export class PostCreatedEventConsumer {
                   createdAt: validatedPost.data.createdAt,
                };
 
-               await this._timelineServies.appendPostToMultipleUserTimeline(dto);
+               await this._timelineServies.appendPostToMultipleUserFeed(dto);
 
                // update the cache
 

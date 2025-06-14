@@ -1,10 +1,10 @@
-import { ITimelineRepository } from '@domain/interfaces/ITimelineRepository';
-import { TimelinePost } from '@domain/TimelinePost.entity';
-import timelineModel from '../models/timelineModel';
+import { IFeedRepository } from '@domain/interfaces/IFeedRepository';
+import { FeedPostEntity } from '@domain/FeedPost.entity';
+import feedModel from '../models/feedModel';
 
-export class TimelineRepository implements ITimelineRepository {
-   bulkUpsertTimelinePost = async (posts: TimelinePost[]): Promise<void> => {
-      const operations: Parameters<typeof timelineModel.bulkWrite>[0] = posts.map((post) => ({
+export class FeedRepository implements IFeedRepository {
+   bulkUpsertTimelinePost = async (posts: FeedPostEntity[]): Promise<void> => {
+      const operations: Parameters<typeof feedModel.bulkWrite>[0] = posts.map((post) => ({
          updateOne: {
             filter: { userId: post.userId, postId: post.postId },
             update: { $set: { authorId: post.authorId, createdAt: post.createdAt } },
@@ -12,7 +12,7 @@ export class TimelineRepository implements ITimelineRepository {
          },
       }));
 
-      const res = await timelineModel.bulkWrite(operations);
+      const res = await feedModel.bulkWrite(operations);
 
       console.log(res);
    };
@@ -25,16 +25,17 @@ export class TimelineRepository implements ITimelineRepository {
       from: string | null,
       limit: number
    ): Promise<{
-      post: Pick<TimelinePost, 'postId' | 'createdAt'>[];
+      post: Omit<Required<FeedPostEntity>, 'authorId' | 'userId'>[];
       from: string | null;
       hasMore: boolean;
    }> => {
-      const res = await timelineModel
+      const res = await feedModel
          .find({ userId, ...(from && { _id: { $lt: from } }) }, { postId: 1, createdAt: 1 })
          .sort({ _id: -1 })
          .limit(limit);
 
       const parsedTimelinePosts = res.map((doc) => ({
+         id: doc.id,
          postId: doc.postId,
          createdAt: doc.createdAt,
       }));
@@ -42,5 +43,10 @@ export class TimelineRepository implements ITimelineRepository {
       const hasMore = res.length === limit;
 
       return { post: parsedTimelinePosts, from: hasMore ? res[res.length - 1].id : null, hasMore };
+   };
+
+   deletePostFromAllTimeline = async (postId: string): Promise<{ deletedCount: number }> => {
+      const res = await feedModel.deleteMany({ postId });
+      return { deletedCount: res.deletedCount };
    };
 }
