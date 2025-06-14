@@ -79,7 +79,7 @@ export class PublicPostQueryControllet {
             throw new PostNotFoundError();
          }
 
-         const authorBasicDetails = await this._userSerives.getBasicUserProfile([
+         const [authorBasicDetails] = await this._userSerives.getBasicUserProfile([
             postdetails.authorId,
          ]);
 
