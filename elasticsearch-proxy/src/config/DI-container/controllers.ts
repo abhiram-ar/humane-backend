@@ -15,4 +15,4 @@ export const publicPostQueryController = new PublicPostQueryControllet(
    externalUserServices
 );
 
-export const publicCommentController = new PublicCommentController(commentServices);
+export const publicCommentController = new PublicCommentController(commentServices, userServices);

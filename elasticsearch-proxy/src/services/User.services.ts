@@ -178,6 +178,8 @@ export class UserServices implements IUserServices {
    getBasicUserProfile = async (
       dto: GetUserBasicProfileFromIdsInputDTO
    ): Promise<GetBasicUserProfileFromIdsOutputDTO> => {
+      if (dto.length === 0) return []; // empty search  in es will throw an error
+
       const userDoclist = await this._userRepository.getUsersById(dto);
 
       const avatarURLHydratedUserList = userDoclist.map((userDoc) => {
