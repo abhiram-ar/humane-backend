@@ -1,7 +1,6 @@
-import { ENV } from '@config/env';
 import { PostService } from '@services/Post.services';
 import { UserServices } from '@services/User.services';
-import axios, { HttpStatusCode } from 'axios';
+import { HttpStatusCode } from 'axios';
 import { NextFunction, Request, Response } from 'express';
 import { ZodValidationError } from 'humane-common';
 import {
@@ -9,11 +8,13 @@ import {
    getUserTimelineSchema,
 } from 'interfaces/dto/post/GetUserTimeline.dto';
 import { PostVisibility } from 'interfaces/dto/post/Post.dto';
+import { IExternalUserServices } from 'interfaces/services/IExternalUserService';
 
 export class PublicPostQueryControllet {
    constructor(
       private readonly _postServices: PostService,
-      private readonly _userSerives: UserServices
+      private readonly _userSerives: UserServices,
+      private readonly _externalUserService: IExternalUserServices
    ) {}
 
    getUserTimeline = async (req: Request, res: Response, next: NextFunction) => {
@@ -35,31 +36,12 @@ export class PublicPostQueryControllet {
          } else if (req.user.userId === validatedDTO.data.targetUserId) {
             filter = undefined;
          } else {
-            type RelationshipStatus =
-               | 'sameUser'
-               | 'strangers'
-               | 'friends'
-               | 'friendreqSend'
-               | 'friendReqWaitingApproval'
-               | 'blocked';
-
-            type RelationshipStatusResponse = {
-               success: boolean;
-               message: string;
-               data: { status: RelationshipStatus };
-            };
-
-            const response = await axios.get<RelationshipStatusResponse>(
-               `${ENV.USER_SERVICE_BASE_URL}/api/v1/internal/relationship/status`,
-               {
-                  params: {
-                     currentUserId: req.user.userId,
-                     targetUserId: validatedDTO.data.targetUserId,
-                  },
-               }
+            const relStatus = await this._externalUserService.getRelationshipStatus(
+               req.user.userId,
+               validatedDTO.data.targetUserId
             );
 
-            if (response.data.data.status !== 'friends') {
+            if (relStatus !== 'friends') {
                filter = 'public';
             } else {
                filter = undefined;
