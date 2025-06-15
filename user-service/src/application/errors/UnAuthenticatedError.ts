@@ -1,4 +1,4 @@
-import { AppError } from './AppError.abstract';
+import { AppError } from "humane-common";
 
 export class UnAuthenticatedError extends AppError {
    public statusCode = 401;

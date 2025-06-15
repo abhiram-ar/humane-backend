@@ -1,4 +1,4 @@
-import { AppError } from '../../application/errors/AppError.abstract';
+import { AppError } from 'humane-common';
 import { ZodError } from 'zod';
 
 export class ZodValidationError extends AppError {

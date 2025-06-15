@@ -1,4 +1,4 @@
-import { AppError } from './AppError.abstract';
+import { AppError } from "humane-common";
 
 export class RelationshipBlockedError extends AppError {
    public statusCode = 403;
