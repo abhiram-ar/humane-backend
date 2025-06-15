@@ -13,8 +13,9 @@ import {
    MessageBrokerTopics,
 } from 'humane-common';
 import { EventBusError } from '@application/errors/EventbusError';
+import { ISignupUser } from '@ports/usecases/user/ISignupUser.usecase';
 
-export class SignupUser {
+export class SignupUser implements ISignupUser {
    constructor(
       private readonly _userRepository: IUserRepository,
       private readonly _JWTService: IJWTService,

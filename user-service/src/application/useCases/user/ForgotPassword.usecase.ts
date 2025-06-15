@@ -6,6 +6,7 @@ import { forgotPasswordDTO } from '@dtos/user/forgotPassword.dto';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IJWTService } from '@ports/IJWTService';
 import { IUserRepository } from '@ports/IUserRepository';
+import { IForgotPassword } from '@ports/usecases/user/IForgotPassword.usecase';
 import {
    UserPasswordRecoveryEventPaylaod,
    createEvent,
@@ -13,7 +14,7 @@ import {
    MessageBrokerTopics,
 } from 'humane-common';
 
-export class ForgotPassword {
+export class ForgotPassword implements IForgotPassword {
    constructor(
       private readonly _userRepository: IUserRepository,
       private readonly _jwtService: IJWTService,

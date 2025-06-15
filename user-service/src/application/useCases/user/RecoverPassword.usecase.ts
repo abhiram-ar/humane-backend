@@ -6,8 +6,9 @@ import { recoverPasswordDTO } from '@dtos/user/recoverPassword.dto';
 import { IHashService } from '@ports/IHashService';
 import { IJWTService } from '@ports/IJWTService';
 import { IUserRepository } from '@ports/IUserRepository';
+import { IRecoverPassword } from '@ports/usecases/user/IRecoverPassword.usecase';
 
-export class RecoverPassword {
+export class RecoverPassword implements IRecoverPassword {
    constructor(
       private readonly _userRepository: IUserRepository,
       private readonly _jwtService: IJWTService,

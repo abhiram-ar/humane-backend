@@ -1,9 +1,10 @@
 import { StorageError } from '@application/errors/StorageError';
 import { GeneratePresignedURLInputDTO } from '@dtos/user/generatePreSignedURL.input.dto';
 import { IStorageService } from '@ports/IStorageService';
+import { IGeneratePresignedURL } from '@ports/usecases/user/IGeneratePresignedURL';
 
 // move this to common use case
-export class GeneratePresignedURL {
+export class GeneratePresignedURL implements IGeneratePresignedURL {
    constructor(private readonly _storageSerice: IStorageService) {}
 
    execute = async (dto: GeneratePresignedURLInputDTO): Promise<string> => {

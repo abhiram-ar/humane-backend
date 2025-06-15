@@ -6,8 +6,9 @@ import { ENV } from '@config/env';
 import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 import { JWTService } from '@infrastructure/service/JWTService';
 import { IUserRepository } from '@ports/IUserRepository';
+import { IRefreshUserAccessToken } from '@ports/usecases/user/IRefreshUserToken.usecase';
 
-export class RefreshUserAccessToken {
+export class RefreshUserAccessToken implements IRefreshUserAccessToken {
    constructor(
       private readonly _userReporitory: IUserRepository,
       private readonly _jwtService: JWTService

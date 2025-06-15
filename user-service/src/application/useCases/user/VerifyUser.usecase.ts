@@ -11,8 +11,9 @@ import {
    UserCreatedEventPayload,
 } from 'humane-common';
 import { EventBusError } from '@application/errors/EventbusError';
+import { IVerifyUser } from '@ports/usecases/user/IVerifyUser.usecase';
 
-export class VerifyUser {
+export class VerifyUser implements IVerifyUser {
    constructor(
       private readonly _userRepository: IUserRepository,
       private readonly _JWT: JWTService,
