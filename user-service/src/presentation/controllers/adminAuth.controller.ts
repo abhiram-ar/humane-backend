@@ -7,6 +7,7 @@ import { JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 import { adminLoginSchema } from '@dtos/admin/adminLogin.dto';
 import { signupAdminSchema } from '@dtos/admin/signupAdmin.dto';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
+import { HttpStatusCode } from 'axios';
 import { NextFunction, Request, Response } from 'express';
 
 export class AdminAuthController {
@@ -26,9 +27,7 @@ export class AdminAuthController {
 
          const newAdmin = await this._createAdmin.execute(parsed.data);
 
-         res.status(201).json({
-            success: true,
-            message: 'admin signup successful',
+         res.status(HttpStatusCode.Created).json({
             data: newAdmin,
          });
       } catch (error) {
@@ -52,9 +51,7 @@ export class AdminAuthController {
             maxAge: JWT_REFRESH_TOKEN_EXPIRY_SECONDS * 1000,
          });
 
-         res.status(200).json({
-            success: true,
-            message: 'User email login successful',
+         res.status(HttpStatusCode.Ok).json({
             data: { accessToken },
          });
       } catch (error) {
@@ -71,9 +68,7 @@ export class AdminAuthController {
 
          const { newAccessToken } = await this._refreshToken.execute(refreshJWT);
 
-         res.status(200).json({
-            success: true,
-            message: 'Access token refreshed',
+         res.status(HttpStatusCode.Ok).json({
             data: { token: newAccessToken },
          });
       } catch (error) {
@@ -93,11 +88,10 @@ export class AdminAuthController {
             secure: ENV.NODE_ENV === 'production' ? true : false,
             sameSite: ENV.NODE_ENV === 'production' ? 'none' : 'lax',
          });
-         res.status(200).json({ success: true, message: 'User logout successful' });
+         res.status(HttpStatusCode.Ok).json({ message: 'User logout successful' });
       } catch (error) {
          if (error instanceof UnAuthenticatedError) {
-            return res.status(200).json({
-               success: true,
+            return res.status(HttpStatusCode.Ok).json({
                message: `${error.message},User is not authenticated to logout`,
             });
          }
