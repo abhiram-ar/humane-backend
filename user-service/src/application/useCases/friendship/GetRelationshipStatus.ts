@@ -9,8 +9,9 @@ import {
 import { IBlockedRelationshipRepository } from '@ports/IBlockedRelationshipRepository';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IUserRepository } from '@ports/IUserRepository';
+import { IGetRelationShipStatus } from '@ports/usecases/friendship/IGetRelationshipStatus';
 
-export class GetRelationShipStatus {
+export class GetRelationShipStatus implements IGetRelationShipStatus {
    constructor(
       private readonly _userRepo: IUserRepository,
       private readonly _blockedRelatioshipRepo: IBlockedRelationshipRepository,

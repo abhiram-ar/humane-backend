@@ -8,8 +8,9 @@ import {
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IStorageService } from '@ports/IStorageService';
 import { IUserRepository } from '@ports/IUserRepository';
+import { IMutualFriends } from '@ports/usecases/friendship/IMutualFriends.usecase';
 
-export class MutualFriends {
+export class MutualFriends implements IMutualFriends {
    constructor(
       private readonly _userRepo: IUserRepository,
       private readonly _friendshipRepo: IFriendshipRepository,

@@ -14,9 +14,10 @@ import { IBlockedRelationshipRepository } from '@ports/IBlockedRelationshipRepos
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IUserRepository } from '@ports/IUserRepository';
+import { IFriendRequest } from '@ports/usecases/friendship/IFriendRequest.usecase';
 import { AppEventsTypes, createEvent, MessageBrokerTopics } from 'humane-common';
 
-export class FriendRequest {
+export class FriendRequest implements IFriendRequest {
    constructor(
       private readonly _friendShipRepository: IFriendshipRepository,
       private readonly _blockedRelationshipRepository: IBlockedRelationshipRepository,

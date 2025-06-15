@@ -7,8 +7,9 @@ import {
 } from '@dtos/friendship/GetFriendRequests.dto';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IStorageService } from '@ports/IStorageService';
+import { IGetFriendRequest } from '@ports/usecases/friendship/IGetFriendRequestList.usercase';
 
-export class GetFriendRequest {
+export class GetFriendRequest implements IGetFriendRequest {
    constructor(
       private readonly _friendshipRepo: IFriendshipRepository,
       private readonly _storageService: IStorageService
