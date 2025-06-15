@@ -2,8 +2,9 @@ import { IPagination } from '@application/types/Pagination.type';
 import { AdminGetUserResponseDTO, GetUserDTO } from '@dtos/admin/getUsers.dto';
 import { IUserQueryService } from '@ports/IUserQueryService';
 import { IUserRepository } from '@ports/IUserRepository';
+import { IAdminGetUserList } from '@ports/usecases/admin/IGetUserList.usecase';
 
-export class AdminGetUserList {
+export class AdminGetUserList implements IAdminGetUserList {
    constructor(
       private readonly _userRepository: IUserRepository,
       private readonly _userQueryService: IUserQueryService
