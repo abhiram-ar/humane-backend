@@ -6,7 +6,9 @@ import { JWTTokenPaylod } from '@application/types/JWTTokenPayload.type';
 import { RefreshAdminAccessToken } from '@application/useCases/admin/RefreshAdminToken.usecase';
 import { RefreshUserAccessToken } from '@application/useCases/user/RefreshUserToken.usecase';
 import { ENV } from '@config/env';
+import { logger } from '@config/logger';
 import { IJWTService } from '@ports/IJWTService';
+import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 
 export class GlobalRefreshController {
@@ -38,16 +40,14 @@ export class GlobalRefreshController {
          if (payload.type === 'admin') {
             const { newAccessToken } = await this._refreshAdminToken.execute(refreshJWT);
             newToken = newAccessToken;
-         } else if (payload.type === "user") {
+         } else if (payload.type === 'user') {
             const { newAccessToken } = await this._refreshUserToken.execute(refreshJWT);
             newToken = newAccessToken;
          } else {
             throw new JWTRefreshError('Invalid token type');
          }
 
-         res.status(200).json({
-            success: true,
-            message: 'Access token refreshed',
+         res.status(HttpStatusCode.Ok).json({
             data: { token: newToken },
          });
       } catch (error) {
@@ -56,7 +56,7 @@ export class GlobalRefreshController {
             error instanceof UserNotFoundError ||
             error instanceof UserBlockedError
          ) {
-            console.error(error.message);
+            logger.error(error.message);
             res.clearCookie('refreshJWT', {
                httpOnly: true,
                secure: ENV.NODE_ENV === 'production' ? true : false,
