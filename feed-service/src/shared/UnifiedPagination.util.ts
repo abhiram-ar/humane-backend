@@ -1,5 +1,6 @@
-export const stringifyUnifiedCursor = (createdAt: Date, postId: string) => {
-   return [createdAt.getTime(), postId].join('|');
+export const stringifyUnifiedCursor = (createdAt: Date | number, postId: string) => {
+   const createdAtNum = typeof createdAt === 'number' ? createdAt : createdAt.getTime();
+   return [createdAtNum, postId].join('|');
 };
 
 export const parseUnifiedCursor = (cursorStr: string) => {

@@ -1,7 +1,7 @@
 import { logger } from '@config/logger';
 import { postSchema } from '@dtos/Post.dto';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
-import { FeedServices } from '@services/feed.services';
+import { FeedServices } from '@services/Feed.services';
 import {
    AppEvent,
    AppEventsTypes,

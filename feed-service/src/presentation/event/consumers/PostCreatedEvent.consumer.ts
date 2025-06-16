@@ -3,7 +3,7 @@ import { AppendPostToMultipleUserTimelineInputDTO } from '@dtos/AppendPostToMult
 import { postSchema } from '@dtos/Post.dto';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
 import { IUserService } from '@ports/IUserService';
-import { FeedServices } from '@services/feed.services';
+import { FeedServices } from '@services/Feed.services';
 import {
    AppEvent,
    AppEventsTypes,
