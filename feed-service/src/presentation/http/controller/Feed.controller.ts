@@ -1,5 +1,7 @@
 import { HydratedPost } from '@application/Types/HydratedPost';
+import { logger } from '@config/logger';
 import { GetFeedInputDTO, getFeedInputSchema } from '@dtos/getFeed.dto';
+import { redisClient } from '@infrastructure/cache/redis/client';
 import { IESproxyService } from '@ports/IESproxyService';
 import { FeedServices } from '@services/feed.services';
 import { Request, Response, NextFunction } from 'express';
@@ -26,15 +28,41 @@ export class FeedController {
          if (!validatedInputDTO.success) {
             throw new ZodValidationError(validatedInputDTO.error);
          }
+
          // TODO: read rawTimeline from cache
+
+         const max = validatedInputDTO.data.from
+            ? new Date(parseInt(validatedInputDTO.data.from.split('|')[0])).getTime()
+            : Date.now();
+         console.log('from', validatedInputDTO.data.from);
+         console.log(max, 'max');
+
+         const cacheReads = await redisClient.zRange(validatedInputDTO.data.userId, '(' + max, 0, {
+            BY: 'SCORE',
+            REV: true,
+            LIMIT: { offset: 0, count: validatedInputDTO.data.limit },
+         });
 
          // on miss read from DB
          const rawFeed = await this._timelineServies.getUserFeedPaginated(validatedInputDTO.data);
+         if (cacheReads.length === 0 && !validatedInputDTO.data.from) {
+            const recentPost = await this._timelineServies.getUserFeedPaginated({
+               ...validatedInputDTO.data,
+               limit: 100,
+            });
+            const entry = recentPost.post.map((post) => ({
+               score: post.createdAt.getTime(),
+               value: post.postId,
+            }));
+            redisClient.zAdd(validatedInputDTO.data.userId, entry);
+            logger.info('added to cache');
+         }
          // TODO: populaate cache is it does not exsit only
 
          // hydrate rawFeed with users and post details
 
          const postIds = rawFeed.post.map((post) => post.postId);
+         console.log('cmp', postIds, cacheReads);
 
          let hydratedPosts: (HydratedPost | null)[] = [];
 
