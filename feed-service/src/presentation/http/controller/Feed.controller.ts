@@ -29,26 +29,67 @@ export class FeedController {
             throw new ZodValidationError(validatedInputDTO.error);
          }
 
-         // TODO: read rawTimeline from cache
+         let postIds: string[] = [];
+         let pagination: { from: string | null; hasMore: boolean } = { hasMore: false, from: null };
 
          const max = validatedInputDTO.data.from
             ? new Date(parseInt(validatedInputDTO.data.from.split('|')[0])).getTime()
             : Date.now();
-         console.log('from', validatedInputDTO.data.from);
-         console.log(max, 'max');
 
-         const cacheReads = await redisClient.zRange(validatedInputDTO.data.userId, '(' + max, 0, {
-            BY: 'SCORE',
-            REV: true,
-            LIMIT: { offset: 0, count: validatedInputDTO.data.limit },
-         });
+         // TODO: read rawTimeline from cache
+         const cacheReads = await redisClient.zRangeWithScores(
+            validatedInputDTO.data.userId,
+            '(' + max, // exclude the current max cursor
+            0, // min
+            {
+               BY: 'SCORE',
+               REV: true,
+               LIMIT: { offset: 0, count: validatedInputDTO.data.limit },
+            }
+         );
+         if (cacheReads.length === validatedInputDTO.data.limit) {
+            postIds = cacheReads.map((cache) => cache.value);
+            const lastCacheRead = cacheReads[cacheReads.length - 1];
+            pagination = { from: `${lastCacheRead.score}|${lastCacheRead.value}`, hasMore: true };
+            logger.info('full cache read');
+         } else if (cacheReads.length < validatedInputDTO.data.limit) {
+            const remainingToRead = validatedInputDTO.data.limit - cacheReads.length;
+            const lastCacheRead = cacheReads[cacheReads.length - 1];
 
-         // on miss read from DB
-         const rawFeed = await this._timelineServies.getUserFeedPaginated(validatedInputDTO.data);
+            const newFrom = lastCacheRead
+               ? [lastCacheRead.score, lastCacheRead.value].join('|')
+               : validatedInputDTO.data.from;
+
+            const dbReads = await this._timelineServies.getUserFeedPaginated({
+               userId: validatedInputDTO.data.userId,
+               from: newFrom,
+               limit: remainingToRead,
+            });
+            console.log(
+               'DBread',
+               dbReads.post.map((post) => post.postId)
+            );
+            postIds = [
+               ...cacheReads.map((cache) => cache.value),
+               ...dbReads.post.map((post) => post.postId),
+            ];
+            pagination = dbReads.pagination;
+            logger.info('partial cache read');
+         } else {
+            // on cache miss readFromDB
+            const rawFeed = await this._timelineServies.getUserFeedPaginated(
+               validatedInputDTO.data
+            );
+            postIds = rawFeed.post.map((post) => post.postId);
+            pagination = rawFeed.pagination;
+            logger.warn('cache miss, full DB read');
+         }
+
+         // TODO: populaate cache is it does not exsit only
          if (cacheReads.length === 0 && !validatedInputDTO.data.from) {
             const recentPost = await this._timelineServies.getUserFeedPaginated({
                ...validatedInputDTO.data,
-               limit: 100,
+               limit: 7,
             });
             const entry = recentPost.post.map((post) => ({
                score: post.createdAt.getTime(),
@@ -57,12 +98,15 @@ export class FeedController {
             redisClient.zAdd(validatedInputDTO.data.userId, entry);
             logger.info('added to cache');
          }
-         // TODO: populaate cache is it does not exsit only
 
          // hydrate rawFeed with users and post details
 
-         const postIds = rawFeed.post.map((post) => post.postId);
-         console.log('cmp', postIds, cacheReads);
+         // const postIds = rawFeed.post.map((post) => post.postId);
+         console.log(
+            'cmp',
+            postIds,
+            cacheReads.map((post) => post.value)
+         );
 
          let hydratedPosts: (HydratedPost | null)[] = [];
 
@@ -77,7 +121,7 @@ export class FeedController {
 
          // get hot users profile from read-through cache
          res.status(HttpStatusCodes.OK).json({
-            data: { posts: hydratedPosts, pagination: rawFeed.pagination },
+            data: { posts: hydratedPosts, pagination: pagination },
          });
       } catch (error) {
          next(error);
