@@ -2,14 +2,16 @@ import { HydratedPost } from '@application/Types/HydratedPost';
 import { logger } from '@config/logger';
 import { GetFeedInputDTO, getFeedInputSchema } from '@dtos/getFeed.dto';
 import { redisClient } from '@infrastructure/cache/redis/client';
+import { FeedCache } from '@infrastructure/cache/redis/FeedCache';
 import { IESproxyService } from '@ports/IESproxyService';
 import { FeedServices } from '@services/feed.services';
 import { Request, Response, NextFunction } from 'express';
 import { HttpStatusCodes, UnAuthenticatedError, ZodValidationError } from 'humane-common';
 export class FeedController {
    constructor(
-      private readonly _timelineServies: FeedServices,
-      private readonly _esProxyService: IESproxyService
+      private readonly _feedServices: FeedServices,
+      private readonly _esProxyService: IESproxyService,
+      private readonly _feedCache: FeedCache
    ) {}
 
    getTimeline = async (req: Request, res: Response, next: NextFunction) => {
@@ -52,7 +54,7 @@ export class FeedController {
             const lastCacheRead = cacheReads[cacheReads.length - 1];
             pagination = { from: `${lastCacheRead.score}|${lastCacheRead.value}`, hasMore: true };
             logger.info('full cache read');
-         } else if (cacheReads.length < validatedInputDTO.data.limit) {
+         } else if (cacheReads.length !== 0 && cacheReads.length < validatedInputDTO.data.limit) {
             const remainingToRead = validatedInputDTO.data.limit - cacheReads.length;
             const lastCacheRead = cacheReads[cacheReads.length - 1];
 
@@ -60,15 +62,17 @@ export class FeedController {
                ? [lastCacheRead.score, lastCacheRead.value].join('|')
                : validatedInputDTO.data.from;
 
-            const dbReads = await this._timelineServies.getUserFeedPaginated({
+            const dbReads = await this._feedServices.getUserFeedPaginated({
                userId: validatedInputDTO.data.userId,
                from: newFrom,
                limit: remainingToRead,
             });
+
             console.log(
                'DBread',
                dbReads.post.map((post) => post.postId)
             );
+
             postIds = [
                ...cacheReads.map((cache) => cache.value),
                ...dbReads.post.map((post) => post.postId),
@@ -76,10 +80,8 @@ export class FeedController {
             pagination = dbReads.pagination;
             logger.info('partial cache read');
          } else {
-            // on cache miss readFromDB
-            const rawFeed = await this._timelineServies.getUserFeedPaginated(
-               validatedInputDTO.data
-            );
+            // on cache miss readFromDB or generall fallback
+            const rawFeed = await this._feedServices.getUserFeedPaginated(validatedInputDTO.data);
             postIds = rawFeed.post.map((post) => post.postId);
             pagination = rawFeed.pagination;
             logger.warn('cache miss, full DB read');
@@ -87,7 +89,7 @@ export class FeedController {
 
          // TODO: populaate cache is it does not exsit only
          if (cacheReads.length === 0 && !validatedInputDTO.data.from) {
-            const recentPost = await this._timelineServies.getUserFeedPaginated({
+            const recentPost = await this._feedServices.getUserFeedPaginated({
                ...validatedInputDTO.data,
                limit: 7,
             });
@@ -100,16 +102,7 @@ export class FeedController {
          }
 
          // hydrate rawFeed with users and post details
-
-         // const postIds = rawFeed.post.map((post) => post.postId);
-         console.log(
-            'cmp',
-            postIds,
-            cacheReads.map((post) => post.value)
-         );
-
          let hydratedPosts: (HydratedPost | null)[] = [];
-
          if (postIds && postIds.length > 0) {
             hydratedPosts = await this._esProxyService.getPostsDetail(postIds);
          }
