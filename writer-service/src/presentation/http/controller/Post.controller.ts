@@ -25,13 +25,13 @@ export class PostController {
       private readonly _postService: IPostService,
       private readonly _eventPubliser: IEventPublisher,
       private readonly _storageService: IStorageService,
-      private readonly _commentService: ICommentService,
+      private readonly _commentService: ICommentService
    ) {}
 
    createPost = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (!req.user || req.user.type !== 'user') {
-            throw new UnAuthenticatedError('user not in req header');
+            throw new UnAuthenticatedError();
          }
 
          const dto: CreatePostDTO = {
@@ -57,7 +57,6 @@ export class PostController {
          }
 
          res.status(HttpStatusCode.Created).json({
-            message: 'post created',
             data: { post: createdPost },
          });
       } catch (error) {
@@ -68,7 +67,7 @@ export class PostController {
    deletePost = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (!req.user || req.user.type !== 'user') {
-            throw new UnAuthenticatedError('user not in req header');
+            throw new UnAuthenticatedError();
          }
 
          const dto: DeletePostDTO = {
@@ -88,14 +87,13 @@ export class PostController {
             postDeltedEvent
          );
 
-         await this._commentService.deleteAllPostComments(deltedPost.id)
+         await this._commentService.deleteAllPostComments(deltedPost.id);
 
          if (!ack) {
             logger.warn(`post ${deltedPost.id} deleted event not publised in eventbus`);
          }
 
          res.status(HttpStatusCode.Accepted).json({
-            message: 'post deleted',
             data: { post: deltedPost },
          });
       } catch (error) {
@@ -106,7 +104,7 @@ export class PostController {
    getPresingedPosterURL = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (!req.user || req.user.type !== 'user') {
-            throw new UnAuthenticatedError('user not found in req header');
+            throw new UnAuthenticatedError();
          }
 
          const dto: GeneratePresignedURLInputDTO = {
@@ -127,7 +125,6 @@ export class PostController {
          if (!result) throw new StorageError('unable to create pre-signedURL');
 
          res.status(HttpStatusCode.Created).json({
-            message: 'post poster presignedURL genrated',
             data: result,
          });
       } catch (error) {
