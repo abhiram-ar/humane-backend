@@ -6,8 +6,9 @@ import { getUserProfileSchema } from 'interfaces/dto/GetUserProfile.dto';
 import { infiniteScrollSearchSchema } from 'interfaces/dto/infiniteScrollSearch.dto';
 import { UserServices } from '@services/User.services';
 import { Request, Response, NextFunction } from 'express';
-import { GenericError, ZodValidationError } from 'humane-common';
+import { ZodValidationError } from 'humane-common';
 import { HttpStatusCode } from 'axios';
+import { InvalidUserIdsFormatError } from 'errors/InvalidUserIdsFormatError';
 
 export class PublicUserQueryController {
    constructor(private readonly _userSerives: UserServices) {}
@@ -41,7 +42,7 @@ export class PublicUserQueryController {
          } else if (Array.isArray(userId)) {
             ids = userId as string[];
          } else {
-            throw new GenericError('Invalid userId type for this query');
+            throw new InvalidUserIdsFormatError();
          }
 
          const parsed = getUserBasicProfileFromIdsSchema.safeParse(ids);

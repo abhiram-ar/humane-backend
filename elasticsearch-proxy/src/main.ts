@@ -10,6 +10,11 @@ const bootstrap = async () => {
       await postRepository.initializePostIndex();
       await commentRepository.initializeCommentIndex();
 
+      app.listen(3000, () => {
+         logger.info('es-proxy started');
+         console.log('hello');
+      });
+
       await startAllConsumers();
       process.on('SIGINT', () => {
          esClient.close();
@@ -20,11 +25,6 @@ const bootstrap = async () => {
          stopAllConsumer();
       });
       await userRepository.pingES();
-
-      app.listen(3000, () => {
-         logger.info('es-proxy started');
-         console.log('hello');
-      });
    } catch (error) {
       logger.error('error starting es-proxy');
    }
