@@ -7,13 +7,14 @@ import { FeedServices } from '@services/Feed.services';
 import {
    AppEvent,
    AppEventsTypes,
-   EventBusError,
+   EventConsumerMissMatchError,
+   IConsumer,
    MessageBrokerTopics,
    ZodValidationError,
 } from 'humane-common';
 import { Consumer } from 'kafkajs';
 
-export class PostCreatedEventConsumer {
+export class PostCreatedEventConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(
@@ -43,7 +44,7 @@ export class PostCreatedEventConsumer {
 
             try {
                if (event.eventType != AppEventsTypes.POST_CREATED) {
-                  throw new EventBusError('Invalid event type for this comsumer');
+                  throw new EventConsumerMissMatchError();
                }
 
                const validatedPost = postSchema.safeParse(event.payload);
