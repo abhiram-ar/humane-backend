@@ -17,6 +17,7 @@ export class FeedRepository implements IFeedRepository {
       console.log(res);
    };
    removeAuthorPostsFromUserTimeline(userId: string, authorId: string): Promise<void> {
+      // TODO
       throw new Error('Method not implemented.');
    }
 
