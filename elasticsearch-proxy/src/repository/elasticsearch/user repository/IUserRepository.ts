@@ -1,5 +1,5 @@
 import { UpdateUserDTO } from 'interfaces/dto/updateUser.dto';
-import { UserDocument } from '@repository/elasticsearch/user repository/UserDocument.type';
+import { IUserDocument } from '@repository/elasticsearch/user repository/UserDocument.type';
 import { CreateUserDTO } from 'interfaces/dto/createUser.dto';
 
 export interface IUserRepository {
@@ -31,19 +31,19 @@ export interface IUserRepository {
       search: string,
       from: number,
       size: number
-   ): Promise<{ users: (UserDocument & { id: string })[]; totalEntries: number }>;
+   ): Promise<{ users: (IUserDocument & { id: string })[]; totalEntries: number }>;
 
    infiniteScrollSearchQuery(
       searchQuery: string,
       sortAfter: [number] | null,
       size: number
    ): Promise<{
-      users: (UserDocument & { id: string })[];
+      users: (IUserDocument & { id: string })[];
       searchAfter: [number] | null;
       hasMore: boolean;
    }>;
 
-   getUserById(userId: string): Promise<(UserDocument & { id: string }) | null>;
+   getUserById(userId: string): Promise<(IUserDocument & { id: string }) | null>;
 
-   getUsersById(userIds: string[]): Promise<((UserDocument & { id: string }) | null)[]>;
+   getUsersById(userIds: string[]): Promise<((IUserDocument & { id: string }) | null)[]>;
 }

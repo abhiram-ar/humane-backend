@@ -2,13 +2,14 @@ import { Client, errors } from '@elastic/elasticsearch';
 import { CreateUserDTO } from 'interfaces/dto/createUser.dto';
 import { IUserRepository } from '@repository/elasticsearch/user repository/IUserRepository';
 import { ES_INDEXES } from '../ES_INDEXES';
-import { UserDocument } from './UserDocument.type';
+import { IUserDocument } from './UserDocument.type';
 import { UpdateUserDTO } from 'interfaces/dto/updateUser.dto';
 import { logger } from '@config/logger';
 
 export class UserRepository implements IUserRepository {
    private readonly _index = ES_INDEXES.USER_PROFILE_INDEX;
    constructor(public readonly _client: Client) {}
+  
 
    initializeUserIndex = async () => {
       const indexExists = await this._client.indices.exists({
@@ -56,7 +57,7 @@ export class UserRepository implements IUserRepository {
    };
    updatedAtQuery = async (id: string): Promise<{ updatedAt: string | undefined } | null> => {
       try {
-         const res = await this._client.get<Pick<UserDocument, 'updatedAt'>>({
+         const res = await this._client.get<Pick<IUserDocument, 'updatedAt'>>({
             index: this._index,
             id,
             _source: ['updatedAt'],
@@ -80,7 +81,7 @@ export class UserRepository implements IUserRepository {
       await this._client.update({
          index: this._index,
          id: id,
-         doc: { ...data, updatedAt } as UserDocument,
+         doc: { ...data, updatedAt } as IUserDocument,
       });
    };
    updateUserAvatarKeyCommand = async (
@@ -91,7 +92,7 @@ export class UserRepository implements IUserRepository {
       await this._client.update({
          index: this._index,
          id: docId,
-         doc: { avatarKey, updatedAt } as UserDocument,
+         doc: { avatarKey, updatedAt } as IUserDocument,
       });
    };
 
@@ -106,7 +107,7 @@ export class UserRepository implements IUserRepository {
          doc: {
             coverPhotoKey,
             updatedAt,
-         } as UserDocument,
+         } as IUserDocument,
       });
    };
 
@@ -121,7 +122,7 @@ export class UserRepository implements IUserRepository {
          doc: {
             isBlocked: newBlockStatus,
             updatedAt,
-         } as UserDocument,
+         } as IUserDocument,
       });
    };
 
@@ -129,14 +130,14 @@ export class UserRepository implements IUserRepository {
       search: string,
       from: number,
       size: number
-   ): Promise<{ users: (UserDocument & { id: string })[]; totalEntries: number }> => {
+   ): Promise<{ users: (IUserDocument & { id: string })[]; totalEntries: number }> => {
       type Query = NonNullable<Parameters<typeof this._client.search>[0]>['query'];
 
       const query: Query = search
          ? {
               multi_match: {
                  query: search,
-                 fields: ['firstName', 'lastName'] as (keyof UserDocument)[],
+                 fields: ['firstName', 'lastName'] as (keyof IUserDocument)[],
                  fuzziness: 'AUTO',
               },
            }
@@ -144,7 +145,7 @@ export class UserRepository implements IUserRepository {
               match_all: {},
            };
 
-      const res = await this._client.search<UserDocument>({
+      const res = await this._client.search<IUserDocument>({
          index: this._index,
          from,
          size,
@@ -155,7 +156,7 @@ export class UserRepository implements IUserRepository {
       const parsedUserList = res.hits.hits
          .map((hit) => ({ ...hit._source, id: hit._id }))
          .filter(
-            (user): user is UserDocument & { id: string } =>
+            (user): user is IUserDocument & { id: string } =>
                user !== undefined && typeof user.id === 'string'
          );
 
@@ -169,11 +170,11 @@ export class UserRepository implements IUserRepository {
       sortAfter: [number] | null,
       size: number
    ): Promise<{
-      users: (UserDocument & { id: string })[];
+      users: (IUserDocument & { id: string })[];
       searchAfter: [number] | null;
       hasMore: boolean;
    }> => {
-      const res = await this._client.search<UserDocument>({
+      const res = await this._client.search<IUserDocument>({
          index: this._index,
          size,
          sort: [{ createdAt: 'desc' }], // this changes to type of searchAfter array
@@ -181,7 +182,7 @@ export class UserRepository implements IUserRepository {
          query: {
             multi_match: {
                query: searchQuery,
-               fields: ['firstName', 'lastName'] as (keyof UserDocument)[],
+               fields: ['firstName', 'lastName'] as (keyof IUserDocument)[],
                fuzziness: 'AUTO',
             },
          },
@@ -192,7 +193,7 @@ export class UserRepository implements IUserRepository {
       const parsedUserList = hits
          .map((hit) => ({ ...hit._source, id: hit._id }))
          .filter(
-            (user): user is UserDocument & { id: string } =>
+            (user): user is IUserDocument & { id: string } =>
                user !== undefined && typeof user.id === 'string'
          );
 
@@ -201,9 +202,9 @@ export class UserRepository implements IUserRepository {
       return { users: parsedUserList, searchAfter, hasMore: hits.length === size };
    };
 
-   getUserById = async (userId: string): Promise<(UserDocument & { id: string }) | null> => {
+   getUserById = async (userId: string): Promise<(IUserDocument & { id: string }) | null> => {
       try {
-         const res = await this._client.get<UserDocument>({ index: this._index, id: userId });
+         const res = await this._client.get<IUserDocument>({ index: this._index, id: userId });
 
          if (!res.found || !res._source) return null;
 
@@ -221,8 +222,8 @@ export class UserRepository implements IUserRepository {
 
    getUsersById = async (
       userIds: string[]
-   ): Promise<((UserDocument & { id: string }) | null)[]> => {
-      const res = await this._client.mget<UserDocument>({
+   ): Promise<((IUserDocument & { id: string }) | null)[]> => {
+      const res = await this._client.mget<IUserDocument>({
          index: this._index,
          ids: userIds,
          _source: true,
@@ -230,7 +231,7 @@ export class UserRepository implements IUserRepository {
 
       const parsedUserDocList = res.docs.map((doc) => {
          const typedDoc = doc as {
-            _source: UserDocument;
+            _source: IUserDocument;
             found: boolean;
             _id: string;
             _index: string;
