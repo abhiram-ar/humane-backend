@@ -12,6 +12,7 @@ import { updateUserProfileSchema } from '@dtos/user/updateUserProfile.input.dto'
 import { updateUserAvatarSchema } from '@dtos/user/updateAnonProfileAvatar.input.dto';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
 import { NextFunction, Request, Response } from 'express';
+import { HttpStatusCode } from 'axios';
 
 export class UserProfileController {
    constructor(
@@ -38,9 +39,7 @@ export class UserProfileController {
 
          const profile = await this._getCurrentUserProfile.execute(parsed.data);
 
-         res.status(200).json({
-            success: true,
-            message: 'Anon profile successfully fetched',
+         res.status(HttpStatusCode.Ok).json({
             data: { profile },
          });
       } catch (error) {
@@ -65,9 +64,7 @@ export class UserProfileController {
 
          const updatedProfile = await this._updateUserProfile.execute(req.user.userId, parsed.data);
 
-         res.status(201).json({
-            success: true,
-            message: 'profile updated',
+         res.status(HttpStatusCode.Ok).json({
             data: { profile: updatedProfile },
          });
       } catch (error) {
@@ -84,9 +81,7 @@ export class UserProfileController {
 
          const preSignedURL = await this._generatePreSignedURL.execute(parsed.data);
 
-         res.status(201).json({
-            success: true,
-            message: `presigned url created for ${parsed.data.fileName} with  mimeType:${parsed.data.mimeType}`,
+         res.status(HttpStatusCode.Created).json({
             data: {
                preSignedURL,
             },
@@ -117,9 +112,7 @@ export class UserProfileController {
             parsed.data
          );
 
-         res.status(201).json({
-            success: true,
-            message: 'user profile picture updated',
+         res.status(HttpStatusCode.Ok).json({
             data: {
                avatarKey: updatedAvatarKey,
                avatarURL: newAvatarURL,
@@ -149,9 +142,7 @@ export class UserProfileController {
          const { updatedCoverPhotoKey, newCoverPhotoURL } =
             await this._updateUserCoverPhoto.execute(userId, parsed.data);
 
-         res.status(201).json({
-            success: true,
-            message: 'user profile picture updated',
+         res.status(HttpStatusCode.Ok).json({
             data: {
                coverPhoto: updatedCoverPhotoKey,
                coverPhotoURL: newCoverPhotoURL,

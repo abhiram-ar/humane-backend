@@ -2,8 +2,9 @@ import { IUserRepository } from '@ports/IUserRepository';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { GetCurrentAnonProfileInputDTO } from '@dtos/user/getCurrentAnonProfile.input.dto';
 import { IStorageService } from '@ports/IStorageService';
+import { IGetCurrentUserProfile } from '@ports/usecases/user/IGetCurrentUserProfile';
 
-export class GetCurrentUserProfile {
+export class GetCurrentUserProfile implements IGetCurrentUserProfile {
    constructor(
       private readonly _userRepository: IUserRepository,
       private readonly _storageService: IStorageService

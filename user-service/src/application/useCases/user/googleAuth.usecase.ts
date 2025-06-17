@@ -13,8 +13,9 @@ import {
 } from 'humane-common';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { EventBusError } from '@application/errors/EventbusError';
+import { IUserGoogleAuth } from '@ports/usecases/user/IGoogleAuth.usecase';
 
-export class UserGoogleAuth {
+export class UserGoogleAuth implements IUserGoogleAuth {
    constructor(
       private readonly _userRepository: IUserRepository,
       private readonly _jetService: IJWTService,

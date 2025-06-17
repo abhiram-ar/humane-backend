@@ -21,6 +21,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { GenericError } from '@application/errors/GenericError';
 import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
 import { UserGoogleAuth } from '@application/useCases/user/googleAuth.usecase';
+import { HttpStatusCode } from 'axios';
 
 export class UserAuthController {
    constructor(
@@ -44,9 +45,7 @@ export class UserAuthController {
 
          const signupToken = await this._singupUser.execute(parsed.data);
 
-         res.status(201).json({
-            success: true,
-            message: 'User singup token created successfully',
+         res.status(HttpStatusCode.Accepted).json({
             data: { token: signupToken },
          });
       } catch (error) {
@@ -63,9 +62,7 @@ export class UserAuthController {
 
          const newUser = await this._verifyUser.execute(parsed.data);
 
-         res.status(201).json({
-            success: true,
-            message: 'email verification success',
+         res.status(HttpStatusCode.Created).json({
             data: { user: newUser },
          });
       } catch (error) {
@@ -91,9 +88,7 @@ export class UserAuthController {
             maxAge: JWT_REFRESH_TOKEN_EXPIRY_SECONDS * 1000,
          });
 
-         res.status(200).json({
-            success: true,
-            message: 'User email login successful',
+         res.status(HttpStatusCode.Ok).json({
             data: { accessToken },
          });
       } catch (error) {
@@ -110,9 +105,7 @@ export class UserAuthController {
 
          const { newAccessToken } = await this._refreshUserAccessToken.execute(refreshJWT);
 
-         res.status(200).json({
-            success: true,
-            message: 'Access token refreshed',
+         res.status(HttpStatusCode.Ok).json({
             data: { token: newAccessToken },
          });
       } catch (error) {
@@ -144,10 +137,10 @@ export class UserAuthController {
             secure: ENV.NODE_ENV === 'production' ? true : false,
             sameSite: ENV.NODE_ENV === 'production' ? 'none' : 'lax',
          });
-         res.status(200).json({ success: true, message: 'User logout successful' });
+         res.status(HttpStatusCode.Ok).json({});
       } catch (error) {
          if (error instanceof UnAuthenticatedError) {
-            return res.status(200).json({
+            return res.status(HttpStatusCode.Ok).json({
                success: true,
                message: `${error.message},User is not authenticated to logout`,
             });

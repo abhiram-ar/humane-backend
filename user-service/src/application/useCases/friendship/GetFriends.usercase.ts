@@ -5,8 +5,9 @@ import {
 } from '@dtos/friendship/GetFriends.dto';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IStorageService } from '@ports/IStorageService';
+import { IGetFriends } from '@ports/usecases/friendship/IGetFriends.usercase';
 
-export class GetFriends {
+export class GetFriends implements IGetFriends {
    constructor(
       private readonly _friendshipRepo: IFriendshipRepository,
       private readonly _storageService: IStorageService

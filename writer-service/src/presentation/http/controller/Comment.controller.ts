@@ -48,7 +48,6 @@ export class CommentController {
          }
 
          res.status(HttpStatusCodes.CREATED).json({
-            message: 'comment created',
             data: { comment: createdComment },
          });
       } catch (error) {
@@ -86,7 +85,6 @@ export class CommentController {
          }
 
          res.status(HttpStatusCodes.CREATED).json({
-            message: 'comment deleted',
             data: { comment: deletedComment },
          });
       } catch (error) {

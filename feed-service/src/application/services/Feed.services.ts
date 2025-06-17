@@ -2,8 +2,9 @@ import { IFeedRepository } from '@domain/interfaces/IFeedRepository';
 import { FeedPostEntity } from '@domain/FeedPost.entity';
 import { AppendPostToMultipleUserTimelineInputDTO } from '@dtos/AppendPostToMultipleUserTimeline.dto';
 import { logger } from '@config/logger';
+import { IFeedServices } from '@ports/IFeedServices';
 
-export class FeedServices {
+export class FeedServices implements IFeedServices {
    constructor(private readonly _timelineRepo: IFeedRepository) {}
 
    appendPostToMultipleUserFeed = async (dto: AppendPostToMultipleUserTimelineInputDTO) => {

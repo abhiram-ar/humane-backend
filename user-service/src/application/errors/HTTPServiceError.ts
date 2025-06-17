@@ -1,4 +1,4 @@
-import { AppError } from './AppError.abstract';
+import { AppError } from "humane-common";
 
 export class HTTPServiceError extends AppError {
    public statusCode = 500;

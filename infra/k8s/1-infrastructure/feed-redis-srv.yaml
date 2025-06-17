@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feed-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: feed-redis
+  template:
+    metadata:
+      labels:
+        app: feed-redis
+    spec:
+      containers:
+        - name: feed-redis
+          image: redis:8.0
+          ports:
+            - containerPort: 6379
+          command: ["redis-server", "--save", "", "--appendonly", "no"] # args, prevent attempting to to write snapshot to disk. For dev env this is good for performance
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          livenessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+      volumes:
+        - name: redis-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: feed-redis-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: feed-redis
+  ports:
+    - port: 6379
+      targetPort: 6379

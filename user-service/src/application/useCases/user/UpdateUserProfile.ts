@@ -9,8 +9,9 @@ import {
 } from 'humane-common';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { EventBusError } from '@application/errors/EventbusError';
+import { IUpdateUserProfile } from '@ports/usecases/user/IUpdateUserProfile';
 
-export class UpdateUserProfile {
+export class UpdateUserProfile implements IUpdateUserProfile {
    constructor(
       private readonly _userRepository: IUserRepository,
       private readonly _eventPublisher: IEventPublisher

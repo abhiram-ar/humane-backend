@@ -57,7 +57,6 @@ export class PublicPostQueryControllet {
          const targetUserDetails = await this._userSerives.getBasicUserProfile([dto.targetUserId]);
 
          res.status(HttpStatusCode.Ok).json({
-            message: 'user timemline fetcheed',
             data: { posts, targetUserDetails: targetUserDetails[0], pagination },
          });
       } catch (error) {
@@ -84,7 +83,6 @@ export class PublicPostQueryControllet {
          ]);
 
          res.status(HttpStatusCodes.OK).json({
-            message: 'author details hydrated post',
             data: { post: { ...postdetails, author: authorBasicDetails } },
          });
       } catch (error) {

@@ -6,6 +6,7 @@ export const ENV = {
    ELASTICSEARCH_PROXY_BASE_URL: process.env.ELASTICSEARCH_PROXY_BASE_URL,
    MONGODB_URI: process.env.MONGODB_URI,
    USER_SERVICE_BASE_URL: process.env.USER_SERVICE_BASE_URL,
+   FEED_CACHE_SIZE: process.env.FEED_CACHE_SIZE,
 } as const;
 
 function checkEnv() {

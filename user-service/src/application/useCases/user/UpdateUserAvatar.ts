@@ -10,8 +10,9 @@ import {
    MessageBrokerTopics,
    UpdateUserAvatarKeyEventPayload,
 } from 'humane-common';
+import { IUpdateUserAvatar } from '@ports/usecases/user/IUpdateUserAvatar';
 
-export class UpdateUserAvatar {
+export class UpdateUserAvatar implements IUpdateUserAvatar {
    constructor(
       private readonly _userRepository: IUserRepository,
       private readonly _storageService: IStorageService,

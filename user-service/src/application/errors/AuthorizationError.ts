@@ -1,4 +1,4 @@
-import { AppError } from './AppError.abstract';
+import { AppError } from 'humane-common';
 
 export class AuthorizationError extends AppError {
    public statusCode = 403;

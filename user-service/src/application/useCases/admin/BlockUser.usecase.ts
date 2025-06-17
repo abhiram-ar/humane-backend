@@ -3,6 +3,7 @@ import { AdminGetUserResponseDTO } from '@dtos/admin/getUsers.dto';
 import { UpdateUserBlockStatusDTO } from '@dtos/admin/updateUserBlockStatus.dto';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IUserRepository } from '@ports/IUserRepository';
+import { IAdminUpdateUserBlockStatus } from '@ports/usecases/admin/IBlockUser.usecase';
 import {
    AppEventsTypes,
    createEvent,
@@ -11,7 +12,7 @@ import {
    UpdateUserBlockStatusEventPaylaod,
 } from 'humane-common';
 
-export class AdminUpdateUserBlockStatus {
+export class AdminUpdateUserBlockStatus implements IAdminUpdateUserBlockStatus {
    constructor(
       private readonly _userRepository: IUserRepository,
       private readonly _eventPublisher: IEventPublisher

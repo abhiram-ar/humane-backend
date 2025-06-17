@@ -1,4 +1,5 @@
 import { FeedController } from '@presentation/http/controller/Feed.controller';
-import { timelineServices } from './services.container';
+import { esProxyService, feedServices } from './services.container';
+import { feedCache } from './cache.container';
 
-export const timelineController = new FeedController(timelineServices);
+export const timelineController = new FeedController(feedServices, esProxyService, feedCache);

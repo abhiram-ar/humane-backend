@@ -50,6 +50,7 @@ import {
    GetUserSendFriendRequestListInputDTO,
 } from '@dtos/friendship/GetUserSendFriendRequests.dto';
 import { GetFriendRequest } from '@application/useCases/friendship/GetFriendRequestList.usercase';
+import { HttpStatusCode } from 'axios';
 
 export class UserRelationshipController {
    constructor(
@@ -65,7 +66,7 @@ export class UserRelationshipController {
    sendFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
-            throw new UnAuthenticatedError('No userId in auth header');
+            throw new UnAuthenticatedError();
          }
 
          const { recieverId } = req.body;
@@ -83,7 +84,7 @@ export class UserRelationshipController {
 
          const result = await this._friendRequest.send(parsed.data);
 
-         res.status(200).json({ success: true, message: 'Friend request send', data: result });
+         res.status(HttpStatusCode.Created).json({ data: result });
       } catch (error) {
          next(error);
       }
@@ -92,7 +93,7 @@ export class UserRelationshipController {
    cancelFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
-            throw new UnAuthenticatedError('No userId in auth header');
+            throw new UnAuthenticatedError();
          }
 
          const { recieverId } = req.body;
@@ -109,9 +110,7 @@ export class UserRelationshipController {
 
          const result = await this._friendRequest.cancel(parsed.data);
 
-         res.status(201).json({
-            success: true,
-            message: 'friend request cancelled successfully',
+         res.status(HttpStatusCode.Accepted).json({
             data: result,
          });
       } catch (error) {
@@ -122,7 +121,7 @@ export class UserRelationshipController {
    declineFriendReq = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
-            throw new UnAuthenticatedError('No userId in auth header');
+            throw new UnAuthenticatedError();
          }
 
          const { targetUserId } = req.params;
@@ -140,9 +139,7 @@ export class UserRelationshipController {
 
          const result = await this._friendRequest.decline(parsed.data);
 
-         res.status(201).json({
-            success: true,
-            messasge: 'friendship removed successfully',
+         res.status(HttpStatusCode.Ok).json({
             data: result,
          });
       } catch (error) {
@@ -153,7 +150,7 @@ export class UserRelationshipController {
    removeFriendship = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
-            throw new UnAuthenticatedError('No userId in auth header');
+            throw new UnAuthenticatedError();
          }
 
          const { targetUserId } = req.params;
@@ -171,9 +168,7 @@ export class UserRelationshipController {
 
          const result = await this._removeFriendship.execute(parsed.data);
 
-         res.status(201).json({
-            success: true,
-            messasge: 'friendship removed successfully',
+         res.status(HttpStatusCode.Ok).json({
             data: result,
          });
       } catch (error) {
@@ -184,7 +179,7 @@ export class UserRelationshipController {
    getFriendRequestList = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
-            throw new UnAuthenticatedError('No userId in auth header');
+            throw new UnAuthenticatedError();
          }
          const { size = 10, createdAt, lastId } = req.query;
 
@@ -205,9 +200,7 @@ export class UserRelationshipController {
 
          const result = await this._getFriendRequest.list(parsed.data);
 
-         res.status(200).json({
-            sucess: true,
-            message: 'Friend request list fetcehed successful',
+         res.status(HttpStatusCode.Ok).json({
             data: result,
          });
       } catch (error) {
@@ -218,7 +211,7 @@ export class UserRelationshipController {
    getFriendsRequestCount = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
-            throw new UnAuthenticatedError('No userId in auth header');
+            throw new UnAuthenticatedError();
          }
          const dto: GetFriendRequestCountInputDTO = {
             userId: req.user.userId,
@@ -229,7 +222,7 @@ export class UserRelationshipController {
 
          const count = await this._getFriendRequest.count(parsed.data);
 
-         res.status(200).json({ success: true, message: 'friend list fetched', data: { count } });
+         res.status(HttpStatusCode.Ok).json({ data: { count } });
       } catch (error) {
          next(error);
       }
@@ -238,7 +231,7 @@ export class UserRelationshipController {
    getUserSendFriendRequestList = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
-            throw new UnAuthenticatedError('No userId in auth header');
+            throw new UnAuthenticatedError();
          }
          const { size = 10, createdAt, lastId } = req.query;
 
@@ -259,9 +252,7 @@ export class UserRelationshipController {
 
          const result = await this._getUserSendFriendReq.execute(parsed.data);
 
-         res.status(200).json({
-            sucess: true,
-            message: 'user send Friend request list fetcehed successful',
+         res.status(HttpStatusCode.Ok).json({
             data: result,
          });
       } catch (error) {
@@ -272,7 +263,7 @@ export class UserRelationshipController {
    acceptFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
-            throw new UnAuthenticatedError('No userId in auth header');
+            throw new UnAuthenticatedError();
          }
 
          const { requesterId } = req.body;
@@ -290,7 +281,7 @@ export class UserRelationshipController {
 
          const result = await this._friendRequest.accept(parsed.data);
 
-         res.status(201).json({ success: true, message: 'friend req accepted', data: result });
+         res.status(HttpStatusCode.Created).json({ data: result });
       } catch (error) {
          next(error);
       }
@@ -317,7 +308,7 @@ export class UserRelationshipController {
 
          const result = await this._getFriends.list(parsed.data);
 
-         res.status(200).json({ success: true, message: 'friend list fetched', data: result });
+         res.status(HttpStatusCode.Ok).json({ data: result });
       } catch (error) {
          next(error);
       }
@@ -326,7 +317,7 @@ export class UserRelationshipController {
    getFriendsCount = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
-            throw new UnAuthenticatedError('No userId in auth header');
+            throw new UnAuthenticatedError();
          }
          const { targetUserId } = req.query;
          const dto: GetFriendCountInputDTO = {
@@ -338,7 +329,7 @@ export class UserRelationshipController {
 
          const count = await this._getFriends.count(parsed.data);
 
-         res.status(200).json({ success: true, message: 'friend list fetched', data: { count } });
+         res.status(HttpStatusCode.Ok).json({ data: { count } });
       } catch (error) {
          next(error);
       }
@@ -347,7 +338,7 @@ export class UserRelationshipController {
    getRelationshipStatus = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
-            throw new UnAuthenticatedError('User not found in request header');
+            throw new UnAuthenticatedError();
          }
          const { targetUserId } = req.query;
 
@@ -363,9 +354,7 @@ export class UserRelationshipController {
 
          const status = await this._getRelationshipStatus.execute(parsed.data);
 
-         res.status(200).json({
-            success: true,
-            message: 'Relationship status fetched',
+         res.status(HttpStatusCode.Ok).json({
             data: { status },
          });
       } catch (error) {
@@ -376,7 +365,7 @@ export class UserRelationshipController {
    getMutualFriendsList = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
-            throw new UnAuthenticatedError('User not found in request header');
+            throw new UnAuthenticatedError();
          }
          const { size = 10, createdAt, lastId, targetUserId } = req.query;
 
@@ -398,9 +387,7 @@ export class UserRelationshipController {
 
          const result = await this._mutualFriends.list(parsed.data);
 
-         res.status(200).json({
-            success: true,
-            message: 'Mutual friends list fetched',
+         res.status(HttpStatusCode.Ok).json({
             data: result,
          });
       } catch (error) {
@@ -411,7 +398,7 @@ export class UserRelationshipController {
    getMutualFriendsCount = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
-            throw new UnAuthenticatedError('User not found in request header');
+            throw new UnAuthenticatedError();
          }
          const { targetUserId } = req.query;
 
@@ -428,9 +415,7 @@ export class UserRelationshipController {
 
          const count = await this._mutualFriends.count(parsed.data);
 
-         res.status(200).json({
-            success: true,
-            message: 'Mutual friends count fetched',
+         res.status(HttpStatusCode.Ok).json({
             data: { count },
          });
       } catch (error) {

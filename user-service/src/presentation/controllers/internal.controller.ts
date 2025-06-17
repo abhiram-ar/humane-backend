@@ -38,7 +38,6 @@ export class InternalController {
          const friends = await this._getFriends.allFriends(userId);
 
          res.status(HttpStatusCode.Ok).json({
-            message: 'non hot user, friendslist included',
             data: { isHotUser: false, friends },
          });
       } catch (error) {

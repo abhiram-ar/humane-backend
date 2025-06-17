@@ -1,6 +1,7 @@
 import checkEnv from '@config/env';
 import { startAllConsumers, stopAllConsumer } from '@config/kafka';
 import { logger } from '@config/logger';
+import { connectRedis, disconnectRedis } from '@infrastructure/cache/redis/client';
 import connectDB from '@infrastructure/persistance/mongoDB/mongoDBclient';
 import app from '@presentation/http/app';
 
@@ -10,11 +11,14 @@ const bootstrap = async () => {
    try {
       checkEnv();
       await connectDB();
+      await connectRedis();
       await startAllConsumers();
       process.on('SIGINT', async () => {
+         disconnectRedis();
          await stopAllConsumer();
       });
       process.on('SIGTERM', async () => {
+         disconnectRedis();
          await stopAllConsumer();
       });
 

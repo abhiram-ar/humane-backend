@@ -17,10 +17,11 @@
       "cors": "^2.8.5",
       "date-fns": "^4.1.0",
       "express": "^5.1.0",
-      "humane-common": "^1.0.73",
+      "humane-common": "^1.0.77",
       "kafkajs": "^2.2.4",
       "mongoose": "^8.15.1",
       "morgan": "^1.10.0",
+      "redis": "^5.5.6",
       "winston": "^3.17.0",
       "zod": "^3.25.53"
    },

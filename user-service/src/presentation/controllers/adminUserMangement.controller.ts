@@ -4,6 +4,7 @@ import { updateuserblockStatusSchema } from '@dtos/admin/updateUserBlockStatus.d
 import { GetUserDTO, getUsersForAdminSchema } from '@dtos/admin/getUsers.dto';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
 import { Request, Response, NextFunction } from 'express';
+import { HttpStatusCode } from 'axios';
 
 export class AdminUserManagementController {
    constructor(
@@ -29,9 +30,7 @@ export class AdminUserManagementController {
 
          const { users, pagination } = await this._getUserList.execute(parsed.data);
 
-         res.status(200).json({
-            success: true,
-            message: 'user list successfully fetched',
+         res.status(HttpStatusCode.Ok).json({
             data: { users, pagination, filter: { search } },
          });
       } catch (error) {
@@ -49,9 +48,7 @@ export class AdminUserManagementController {
 
          const updatedUser = await this._updateUserBlockStatus.execute(parsed.data);
 
-         res.status(201).json({
-            success: true,
-            message: 'User block status updated',
+         res.status(HttpStatusCode.Ok).json({
             data: { user: updatedUser },
          });
       } catch (error) {

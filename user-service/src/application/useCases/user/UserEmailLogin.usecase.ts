@@ -8,8 +8,9 @@ import { IUserRepository } from '@ports/IUserRepository';
 import { UserJWTTokenPayload } from '@application/types/JWTTokenPayload.type';
 import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS, JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 import { EmailError } from '@application/errors/EmailError';
+import { IUserEmailLogin } from '@ports/usecases/user/IUserEmailLogin.usecase';
 
-export class UserEmailLogin {
+export class UserEmailLogin implements IUserEmailLogin {
    constructor(
       private readonly _userRepository: IUserRepository,
       private readonly _hasingService: IHashService,

@@ -17,6 +17,7 @@ export class FeedRepository implements IFeedRepository {
       console.log(res);
    };
    removeAuthorPostsFromUserTimeline(userId: string, authorId: string): Promise<void> {
+      // TODO
       throw new Error('Method not implemented.');
    }
 
@@ -29,9 +30,21 @@ export class FeedRepository implements IFeedRepository {
       from: string | null;
       hasMore: boolean;
    }> => {
+      let cursorFilter = {};
+      if (from) {
+         const [createdAtStr, postId] = from.split('|');
+         const createdAt = new Date(Number(createdAtStr));
+         cursorFilter = {
+            $or: [
+               { createdAt: { $lt: createdAt } },
+               { createdAt: createdAt, postId: { $lt: postId } },
+            ],
+         };
+      }
+
       const res = await feedModel
-         .find({ userId, ...(from && { _id: { $lt: from } }) }, { postId: 1, createdAt: 1 })
-         .sort({ _id: -1 })
+         .find({ userId, ...cursorFilter }, { postId: 1, createdAt: 1 })
+         .sort({ createdAt: -1, postId: -1 })
          .limit(limit);
 
       const parsedTimelinePosts = res.map((doc) => ({
@@ -41,8 +54,12 @@ export class FeedRepository implements IFeedRepository {
       }));
 
       const hasMore = res.length === limit;
+      const cursor =
+         hasMore && res.length > 0
+            ? `${res[res.length - 1].createdAt.getTime()}|${res[res.length - 1].postId}`
+            : null;
 
-      return { post: parsedTimelinePosts, from: hasMore ? res[res.length - 1].id : null, hasMore };
+      return { post: parsedTimelinePosts, from: cursor, hasMore };
    };
 
    deletePostFromAllTimeline = async (postId: string): Promise<{ deletedCount: number }> => {

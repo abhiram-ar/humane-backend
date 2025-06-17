@@ -47,7 +47,6 @@ export class PublicCommentController {
          );
 
          res.status(HttpStatusCode.Ok).json({
-            message: 'comment fetched',
             data: { comments: authorHydratedComments, pagination },
          });
       } catch (error) {

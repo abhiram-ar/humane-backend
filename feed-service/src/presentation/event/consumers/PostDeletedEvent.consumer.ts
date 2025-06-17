@@ -1,17 +1,18 @@
 import { logger } from '@config/logger';
 import { postSchema } from '@dtos/Post.dto';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
-import { FeedServices } from '@services/feed.services';
+import { FeedServices } from '@services/Feed.services';
 import {
    AppEvent,
    AppEventsTypes,
-   EventBusError,
+   EventConsumerMissMatchError,
+   IConsumer,
    MessageBrokerTopics,
    ZodValidationError,
 } from 'humane-common';
 import { Consumer } from 'kafkajs';
 
-export class PostDeletedEventConsumer {
+export class PostDeletedEventConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(
@@ -41,7 +42,7 @@ export class PostDeletedEventConsumer {
 
             try {
                if (event.eventType != AppEventsTypes.POST_DELETED) {
-                  throw new EventBusError('Invalid event type for this comsumer');
+                  throw new EventConsumerMissMatchError();
                }
 
                const validatedPost = postSchema.safeParse(event.payload);

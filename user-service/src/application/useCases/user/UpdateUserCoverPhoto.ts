@@ -10,8 +10,9 @@ import {
    UpdateUserCoverPhotoKeyEventPayload,
 } from 'humane-common';
 import { IEventPublisher } from '@ports/IEventProducer';
+import { IUpdateUserCoverPhoto } from '@ports/usecases/user/IUpdateUserCoverPhoto';
 
-export class UpdateUserCoverPhoto {
+export class UpdateUserCoverPhoto implements IUpdateUserCoverPhoto {
    constructor(
       private readonly _userRepository: IUserRepository,
       private readonly _storageService: IStorageService,

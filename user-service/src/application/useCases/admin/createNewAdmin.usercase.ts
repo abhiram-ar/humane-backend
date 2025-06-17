@@ -4,8 +4,9 @@ import { createAdminDTO } from '@dtos/admin/createAdmin.dto';
 import { signupAdminDTO } from '@dtos/admin/signupAdmin.dto';
 import { ENV } from '@config/env';
 import { EmailError } from '@application/errors/EmailError';
+import { ICreateAdmin } from '@ports/usecases/admin/ICreateNewAdmin.usercase';
 
-export class CreateAdmin {
+export class CreateAdmin implements ICreateAdmin {
    constructor(
       private readonly _adminRepository: IAdminRepository,
       private readonly _hashService: IHashService
@@ -15,7 +16,7 @@ export class CreateAdmin {
       dto: signupAdminDTO
    ): Promise<{ firstName: string; lastName?: string; email: string }> => {
       const emailExists = await this._adminRepository.emailExists(dto.email);
-      
+
       if (emailExists) {
          throw new EmailError('Email already exists');
       }

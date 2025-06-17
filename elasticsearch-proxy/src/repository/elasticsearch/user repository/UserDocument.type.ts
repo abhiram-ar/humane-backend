@@ -1,4 +1,4 @@
-export interface UserDocument {
+export interface IUserDocument {
    firstName: string;
    lastName?: string | null;
    bio?: string | null;

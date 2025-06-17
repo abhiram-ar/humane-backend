@@ -7,8 +7,9 @@ import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS, JWT_REFRESH_TOKEN_EXPIRY_SECONDS } fro
 import { EmailError } from '@application/errors/EmailError';
 import { IAdminRepository } from '@ports/IAdminRepository';
 import { adminLoginDTO } from '@dtos/admin/adminLogin.dto';
+import { IAdminEmailLogin } from '@ports/usecases/admin/IAdminEmailLogin';
 
-export class AdminEmailLogin {
+export class AdminEmailLogin implements IAdminEmailLogin {
    constructor(
       private readonly _AdminRepository: IAdminRepository,
       private readonly _hasingService: IHashService,

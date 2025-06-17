@@ -2,7 +2,8 @@ import { logger } from '@config/logger';
 import {
    AppEvent,
    AppEventsTypes,
-   EventBusError,
+   EventConsumerMissMatchError,
+   IConsumer,
    MessageBrokerTopics,
    ZodValidationError,
 } from 'humane-common';
@@ -11,7 +12,7 @@ import { Consumer } from 'kafkajs';
 import { CommentService } from '@services/Comment.services';
 import { commentSchema } from 'interfaces/dto/post/Comment.dto';
 
-export class CommentCreatedEventConsumer {
+export class CommentCreatedEventConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(
@@ -40,7 +41,7 @@ export class CommentCreatedEventConsumer {
 
             try {
                if (event.eventType != AppEventsTypes.COMMENT_CREATED) {
-                  throw new EventBusError('Invalid event type for this comsumer');
+                  throw new EventConsumerMissMatchError();
                }
                const parsed = commentSchema.safeParse(event.payload);
 

@@ -7,9 +7,10 @@ import { RemoveFriendshipInputDTO } from '@dtos/friendship/RemoveFriendshipInput
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IUserRepository } from '@ports/IUserRepository';
+import { IRemoveFriendship } from '@ports/usecases/friendship/IRemoveFriendship.usecase';
 import { AppEventsTypes, createEvent, MessageBrokerTopics, UserNotFoundError } from 'humane-common';
 
-export class RemoveFriendship {
+export class RemoveFriendship implements IRemoveFriendship {
    constructor(
       private readonly _friendshipRepo: IFriendshipRepository,
       private readonly _userRepo: IUserRepository,

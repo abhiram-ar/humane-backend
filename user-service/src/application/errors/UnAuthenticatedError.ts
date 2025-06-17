@@ -1,8 +1,8 @@
-import { AppError } from './AppError.abstract';
+import { AppError } from "humane-common";
 
 export class UnAuthenticatedError extends AppError {
    public statusCode = 401;
-   constructor(public message: string) {
+   constructor(public message: string = 'No userId in auth header') {
       super(message);
       Object.setPrototypeOf(this, UnAuthenticatedError.prototype);
    }
