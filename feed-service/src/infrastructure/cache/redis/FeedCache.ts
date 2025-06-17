@@ -36,7 +36,11 @@ export class FeedCache implements IFeedCache {
          value: post.postId,
       }));
 
-      await redisClient.zAdd(dto.userId, entry);
-      logger.debug(`polpulated recent post to ${dto.userId} timeline cache`);
+      if (entry.length > 0) {
+         await redisClient.zAdd(dto.userId, entry);
+         logger.debug(`polpulated recent post to ${dto.userId} timeline cache`);
+      } else {
+         logger.warn('skipping recent post cache polpulation as there is no post to add');
+      }
    };
 }
