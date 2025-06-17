@@ -3,6 +3,7 @@ import {
    AppEvent,
    AppEventsTypes,
    EventBusError,
+   IConsumer,
    MessageBrokerTopics,
    ZodValidationError,
 } from 'humane-common';
@@ -12,7 +13,7 @@ import { postSchema } from 'interfaces/dto/post/Post.dto';
 import { ICommentService } from 'interfaces/services/IComment.services';
 import { IPostService } from 'interfaces/services/IPost.services';
 
-export class PostDeletedEventConsumer {
+export class PostDeletedEventConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(

@@ -5,11 +5,11 @@ import { updateUserAvatarKeySchema } from 'interfaces/dto/updateUserAvatarKey.dt
 import { updateUserBlockStatusSchema } from 'interfaces/dto/updateUserBlockStatus.dto';
 import { updateUserCoverPhotokeySchema } from 'interfaces/dto/updateUserCoverPhotokey';
 import { UserServices } from '@services/User.services';
-import { AppEvent, AppEventsTypes, MessageBrokerTopics } from 'humane-common';
+import { AppEvent, AppEventsTypes, IConsumer, MessageBrokerTopics } from 'humane-common';
 import KafkaSingleton from 'kafka/KafkaSingleton';
 import { Consumer } from 'kafkajs';
 
-export class UserProfileEventsConsumer {
+export class UserProfileEventsConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(

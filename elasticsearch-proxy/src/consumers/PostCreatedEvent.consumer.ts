@@ -3,6 +3,7 @@ import {
    AppEvent,
    AppEventsTypes,
    EventBusError,
+   IConsumer,
    MessageBrokerTopics,
    ZodValidationError,
 } from 'humane-common';
@@ -11,7 +12,7 @@ import { Consumer } from 'kafkajs';
 import { PostService } from '@services/Post.services';
 import { postSchema } from 'interfaces/dto/post/Post.dto';
 
-export class PostCreatedEventConsumer {
+export class PostCreatedEventConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(

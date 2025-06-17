@@ -3,6 +3,7 @@ import {
    AppEvent,
    AppEventsTypes,
    EventBusError,
+   IConsumer,
    MessageBrokerTopics,
    ZodValidationError,
 } from 'humane-common';
@@ -11,7 +12,7 @@ import { Consumer } from 'kafkajs';
 import { CommentService } from '@services/Comment.services';
 import { commentSchema } from 'interfaces/dto/post/Comment.dto';
 
-export class CommentDeletedEventConsumer {
+export class CommentDeletedEventConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(
