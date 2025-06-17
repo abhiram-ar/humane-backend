@@ -2,8 +2,9 @@ import { createUserDTO } from '../DTOs/user/createUser.dto';
 import { User } from '../../domain/entities/user.entity';
 import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
 import { AdminGetUserResponseDTO, GetUserDTO } from '@dtos/admin/getUsers.dto';
+import { IBaseRepository } from './IBaseRepository';
 
-export interface IUserRepository {
+export interface IUserRepository extends IBaseRepository {
    create(dto: createUserDTO): Promise<User>;
    emailExists(email: string): Promise<boolean>;
 

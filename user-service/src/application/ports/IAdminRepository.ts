@@ -1,7 +1,8 @@
 import { Admin } from '@domain/entities/admin.entity';
 import { createAdminDTO } from '@dtos/admin/createAdmin.dto';
+import { IBaseRepository } from './IBaseRepository';
 
-export interface IAdminRepository {
+export interface IAdminRepository extends IBaseRepository {
    create(
       dto: createAdminDTO
    ): Promise<Pick<Admin, 'id' | 'email' | 'firstName' | 'lastName'> | null>;
