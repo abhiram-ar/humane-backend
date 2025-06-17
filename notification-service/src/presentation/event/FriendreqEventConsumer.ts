@@ -1,5 +1,12 @@
 import { Consumer } from 'kafkajs';
-import { AppEvent, AppEventsTypes, MessageBrokerTopics, ZodValidationError } from 'humane-common';
+import {
+   AppEvent,
+   AppEventsTypes,
+   EventConsumerMissMatchError,
+   IConsumer,
+   MessageBrokerTopics,
+   ZodValidationError,
+} from 'humane-common';
 import KafkaSingleton from '@infrastructure/event/KafkaSingleton';
 import { logger } from '@config/logger';
 import {
@@ -12,7 +19,7 @@ import { FriendReqAcceptedNotificationService } from '@application/usercase/Frie
 import { isUserOnline } from '@presentation/websocket/utils/isUserOnline';
 import { IElasticSearchProxyService } from '@ports/IElasticSearchProxyService';
 
-export class FriendReqEventConsumer {
+export class FriendReqEventConsumer implements IConsumer {
    private _consumer: Consumer;
    constructor(
       private readonly _kafka: KafkaSingleton,
@@ -131,9 +138,7 @@ export class FriendReqEventConsumer {
                   }
                   //
                } else {
-                  throw new Error(
-                     `Invalid event type (${event.eventType}) for notificaion-srv:frendreqNoti consumer`
-                  );
+                  throw new EventConsumerMissMatchError();
                }
                logger.info(`Processed ${event.eventType}: ${event.eventId}`);
             } catch (error) {
