@@ -4,6 +4,7 @@ import { FeedServices } from '@services/Feed.services';
 import { parseUnifiedCursor } from 'shared/UnifiedPagination.util';
 import { redisClient } from './client';
 import { IFeedCache } from '@ports/IFeedCache';
+import { ENV } from '@config/env';
 
 export class FeedCache implements IFeedCache {
    constructor(private readonly _feedServices: FeedServices) {}
@@ -28,7 +29,7 @@ export class FeedCache implements IFeedCache {
    addPostToUserFeed = async (dto: GetFeedInputDTO) => {
       const recentPost = await this._feedServices.getUserFeedPaginated({
          ...dto,
-         limit: 7,
+         limit: parseInt(ENV.FEED_CACHE_SIZE as string),
       });
       const entry = recentPost.post.map((post) => ({
          score: post.createdAt.getTime(),
