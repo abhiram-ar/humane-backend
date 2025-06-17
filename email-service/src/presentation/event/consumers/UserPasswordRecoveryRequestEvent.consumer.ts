@@ -1,13 +1,13 @@
 import { SendPasswordRecoveryMail } from '@application/usecases/email/SendPasswordRecoveryMail';
 import KafkaSingleton from '@infrastructure/event-bus/KafkaSingleton';
-import { MessageBrokerTopics, UserPasswordRecoveryRequestEvent } from 'humane-common';
+import { IConsumer, MessageBrokerTopics, UserPasswordRecoveryRequestEvent } from 'humane-common';
 import { Consumer } from 'kafkajs';
 import {
    SendPasswordRecoveryMailInputDTO,
    sendPasswordRecoveryMailInputSchema,
 } from '@dtos/sendPasswordRecoveryMailInput.dto';
 
-export class UserPasswordRecoveryRequestEventConsumer {
+export class UserPasswordRecoveryRequestEventConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(

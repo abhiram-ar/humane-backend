@@ -1,13 +1,13 @@
 import KafkaSingleton from '@infrastructure/event-bus/KafkaSingleton';
 import { Consumer } from 'kafkajs';
 import { SendUserVerificationMail } from '@application/usecases/email/SendVerificationMail';
-import { MessageBrokerTopics, UserSignupEvent } from 'humane-common';
+import { IConsumer, MessageBrokerTopics, UserSignupEvent } from 'humane-common';
 import {
    SendUserVerificationMailDTO,
    sendUserVerificationMailInputSchema,
 } from '@dtos/sendVerificationMailInput.dto';
 
-export class UserSingupEventConsumer {
+export class UserSingupEventConsumer implements IConsumer {
    private _consumer: Consumer;
    constructor(
       private readonly _kafka: KafkaSingleton,
