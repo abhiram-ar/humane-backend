@@ -9,20 +9,22 @@ import {
 import { BasicUserDetails } from '@application/Types/BasicUserDetails';
 import { UserNotificationService } from '@application/usercase/UserNotification.usecase';
 import { logger } from '@config/logger';
-import { axiosESproxyService } from '@infrastructure/http/axiosESproxy';
-import { GetUserBasicDetailsResponse } from '@presentation/event/Types/GetUserBasicDetails Response';
+import { IElasticSearchProxyService } from '@ports/IElasticSearchProxyService';
 import { CombinedNotificationWithActionableUser } from '@presentation/Types/CombinedNotiWithActionableUser';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 import { UnAuthenticatedError, ZodValidationError } from 'humane-common';
 
 export class UserNotificationController {
-   constructor(private readonly _userNotificationService: UserNotificationService) {}
+   constructor(
+      private readonly _userNotificationService: UserNotificationService,
+      private readonly _esProxyService: IElasticSearchProxyService
+   ) {}
 
    getRecentNotifications = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user') {
-            throw new UnAuthenticatedError('No userId in request');
+            throw new UnAuthenticatedError();
          }
 
          const dto: GetRecentUserNoficationInputDTO = {
@@ -52,12 +54,10 @@ export class UserNotificationController {
 
          if (actionableUserIds.length > 0) {
             // exproxy will throw an error if userIds is null
-            const actionableUserDetails = await axiosESproxyService
-               .get<GetUserBasicDetailsResponse>('/api/v1/query/public/user/basic', {
-                  params: { userId: actionableUserIds },
-                  paramsSerializer: { indexes: null }, // remove user1[]=fsfsdf&user2[]=fsdfsdf issue
-               })
-               .then((data) => data.data.data.user);
+            const actionableUserDetails = await this._esProxyService.getUserBasicDetails(
+               actionableUserIds
+            );
+
             const actionableUserDetailsMap = new Map<string, BasicUserDetails>();
             actionableUserDetails.forEach((user) => {
                if (!user) return;
@@ -82,24 +82,20 @@ export class UserNotificationController {
          }
 
          res.status(HttpStatusCode.Ok).json({
-            success: true,
-            message: 'user notification fetched',
             data: {
                noti: actionableUserIds.length > 0 ? actionableUserDetailsHydratedNoti : noti,
                pagination,
             },
          });
       } catch (error) {
-         res.json(error);
          next(error);
       }
    };
 
    markAsReadFrom = async (req: Request, res: Response, next: NextFunction) => {
-      console.log('hit1');
       try {
          if (req.user?.type !== 'user') {
-            throw new UnAuthenticatedError('No userId in request');
+            throw new UnAuthenticatedError();
          }
 
          const dto: MarkNotificationAsReadInputDTO = {
@@ -117,7 +113,6 @@ export class UserNotificationController {
          // TODO: wite the update to socket - to mark the notification form, since a user might be logged in from other devices
 
          res.status(HttpStatusCode.Accepted).json({
-            success: true,
             message: `user notifation marked as read from ${dto.fromId}`,
          });
       } catch (error) {
