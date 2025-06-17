@@ -5,7 +5,14 @@ import { updateUserAvatarKeySchema } from 'interfaces/dto/updateUserAvatarKey.dt
 import { updateUserBlockStatusSchema } from 'interfaces/dto/updateUserBlockStatus.dto';
 import { updateUserCoverPhotokeySchema } from 'interfaces/dto/updateUserCoverPhotokey';
 import { UserServices } from '@services/User.services';
-import { AppEvent, AppEventsTypes, IConsumer, MessageBrokerTopics } from 'humane-common';
+import {
+   AppEvent,
+   AppEventsTypes,
+   IConsumer,
+   MessageBrokerTopics,
+   InvalidEventPayloadError,
+   EventConsumerMissMatchError,
+} from 'humane-common';
 import KafkaSingleton from 'kafka/KafkaSingleton';
 import { Consumer } from 'kafkajs';
 
@@ -42,7 +49,7 @@ export class UserProfileEventsConsumer implements IConsumer {
                   const parsed = createUserSchema.safeParse(event.payload);
 
                   if (!parsed.success) {
-                     throw new Error('Invalid event payload');
+                     throw new InvalidEventPayloadError();
                   }
 
                   await this._userServices.create(parsed.data);
@@ -50,14 +57,14 @@ export class UserProfileEventsConsumer implements IConsumer {
                   const parsed = updateUserSchema.safeParse(event.payload);
 
                   if (!parsed.success) {
-                     throw new Error('Invalid event payload');
+                     throw new InvalidEventPayloadError();
                   }
                   await this._userServices.update(event.timestamp, parsed.data);
                } else if (event.eventType === AppEventsTypes.USER_AVATAR_UPDATED) {
                   const parsed = updateUserAvatarKeySchema.safeParse(event.payload);
 
                   if (!parsed.success) {
-                     throw new Error('Invalid event payload');
+                     throw new InvalidEventPayloadError();
                   }
 
                   await this._userServices.updateUserAvatarKey(event.timestamp, parsed.data);
@@ -65,7 +72,7 @@ export class UserProfileEventsConsumer implements IConsumer {
                   const parsed = updateUserCoverPhotokeySchema.safeParse(event.payload);
 
                   if (!parsed.success) {
-                     throw new Error('Invalid event payload');
+                     throw new InvalidEventPayloadError();
                   }
 
                   this._userServices.updateUserCoverPhotoKey(event.timestamp, parsed.data);
@@ -73,11 +80,11 @@ export class UserProfileEventsConsumer implements IConsumer {
                   const parsed = updateUserBlockStatusSchema.safeParse(event.payload);
 
                   if (!parsed.success) {
-                     throw new Error('Invalid event payload');
+                     throw new InvalidEventPayloadError();
                   }
                   this._userServices.updateBlockStatus(event.timestamp, parsed.data);
                } else {
-                  throw new Error('Event not configured for this consumer');
+                  throw new EventConsumerMissMatchError();
                }
 
                logger.info(`processed-> ${tempTraceId}`);

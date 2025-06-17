@@ -2,7 +2,7 @@ import { logger } from '@config/logger';
 import {
    AppEvent,
    AppEventsTypes,
-   EventBusError,
+   EventConsumerMissMatchError,
    IConsumer,
    MessageBrokerTopics,
    ZodValidationError,
@@ -43,7 +43,7 @@ export class PostDeletedEventConsumer implements IConsumer {
 
             try {
                if (event.eventType != AppEventsTypes.POST_DELETED) {
-                  throw new EventBusError('Invalid event type for this comsumer');
+                  throw new EventConsumerMissMatchError();
                }
                const validatedPost = postSchema.safeParse(event.payload);
 
@@ -52,7 +52,7 @@ export class PostDeletedEventConsumer implements IConsumer {
                }
 
                await this._PostServices.delete(validatedPost.data.id);
-               await this._commentServices.deleteAllPostComments(validatedPost.data.id)
+               await this._commentServices.deleteAllPostComments(validatedPost.data.id);
 
                logger.info(`processed-> ${event.eventType} ${event.eventId}`);
             } catch (e) {
