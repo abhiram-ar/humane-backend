@@ -8,9 +8,10 @@ import {
 } from 'interfaces/dto/post/HydratePostDetails.dto';
 import { PostService } from '@services/Post.services';
 import { GetBasicUserProfileFromIdsOutputDTO } from 'interfaces/dto/GetUserBasicProfileFromIDs';
+import { HttpStatusCode } from 'axios';
 
 // TODO: rename to common internal controller
-export class InternalUserQueryController {
+export class InternalQueryController {
    constructor(
       private readonly _userSerives: UserServices,
       private readonly _postServices: PostService
@@ -33,9 +34,7 @@ export class InternalUserQueryController {
 
          const { users, pagination } = await this._userSerives.paginatedSearch(parsedDTO.data);
 
-         res.status(200).json({
-            success: true,
-            message: 'userlist successfully fetched',
+         res.status(HttpStatusCode.Ok).json({
             data: { users, pagination },
          });
       } catch (error) {
@@ -92,7 +91,6 @@ export class InternalUserQueryController {
          });
 
          res.status(HttpStatusCodes.OK).json({
-            message: 'author details hydrated posts',
             data: { posts: authorDetailsHydratedPosts },
          });
       } catch (error) {

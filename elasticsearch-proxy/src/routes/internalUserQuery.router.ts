@@ -1,8 +1,8 @@
-import { internalUserQueryController } from '@di/controllers';
+import { internalQueryController } from '@di/controllers';
 import { Router } from 'express';
 
 const internalQueryRouter = Router();
 
-internalQueryRouter.get('/user', internalUserQueryController.searchUser);
-internalQueryRouter.get('/post', internalUserQueryController.hydratePostDetails);
+internalQueryRouter.get('/user', internalQueryController.searchUser);
+internalQueryRouter.get('/post', internalQueryController.hydratePostDetails);
 export default internalQueryRouter;
