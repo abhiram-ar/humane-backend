@@ -17,7 +17,7 @@ export class FeedController {
    getTimeline = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (!req.user || req.user.type !== 'user') {
-            throw new UnAuthenticatedError('user not found in request');
+            throw new UnAuthenticatedError();
          }
 
          const dto: GetFeedInputDTO = {
