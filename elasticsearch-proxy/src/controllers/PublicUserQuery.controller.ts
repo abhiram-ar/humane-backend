@@ -7,6 +7,7 @@ import { infiniteScrollSearchSchema } from 'interfaces/dto/infiniteScrollSearch.
 import { UserServices } from '@services/User.services';
 import { Request, Response, NextFunction } from 'express';
 import { GenericError, ZodValidationError } from 'humane-common';
+import { HttpStatusCode } from 'axios';
 
 export class PublicUserQueryController {
    constructor(private readonly _userSerives: UserServices) {}
@@ -22,9 +23,7 @@ export class PublicUserQueryController {
 
          const user = await this._userSerives.getUserProfile(parsed.data);
 
-         res.status(200).json({
-            success: true,
-            message: 'user successfully fetched',
+         res.status(HttpStatusCode.Ok).json({
             data: { user },
          });
       } catch (error) {
@@ -52,9 +51,7 @@ export class PublicUserQueryController {
 
          const user = await this._userSerives.getBasicUserProfile(parsed.data);
 
-         res.status(200).json({
-            success: true,
-            message: 'user list successfully fetched',
+         res.status(HttpStatusCode.Ok).json({
             data: { user },
          });
       } catch (error) {
@@ -80,9 +77,7 @@ export class PublicUserQueryController {
 
          const result = await this._userSerives.infiniteScollSearch(parsed.data);
 
-         res.status(200).json({
-            success: true,
-            message: 'userlist successfully fetched',
+         res.status(HttpStatusCode.Ok).json({
             data: result,
          });
       } catch (error) {
