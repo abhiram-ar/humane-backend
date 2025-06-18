@@ -1,4 +1,4 @@
-### responsibility
+### Responsibility
 
 -  This service only stores the IDs of the post to construct a feed
 -  Ids are postIds are saturated at read time from post read model
@@ -7,7 +7,7 @@
 -  that post is added to all the friend's timeline to the curresponding author who made the post
 -  at the same time this is written to cache
 
-#### why not deleting a post from cache, when post in deleted from the system
+### why not deleting a post from cache, when post in deleted from the system?
 
 -  deleteing a post is tricky
 -  when a post is deleted we can easily delete it from the DB
