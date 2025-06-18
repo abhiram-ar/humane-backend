@@ -1,4 +1,5 @@
 import { HydratedPost } from '@application/Types/HydratedPost';
+import { ENV } from '@config/env';
 import { logger } from '@config/logger';
 import { GetFeedInputDTO, getFeedInputSchema } from '@dtos/getFeed.dto';
 import { IESproxyService } from '@ports/IESproxyService';
@@ -72,8 +73,8 @@ export class FeedController {
             logger.warn('cache miss, full DB read');
          }
 
-         // populaate cache is it does not exsit only
-         if (cacheReads.length === 0 && !queryData.from) {
+         // try to populaate cache is it does exsit for the first page query
+         if (!queryData.from && cacheReads.length < parseInt(ENV.FEED_CACHE_SIZE as string)) {
             this._feedCache.addPostToUserFeed(queryData);
          }
 
