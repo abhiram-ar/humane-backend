@@ -2,6 +2,7 @@ import { logger } from '@config/logger';
 import { AppendPostToMultipleUserTimelineInputDTO } from '@dtos/AppendPostToMultipleUserTimeline.dto';
 import { postSchema } from '@dtos/Post.dto';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
+import { IFeedCache } from '@ports/IFeedCache';
 import { IUserService } from '@ports/IUserService';
 import { FeedServices } from '@services/Feed.services';
 import {
@@ -20,7 +21,8 @@ export class PostCreatedEventConsumer implements IConsumer {
    constructor(
       private readonly _kafka: KafkaSingleton,
       private readonly _timelineServies: FeedServices,
-      private readonly _userServices: IUserService
+      private readonly _userServices: IUserService,
+      private readonly _feedCache: IFeedCache
    ) {
       this.consumer = this._kafka.createConsumer('feed-srv-post-created-v3');
    }
@@ -73,6 +75,7 @@ export class PostCreatedEventConsumer implements IConsumer {
                await this._timelineServies.appendPostToMultipleUserFeed(dto);
 
                // update the cache
+               await this._feedCache.upsetPostToMultipleUserFeed(dto);
 
                logger.info(`processed-> ${event.eventId}`);
             } catch (e) {

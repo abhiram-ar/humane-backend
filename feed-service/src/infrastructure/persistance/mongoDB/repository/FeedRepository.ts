@@ -1,6 +1,7 @@
 import { IFeedRepository } from '@domain/interfaces/IFeedRepository';
 import { FeedPostEntity } from '@domain/FeedPost.entity';
 import feedModel from '../models/feedModel';
+import { logger } from '@config/logger';
 
 export class FeedRepository implements IFeedRepository {
    bulkUpsertTimelinePost = async (posts: FeedPostEntity[]): Promise<void> => {
@@ -14,7 +15,7 @@ export class FeedRepository implements IFeedRepository {
 
       const res = await feedModel.bulkWrite(operations);
 
-      console.log(res);
+      logger.debug(`post upserted in ${res.upsertedCount} user timeline DB`);
    };
    removeAuthorPostsFromUserTimeline(userId: string, authorId: string): Promise<void> {
       // TODO
