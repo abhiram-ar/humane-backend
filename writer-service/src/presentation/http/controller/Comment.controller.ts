@@ -73,7 +73,7 @@ export class CommentController {
          }
          const deletedComment = await this._commentServices.delete(parsed.data);
 
-         // TODO: clear comments realted to this comment
+         // TODO: clear likes realted to this comment
          const commentDeltedEvent = createEvent(AppEventsTypes.COMMENT_DELTED, deletedComment);
          const { ack } = await this._eventPubliser.send(
             MessageBrokerTopics.COMMENT_DELTED_EVENTS_TOPIC,

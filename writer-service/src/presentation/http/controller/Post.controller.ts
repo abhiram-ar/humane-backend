@@ -80,6 +80,7 @@ export class PostController {
             throw new ZodValidationError(parsed.error);
          }
          const deltedPost = await this._postService.delete(parsed.data);
+         // TODO: clear comments realted to this post
 
          const postDeltedEvent = createEvent(AppEventsTypes.POST_DELETED, deltedPost);
          const { ack } = await this._eventPubliser.send(
