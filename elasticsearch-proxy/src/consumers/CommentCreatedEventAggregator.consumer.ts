@@ -28,7 +28,7 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
    private readonly _FLUSH_INTERVAL = 3000; //3s
    private readonly _MAX_BATCH_SIZE = 100;
 
-   // dual buffer to handle events occuring while the one buffer is being flused
+   // dual buffer, one to handle events occuring while the other buffer is being flused
    // alternative use a mutex lock while flushing
    private activeBatch = {
       updates: new Map<string, number>(),
@@ -40,12 +40,14 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
    };
 
    rotateAndflushBatch = async () => {
-      if (this.activeBatch.updates.size === 0) return;
+      // 2nd flag condition: if the current active batch fills up quicky,
+      // then this function can execute prematurly before the current flushing bactch completes
+      if (this.activeBatch.updates.size === 0 || this.flushingBatch.updates.size > 0) return;
 
       // rotate buffers before flushing to avoid race conditions
       let temp = this.activeBatch;
-      this.flushingBatch = temp;
       this.activeBatch = this.flushingBatch;
+      this.flushingBatch = temp;
 
       logger.debug(`flushing ${this.flushingBatch.updates.size} comment increment count`);
 

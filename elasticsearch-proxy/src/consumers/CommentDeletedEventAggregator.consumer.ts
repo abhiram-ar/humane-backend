@@ -40,12 +40,14 @@ export class CommentDeletedEventAggregateConsumer implements IConsumer {
    };
 
    rotateAndflushBatch = async () => {
-      if (this.activeBatch.updates.size === 0) return;
+      // 2nd flag condition: if the current active batch fills up quicky,
+      // then this function can execute prematurly before the current flushing bactch completes
+      if (this.activeBatch.updates.size === 0 || this.flushingBatch.updates.size > 0) return;
 
       // rotate buffers before flushing to avoid race conditions
       let temp = this.activeBatch;
-      this.flushingBatch = temp;
       this.activeBatch = this.flushingBatch;
+      this.flushingBatch = temp;
 
       logger.debug('flushing comment delete count: ' + this.flushingBatch);
 
