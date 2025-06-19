@@ -1,6 +1,7 @@
 import {
    commentCreatedEventAggreteComsumer,
    commentCreatedEventConsumer,
+   commentDeletedEventAggreateConsumer,
    commentDeletedEventConsumer,
    postCreatedEventConsumer,
    postDeletedEventConsumer,
@@ -14,6 +15,7 @@ export const startAllConsumers = async () => {
    await commentCreatedEventConsumer.start();
    await commentDeletedEventConsumer.start();
    await commentCreatedEventAggreteComsumer.start();
+   await commentDeletedEventAggreateConsumer.start();
 };
 
 export const stopAllConsumer = async () => {
@@ -23,4 +25,5 @@ export const stopAllConsumer = async () => {
    await commentCreatedEventConsumer.stop();
    await commentDeletedEventConsumer.stop();
    await commentCreatedEventAggreteComsumer.stop();
+   await commentDeletedEventAggreateConsumer.stop();
 };

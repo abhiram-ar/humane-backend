@@ -24,7 +24,7 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
       );
    }
 
-   FLUSH_INTERVAL = 2000; //2s
+   FLUSH_INTERVAL = 3000; //3s
    MAX_BATCH_SIZE = 100;
 
    // dual buffer to handle events occuring while the one buffer is being flused
@@ -46,7 +46,7 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
       this.flushingBatch = temp;
       this.activeBatch = this.flushingBatch;
 
-      logger.debug('flushing comment count: ' + this.flushingBatch);
+      logger.debug(`flushing ${this.flushingBatch.updates.size} comment increment count`);
 
       try {
          const ops: { postId: string; delta: number }[] = [];
@@ -66,7 +66,9 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
          );
          await this.consumer.commitOffsets(offsetEntries);
       } catch (error) {
-         logger.error('error while bulk update flush: ' + (error as Error)?.message);
+         logger.error(
+            'error while bulk decement commnet count update  flush: ' + (error as Error)?.message
+         );
       } finally {
          this.flushingBatch.updates.clear();
          this.flushingBatch.partitionOffsets.clear();

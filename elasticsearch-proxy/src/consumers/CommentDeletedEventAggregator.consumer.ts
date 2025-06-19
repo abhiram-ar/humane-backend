@@ -11,8 +11,9 @@ import KafkaSingleton from 'kafka/KafkaSingleton';
 import { Consumer } from 'kafkajs';
 import { commentSchema } from 'interfaces/dto/post/Comment.dto';
 import { IPostService } from 'interfaces/services/IPost.services';
+import { CommentAggreagateUpdateError } from 'errors/CommentAggreateUpdateError';
 
-export class CommentCreatedEventAggregateConsumer implements IConsumer {
+export class CommentDeletedEventAggregateConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(
@@ -20,7 +21,7 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
       private readonly _postServices: IPostService
    ) {
       this.consumer = this._kafka.createConsumer(
-         'elasticsearch-proxy-comment-created-aggregator-v7'
+         'elasticsearch-proxy-comment-deleted-aggregator-v1'
       );
    }
 
@@ -46,7 +47,7 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
       this.flushingBatch = temp;
       this.activeBatch = this.flushingBatch;
 
-      logger.debug('flushing comment count: ' + this.flushingBatch);
+      logger.debug('flushing comment delete count: ' + this.flushingBatch);
 
       try {
          const ops: { postId: string; delta: number }[] = [];
@@ -54,19 +55,22 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
             ops.push({ postId, delta });
          }
 
-         await this._postServices.bulkUpdateCommentsCount(ops);
+         const { ack } = await this._postServices.bulkUpdateCommentsCount(ops);
+         if (!ack) {
+            throw new CommentAggreagateUpdateError();
+         }
 
          // Commit Kafka offsets
          const offsetEntries = Array.from(this.flushingBatch.partitionOffsets).map(
             ([partition, offset]) => ({
-               topic: MessageBrokerTopics.COMMENT_CREATED_EVENTS_TOPIC,
+               topic: MessageBrokerTopics.COMMENT_DELTED_EVENTS_TOPIC,
                partition,
                offset: String(offset + 1),
             })
          );
          await this.consumer.commitOffsets(offsetEntries);
       } catch (error) {
-         logger.error('error while bulk update flush: ' + (error as Error)?.message);
+         logger.error('error while bulk comment delete flush: ' + (error as Error)?.message);
       } finally {
          this.flushingBatch.updates.clear();
          this.flushingBatch.partitionOffsets.clear();
@@ -78,7 +82,7 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
       logger.info('Comment created event aggretator consumer connected ');
 
       await this.consumer.subscribe({
-         topic: MessageBrokerTopics.COMMENT_CREATED_EVENTS_TOPIC,
+         topic: MessageBrokerTopics.COMMENT_DELTED_EVENTS_TOPIC,
          fromBeginning: true,
       });
 
@@ -99,7 +103,7 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
             logger.verbose(JSON.stringify(event, null, 2));
 
             try {
-               if (event.eventType != AppEventsTypes.COMMENT_CREATED) {
+               if (event.eventType != AppEventsTypes.COMMENT_DELTED) {
                   throw new EventConsumerMissMatchError();
                }
                const parsed = commentSchema.safeParse(event.payload);
@@ -111,7 +115,7 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
                const postId = parsed.data.postId;
                const prevAggregatedCommentCountDiff = this.activeBatch.updates.get(postId) || 0;
 
-               this.activeBatch.updates.set(postId, prevAggregatedCommentCountDiff + 1);
+               this.activeBatch.updates.set(postId, prevAggregatedCommentCountDiff - 1);
                const currentPartitionMax = this.activeBatch.partitionOffsets.get(partition) ?? -1;
 
                if (offset > currentPartitionMax) {

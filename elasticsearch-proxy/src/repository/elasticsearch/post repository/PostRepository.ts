@@ -158,10 +158,10 @@ export class PostRepository implements IPostRepository {
       });
 
       try {
-         const res = await this._client.bulk({
+         await this._client.bulk({
             operations: bulkBody,
          });
-         console.log(JSON.stringify(res.items, null, 2));
+
          return { ack: true };
       } catch (error) {
          logger.error('error while bulk updating post comments');

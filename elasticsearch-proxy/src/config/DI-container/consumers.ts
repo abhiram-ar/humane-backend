@@ -6,6 +6,7 @@ import { PostDeletedEventConsumer } from 'consumers/PostDeletedEvent.consumer';
 import { CommentCreatedEventConsumer } from 'consumers/CommentCreatedEvent.consumer';
 import { CommentDeletedEventConsumer } from 'consumers/CommentDeletedEvent.consumer';
 import { CommentCreatedEventAggregateConsumer } from 'consumers/CommentCreatedEventAggregator.consumer';
+import { CommentDeletedEventAggregateConsumer } from 'consumers/CommentDeletedEventAggregator.consumer';
 
 export const userProfileConsumer = new UserProfileEventsConsumer(
    KafkaSingleton.getInstance(),
@@ -34,6 +35,11 @@ export const commentDeletedEventConsumer = new CommentDeletedEventConsumer(
 );
 
 export const commentCreatedEventAggreteComsumer = new CommentCreatedEventAggregateConsumer(
+   KafkaSingleton.getInstance(),
+   postServices
+);
+
+export const commentDeletedEventAggreateConsumer = new CommentDeletedEventAggregateConsumer(
    KafkaSingleton.getInstance(),
    postServices
 );
