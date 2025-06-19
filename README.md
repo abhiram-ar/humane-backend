@@ -44,6 +44,6 @@ choices;
 
 -  why not moderating comments? Good commets are rewarded so people are forces to put good comments
 
-### System Desing
+### System Design
 
-![Alt text](./System%20Design/full-architecture.png)
+![Alt text](/Docs/full-architecture-light.png)
