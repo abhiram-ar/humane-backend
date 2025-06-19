@@ -43,3 +43,7 @@ production change
 choices;
 
 -  why not moderating comments? Good commets are rewarded so people are forces to put good comments
+
+### System Desing
+
+![Alt text](./System%20Design/full-architecture.png)
