@@ -17,12 +17,12 @@ export class PostService implements IPostService {
       // if events are retried
       const exisingPost = await this._postRepo.getUpdatedAt(dto.id);
       if (!exisingPost) {
-         await this._postRepo.create(dto);
+         await this._postRepo.create({ ...dto, commentCount: 0 });
          return;
       }
 
       if (new Date(dto.updatedAt) > new Date(exisingPost.updatedAt)) {
-         await this._postRepo.replace(dto.id, dto);
+         await this._postRepo.replace(dto.id, { ...dto, commentCount: 0 });
          return;
       } else logger.warn('Skipping post creation since incommiing document is old');
    };
@@ -84,5 +84,11 @@ export class PostService implements IPostService {
       });
 
       return { posts: postURLHydratedPosts, pagination: { from: res.from, hasMore: res.hasMore } };
+   };
+
+   bulkUpdateCommentsCount = async (
+      dto: { postId: string; delta: number }[]
+   ): Promise<{ ack: boolean }> => {
+      return await this._postRepo.bulkUpdateCommentsCount(dto);
    };
 }

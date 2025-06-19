@@ -11,4 +11,6 @@ export interface IPostRepository extends IBaseRepository<IPostDocument> {
       limit: number,
       filter: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined
    ): Promise<{ posts: IPostDocument[]; from: string | null; hasMore: boolean }>;
+
+   bulkUpdateCommentsCount(updates: { postId: string; delta: number }[]): Promise<{ ack: boolean }>;
 }
