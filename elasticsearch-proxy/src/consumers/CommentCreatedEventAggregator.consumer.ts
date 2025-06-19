@@ -11,6 +11,7 @@ import KafkaSingleton from 'kafka/KafkaSingleton';
 import { Consumer } from 'kafkajs';
 import { commentSchema } from 'interfaces/dto/post/Comment.dto';
 import { IPostService } from 'interfaces/services/IPost.services';
+import { CommentAggreagateUpdateError } from 'errors/CommentAggreateUpdateError';
 
 export class CommentCreatedEventAggregateConsumer implements IConsumer {
    private consumer: Consumer;
@@ -24,8 +25,8 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
       );
    }
 
-   FLUSH_INTERVAL = 3000; //3s
-   MAX_BATCH_SIZE = 100;
+   private readonly _FLUSH_INTERVAL = 3000; //3s
+   private readonly _MAX_BATCH_SIZE = 100;
 
    // dual buffer to handle events occuring while the one buffer is being flused
    // alternative use a mutex lock while flushing
@@ -54,7 +55,10 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
             ops.push({ postId, delta });
          }
 
-         await this._postServices.bulkUpdateCommentsCount(ops);
+         const { ack } = await this._postServices.bulkUpdateCommentsCount(ops);
+         if (!ack) {
+            throw new CommentAggreagateUpdateError();
+         }
 
          // Commit Kafka offsets
          const offsetEntries = Array.from(this.flushingBatch.partitionOffsets).map(
@@ -87,7 +91,7 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
       // timebased flushing
       setInterval(() => {
          this.rotateAndflushBatch();
-      }, this.FLUSH_INTERVAL);
+      }, this._FLUSH_INTERVAL);
 
       await this.consumer.run({
          eachMessage: async ({ message, heartbeat, partition }) => {
@@ -120,7 +124,7 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
                   this.activeBatch.partitionOffsets.set(partition, offset);
                }
 
-               if (this.activeBatch.updates.size > this.MAX_BATCH_SIZE) {
+               if (this.activeBatch.updates.size > this._MAX_BATCH_SIZE) {
                   await this.rotateAndflushBatch();
                }
 

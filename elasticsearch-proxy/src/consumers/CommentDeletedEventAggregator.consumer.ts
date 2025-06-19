@@ -25,8 +25,8 @@ export class CommentDeletedEventAggregateConsumer implements IConsumer {
       );
    }
 
-   FLUSH_INTERVAL = 2000; //2s
-   MAX_BATCH_SIZE = 100;
+   private readonly _FLUSH_INTERVAL = 5000; //5s
+   private readonly _MAX_BATCH_SIZE = 100;
 
    // dual buffer to handle events occuring while the one buffer is being flused
    // alternative use a mutex lock while flushing
@@ -89,7 +89,7 @@ export class CommentDeletedEventAggregateConsumer implements IConsumer {
       // timebased flushing
       setInterval(() => {
          this.rotateAndflushBatch();
-      }, this.FLUSH_INTERVAL);
+      }, this._FLUSH_INTERVAL);
 
       await this.consumer.run({
          eachMessage: async ({ message, heartbeat, partition }) => {
@@ -122,7 +122,7 @@ export class CommentDeletedEventAggregateConsumer implements IConsumer {
                   this.activeBatch.partitionOffsets.set(partition, offset);
                }
 
-               if (this.activeBatch.updates.size > this.MAX_BATCH_SIZE) {
+               if (this.activeBatch.updates.size > this._MAX_BATCH_SIZE) {
                   await this.rotateAndflushBatch();
                }
 
