@@ -28,7 +28,7 @@ export class CommentDeletedEventAggregateConsumer implements IConsumer {
    private readonly _FLUSH_INTERVAL = 5000; //5s
    private readonly _MAX_BATCH_SIZE = 100;
 
-   // dual buffer to handle events occuring while the one buffer is being flused
+   // dual buffer, one to handle events occuring while the other buffer is being flused
    // alternative use a mutex lock while flushing
    private activeBatch = {
       updates: new Map<string, number>(),
