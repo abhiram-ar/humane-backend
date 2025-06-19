@@ -3,6 +3,7 @@ import { IPostRepository } from 'interfaces/repository/IPostRepository';
 import { ES_INDEXES } from '../ES_INDEXES';
 import { Client, errors } from '@elastic/elasticsearch';
 import { PostVisibility } from 'humane-common';
+import { logger } from '@config/logger';
 
 export class PostRepository implements IPostRepository {
    private readonly _index = ES_INDEXES.POST_INDEX;
@@ -31,13 +32,18 @@ export class PostRepository implements IPostRepository {
                   moderationMetadata: { type: 'object' },
                   createdAt: { type: 'date' }, // this is interpreated as iso data string in elastic search, covert the toISODataString() before injesting
                   updatedAt: { type: 'date', index: false },
+                  commentCount: { type: 'integer', index: false },
                },
             },
          });
    };
 
    create = async (post: IPostDocument): Promise<void> => {
-      await this._client.index({ index: this._index, id: post.id, document: post });
+      await this._client.index({
+         index: this._index,
+         id: post.id,
+         document: { ...post, commentCount: 0 },
+      });
    };
    deleteById = async (itemId: string): Promise<{ found: boolean; deleted: boolean }> => {
       try {
@@ -125,5 +131,42 @@ export class PostRepository implements IPostRepository {
    };
    replace = async (postId: string, doc: IPostDocument): Promise<void> => {
       await this._client.update({ index: this._index, id: postId, doc });
+   };
+
+   bulkUpdateCommentsCount = async (
+      updates: { postId: string; delta: number }[]
+   ): Promise<{ ack: boolean }> => {
+      const bulkBody: any[] = [];
+      updates.forEach((update) => {
+         bulkBody.push({
+            update: { _index: this._index, _id: update.postId },
+         });
+
+         bulkBody.push({
+            script: {
+               source: `
+               if(ctx._source.commentCount == null) {
+                  ctx._source.commentCount = params.delta;
+                  } 
+               else {
+                  ctx._source.commentCount += params.delta;
+               }`,
+               lang: 'painless',
+               params: { delta: update.delta },
+            },
+         });
+      });
+
+      try {
+         await this._client.bulk({
+            operations: bulkBody,
+         });
+
+         return { ack: true };
+      } catch (error) {
+         logger.error('error while bulk updating post comments');
+         console.log(error);
+         return { ack: false };
+      }
    };
 }

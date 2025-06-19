@@ -21,4 +21,7 @@ export type IPostDocument = {
 
    createdAt: Date;
    updatedAt: Date;
+
+   // additionally added
+   commentCount: Number | null;
 };

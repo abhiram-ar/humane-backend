@@ -20,4 +20,6 @@ export interface IPostService {
       posts: (Omit<IPostDocument, 'posterKey'> & { posterURL: string | null })[];
       pagination: { from: string | null; hasMore: boolean };
    }>;
+
+   bulkUpdateCommentsCount(dto: { postId: string; delta: number }[]): Promise<{ ack: boolean }>;
 }
