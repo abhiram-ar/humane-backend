@@ -2,6 +2,7 @@
 
 -  When Bulk inserting likes. Mongoose will not throw error if we add like to a invalid commentId.
    At the same time invalid comments will not be inserted to mongoDB
+-  Idempotency key for commnet like = commentId + authorId
 
 ##### Why cant we combine all the comumers when comments are liked
 
