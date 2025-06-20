@@ -1,5 +1,5 @@
 export class Like {
-   public readonly createdAt: Date | undefined;
-   public updatedAt: Date | undefined;
+   public readonly createdAt?: Date;
+   public updatedAt?: Date;
    constructor(public authorId: string, public commentId: string) {}
 }

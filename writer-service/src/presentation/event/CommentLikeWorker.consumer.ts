@@ -1,6 +1,5 @@
 import { addCommentLikeRequestSchema } from '@application/dtos/AddLikeRequest.dto';
 import { BulkCommnetLikeInsertInputDTO } from '@application/dtos/BulkCommentLikeInsertInput.dto';
-import { CommentBulkInsertError } from '@application/errors/CommentLikeBulkInsertError';
 import { logger } from '@config/logget';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
 import { ILikeServices } from '@ports/ILikeServices';
@@ -24,7 +23,7 @@ export class CommentLikeWorker implements IConsumer {
       this.consumer = this._kafka.createConsumer('elasticsearch-proxy-comment-like-worker-v9');
    }
 
-   private readonly _FLUSH_INTERVAL = 3000; //3s
+   private readonly _FLUSH_INTERVAL = 1000; //1s
    private readonly _MAX_BATCH_SIZE = 1000;
 
    // dual buffer, one to handle events occuring while the other buffer is being flused
@@ -47,7 +46,7 @@ export class CommentLikeWorker implements IConsumer {
       this.activeBatch = this.flushingBatch;
       this.flushingBatch = temp;
 
-      logger.debug(`flushing ${this.flushingBatch.updates.size} comment add likes`);
+      logger.debug(`flushing ${this.flushingBatch.updates.size} comment like requests`);
 
       try {
          const dto: BulkCommnetLikeInsertInputDTO = [];
@@ -55,13 +54,7 @@ export class CommentLikeWorker implements IConsumer {
             dto.push(likeEntry);
          }
 
-         const result = await this._likeServices.bulkInsert(dto);
-         if (result === null) {
-            throw new CommentBulkInsertError();
-         }
-         logger.info(`inserted ${result.length}/${dto.length} comment likes`);
-
-         // TODO: publish comment created events
+         await this._likeServices.bulkInsert(dto);
 
          // Commit Kafka offsets
          const offsetEntries = Array.from(this.flushingBatch.partitionOffsets).map(
