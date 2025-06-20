@@ -2,6 +2,5 @@ import { Like } from '@domain/entities/Likes.entity';
 import { IBaseRepository } from './IBaseRepository';
 
 export interface ILikesRepository extends IBaseRepository<Like> {
-   create(entity: Like): Promise<Required<Like>>;
-   delete(authorId: string, likeId: string): Promise<Required<Like> | null>;
+   bulkInsert(likes: Like[]): Promise<Required<Like>[] | null>;
 }

@@ -1,4 +1,4 @@
-import { commentController, postController } from '@di/controller.container';
+import { commentController, likeController, postController } from '@di/controller.container';
 import express from 'express';
 import { isAuthenticated } from 'humane-common';
 
@@ -12,4 +12,5 @@ postRouter.post('/pre-signed-url/posterKey', isAuthenticated, postController.get
 postRouter.post('/:postId/comment', isAuthenticated, commentController.createComment);
 postRouter.delete('/:postId/comment/:commentId', isAuthenticated, commentController.deleteComment);
 
+postRouter.post('/comment/:commentId/like', isAuthenticated, likeController.addCommentLikeRequest);
 export default postRouter;
