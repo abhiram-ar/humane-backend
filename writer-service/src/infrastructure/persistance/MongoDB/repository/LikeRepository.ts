@@ -59,7 +59,7 @@ export class LikeRepository implements ILikesRepository {
    ): Promise<HasUserLikedComment[]> => {
       const res = await likeModel.find(
          { authorId: userId, commentId: { $in: commentIds } },
-         { commentId: 1, _id: 0 } //remove _id we can getId from index
+         { commentId: 1, _id: 0 } //remove _id we can commentId from index
       );
       const parsed = res.map((doc) => ({ commentId: String(doc.commentId), hasLikedByUser: true }));
 

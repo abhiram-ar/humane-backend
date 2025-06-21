@@ -52,7 +52,10 @@ export class CommentRepository implements ICommentRepository {
    ): Promise<Pick<Required<Comment>, 'id' | 'likeCount' | 'likedByPostAuthor'>[]> => {
       if (commentIds.length === 0) return [];
 
-      const res = await commentModel.find({ _id: { $in: commentIds } });
+      const res = await commentModel.find(
+         { _id: { $in: commentIds } },
+         { likedByPostAuthor: 1, likeCount: 1 }
+      );
 
       const parsed: Pick<Required<Comment>, 'id' | 'likeCount' | 'likedByPostAuthor'>[] = res.map(
          (doc) => ({
