@@ -8,6 +8,7 @@
 
 -  We need to update the like count as fast as possible.
 -  Checking the user should recive humane point, Can will take some time and processed async
+-  For high-throughput systems transactions are expensive so we are not combining all these ops into a transaction
 -  So Decided to have two seperate comsumer to work on comment.created event
 
 #### Why not combining commnet liked/unliked event in unified consumer
