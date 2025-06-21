@@ -2,7 +2,7 @@ import { ENV } from '@config/env';
 import axios from 'axios';
 import { RelationshipStatus } from 'humane-common';
 import { IExternalUserServices } from 'interfaces/services/IExternalUserService';
-import { RelationshipStatusResponse } from './GetRelationshipStatus.type';
+import { RelationshipStatusResponse } from './Types/GetRelationshipStatus.type';
 
 export class ExternalUserServices implements IExternalUserServices {
    getRelationshipStatus = async (

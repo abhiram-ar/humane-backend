@@ -1,13 +1,16 @@
 import { InternalQueryController } from 'controllers/InternalUserQuery.controller';
-import { commentServices, externalUserServices, postServices, userServices } from './services';
+import {
+   commentServices,
+   externalUserServices,
+   externalWriterService,
+   postServices,
+   userServices,
+} from './services';
 import { PublicUserQueryController } from 'controllers/PublicUserQuery.controller';
 import { PublicPostQueryControllet } from 'controllers/PublicPostQuery.controller';
 import { PublicCommentController } from 'controllers/PublicCommentQuery.controller';
 
-export const internalQueryController = new InternalQueryController(
-   userServices,
-   postServices
-);
+export const internalQueryController = new InternalQueryController(userServices, postServices);
 export const publicUserQueryController = new PublicUserQueryController(userServices);
 export const publicPostQueryController = new PublicPostQueryControllet(
    postServices,
@@ -15,4 +18,8 @@ export const publicPostQueryController = new PublicPostQueryControllet(
    externalUserServices
 );
 
-export const publicCommentController = new PublicCommentController(commentServices, userServices);
+export const publicCommentController = new PublicCommentController(
+   commentServices,
+   userServices,
+   externalWriterService
+);

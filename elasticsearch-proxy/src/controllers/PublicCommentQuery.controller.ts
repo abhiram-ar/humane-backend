@@ -1,14 +1,22 @@
+import { CommentMetadata } from '@services/external/Types/GetCommnetMetadata.type';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 import { ZodValidationError } from 'humane-common';
 import { GetBasicUserProfileFromIdsOutputDTO } from 'interfaces/dto/GetUserBasicProfileFromIDs';
 import { GetCommentsInputDTO, getCommentsInputScheam } from 'interfaces/dto/post/GetComments.dto';
 import { ICommentService } from 'interfaces/services/IComment.services';
+import { IExternalWriterService } from 'interfaces/services/IExternalWriterServices';
 import { IUserServices } from 'interfaces/services/IUser.services';
+import {
+   AuthorHydratedComment,
+   CommentMetaDataAndAuthorHydratedComment,
+} from './Types/GetPostCommentsResponse.type';
 export class PublicCommentController {
    constructor(
       private readonly _commentServices: ICommentService,
-      private readonly _userService: IUserServices
+      private readonly _userService: IUserServices,
+
+      private readonly _externalWriterService: IExternalWriterService
    ) {}
 
    getPostComments = async (req: Request, res: Response, next: NextFunction) => {
@@ -46,8 +54,42 @@ export class PublicCommentController {
                : comment
          );
 
+         let responseData: (CommentMetaDataAndAuthorHydratedComment | AuthorHydratedComment)[] =
+            authorHydratedComments;
+
+         let userId: string | undefined = undefined;
+         if (req.user && req.user.type === 'user') {
+            userId = req.user.userId;
+         }
+
+         const commnetIdSet = new Set<string>();
+         comments.forEach((comment) => commnetIdSet.add(comment.id));
+         const commentsMetadata = await this._externalWriterService.getCommentsMetadataOfAUser(
+            Array.from(commnetIdSet.values()),
+            userId
+         );
+
+         if (commentsMetadata) {
+            const commentIdToMetadataMap = new Map<string, Omit<CommentMetadata, 'id'>>();
+            commentsMetadata.forEach((commentMetata) => {
+               const { id, ...metadataWithoutCommentId } = commentMetata;
+               commentIdToMetadataMap.set(id, metadataWithoutCommentId);
+            });
+
+            responseData = authorHydratedComments.map((comment) => {
+               if (commentIdToMetadataMap.has(comment.id)) {
+                  return {
+                     ...comment,
+                     ...(commentIdToMetadataMap.get(comment.id) as CommentMetadata),
+                  };
+               } else {
+                  return comment;
+               }
+            });
+         }
+
          res.status(HttpStatusCode.Ok).json({
-            data: { comments: authorHydratedComments, pagination },
+            data: { comments: responseData, pagination },
          });
       } catch (error) {
          next(error);

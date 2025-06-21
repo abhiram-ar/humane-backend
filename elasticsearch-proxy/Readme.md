@@ -13,3 +13,11 @@ fix:
 
 -  Implement a mutex lock while flusing the aggreate result to ES.
 -  Or have 2 buffers one for collecting aggreteate and one for flushing, Rotate the buffer while flushing (our implementation)
+
+##### Post comment list response
+
+-  we will be fetching post metadata from writer serviec
+-  these metadata includes likecount, hasUserLiked, hasPostAutherliked
+-  if in any case the post service is not available or there is an error, there commet details reponse will work fine, but there wont be comment metadta in the response
+-  This make sure the commnet list feature works fine, even if the writer service have a problem
+-  impNote: if the comment is liked by the postAuthor, we are not providing the postAuthor base details, frontend is suppose to fetch the post author details as FFB
