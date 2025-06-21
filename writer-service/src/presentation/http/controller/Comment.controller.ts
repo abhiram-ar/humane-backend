@@ -22,7 +22,7 @@ export class CommentController {
    createComment = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (!req.user || req.user.type !== 'user') {
-            throw new UnAuthenticatedError('user not in req header');
+            throw new UnAuthenticatedError();
          }
 
          const dto: CreateCommentDTO = {
@@ -60,7 +60,7 @@ export class CommentController {
    deleteComment = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (!req.user || req.user.type !== 'user') {
-            throw new UnAuthenticatedError('user not in req header');
+            throw new UnAuthenticatedError();
          }
 
          const dto: DeleteCommentDTO = {
