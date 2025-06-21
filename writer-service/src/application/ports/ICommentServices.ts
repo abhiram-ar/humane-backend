@@ -8,4 +8,8 @@ export interface ICommentService {
    delete(dto: DeleteCommentDTO): Promise<Required<Comment>>;
    deleteAllPostComments(postId: string): Promise<void>;
    bulkUpdateCommentLikeCountFromDiff(dto: BulkUpdateCommentLikeCountInputDTO): Promise<unknown>;
+
+   getCommnetLikeMetadataByIds(
+      commentIds: string[]
+   ): Promise<Pick<Required<Comment>, 'id' | 'likeCount' | 'likedByPostAuthor'>[]>;
 }

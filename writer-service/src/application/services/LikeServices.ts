@@ -1,5 +1,6 @@
 import { BulkCommnetLikeInsertInputDTO } from '@application/dtos/BulkCommentLikeInsertInput.dto';
 import { CommentLikeBulkInsertError } from '@application/errors/CommentLikeBulkInsertError';
+import { HasUserLikedComment } from '@application/Types/HasUserLikedComment.type';
 import { logger } from '@config/logget';
 import { Like } from '@domain/entities/Likes.entity';
 import { ILikesRepository } from '@domain/repository/ILikesRepository';
@@ -47,5 +48,14 @@ export class LikeServices implements ILikeServices {
       publishResult.forEach((res) => res.ack && successCount++);
 
       logger.info(`published ${successCount}/${dto.length} ${AppEventsTypes.COMMENT_LIKED} events`);
+   };
+
+   hasUserLikedTheseComments = async (
+      userId: string,
+      commentIds: string[]
+   ): Promise<HasUserLikedComment[]> => {
+      // TODO: check in cache,
+
+      return this._likeRepo.hasUserLikedTheseComments(userId, commentIds);
    };
 }

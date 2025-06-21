@@ -44,7 +44,14 @@ export class CommentService implements ICommentService {
 
    bulkUpdateCommentLikeCountFromDiff = async (dto: BulkUpdateCommentLikeCountInputDTO) => {
       const res = this._commentRepo.bulkUpdateCommentCountFromDiff(dto);
+      return res;
 
       // TODO: upadte cache
+   };
+   getCommnetLikeMetadataByIds = async (
+      commentIds: string[]
+   ): Promise<Pick<Required<Comment>, 'id' | 'likeCount' | 'likedByPostAuthor'>[]> => {
+      // TODO: read through cache
+      return await this._commentRepo.getCommnetLikeMetadataByIds(commentIds);
    };
 }

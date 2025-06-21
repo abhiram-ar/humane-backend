@@ -3,9 +3,19 @@ import { ILikesRepository } from '@domain/repository/ILikesRepository';
 import likeModel from '../Models/likeModel';
 import { likeAutoMapper } from '../mapper/likeAutoMapper';
 import { logger } from '@config/logget';
+import { HasUserLikedComment } from '@application/Types/HasUserLikedComment.type';
 
 export class LikeRepository implements ILikesRepository {
    constructor() {}
+
+   create(entity: Like): Promise<Required<Like>> {
+      throw new Error('Method not implemented.');
+   }
+
+   delete(authorId: string, entityId: string): Promise<Required<Like> | null> {
+      throw new Error('Method not implemented.');
+   }
+
    bulkInsert = async (likes: Like[]): Promise<Required<Like>[] | null> => {
       const inserts = likes.map((like) => ({ authorId: like.authorId, commentId: like.commentId }));
 
@@ -42,10 +52,18 @@ export class LikeRepository implements ILikesRepository {
          }
       }
    };
-   create(entity: Like): Promise<Required<Like>> {
-      throw new Error('Method not implemented.');
-   }
-   delete(authorId: string, entityId: string): Promise<Required<Like> | null> {
-      throw new Error('Method not implemented.');
-   }
+
+   hasUserLikedTheseComments = async (
+      userId: string,
+      commentIds: string[]
+   ): Promise<HasUserLikedComment[]> => {
+      const res = await likeModel.find(
+         { authorId: userId, commentId: { $in: commentIds } },
+         { commentId: 1, _id: 0 } //remove _id we can getId from index
+      );
+      console.log(res);
+      const parsed = res.map((doc) => ({ commentId: String(doc.commentId), hasLikedByUser: true }));
+
+      return parsed;
+   };
 }

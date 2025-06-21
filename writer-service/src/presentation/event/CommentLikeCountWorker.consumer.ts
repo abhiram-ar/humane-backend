@@ -61,7 +61,7 @@ export class CommentLikeCountWorker implements IConsumer {
          // Commit Kafka offsets
          const offsetEntries = Array.from(this.flushingBatch.partitionOffsets).map(
             ([partition, offset]) => ({
-               topic: MessageBrokerTopics.ADD_COMMENT_LIKE_REQUEST_TOPIC,
+               topic: MessageBrokerTopics.COMMENT_LIKED_EVENT_TOPIC,
                partition,
                offset: String(offset + 1),
             })

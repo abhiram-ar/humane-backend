@@ -6,4 +6,8 @@ export interface ICommentRepository extends IBaseRepository<Comment> {
    deleteAllPostComments(postId: string): Promise<{ deletedCount: number }>;
 
    bulkUpdateCommentCountFromDiff(dto: BulkUpdateCommentLikeCountInputDTO): Promise<Comment[]>;
+
+   getCommnetLikeMetadataByIds(
+      commentIds: string[]
+   ): Promise<Pick<Required<Comment>, 'id' | 'likeCount' | 'likedByPostAuthor'>[]>;
 }

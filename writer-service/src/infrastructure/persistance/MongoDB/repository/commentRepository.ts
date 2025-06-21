@@ -46,4 +46,22 @@ export class CommentRepository implements ICommentRepository {
 
       return query.map((res) => commentAutoMapper(res));
    };
+
+   getCommnetLikeMetadataByIds = async (
+      commentIds: string[]
+   ): Promise<Pick<Required<Comment>, 'id' | 'likeCount' | 'likedByPostAuthor'>[]> => {
+      if (commentIds.length === 0) return [];
+
+      const res = await commentModel.find({ _id: { $in: commentIds } });
+
+      const parsed: Pick<Required<Comment>, 'id' | 'likeCount' | 'likedByPostAuthor'>[] = res.map(
+         (doc) => ({
+            id: doc.id,
+            likedByPostAuthor: doc.likedByPostAuthor,
+            likeCount: doc.likeCount,
+         })
+      );
+
+      return parsed;
+   };
 }

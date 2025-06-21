@@ -4,7 +4,8 @@ import morgan from 'morgan';
 import cookieParse from 'cookie-parser';
 import { errorHandler } from 'humane-common';
 import postRouter from './router/postRouter';
-import { commentRepository } from '@di/repository.container';
+import { internalController } from '@di/controller.container';
+import internalRouter from './router/internalRouter';
 
 const app = express();
 
@@ -18,19 +19,15 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use(cookieParse());
 
-app.post('/api/v1/writer/test', async (req, res) => {
-   const result = await commentRepository.bulkUpdateCommentCountFromDiff([
-      { commentId: '6856473c5e744e36b3455fe4', likeCountDiff: 1 },
-      { commentId: '685646e290fc2b6e95c21ee5', likeCountDiff: 2 },
-   ]);
-   res.status(200).json(result);
-});
-
 app.get('/api/v1/writer/health', (_, res) => {
    res.status(200).json({ status: 'Ok' });
 });
 
 app.use('/api/v1/post', postRouter);
+
+app.use('/api/v1/internal', internalRouter);
+
+app.post('/api/v1/writer/test', internalController.getCommentMetadataForAUser);
 
 app.use(errorHandler);
 
