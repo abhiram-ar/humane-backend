@@ -1,8 +1,8 @@
-import { addCommentLikeRequestSchema } from '@application/dtos/AddLikeRequest.dto';
-import { BulkCommnetLikeInsertInputDTO } from '@application/dtos/BulkCommentLikeInsertInput.dto';
+import { BulkUpdateCommentLikeCountInputDTO } from '@application/dtos/BulkUpdateCommentLikeCount.dto';
+import { commnetLikeSchema } from '@application/dtos/CommentLike.dto';
 import { logger } from '@config/logget';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
-import { ILikeServices } from '@ports/ILikeServices';
+import { ICommentService } from '@ports/ICommentServices';
 import {
    AppEvent,
    AppEventsTypes,
@@ -13,14 +13,16 @@ import {
 } from 'humane-common';
 import { Consumer } from 'kafkajs';
 
-export class CommentLikeWorker implements IConsumer {
+export class CommentLikeCountWorker implements IConsumer {
    private consumer: Consumer;
 
    constructor(
       private readonly _kafka: KafkaSingleton,
-      private readonly _likeServices: ILikeServices
+      private readonly _commentServices: ICommentService
    ) {
-      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-comment-like-worker-v9');
+      this.consumer = this._kafka.createConsumer(
+         'elasticsearch-proxy-comment-like-count-worker-v9'
+      );
    }
 
    private readonly _FLUSH_INTERVAL = 1000; //1s
@@ -28,11 +30,11 @@ export class CommentLikeWorker implements IConsumer {
 
    // dual buffer, one to handle events occuring while the other buffer is being flused
    private activeBatch = {
-      updates: new Map<string, { authorId: string; commentId: string }>(),
+      updates: new Map<string, number>(),
       partitionOffsets: new Map<number, number>(),
    };
    private flushingBatch = {
-      updates: new Map<string, { authorId: string; commentId: string }>(),
+      updates: new Map<string, number>(),
       partitionOffsets: new Map<number, number>(),
    };
 
@@ -46,15 +48,15 @@ export class CommentLikeWorker implements IConsumer {
       this.activeBatch = this.flushingBatch;
       this.flushingBatch = temp;
 
-      logger.debug(`flushing ${this.flushingBatch.updates.size} comment like requests`);
+      logger.debug(`flushing ${this.flushingBatch.updates.size} comment like count diff`);
 
       try {
-         const dto: BulkCommnetLikeInsertInputDTO = [];
-         for (const likeEntry of this.flushingBatch.updates.values()) {
-            dto.push(likeEntry);
+         const dto: BulkUpdateCommentLikeCountInputDTO = [];
+         for (const [key, value] of this.flushingBatch.updates.entries()) {
+            dto.push({ commentId: key, likeCountDiff: value });
          }
 
-         await this._likeServices.bulkInsert(dto);
+         await this._commentServices.bulkUpdateCommentLikeCountFromDiff(dto);
 
          // Commit Kafka offsets
          const offsetEntries = Array.from(this.flushingBatch.partitionOffsets).map(
@@ -67,7 +69,7 @@ export class CommentLikeWorker implements IConsumer {
          await this.consumer.commitOffsets(offsetEntries);
       } catch (error) {
          logger.error(
-            'error while bulk inserting commnet likes flush: ' + (error as Error)?.message
+            'error while bulk updating commnet likes count diff flush: ' + (error as Error)?.message
          );
       } finally {
          this.flushingBatch.updates.clear();
@@ -77,10 +79,10 @@ export class CommentLikeWorker implements IConsumer {
 
    start = async () => {
       await this.consumer.connect();
-      logger.info('Comment like worker consumer connected ');
+      logger.info('Comment like count worker consumer connected ');
 
       await this.consumer.subscribe({
-         topic: MessageBrokerTopics.ADD_COMMENT_LIKE_REQUEST_TOPIC,
+         topic: MessageBrokerTopics.COMMENT_LIKED_EVENT_TOPIC,
          fromBeginning: true,
       });
 
@@ -102,22 +104,20 @@ export class CommentLikeWorker implements IConsumer {
             // logger.verbose(JSON.stringify(event, null, 2));
 
             try {
-               if (event.eventType != AppEventsTypes.ADD_COMMENT_LIKE_REQUESTED) {
+               if (event.eventType != AppEventsTypes.COMMENT_LIKED) {
                   throw new EventConsumerMissMatchError();
                }
 
-               const { data, error, success } = addCommentLikeRequestSchema.safeParse(
-                  event.payload
-               );
+               const { data, error, success } = commnetLikeSchema.safeParse(event.payload);
                if (!success) {
                   throw new ZodValidationError(error);
                }
 
-               const updateMapKey = data.commentId + '|' + data.authorId;
-               this.activeBatch.updates.set(updateMapKey, data);
+               const commentId = data.commentId;
+               let lastComputedCountDiff = this.activeBatch.updates.get(commentId) ?? 0;
+               this.activeBatch.updates.set(commentId, lastComputedCountDiff + 1);
 
                const currentPartitionMax = this.activeBatch.partitionOffsets.get(partition) ?? -1;
-
                if (offset > currentPartitionMax) {
                   this.activeBatch.partitionOffsets.set(partition, offset);
                }

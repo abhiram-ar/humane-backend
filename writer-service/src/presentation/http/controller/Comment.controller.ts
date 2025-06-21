@@ -37,7 +37,9 @@ export class CommentController {
          }
          const createdComment = await this._commentServices.create(parsed.data);
 
-         const commentCreatedEvent = createEvent(AppEventsTypes.COMMENT_CREATED, createdComment);
+         const { likeCount, likedByPostAuthor, ...eventPayload } = createdComment;
+
+         const commentCreatedEvent = createEvent(AppEventsTypes.COMMENT_CREATED, eventPayload);
          const { ack } = await this._eventPubliser.send(
             MessageBrokerTopics.COMMENT_CREATED_EVENTS_TOPIC,
             commentCreatedEvent
@@ -73,8 +75,10 @@ export class CommentController {
          }
          const deletedComment = await this._commentServices.delete(parsed.data);
 
+         const { likeCount, likedByPostAuthor, ...eventPayload } = deletedComment;
+
          // TODO: clear likes realted to this comment
-         const commentDeltedEvent = createEvent(AppEventsTypes.COMMENT_DELTED, deletedComment);
+         const commentDeltedEvent = createEvent(AppEventsTypes.COMMENT_DELTED, eventPayload);
          const { ack } = await this._eventPubliser.send(
             MessageBrokerTopics.COMMENT_DELTED_EVENTS_TOPIC,
             commentDeltedEvent

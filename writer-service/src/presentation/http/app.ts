@@ -4,7 +4,7 @@ import morgan from 'morgan';
 import cookieParse from 'cookie-parser';
 import { errorHandler } from 'humane-common';
 import postRouter from './router/postRouter';
-import { likeServices } from '@di/services.container';
+import { commentRepository } from '@di/repository.container';
 
 const app = express();
 
@@ -19,8 +19,9 @@ app.use(morgan('dev'));
 app.use(cookieParse());
 
 app.post('/api/v1/writer/test', async (req, res) => {
-   const result = await likeServices.bulkInsert([
-      { commentId: '684c2cf950a3a1a43610d90d', authorId: 'gopalan' },
+   const result = await commentRepository.bulkUpdateCommentCountFromDiff([
+      { commentId: '6856473c5e744e36b3455fe4', likeCountDiff: 1 },
+      { commentId: '685646e290fc2b6e95c21ee5', likeCountDiff: 2 },
    ]);
    res.status(200).json(result);
 });
