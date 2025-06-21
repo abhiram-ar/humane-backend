@@ -61,7 +61,6 @@ export class LikeRepository implements ILikesRepository {
          { authorId: userId, commentId: { $in: commentIds } },
          { commentId: 1, _id: 0 } //remove _id we can getId from index
       );
-      console.log(res);
       const parsed = res.map((doc) => ({ commentId: String(doc.commentId), hasLikedByUser: true }));
 
       return parsed;
