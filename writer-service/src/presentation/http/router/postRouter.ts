@@ -13,4 +13,5 @@ postRouter.post('/:postId/comment', isAuthenticated, commentController.createCom
 postRouter.delete('/:postId/comment/:commentId', isAuthenticated, commentController.deleteComment);
 
 postRouter.post('/comment/:commentId/like', isAuthenticated, likeController.addCommentLikeRequest);
+postRouter.post('/comment/:commentId/unlike', isAuthenticated, likeController.commnetUnlikeRequest);
 export default postRouter;
