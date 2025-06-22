@@ -2,7 +2,7 @@ import {
    AddCommentLikeRequestDTO,
    addCommentLikeRequestSchema,
 } from '@application/dtos/AddLikeRequest.dto';
-import { RemoveCommentLikeRequestDTO, removeCommentLikeRequestSchema } from '@application/dtos/RemoveLikeRequest.dto copy';
+import { commentUnlikeRequestDTO, commentUnlikeRequestSchema } from '@application/dtos/commentUnlikeRequest.dto';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { HttpStatusCode } from 'axios';
 import { randomUUID } from 'crypto';
@@ -66,12 +66,12 @@ export class LikeController {
          if (!req.user || req.user.type !== 'user') {
             throw new UnAuthenticatedError();
          }
-         const dto: RemoveCommentLikeRequestDTO = {
+         const dto: commentUnlikeRequestDTO = {
             authorId: req.user.userId,
             commentId: req.params.commentId,
          };
 
-         const validatedDTO = removeCommentLikeRequestSchema.safeParse(dto);
+         const validatedDTO = commentUnlikeRequestSchema.safeParse(dto);
          if (!validatedDTO.success) {
             throw new ZodValidationError(validatedDTO.error);
          }

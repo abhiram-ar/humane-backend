@@ -1,9 +1,12 @@
 import { BulkCommnetLikeInsertInputDTO } from '@application/dtos/BulkCommentLikeInsertInput.dto';
+import { BulkUpdateCommentLikeCountInputDTO } from '@application/dtos/BulkUpdateCommentLikeCount.dto';
+import { commentUnlikeRequestDTO } from '@application/dtos/commentUnlikeRequest.dto';
 import { CommentLikeBulkInsertError } from '@application/errors/CommentLikeBulkInsertError';
 import { HasUserLikedComment } from '@application/Types/HasUserLikedComment.type';
 import { logger } from '@config/logget';
 import { Like } from '@domain/entities/Likes.entity';
 import { ILikesRepository } from '@domain/repository/ILikesRepository';
+import { ICommentService } from '@ports/ICommentServices';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { ILikeServices } from '@ports/ILikeServices';
 import {
@@ -16,8 +19,33 @@ import {
 export class LikeServices implements ILikeServices {
    constructor(
       private readonly _likeRepo: ILikesRepository,
-      private readonly _eventPublisher: IEventPublisher
+      private readonly _eventPublisher: IEventPublisher,
+      private readonly _commentServices: ICommentService
    ) {}
+   bulkDelete = async (dto: commentUnlikeRequestDTO[]): Promise<void> => {
+      if (dto.length === 0) return;
+
+      const domainLikes = dto.map((req) => new Like(req.authorId, req.commentId));
+
+      const deletedCount = await this._likeRepo.bulkDelete(domainLikes);
+      logger.debug(`🗑️ Deleted ${deletedCount}/${dto.length} likes`);
+
+      // decrement commnet like count
+      const comnetLikeCountdiffMap = new Map<string, number>();
+      domainLikes.forEach((like) => {
+         const prevCountDiff = comnetLikeCountdiffMap.get(like.commentId) ?? 0;
+         comnetLikeCountdiffMap.set(like.commentId, prevCountDiff - 1);
+      });
+
+      const updateCommnetCountDTO: BulkUpdateCommentLikeCountInputDTO = [];
+      for (let [commentId, likeCountDiff] of comnetLikeCountdiffMap.entries()) {
+         updateCommnetCountDTO.push({ commentId, likeCountDiff });
+      }
+
+      this._commentServices.bulkUpdateCommentLikeCountFromDiff(updateCommnetCountDTO);
+
+      // handle author liked or handle in the hasPostAuthorLiked/unlied consumer or here
+   };
 
    bulkInsert = async (dto: BulkCommnetLikeInsertInputDTO): Promise<void> => {
       const domainLikes = dto.map((like) => new Like(like.authorId, like.commentId));
