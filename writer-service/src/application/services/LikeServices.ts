@@ -1,12 +1,10 @@
 import { BulkCommnetLikeInsertInputDTO } from '@application/dtos/BulkCommentLikeInsertInput.dto';
-import { BulkUpdateCommentLikeCountInputDTO } from '@application/dtos/BulkUpdateCommentLikeCount.dto';
 import { commentUnlikeRequestDTO } from '@application/dtos/commentUnlikeRequest.dto';
 import { CommentLikeBulkInsertError } from '@application/errors/CommentLikeBulkInsertError';
 import { HasUserLikedComment } from '@application/Types/HasUserLikedComment.type';
 import { logger } from '@config/logget';
 import { Like } from '@domain/entities/Likes.entity';
 import { ILikesRepository } from '@domain/repository/ILikesRepository';
-import { ICommentService } from '@ports/ICommentServices';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { ILikeServices } from '@ports/ILikeServices';
 import {
@@ -19,8 +17,7 @@ import {
 export class LikeServices implements ILikeServices {
    constructor(
       private readonly _likeRepo: ILikesRepository,
-      private readonly _eventPublisher: IEventPublisher,
-      private readonly _commentServices: ICommentService
+      private readonly _eventPublisher: IEventPublisher
    ) {}
    bulkDelete = async (dto: commentUnlikeRequestDTO[]): Promise<void> => {
       if (dto.length === 0) return;
@@ -36,13 +33,6 @@ export class LikeServices implements ILikeServices {
          const prevCountDiff = comnetLikeCountdiffMap.get(like.commentId) ?? 0;
          comnetLikeCountdiffMap.set(like.commentId, prevCountDiff - 1);
       });
-
-      const updateCommnetCountDTO: BulkUpdateCommentLikeCountInputDTO = [];
-      for (let [commentId, likeCountDiff] of comnetLikeCountdiffMap.entries()) {
-         updateCommnetCountDTO.push({ commentId, likeCountDiff });
-      }
-
-      this._commentServices.bulkUpdateCommentLikeCountFromDiff(updateCommnetCountDTO);
 
       // handle author liked or handle in the hasPostAuthorLiked/unlied consumer or here
    };

@@ -13,4 +13,4 @@ export const eventPubliser = new KafkaPublisher(KafkaSingleton.getInstance());
 
 export const storageService = new AWSStorageService();
 
-export const likeServices = new LikeServices(likeReposotory, eventPubliser, commentServices);
+export const likeServices = new LikeServices(likeReposotory, eventPubliser);

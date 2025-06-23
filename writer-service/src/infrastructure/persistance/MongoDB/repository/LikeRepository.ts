@@ -5,7 +5,8 @@ import { likeAutoMapper } from '../mapper/likeAutoMapper';
 import { logger } from '@config/logget';
 import { HasUserLikedComment } from '@application/Types/HasUserLikedComment.type';
 import mongoose, { isValidObjectId } from 'mongoose';
-import { se } from 'date-fns/locale';
+import commentModel from '../Models/commentModel';
+import { BulkUpdateCommentLikeCountInputDTO } from '@application/dtos/BulkUpdateCommentLikeCount.dto';
 
 export class LikeRepository implements ILikesRepository {
    constructor() {}
@@ -17,34 +18,84 @@ export class LikeRepository implements ILikesRepository {
    delete(authorId: string, entityId: string): Promise<Required<Like> | null> {
       throw new Error('Method not implemented.');
    }
-   bulkDelete = async (likes: Like[]): Promise<number> => {
-      const docsFilter = likes
-         .filter((like) => {
-            if (isValidObjectId(like.commentId)) return true;
-            logger.warn(`Invalid objectId (comment: ${like.commentId}), skipping like deletion`);
-            return false;
-         })
-         .map((like) => ({
+   bulkDelete = async (likes: Like[]): Promise<Required<Like>[]> => {
+      const sanitizedLikes = likes.filter((like) => {
+         if (isValidObjectId(like.commentId)) return true;
+         logger.warn(`Invalid objectId (comment: ${like.commentId}), skipping like deletion`);
+         return false;
+      });
+      if (sanitizedLikes.length === 0) return []; // ⚠️ if empty filter execute all the data in the collection will be cleared
+
+      const docsFilter = sanitizedLikes.map((like) => ({
+         authorId: like.authorId,
+         commentId: like.commentId,
+      }));
+
+      const session = await mongoose.startSession();
+      try {
+         session.startTransaction();
+
+         const likesFound = await likeModel.find({ $or: docsFilter }, {}, { session });
+
+         const deleteFilter = likesFound.map((like) => ({
             authorId: like.authorId,
             commentId: like.commentId,
          }));
-      if (docsFilter.length === 0) return 0; // ⚠️ if empty filter execute all the data in the collection will be cleared
-      const session = await mongoose.startSession();
-      session.startTransaction();
-      const res = await likeModel.deleteMany({ $or: docsFilter }, { ordered: false, session });
-      await session.abortTransaction();
-      await session.endSession();
+         if (deleteFilter.length === 0) {
+            await session.abortTransaction();
+            await session.endSession();
+            return [];
+         }
 
-      return res.deletedCount;
+         await likeModel.deleteMany({ $or: deleteFilter }, { ordered: false, session });
+
+         const comnetLikeCountdiffMap = new Map<string, number>();
+         likesFound.forEach((like) => {
+            const prevCountDiff = comnetLikeCountdiffMap.get(String(like.commentId)) ?? 0;
+            comnetLikeCountdiffMap.set(String(like.commentId), prevCountDiff - 1);
+         });
+
+         const updateCommnetCountDTO: BulkUpdateCommentLikeCountInputDTO = [];
+         for (let [commentId, likeCountDiff] of comnetLikeCountdiffMap.entries()) {
+            updateCommnetCountDTO.push({ commentId, likeCountDiff });
+         }
+
+         const ops: Parameters<typeof commentModel.bulkWrite>[0] = updateCommnetCountDTO.map(
+            (op) => ({
+               updateOne: {
+                  filter: { _id: op.commentId },
+                  update: { $inc: { likeCount: op.likeCountDiff } },
+               },
+            })
+         );
+
+         const bulkwriteRes = await commentModel.bulkWrite(ops, { ordered: false, session });
+         console.log(bulkwriteRes);
+
+         await session.commitTransaction();
+         await session.endSession();
+         return likesFound.map(likeAutoMapper);
+      } catch (error) {
+         logger.error('errro while commnet like bulk delete transaction');
+         session.abortTransaction();
+         await session.endSession();
+         throw error;
+      }
    };
 
    bulkInsert = async (likes: Like[]): Promise<Required<Like>[] | null> => {
-      const inserts = likes.map((like) => ({ authorId: like.authorId, commentId: like.commentId }));
+      const inserts = likes
+         .filter((like) => {
+            if (isValidObjectId(like.commentId)) return true;
+            logger.warn(
+               `Invalid objectId (comment: ${like.commentId}), skipping this commnet like entry`
+            );
+            return false;
+         })
+         .map((like) => ({ authorId: like.authorId, commentId: like.commentId }));
 
       try {
          const res = await likeModel.insertMany(inserts, { ordered: false });
-
-         logger.info('full batch inserted');
 
          return res.map((doc) => likeAutoMapper(doc));
       } catch (err: unknown) {

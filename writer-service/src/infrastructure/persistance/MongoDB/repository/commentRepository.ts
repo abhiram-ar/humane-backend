@@ -4,6 +4,7 @@ import commentModel from '../Models/commentModel';
 import { commentAutoMapper } from '../mapper/commentAutoMapper';
 import { BulkUpdateCommentLikeCountInputDTO } from '@application/dtos/BulkUpdateCommentLikeCount.dto';
 import { logger } from '@config/logget';
+import { isValidObjectId } from 'mongoose';
 
 export class CommentRepository implements ICommentRepository {
    create = async (comment: Comment): Promise<Required<Comment>> => {
@@ -31,17 +32,25 @@ export class CommentRepository implements ICommentRepository {
    bulkUpdateCommentCountFromDiff = async (
       dto: BulkUpdateCommentLikeCountInputDTO
    ): Promise<Comment[]> => {
-      const ops: Parameters<typeof commentModel.bulkWrite>[0] = dto.map((op) => ({
+      const sanitizedDTO = dto.filter((op) => {
+         if (isValidObjectId(op.commentId)) return true;
+         logger.warn(`Invalid objectId (comment: ${op.commentId}), skipping like count updation`);
+         return false;
+      });
+
+      const ops: Parameters<typeof commentModel.bulkWrite>[0] = sanitizedDTO.map((op) => ({
          updateOne: {
             filter: { _id: op.commentId },
             update: { $inc: { likeCount: op.likeCountDiff } },
          },
       }));
 
+      if (ops.length === 0) return [];
+
       const bulkwriteRes = await commentModel.bulkWrite(ops, { ordered: false });
       logger.info(`updated like count of ${bulkwriteRes.modifiedCount}/${dto.length} comments`);
 
-      const commnetIds = dto.map((op) => op.commentId);
+      const commnetIds = sanitizedDTO.map((op) => op.commentId);
       const query = await commentModel.find({ _id: { $in: commnetIds } });
 
       return query.map((res) => commentAutoMapper(res));
