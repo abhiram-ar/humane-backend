@@ -11,6 +11,8 @@ export class ExternalWriterService implements IExternalWriterService {
       | { id: string; likeCount: number; likedByPostAuthor: boolean; hasLikedByUser?: boolean }[]
       | null
    > => {
+      if (!commentIds) return null;
+      if (commentIds.length === 0) return [];
       try {
          const res = await axios.get<GetCommentMetadataForAUser>(
             'http://writer-srv:3000/api/v1/internal/comment/metadata',

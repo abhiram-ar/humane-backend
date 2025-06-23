@@ -12,7 +12,6 @@ const bootstrap = async () => {
 
       app.listen(3000, () => {
          logger.info('es-proxy server started');
-         console.log('hello');
       });
 
       await startAllConsumers();

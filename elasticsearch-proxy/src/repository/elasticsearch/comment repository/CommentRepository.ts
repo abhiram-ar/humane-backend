@@ -104,8 +104,6 @@ export class CommetRepository implements ICommenetRepository {
       from: string | null,
       limit: number
    ): Promise<{ comments: ICommentDocument[]; from: string | null; hasMore: boolean }> => {
-      console.log(from, limit);
-
       const res = await this._client.search<ICommentDocument>({
          index: this._index,
          query: { term: { postId } },
