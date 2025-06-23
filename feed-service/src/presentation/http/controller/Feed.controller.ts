@@ -1,5 +1,4 @@
 import { HydratedPost } from '@application/Types/HydratedPost';
-import { ENV } from '@config/env';
 import { logger } from '@config/logger';
 import { GetFeedInputDTO, getFeedInputSchema } from '@dtos/getFeed.dto';
 import { IESproxyService } from '@ports/IESproxyService';
@@ -74,7 +73,9 @@ export class FeedController {
          }
 
          // try to populaate cache is it does exsit for the first page query
-         if (!queryData.from && cacheReads.length < parseInt(ENV.FEED_CACHE_SIZE as string)) {
+         if (!queryData.from && cacheReads.length < queryData.limit) {
+            // note: there are some edge confition for this caching condition, more info in README.md
+            // dont await this let this happen in the background
             this._feedCache.addPostToUserFeed(queryData);
          }
 

@@ -49,7 +49,7 @@ export class CommentDeletedEventAggregateConsumer implements IConsumer {
       this.activeBatch = this.flushingBatch;
       this.flushingBatch = temp;
 
-      logger.debug('flushing comment delete count: ' + this.flushingBatch);
+      logger.debug('🔃 Flushing comment delete count: ' + this.flushingBatch);
 
       try {
          const ops: { postId: string; delta: number }[] = [];
@@ -101,8 +101,8 @@ export class CommentDeletedEventAggregateConsumer implements IConsumer {
 
             const offset = Number(message.offset);
 
-            logger.debug(`new Event-> ${event.eventType} ${event.eventId}`);
-            logger.verbose(JSON.stringify(event, null, 2));
+            logger.debug(`🔽 new Event-> ${event.eventType} ${event.eventId}`);
+            // logger.verbose(JSON.stringify(event, null, 2));
 
             try {
                if (event.eventType != AppEventsTypes.COMMENT_DELTED) {

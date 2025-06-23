@@ -1,6 +1,6 @@
-import { publicPostQueryController } from '@di/controllers';
+import { publicCommentController, publicPostQueryController } from '@di/controllers';
 import { Router } from 'express';
-import { isAuthenticated } from 'humane-common';
+import { AuthenticateWithNoError, isAuthenticated } from 'humane-common';
 
 const publicPostRouter = Router();
 
@@ -11,5 +11,11 @@ publicPostRouter.get(
 );
 
 publicPostRouter.get('/:postId', publicPostQueryController.postFullDetails);
+
+publicPostRouter.get(
+   '/:postId/comment',
+   AuthenticateWithNoError,
+   publicCommentController.getPostComments
+);
 
 export default publicPostRouter;

@@ -14,6 +14,9 @@ export class CommetRepository implements ICommenetRepository {
       if (!indexExists)
          await this._client.indices.create({
             index: ES_INDEXES.COMMENT_INDEX,
+            settings: {
+               number_of_replicas: 0, // 👈 Critical fix for single-node
+            },
             mappings: {
                // prevent dynamic filed creation in production, improve query performance and better resouce utilization
                dynamic: 'false',
@@ -101,8 +104,6 @@ export class CommetRepository implements ICommenetRepository {
       from: string | null,
       limit: number
    ): Promise<{ comments: ICommentDocument[]; from: string | null; hasMore: boolean }> => {
-      console.log(from, limit);
-
       const res = await this._client.search<ICommentDocument>({
          index: this._index,
          query: { term: { postId } },

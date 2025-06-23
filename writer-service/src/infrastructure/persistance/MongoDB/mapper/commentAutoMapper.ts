@@ -12,6 +12,8 @@ export const commentAutoMapper = (
       authorId: doc.authorId,
       postId: String(doc.postId),
       content: doc.content,
+      likeCount: doc.likeCount,
+      likedByPostAuthor: doc.likedByPostAuthor,
    };
    return dto;
 };

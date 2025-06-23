@@ -1,3 +1,4 @@
+import { BulkUpdateCommentLikeCountInputDTO } from '@application/dtos/BulkUpdateCommentLikeCount.dto';
 import { CreateCommentDTO } from '@application/dtos/CreateComment';
 import { DeleteCommentDTO } from '@application/dtos/DeleteComment.dto';
 import { EntityNotFound } from '@application/errors/EntityNotFoundError';
@@ -39,5 +40,18 @@ export class CommentService implements ICommentService {
    deleteAllPostComments = async (postId: string): Promise<void> => {
       const { deletedCount } = await this._commentRepo.deleteAllPostComments(postId);
       logger.info(`removed ${deletedCount} comments related to post(${postId})`);
+   };
+
+   bulkUpdateCommentLikeCountFromDiff = async (dto: BulkUpdateCommentLikeCountInputDTO) => {
+      const res = this._commentRepo.bulkUpdateCommentCountFromDiff(dto);
+      return res;
+
+      // TODO: upadte cache
+   };
+   getCommnetLikeMetadataByIds = async (
+      commentIds: string[]
+   ): Promise<Pick<Required<Comment>, 'id' | 'likeCount' | 'likedByPostAuthor'>[]> => {
+      // TODO: read through cache
+      return await this._commentRepo.getCommnetLikeMetadataByIds(commentIds);
    };
 }

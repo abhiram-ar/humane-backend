@@ -1,5 +1,10 @@
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
 import { logger } from './logget';
+import {
+   commentLikeCountWorker,
+   commentLikeWorker,
+   commentUnlikedWorker,
+} from '@di/consumer.container';
 
 export async function connectKafkaProducer() {
    await KafkaSingleton.getInstance().getProducer().connect();
@@ -10,3 +15,15 @@ export async function disconnectKafkaProducer() {
    await KafkaSingleton.getInstance().getProducer().disconnect();
    logger.info('kafka producer disconnected');
 }
+
+export const startAllConsumer = async () => {
+   await commentLikeWorker.start();
+   await commentLikeCountWorker.start();
+   await commentUnlikedWorker.start();
+};
+
+export const stopAllConsumer = async () => {
+   await commentLikeWorker.stop();
+   await commentLikeCountWorker.stop();
+   await commentUnlikedWorker.stop();
+};

@@ -6,7 +6,6 @@ import internalQueryRouter from 'routes/internalUserQuery.router';
 import publicQueryRouter from 'routes/publicUserQuery.router';
 import { errorHandler } from 'humane-common';
 import publicPostRouter from 'routes/pubicPostRouter';
-import publicCommentRouter from 'routes/pubicCommentRouter';
 
 const app = express();
 
@@ -28,7 +27,6 @@ app.use('/api/v1/query/internal', internalQueryRouter); //TODO" remove query and
 
 app.use('/api/v1/query/public', publicQueryRouter);
 app.use('/api/v1/query/post', publicPostRouter);
-app.use('/api/v1/query/comment', publicCommentRouter);
 
 app.use(errorHandler);
 

@@ -1,0 +1,12 @@
+# k8s/mongo-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+spec:
+  ports:
+    - port: 27017
+      name: mongo
+  clusterIP: None # Headless service
+  selector:
+    app: mongo

@@ -11,8 +11,7 @@ const bootstrap = async () => {
       await commentRepository.initializeCommentIndex();
 
       app.listen(3000, () => {
-         logger.info('es-proxy started');
-         console.log('hello');
+         logger.info('es-proxy server started');
       });
 
       await startAllConsumers();
@@ -25,6 +24,7 @@ const bootstrap = async () => {
          stopAllConsumer();
       });
       await userRepository.pingES();
+      logger.info('es proxy full operational');
    } catch (error) {
       logger.error('error starting es-proxy');
    }

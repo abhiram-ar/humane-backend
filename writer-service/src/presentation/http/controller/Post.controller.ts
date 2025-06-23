@@ -123,7 +123,7 @@ export class PostController {
             data.fileName,
             data.fileType
          );
-         if (!result) throw new StorageError('unable to create pre-signedURL');
+         if (!result) throw new StorageError();
 
          res.status(HttpStatusCode.Created).json({
             data: result,

@@ -10,6 +10,8 @@ const commentSchema = new mongoose.Schema<ICommentDocument>(
       authorId: { type: String, required: true },
       content: { type: String, required: true },
       postId: { type: mongoose.Schema.Types.ObjectId, ref: 'Post', required: true },
+      likeCount: { type: Number, default: 0 },
+      likedByPostAuthor: { type: Boolean, default: false },
    },
    { timestamps: true }
 );

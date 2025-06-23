@@ -1,8 +1,9 @@
+import { ENV } from '@config/env';
 import mongoose from 'mongoose';
 
 const connectDB = async () => {
    try {
-      const status = await mongoose.connect('mongodb://mongo-srv:27017/notificaion');
+      const status = await mongoose.connect(ENV.MONGODB_URI as string);
       console.log(`Database connected: ${status.connection.host} ${status.connection.name}`);
    } catch (error) {
       console.error('Failed to connect to user DB');
