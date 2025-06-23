@@ -46,7 +46,7 @@ export class CommentUnlikeWorker implements IConsumer {
       this.activeBatch = this.flushingBatch;
       this.flushingBatch = temp;
 
-      logger.debug(`flushing ${this.flushingBatch.updates.size} comment unlike requests`);
+      logger.debug(`🔃 Flushing ${this.flushingBatch.updates.size} comment unlike requests`);
 
       try {
          const dto: BulkCommnetUnlikeInputDTO = [];
@@ -98,7 +98,8 @@ export class CommentUnlikeWorker implements IConsumer {
 
             const offset = Number(message.offset);
 
-            logger.debug(`new Event-> ${event.eventType} ${event.eventId}`);
+            logger.debug(`🔽 new Event-> ${event.eventType} ${event.eventId}`);
+
             // logger.verbose(JSON.stringify(event, null, 2));
 
             try {

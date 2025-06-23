@@ -24,8 +24,8 @@ export class LikeServices implements ILikeServices {
 
       const domainLikes = dto.map((req) => new Like(req.authorId, req.commentId));
 
-      const deletedCount = await this._likeRepo.bulkDelete(domainLikes);
-      logger.debug(`🗑️ Deleted ${deletedCount}/${dto.length} likes`);
+      const deletedLikes = await this._likeRepo.bulkDelete(domainLikes);
+      logger.debug(`Deleted ${deletedLikes.length}/${dto.length} likes`);
 
       // decrement commnet like count
       const comnetLikeCountdiffMap = new Map<string, number>();
@@ -64,8 +64,9 @@ export class LikeServices implements ILikeServices {
 
       let successCount = 0;
       publishResult.forEach((res) => res.ack && successCount++);
-
-      logger.info(`published ${successCount}/${dto.length} ${AppEventsTypes.COMMENT_LIKED} events`);
+      logger.debug(
+         `published ${successCount}/${dto.length} ${AppEventsTypes.COMMENT_LIKED} events`
+      );
    };
 
    hasUserLikedTheseComments = async (

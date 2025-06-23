@@ -24,6 +24,7 @@ export class LikeRepository implements ILikesRepository {
          logger.warn(`Invalid objectId (comment: ${like.commentId}), skipping like deletion`);
          return false;
       });
+
       if (sanitizedLikes.length === 0) return []; // ⚠️ if empty filter execute all the data in the collection will be cleared
 
       const docsFilter = sanitizedLikes.map((like) => ({
@@ -60,17 +61,18 @@ export class LikeRepository implements ILikesRepository {
             updateCommnetCountDTO.push({ commentId, likeCountDiff });
          }
 
-         const ops: Parameters<typeof commentModel.bulkWrite>[0] = updateCommnetCountDTO.map(
-            (op) => ({
+         const bulkCommentCountDiffUpdates: Parameters<typeof commentModel.bulkWrite>[0] =
+            updateCommnetCountDTO.map((op) => ({
                updateOne: {
                   filter: { _id: op.commentId },
                   update: { $inc: { likeCount: op.likeCountDiff } },
                },
-            })
-         );
-
-         const bulkwriteRes = await commentModel.bulkWrite(ops, { ordered: false, session });
-         console.log(bulkwriteRes);
+            }));
+         const bulkwriteRes = await commentModel.bulkWrite(bulkCommentCountDiffUpdates, {
+            ordered: false,
+            session,
+         });
+         logger.debug(`updated ${bulkwriteRes.modifiedCount} comment document(s) like count`);
 
          await session.commitTransaction();
          await session.endSession();
@@ -94,17 +96,16 @@ export class LikeRepository implements ILikesRepository {
          })
          .map((like) => ({ authorId: like.authorId, commentId: like.commentId }));
 
+      if (inserts.length === 0) return [];
+
       try {
          const res = await likeModel.insertMany(inserts, { ordered: false });
 
          return res.map((doc) => likeAutoMapper(doc));
       } catch (err: unknown) {
          if (
-            (typeof err === 'object' &&
-               err !== null &&
-               'name' in err &&
-               (err as any).name === 'BulkWriteError') ||
-            (err as any).name === 'MongoBulkWriteError'
+            (err as any)?.name === 'BulkWriteError' ||
+            (err as any)?.name === 'MongoBulkWriteError'
          ) {
             // Optional: print error reasons
             (err as any).writeErrors.forEach((e: any) => {
