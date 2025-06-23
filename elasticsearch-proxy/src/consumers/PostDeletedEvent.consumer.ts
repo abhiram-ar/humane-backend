@@ -38,8 +38,8 @@ export class PostDeletedEventConsumer implements IConsumer {
                (message.value as Buffer<ArrayBufferLike>).toString()
             ) as AppEvent;
 
-            logger.debug(`new ${event.eventType} Event-> ${event.eventId}`);
-            logger.verbose(JSON.stringify(event, null, 2));
+            logger.debug(`🔽 new ${event.eventType} Event-> ${event.eventId}`);
+            // logger.verbose(JSON.stringify(event, null, 2));
 
             try {
                if (event.eventType != AppEventsTypes.POST_DELETED) {

@@ -49,7 +49,7 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
       this.activeBatch = this.flushingBatch;
       this.flushingBatch = temp;
 
-      logger.debug(`flushing ${this.flushingBatch.updates.size} comment increment count`);
+      logger.debug(`🔃 Flushing ${this.flushingBatch.updates.size} comment increment count`);
 
       try {
          const ops: { postId: string; delta: number }[] = [];
@@ -103,8 +103,8 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
 
             const offset = Number(message.offset);
 
-            logger.debug(`new Event-> ${event.eventType} ${event.eventId}`);
-            logger.verbose(JSON.stringify(event, null, 2));
+            logger.debug(`🔽 new Event-> ${event.eventType} ${event.eventId}`);
+            // logger.verbose(JSON.stringify(event, null, 2));
 
             try {
                if (event.eventType != AppEventsTypes.COMMENT_CREATED) {

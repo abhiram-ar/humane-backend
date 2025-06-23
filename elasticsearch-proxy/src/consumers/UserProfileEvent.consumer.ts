@@ -41,8 +41,8 @@ export class UserProfileEventsConsumer implements IConsumer {
             ) as AppEvent;
 
             const tempTraceId = `${event.eventType}-${event.eventId.split('-')[0]}`;
-            logger.debug(`new Event-> ${tempTraceId}`);
-            logger.verbose(JSON.stringify(event, null, 2));
+            logger.debug(`🔽 new Event-> ${tempTraceId}`);
+            // logger.verbose(JSON.stringify(event, null, 2));
 
             try {
                if (event.eventType === AppEventsTypes.USER_CREATED) {
