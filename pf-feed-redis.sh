@@ -1,0 +1,1 @@
+kubectl port-forward svc/feed-redis-srv 6379:6379
