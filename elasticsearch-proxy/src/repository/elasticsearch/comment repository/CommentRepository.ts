@@ -14,6 +14,9 @@ export class CommetRepository implements ICommenetRepository {
       if (!indexExists)
          await this._client.indices.create({
             index: ES_INDEXES.COMMENT_INDEX,
+            settings: {
+               number_of_replicas: 0, // 👈 Critical fix for single-node
+            },
             mappings: {
                // prevent dynamic filed creation in production, improve query performance and better resouce utilization
                dynamic: 'false',
