@@ -2,5 +2,5 @@ import { Comment } from '@application/dtos/Comment.dto';
 import { PostGotCommentNotification } from '@domain/entities/PostGotCommnetNotification';
 
 export interface IPostGotCommentNotificationService {
-   create(dto: Comment): Promise<Required<PostGotCommentNotification> | undefined>;
+   create(dto: Comment): Promise<Required<PostGotCommentNotification>>;
 }

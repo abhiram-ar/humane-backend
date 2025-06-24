@@ -17,5 +17,6 @@ export const friendReqEventConsumer = new FriendReqEventConsumer(
 
 export const commentCreatedEventConsumer = new CommentCreatedEventConsumer(
    KafkaSingleton.getInstance(),
-   postGotCommnetNotificationService
+   postGotCommnetNotificationService,
+   elasticSearchProxyService
 );
