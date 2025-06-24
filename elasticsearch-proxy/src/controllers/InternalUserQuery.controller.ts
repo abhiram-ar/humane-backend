@@ -42,9 +42,10 @@ export class InternalQueryController {
       }
    };
 
-   hydratePostDetails = async (req: Request, res: Response, next: NextFunction) => {
+   hydratePostDetails = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
       try {
          const { postId } = req.query;
+         const { noAuthorHydration } = req.query;
 
          let ids: HydrartePostDetailsInputDTO;
          if (typeof postId === 'string') {
@@ -60,6 +61,12 @@ export class InternalQueryController {
             throw new ZodValidationError(parsed.error);
          }
          const postdetails = await this._postServices.getPostByIds(parsed.data);
+
+         if (noAuthorHydration && parseInt(noAuthorHydration as string)) {
+            return res.status(200).json({
+               data: { posts: postdetails },
+            });
+         }
 
          // posts will have common author
          const authorIdsSet = new Set<string>();
