@@ -40,4 +40,8 @@ export interface INotificationRepository {
    createPostGotCommentedNotification(
       noti: PostGotCommentNotification
    ): Promise<Required<PostGotCommentNotification>>;
+
+   deletePostGotCommentNotificationByCommentId(
+      commentId: string
+   ): Promise<Required<PostGotCommentNotification> | null>;
 }

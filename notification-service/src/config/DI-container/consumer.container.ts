@@ -7,6 +7,7 @@ import {
 } from './usecases/notificationUsercase.container';
 import { elasticSearchProxyService } from './services.contaner';
 import { CommentCreatedEventConsumer } from '@presentation/event/CommentCreatedEvent.consumer';
+import { CommentDeletedEventConsumer } from '@presentation/event/CommentDeletedEvent.consumer';
 
 export const friendReqEventConsumer = new FriendReqEventConsumer(
    KafkaSingleton.getInstance(),
@@ -19,4 +20,9 @@ export const commentCreatedEventConsumer = new CommentCreatedEventConsumer(
    KafkaSingleton.getInstance(),
    postGotCommnetNotificationService,
    elasticSearchProxyService
+);
+
+export const commentDeltedEventConsumer = new CommentDeletedEventConsumer(
+   KafkaSingleton.getInstance(),
+   postGotCommnetNotificationService
 );

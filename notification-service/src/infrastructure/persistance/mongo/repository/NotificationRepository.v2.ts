@@ -14,7 +14,10 @@ import {
    FRIEND_REQ_ACCEPTED_NOTIFICATION_TYPE,
    FriendReqAcceptedNotification,
 } from '@domain/entities/FriendReqAcceptedNotification.entity';
-import { PostGotCommentNotification } from '@domain/entities/PostGotCommnetNotification';
+import {
+   POST_GOT_COMMNET_NOTIFICATION_TYPE,
+   PostGotCommentNotification,
+} from '@domain/entities/PostGotCommnetNotification';
 import { postGotCommentNotiAutoMapper } from '../automapper/postGotCommnetNotiAutoMapper';
 import { friendReqNotificationAutoMapper } from '../automapper/friendReqNotification.automapper';
 import { friendReqAcceptedAutoMapper } from '../automapper/friendReqAcceptedNoti.automapper';
@@ -149,6 +152,18 @@ export class MongoNotificationRepository implements INotificationRepository {
          metadata: { postId: noti.metadata.postId, commentContent: noti.metadata.commentContent },
       });
 
+      return postGotCommentNotiAutoMapper(res);
+   };
+
+   deletePostGotCommentNotificationByCommentId = async (
+      commentId: string
+   ): Promise<Required<PostGotCommentNotification> | null> => {
+      const res = await postGotCommnetNotificationModel.findOneAndDelete({
+         entityId: commentId,
+         type: POST_GOT_COMMNET_NOTIFICATION_TYPE,
+      });
+
+      if (!res) return null;
       return postGotCommentNotiAutoMapper(res);
    };
 }
