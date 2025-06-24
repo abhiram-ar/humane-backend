@@ -8,17 +8,18 @@ const bootstrap = async () => {
    try {
       checkEnv();
       await connectDB();
-      await startAllConsumers();
+      httpServer.listen(3000, () => {
+         logger.info('http+socket.io server running on port 3000');
+      });
+
       process.on('SIGINT', async () => {
          await stopAllConsumer();
       });
       process.on('SIGTERM', async () => {
          await stopAllConsumer();
       });
-      httpServer.listen(3000, ()=>{
-         logger.info("http+socket.io server running on port 3000")
-         logger.info('notification service started successfuly');
-      })
+      await startAllConsumers();
+      logger.info('notification service fully operational');
    } catch (error) {
       logger.error('Error while starting notificaion serviec');
       logger.error(error);
