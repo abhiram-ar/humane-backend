@@ -4,7 +4,8 @@ import {
    FRIEND_REQ_NOTIFICATION_TYPE,
    FriendReqStatus,
 } from '@domain/entities/FriendReqNotification.entity';
-import mongoose, { Document, HydratedDocument, Schema } from 'mongoose';
+import { POST_GOT_COMMNET_NOTIFICATION_TYPE } from '@domain/entities/PostGotCommnetNotification';
+import mongoose, { Document, Schema } from 'mongoose';
 
 // --------------------- Base Notification -------------------
 interface IBaseNotificationDocument extends Document {
@@ -38,7 +39,7 @@ const notificationModel = mongoose.model<IBaseNotificationDocument>(
 );
 
 // --------------- friend Request Discriminator --------------------
-interface IFriendRequestNotificationDocument extends IBaseNotificationDocument {
+export interface IFriendRequestNotificationDocument extends IBaseNotificationDocument {
    actorId: string;
    metadata: { reqStatus: (typeof FriendReqStatus)[keyof typeof FriendReqStatus] };
    type: typeof FRIEND_REQ_NOTIFICATION_TYPE; // ensure type discriminator is included
@@ -65,7 +66,7 @@ const friendReqNotificationModel =
    );
 
 // --------------- friend Request Acepted Discriminator --------------------
-interface IFriendRequestAcceptedNotificationDocument extends IBaseNotificationDocument {
+export interface IFriendRequestAcceptedNotificationDocument extends IBaseNotificationDocument {
    actorId: string;
    metadata: { reqStatus: 'ACCEPTED' };
    type: typeof FRIEND_REQ_ACCEPTED_NOTIFICATION_TYPE; // ensure type discriminator is included
@@ -91,15 +92,46 @@ const friendReqAcceptedNotificationModel =
       friendReqAcceptedSchema
    );
 
-// ------------------ Type for Friend Request Documents --------------------
-export type FriendReqNotificationDocument = HydratedDocument<IFriendRequestNotificationDocument>;
-export type FriendReqAcceptedNotificationDocument =
-   HydratedDocument<IFriendRequestAcceptedNotificationDocument>;
+// ---------------------- POST-got-commented distriminator ------------------
+export interface IPostGotCommnetNotificationDocument extends IBaseNotificationDocument {
+   actorId: string;
+   metadata: { postId: string; commentContent: string };
+   type: typeof POST_GOT_COMMNET_NOTIFICATION_TYPE; // ensure type discriminator is included
+}
 
+const postGotCommentNotificationSchema = new mongoose.Schema<IPostGotCommnetNotificationDocument>(
+   {
+      actorId: { type: String, required: true },
+      metadata: {
+         postId: {
+            type: String,
+            required: true,
+         },
+         commentContent: {
+            type: String,
+            required: true,
+         },
+      },
+   },
+   { discriminatorKey: 'type' }
+);
+
+const postGotCommnetNotificationModel =
+   notificationModel.discriminator<IPostGotCommnetNotificationDocument>(
+      POST_GOT_COMMNET_NOTIFICATION_TYPE,
+      postGotCommentNotificationSchema
+   );
+
+// ------------------ Combined notifcation Documents --------------------
 export type INotificationDocument =
    | IFriendRequestNotificationDocument
-   | IFriendRequestAcceptedNotificationDocument;
+   | IFriendRequestAcceptedNotificationDocument
+   | IPostGotCommnetNotificationDocument;
 
-// ------m-----odelss------------
-export { friendReqNotificationModel, friendReqAcceptedNotificationModel };
+// ----------------------------models-======================-----------
+export {
+   friendReqNotificationModel,
+   friendReqAcceptedNotificationModel,
+   postGotCommnetNotificationModel,
+};
 export default notificationModel;

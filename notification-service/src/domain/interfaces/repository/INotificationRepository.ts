@@ -4,6 +4,7 @@ import {
    FriendReqNotification,
    FriendReqStatus,
 } from '@domain/entities/FriendReqNotification.entity';
+import { PostGotCommentNotification } from '@domain/entities/PostGotCommnetNotification';
 
 export interface INotificationRepository {
    retriveFriendReqNoti(friendshipId: string): Promise<Required<FriendReqNotification> | null>;
@@ -35,4 +36,8 @@ export interface INotificationRepository {
    deleteFriendReqAcceptedNoti(
       friendshipId: string
    ): Promise<Required<FriendReqAcceptedNotification> | null>;
+
+   createPostGotCommentedNotification(
+      noti: PostGotCommentNotification
+   ): Promise<Required<PostGotCommentNotification>>;
 }

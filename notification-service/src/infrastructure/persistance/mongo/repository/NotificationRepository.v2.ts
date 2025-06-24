@@ -8,11 +8,14 @@ import { CombinedNotification } from '@domain/entities/CombinedNotification';
 import notificationModel, {
    friendReqAcceptedNotificationModel,
    friendReqNotificationModel,
+   postGotCommnetNotificationModel,
 } from '../models/Notification.model.v2';
 import {
    FRIEND_REQ_ACCEPTED_NOTIFICATION_TYPE,
    FriendReqAcceptedNotification,
 } from '@domain/entities/FriendReqAcceptedNotification.entity';
+import { PostGotCommentNotification } from '@domain/entities/PostGotCommnetNotification';
+import { postGotCommentNotiAutoMapper } from '../automapper/postGotCommnetNotiAutoMapper';
 
 // TODO: refactor createing frindReqNoti every time with a mapper
 export class MongoNotificationRepository implements INotificationRepository {
@@ -230,5 +233,19 @@ export class MongoNotificationRepository implements INotificationRepository {
          { reciverId: userId, _id: { $lte: fromId } },
          { $set: { isRead: true } }
       );
+   };
+
+   createPostGotCommentedNotification = async (
+      noti: PostGotCommentNotification
+   ): Promise<Required<PostGotCommentNotification>> => {
+      const res = await postGotCommnetNotificationModel.create({
+         reciverId: noti.reciverId,
+         type: noti.type,
+         actorId: noti.actorId,
+         entityId: noti.entityId,
+         metadata: { postId: noti.metadata.postId, commentContent: noti.metadata.commentContent },
+      });
+
+      return postGotCommentNotiAutoMapper(res);
    };
 }
