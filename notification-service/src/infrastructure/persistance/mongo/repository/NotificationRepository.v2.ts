@@ -75,21 +75,7 @@ export class MongoNotificationRepository implements INotificationRepository {
       const res = await friendReqAcceptedNotificationModel.findOne({ entityId: friendshipId });
       if (!res) return null;
 
-      const friendReqNoti: Required<FriendReqAcceptedNotification> = {
-         id: res.id,
-         reciverId: res.reciverId,
-         isRead: res.isRead,
-         type: res.type,
-         actorId: res.actorId,
-         entityId: res.entityId,
-         metadata: {
-            reqStatus: res.metadata.reqStatus,
-         },
-         createdAt: res.createdAt.toISOString(),
-         updatedAt: res.updatedAt.toISOString(),
-      };
-
-      return friendReqNoti;
+      return friendReqAcceptedAutoMapper(res);
    };
    createFriendReqAcceptedNoti = async (
       friendReqAcceptedNoti: FriendReqAcceptedNotification
