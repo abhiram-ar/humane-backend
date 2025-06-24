@@ -5,8 +5,9 @@ import {
 } from '@domain/entities/PostGotCommnetNotification';
 import { INotificationRepository } from '@domain/interfaces/repository/INotificationRepository';
 import { IElasticSearchProxyService } from '@ports/IElasticSearchProxyService';
-import { IPostGotCommentNotificationService } from './interfaces/ICommentNotification.usecase';
+import { IPostGotCommentNotificationService } from './interfaces/IPostGotCommentNotification.usecase';
 import { PostDoesNotExistError } from '@application/Errors/PostDoesNotExistError';
+import { logger } from '@config/logger';
 
 export class PostGotCommentNotificationService implements IPostGotCommentNotificationService {
    constructor(
@@ -40,5 +41,19 @@ export class PostGotCommentNotificationService implements IPostGotCommentNotific
       );
 
       return newNoti;
+   };
+   deleteNotificationByCommentId = async (
+      commentId: string
+   ): Promise<Required<PostGotCommentNotification> | null> => {
+      const res = await this._notificatioRepo.deletePostGotCommentNotificationByCommentId(
+         commentId
+      );
+      if (res) logger.debug(`delted ${res.id} comment from notification`);
+      return res;
+   };
+   deleteNotificationsByPostId = async (postId: string): Promise<{ deletedCount: number }> => {
+      const res = await this._notificatioRepo.deletePostGotCommentNotificationsByPostId(postId);
+      logger.debug(`delted ${res.deletedCount} comments related to post(${postId})`);
+      return res;
    };
 }

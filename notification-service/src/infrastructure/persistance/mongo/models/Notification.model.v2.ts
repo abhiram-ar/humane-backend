@@ -115,6 +115,7 @@ const postGotCommentNotificationSchema = new mongoose.Schema<IPostGotCommnetNoti
    },
    { discriminatorKey: 'type' }
 );
+postGotCommentNotificationSchema.index({ entityId: 1, 'metadata.postId': 1 }, { unique: true });
 
 const postGotCommnetNotificationModel =
    notificationModel.discriminator<IPostGotCommnetNotificationDocument>(

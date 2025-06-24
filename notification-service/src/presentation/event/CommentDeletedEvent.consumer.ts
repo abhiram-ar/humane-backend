@@ -12,26 +12,24 @@ import KafkaSingleton from '@infrastructure/event/KafkaSingleton';
 import { commentSchema } from '@application/dtos/Comment.dto';
 import { IPostGotCommentNotificationService } from '@application/usercase/interfaces/IPostGotCommentNotification.usecase';
 import { isUserOnline } from '@presentation/websocket/utils/isUserOnline';
-import { IElasticSearchProxyService } from '@ports/IElasticSearchProxyService';
 import { io } from '@presentation/websocket/ws';
 
-export class CommentCreatedEventConsumer implements IConsumer {
+export class CommentDeletedEventConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(
       private readonly _kafka: KafkaSingleton,
-      private readonly _postGotCommentNotification: IPostGotCommentNotificationService,
-      private readonly _esProxy: IElasticSearchProxyService
+      private readonly _postGotCommentNotification: IPostGotCommentNotificationService
    ) {
-      this.consumer = this._kafka.createConsumer('notification-srv-comment-created-v1');
+      this.consumer = this._kafka.createConsumer('notification-srv-comment-deleted-v1');
    }
 
    start = async () => {
       await this.consumer.connect();
-      logger.info('Comment created event consumer connected ');
+      logger.info('Comment deleted event consumer connected ');
 
       await this.consumer.subscribe({
-         topic: MessageBrokerTopics.COMMENT_CREATED_EVENTS_TOPIC,
+         topic: MessageBrokerTopics.COMMENT_DELTED_EVENTS_TOPIC,
       });
 
       await this.consumer.run({
@@ -44,28 +42,23 @@ export class CommentCreatedEventConsumer implements IConsumer {
             // logger.verbose(JSON.stringify(event, null, 2));
 
             try {
-               if (event.eventType != AppEventsTypes.COMMENT_CREATED) {
+               if (event.eventType != AppEventsTypes.COMMENT_DELTED) {
                   throw new EventConsumerMissMatchError();
                }
-               const parsed = commentSchema.safeParse(event.payload);
+               const validatedComment = commentSchema.safeParse(event.payload);
 
-               if (!parsed.success) {
-                  throw new ZodValidationError(parsed.error);
+               if (!validatedComment.success) {
+                  throw new ZodValidationError(validatedComment.error);
                }
 
-               const noti = await this._postGotCommentNotification.create(parsed.data);
+               const noti = await this._postGotCommentNotification.deleteNotificationByCommentId(
+                  validatedComment.data.id
+               );
 
                if (noti && (await isUserOnline(noti.reciverId))) {
-                  const [requesterDetails] = await this._esProxy.getUserBasicDetails(noti.actorId);
-
-                  if (requesterDetails) {
-                     io.to(noti.reciverId).emit('push-noti', {
-                        ...noti,
-                        actionableUser: requesterDetails,
-                     });
-                  } else {
-                     logger.warn('No requester basic details from ES proxy');
-                  }
+                  io.to(noti.reciverId).emit('remove-noti', {
+                     ...noti,
+                  });
                }
 
                logger.info(`processed-> ${event.eventType} ${event.eventId}`);
