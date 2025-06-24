@@ -8,13 +8,17 @@ import { CombinedNotification } from '@domain/entities/CombinedNotification';
 import notificationModel, {
    friendReqAcceptedNotificationModel,
    friendReqNotificationModel,
+   postGotCommnetNotificationModel,
 } from '../models/Notification.model.v2';
 import {
    FRIEND_REQ_ACCEPTED_NOTIFICATION_TYPE,
    FriendReqAcceptedNotification,
 } from '@domain/entities/FriendReqAcceptedNotification.entity';
+import { PostGotCommentNotification } from '@domain/entities/PostGotCommnetNotification';
+import { postGotCommentNotiAutoMapper } from '../automapper/postGotCommnetNotiAutoMapper';
+import { friendReqNotificationAutoMapper } from '../automapper/friendReqNotification.automapper';
+import { friendReqAcceptedAutoMapper } from '../automapper/friendReqAcceptedNoti.automapper';
 
-// TODO: refactor createing frindReqNoti every time with a mapper
 export class MongoNotificationRepository implements INotificationRepository {
    constructor() {}
 
@@ -24,21 +28,7 @@ export class MongoNotificationRepository implements INotificationRepository {
       const res = await friendReqNotificationModel.findOne({ entityId: friendshipId });
       if (!res) return null;
 
-      const friendReqNoti: Required<FriendReqNotification> = {
-         id: res.id,
-         reciverId: res.reciverId,
-         isRead: res.isRead,
-         type: 'friend-req',
-         actorId: res.actorId,
-         entityId: res.entityId,
-         metadata: {
-            reqStatus: res.metadata.reqStatus,
-         },
-         createdAt: res.createdAt.toISOString(),
-         updatedAt: res.updatedAt.toISOString(),
-      };
-
-      return friendReqNoti;
+      return friendReqNotificationAutoMapper(res);
    };
    createFriendReqNoti = async (
       friendReq: FriendReqNotification
@@ -51,21 +41,7 @@ export class MongoNotificationRepository implements INotificationRepository {
          metadata: { reqStatus: friendReq.metadata.reqStatus },
       });
 
-      const friendReqNoti: Required<FriendReqNotification> = {
-         id: res.id,
-         reciverId: res.reciverId,
-         isRead: res.isRead,
-         type: 'friend-req',
-         actorId: res.actorId,
-         entityId: res.entityId,
-         metadata: {
-            reqStatus: res.metadata.reqStatus,
-         },
-         createdAt: res.createdAt.toISOString(),
-         updatedAt: res.updatedAt.toISOString(),
-      };
-
-      return friendReqNoti;
+      return friendReqNotificationAutoMapper(res);
    };
 
    deleteFriendReqNoti = async (
@@ -75,21 +51,7 @@ export class MongoNotificationRepository implements INotificationRepository {
 
       if (!res) return null;
 
-      const friendReqNoti: Required<FriendReqNotification> = {
-         id: res.id,
-         reciverId: res.reciverId,
-         isRead: res.isRead,
-         type: 'friend-req',
-         actorId: res.actorId,
-         entityId: res.entityId,
-         metadata: {
-            reqStatus: res.metadata.reqStatus,
-         },
-         createdAt: res.createdAt.toISOString(),
-         updatedAt: res.updatedAt.toISOString(),
-      };
-
-      return friendReqNoti;
+      return friendReqNotificationAutoMapper(res);
    };
 
    updateFriendReqStatus = async (
@@ -104,21 +66,7 @@ export class MongoNotificationRepository implements INotificationRepository {
 
       if (!res) return null;
 
-      const friendReqNoti: Required<FriendReqNotification> = {
-         id: res.id,
-         reciverId: res.reciverId,
-         isRead: res.isRead,
-         type: 'friend-req',
-         actorId: res.actorId,
-         entityId: res.entityId,
-         metadata: {
-            reqStatus: res.metadata.reqStatus,
-         },
-         createdAt: res.createdAt.toISOString(),
-         updatedAt: res.updatedAt.toISOString(),
-      };
-
-      return friendReqNoti;
+      return friendReqNotificationAutoMapper(res);
    };
 
    retriveFriendReqAcceptedNoti = async (
@@ -127,21 +75,7 @@ export class MongoNotificationRepository implements INotificationRepository {
       const res = await friendReqAcceptedNotificationModel.findOne({ entityId: friendshipId });
       if (!res) return null;
 
-      const friendReqNoti: Required<FriendReqAcceptedNotification> = {
-         id: res.id,
-         reciverId: res.reciverId,
-         isRead: res.isRead,
-         type: res.type,
-         actorId: res.actorId,
-         entityId: res.entityId,
-         metadata: {
-            reqStatus: res.metadata.reqStatus,
-         },
-         createdAt: res.createdAt.toISOString(),
-         updatedAt: res.updatedAt.toISOString(),
-      };
-
-      return friendReqNoti;
+      return friendReqAcceptedAutoMapper(res);
    };
    createFriendReqAcceptedNoti = async (
       friendReqAcceptedNoti: FriendReqAcceptedNotification
@@ -154,21 +88,7 @@ export class MongoNotificationRepository implements INotificationRepository {
          metadata: { reqStatus: friendReqAcceptedNoti.metadata.reqStatus },
       });
 
-      const friendReqNoti: Required<FriendReqAcceptedNotification> = {
-         id: res.id,
-         reciverId: res.reciverId,
-         isRead: res.isRead,
-         type: res.type,
-         actorId: res.actorId,
-         entityId: res.entityId,
-         metadata: {
-            reqStatus: res.metadata.reqStatus,
-         },
-         createdAt: res.createdAt.toISOString(),
-         updatedAt: res.updatedAt.toISOString(),
-      };
-
-      return friendReqNoti;
+      return friendReqAcceptedAutoMapper(res);
    };
    deleteFriendReqAcceptedNoti = async (
       friendshipId: string
@@ -179,21 +99,7 @@ export class MongoNotificationRepository implements INotificationRepository {
 
       if (!res) return null;
 
-      const friendReqNoti: Required<FriendReqAcceptedNotification> = {
-         id: res.id,
-         reciverId: res.reciverId,
-         isRead: res.isRead,
-         type: res.type,
-         actorId: res.actorId,
-         entityId: res.entityId,
-         metadata: {
-            reqStatus: res.metadata.reqStatus,
-         },
-         createdAt: res.createdAt.toISOString(),
-         updatedAt: res.updatedAt.toISOString(),
-      };
-
-      return friendReqNoti;
+      return friendReqAcceptedAutoMapper(res);
    };
 
    retriveRecentUserNotifications = async (
@@ -230,5 +136,19 @@ export class MongoNotificationRepository implements INotificationRepository {
          { reciverId: userId, _id: { $lte: fromId } },
          { $set: { isRead: true } }
       );
+   };
+
+   createPostGotCommentedNotification = async (
+      noti: PostGotCommentNotification
+   ): Promise<Required<PostGotCommentNotification>> => {
+      const res = await postGotCommnetNotificationModel.create({
+         reciverId: noti.reciverId,
+         type: noti.type,
+         actorId: noti.actorId,
+         entityId: noti.entityId,
+         metadata: { postId: noti.metadata.postId, commentContent: noti.metadata.commentContent },
+      });
+
+      return postGotCommentNotiAutoMapper(res);
    };
 }

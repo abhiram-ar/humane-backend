@@ -83,7 +83,7 @@ export class UserNotificationController {
 
          res.status(HttpStatusCode.Ok).json({
             data: {
-               noti: actionableUserIds.length > 0 ? actionableUserDetailsHydratedNoti : noti,
+               noti: actionableUserIds.length > 0 ? actionableUserDetailsHydratedNoti : noti, //not every notification maynot necessay have a actionalble user
                pagination,
             },
          });

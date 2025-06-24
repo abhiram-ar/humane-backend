@@ -3,8 +3,9 @@ import { logger } from '@config/logger';
 import { INotificationRepository } from '@domain/interfaces/repository/INotificationRepository';
 import { FriendReqAcceptedNotification } from '@domain/entities/FriendReqAcceptedNotification.entity';
 import { FriendReqAcceptedNotificationError } from '@application/Errors/FriendReqAcceptedNotificaionError';
+import { IFriendReqAcceptedNotificationService } from './interfaces/IFriendReqAcceptedNotification.usercase';
 
-export class FriendReqAcceptedNotificationService {
+export class FriendReqAcceptedNotificationService implements IFriendReqAcceptedNotificationService {
    constructor(private readonly _notificationRepo: INotificationRepository) {}
 
    create = async ({
@@ -20,7 +21,9 @@ export class FriendReqAcceptedNotificationService {
       const existingFriendReqAcceptedNotificaion =
          await this._notificationRepo.retriveFriendReqAcceptedNoti(friendship.id);
       if (existingFriendReqAcceptedNotificaion) {
-         throw new FriendReqAcceptedNotificationError('Request(id) exists, cannot add duplicate entry');
+         throw new FriendReqAcceptedNotificationError(
+            'Request(id) exists, cannot add duplicate entry'
+         );
       }
 
       // create a frindreqNotificaion
