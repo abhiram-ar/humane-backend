@@ -14,20 +14,24 @@ export class PostGotCommentNotificationService implements IPostGotCommentNotific
       private readonly _esProxy: IElasticSearchProxyService
    ) {}
 
-   create = async (dto: Comment): Promise<Required<PostGotCommentNotification>> => {
+   create = async (commentDTO: Comment): Promise<Required<PostGotCommentNotification> | void> => {
       // get postid authorId
 
-      const postData = await this._esProxy.getPostsDetailsWithoutAuthorDetailsHydration(dto.postId);
+      const postData = await this._esProxy.getPostsDetailsWithoutAuthorDetailsHydration(
+         commentDTO.postId
+      );
       if (!postData || !postData[0]) throw new PostDoesNotExistError(); // invalid postId
+
+      if (postData[0].authorId === commentDTO.authorId) return; // dont want to create a notification if the postAutor itself commneted
 
       const domainPostGotNoti: PostGotCommentNotification = {
          type: POST_GOT_COMMNET_NOTIFICATION_TYPE,
          reciverId: postData[0].authorId,
-         actorId: dto.authorId,
-         entityId: dto.id,
+         actorId: commentDTO.authorId,
+         entityId: commentDTO.id,
          metadata: {
-            postId: dto.postId,
-            commentContent: dto.content,
+            postId: commentDTO.postId,
+            commentContent: commentDTO.content,
          },
       };
 

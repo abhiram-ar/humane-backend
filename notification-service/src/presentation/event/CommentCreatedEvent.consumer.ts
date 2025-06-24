@@ -55,7 +55,7 @@ export class CommentCreatedEventConsumer implements IConsumer {
 
                const noti = await this._postGotCommentNotification.create(parsed.data);
 
-               if (await isUserOnline(noti.reciverId)) {
+               if (noti && (await isUserOnline(noti.reciverId))) {
                   const [requesterDetails] = await this._esProxy.getUserBasicDetails(noti.actorId);
 
                   if (requesterDetails) {
