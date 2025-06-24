@@ -44,4 +44,6 @@ export interface INotificationRepository {
    deletePostGotCommentNotificationByCommentId(
       commentId: string
    ): Promise<Required<PostGotCommentNotification> | null>;
+
+   deletePostGotCommentNotificationsByPostId(postId: string): Promise<{ deletedCount: number }>;
 }

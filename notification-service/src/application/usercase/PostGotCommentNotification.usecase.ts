@@ -51,4 +51,9 @@ export class PostGotCommentNotificationService implements IPostGotCommentNotific
       if (res) logger.debug(`delted ${res.id} comment from notification`);
       return res;
    };
+   deleteNotificationsByPostId = async (postId: string): Promise<{ deletedCount: number }> => {
+      const res = await this._notificatioRepo.deletePostGotCommentNotificationsByPostId(postId);
+      logger.debug(`delted ${res.deletedCount} comments related to post(${postId})`);
+      return res;
+   };
 }

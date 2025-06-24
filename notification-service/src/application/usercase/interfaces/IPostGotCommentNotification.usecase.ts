@@ -7,4 +7,6 @@ export interface IPostGotCommentNotificationService {
    deleteNotificationByCommentId(
       commentId: string
    ): Promise<Required<PostGotCommentNotification> | null>;
+
+   deleteNotificationsByPostId(postId: string): Promise<{ deletedCount: number }>;
 }

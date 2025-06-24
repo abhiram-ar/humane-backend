@@ -166,4 +166,12 @@ export class MongoNotificationRepository implements INotificationRepository {
       if (!res) return null;
       return postGotCommentNotiAutoMapper(res);
    };
+
+   deletePostGotCommentNotificationsByPostId = async (
+      postId: string
+   ): Promise<{ deletedCount: number }> => {
+      const res = await notificationModel.deleteMany({ 'metadata.postId': postId });
+      console.log(res);
+      return { deletedCount: res.deletedCount };
+   };
 }
