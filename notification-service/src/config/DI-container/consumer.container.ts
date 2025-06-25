@@ -1,6 +1,7 @@
 import KafkaSingleton from '@infrastructure/event/KafkaSingleton';
 import { FriendReqEventConsumer } from '@presentation/event/FriendreqEventConsumer';
 import {
+   commentLikesNotificationService,
    friendReqAcceptedNotificationService,
    friendReqNotificationService,
    postGotCommnetNotificationService,
@@ -9,6 +10,7 @@ import { elasticSearchProxyService } from './services.contaner';
 import { CommentCreatedEventConsumer } from '@presentation/event/CommentCreatedEvent.consumer';
 import { CommentDeletedEventConsumer } from '@presentation/event/CommentDeletedEvent.consumer';
 import { PostDeletedEventConsumer } from '@presentation/event/PostDeletedEvent.consumer';
+import { CommentLikedEventConsumer } from '@presentation/event/CommentLikedEvent.consumer';
 
 export const friendReqEventConsumer = new FriendReqEventConsumer(
    KafkaSingleton.getInstance(),
@@ -31,4 +33,9 @@ export const commentDeltedEventConsumer = new CommentDeletedEventConsumer(
 export const postDeletedEventConsumer = new PostDeletedEventConsumer(
    KafkaSingleton.getInstance(),
    postGotCommnetNotificationService
+);
+
+export const commentLikedEventConsumer = new CommentLikedEventConsumer(
+   KafkaSingleton.getInstance(),
+   commentLikesNotificationService
 );
