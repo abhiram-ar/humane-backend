@@ -11,6 +11,7 @@ import { Consumer } from 'kafkajs';
 import KafkaSingleton from '@infrastructure/event/KafkaSingleton';
 import { commnetLikeSchema } from '@application/dtos/CommentLike.dto';
 import { ICommentLikesNotificationService } from '@application/usercase/interfaces/ICommentLikesNotificationService.usecase';
+import { io } from '@presentation/websocket/ws';
 
 export class CommentLikedEventConsumer implements IConsumer {
    private consumer: Consumer;
@@ -32,7 +33,6 @@ export class CommentLikedEventConsumer implements IConsumer {
 
       // TODO: turn this into batched operation
       await this.consumer.run({
-         autoCommit: false,
          eachMessage: async ({ message }) => {
             const event = JSON.parse(
                (message.value as Buffer<ArrayBufferLike>).toString()
@@ -56,9 +56,15 @@ export class CommentLikedEventConsumer implements IConsumer {
                   throw new ZodValidationError(error);
                }
 
-               const res = await this._commentLikesNotificationService.create(validatedCommentLike);
+               const noti = await this._commentLikesNotificationService.create(
+                  validatedCommentLike
+               );
                // update the comments in FE, dont push new notifiaction
-
+               if (noti) {
+                  io.to(noti.reciverId).emit('update-noti', {
+                     ...noti,
+                  });
+               }
                logger.info(`processed-> ${event.eventType} ${event.eventId}`);
             } catch (e) {
                logger.error(`error processing: ${event.eventType} ${event.eventId}`);

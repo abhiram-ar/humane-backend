@@ -22,5 +22,6 @@ export const postGotCommnetNotificationService = new PostGotCommentNotificationS
 );
 
 export const commentLikesNotificationService = new CommentLikesNotificationService(
-   notificationRespository
+   notificationRespository,
+   elasticSearchProxyService
 );

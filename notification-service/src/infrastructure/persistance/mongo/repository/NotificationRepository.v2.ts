@@ -176,8 +176,8 @@ export class MongoNotificationRepository implements INotificationRepository {
    deletePostGotCommentNotificationsByPostId = async (
       postId: string
    ): Promise<{ deletedCount: number }> => {
+      // unified notification for all type of notifiaction, if post is deleted
       const res = await notificationModel.deleteMany({ 'metadata.postId': postId });
-      console.log(res);
       return { deletedCount: res.deletedCount };
    };
 
@@ -198,7 +198,7 @@ export class MongoNotificationRepository implements INotificationRepository {
                $each: [
                   { userId: newLike.authorId, likeId: newLike.commentId + '|' + newLike.authorId },
                ],
-               $slice: -1, // restrict the size to 5
+               $slice: -3, // restrict the size to 5
             },
          },
          isRead: false, // make the notification as not read on each upadte
