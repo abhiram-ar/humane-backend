@@ -27,14 +27,34 @@ export class LikeServices implements ILikeServices {
       const deletedLikes = await this._likeRepo.bulkDelete(domainLikes);
       logger.debug(`Deleted ${deletedLikes.length}/${dto.length} likes`);
 
-      // decrement commnet like count
-      const comnetLikeCountdiffMap = new Map<string, number>();
-      domainLikes.forEach((like) => {
-         const prevCountDiff = comnetLikeCountdiffMap.get(like.commentId) ?? 0;
-         comnetLikeCountdiffMap.set(like.commentId, prevCountDiff - 1);
+      const sendDeleteEventPromises = deletedLikes.map(async (like) => {
+         const unlikeCommenteventPayload: CommentLikeEventPayload = {
+            authorId: like.authorId,
+            commentId: like.commentId,
+            createdAt: like.createdAt,
+            updatedAt: like.updatedAt,
+         };
+
+         const commentUnlikedEvent = createEvent(
+            AppEventsTypes.COMMENT_UNLIKED,
+            unlikeCommenteventPayload
+         );
+
+         return await this._eventPublisher.send(
+            MessageBrokerTopics.COMMENT_UNLIKED_EVENT_TOPIC,
+            commentUnlikedEvent
+         );
       });
 
-      // handle author liked or handle in the hasPostAuthorLiked/unlied consumer or here
+      const publishResult = await Promise.all(sendDeleteEventPromises);
+
+      let successCount = 0;
+      publishResult.forEach((res) => res.ack && successCount++);
+      logger.debug(
+         `published ${successCount}/${dto.length} ${AppEventsTypes.COMMENT_UNLIKED} events`
+      );
+
+      // TODO: handle author liked or handle in the hasPostAuthorLiked/unlied consumer or here
    };
 
    bulkInsert = async (dto: BulkCommnetLikeInsertInputDTO): Promise<void> => {
