@@ -3,5 +3,6 @@ import { CommentLikesNotification } from '@domain/entities/CommentLikesNotificat
 
 export interface ICommentLikesNotificationService {
    create(commnetLike: CommnetLikeDTO): Promise<Required<CommentLikesNotification> | null>;
+   deleteALikeFromNotification(commentLike: CommnetLikeDTO): Promise<Required<CommentLikesNotification> | null>;
    deleteCommentLikesNotificationByCommentId(commentId: string): Promise<void>;
 }

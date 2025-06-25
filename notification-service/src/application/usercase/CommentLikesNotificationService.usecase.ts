@@ -12,6 +12,32 @@ export class CommentLikesNotificationService implements ICommentLikesNotificatio
       private readonly _notificationReposotory: INotificationRepository,
       private readonly _esProxyService: IElasticSearchProxyService
    ) {}
+   deleteALikeFromNotification = async (
+      commentLike: CommnetLikeDTO
+   ): Promise<Required<CommentLikesNotification> | null> => {
+      const commentDetails = await this._esProxyService.getCommnetDetailsFromIds(
+         commentLike.commentId
+      );
+      if (!commentDetails || !commentDetails[0]) return null;
+
+      // dont want notification if the comment author itself like the commnet
+      if (commentDetails[0].authorId === commentLike.authorId) return null;
+
+      const domainCommentLikeNoti: CommentLikesNotification = {
+         type: COMMENT_LIKES_NOTIFICATION_TYPE,
+         reciverId: commentDetails[0].authorId,
+         entityId: commentLike.commentId,
+         metadata: {
+            postId: commentDetails[0].postId,
+            recentLikes: [],
+         },
+      };
+
+      return await this._notificationReposotory.deleteALikeFromCommentLikesNotification(
+         commentLike,
+         domainCommentLikeNoti
+      );
+   };
 
    create = async (
       commnetLike: CommnetLikeDTO
@@ -34,12 +60,10 @@ export class CommentLikesNotificationService implements ICommentLikesNotificatio
          },
       };
 
-      const res = await this._notificationReposotory.upsertCommentLikesNotification(
+      return await this._notificationReposotory.upsertCommentLikesNotification(
          commnetLike,
          newCommentLikesNoti
       );
-
-      return res;
    };
 
    deleteCommentLikesNotificationByCommentId = async (commentId: string): Promise<void> => {

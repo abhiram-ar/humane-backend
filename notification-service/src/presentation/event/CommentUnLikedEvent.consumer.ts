@@ -14,22 +14,22 @@ import { ICommentLikesNotificationService } from '@application/usercase/interfac
 import { io } from '@presentation/websocket/ws';
 import { isUserOnline } from '@presentation/websocket/utils/isUserOnline';
 
-export class CommentLikedEventConsumer implements IConsumer {
+export class CommentUnLikedEventConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(
       private readonly _kafka: KafkaSingleton,
       private readonly _commentLikesNotificationService: ICommentLikesNotificationService
    ) {
-      this.consumer = this._kafka.createConsumer('notification-srv-comment-liked-v1');
+      this.consumer = this._kafka.createConsumer('notification-srv-comment-unliked-v1');
    }
 
    start = async () => {
       await this.consumer.connect();
-      logger.info('Comment liked event consumer connected ');
+      logger.info('Comment unliked event consumer connected ');
 
       await this.consumer.subscribe({
-         topic: MessageBrokerTopics.COMMENT_LIKED_EVENT_TOPIC,
+         topic: MessageBrokerTopics.COMMENT_UNLIKED_EVENT_TOPIC,
       });
 
       // TODO: turn this into batched operation
@@ -43,7 +43,7 @@ export class CommentLikedEventConsumer implements IConsumer {
             // logger.verbose(JSON.stringify(event, null, 2));
 
             try {
-               if (event.eventType != AppEventsTypes.COMMENT_LIKED) {
+               if (event.eventType != AppEventsTypes.COMMENT_UNLIKED) {
                   throw new EventConsumerMissMatchError();
                }
 
@@ -57,17 +57,18 @@ export class CommentLikedEventConsumer implements IConsumer {
                   throw new ZodValidationError(error);
                }
 
-               const noti = await this._commentLikesNotificationService.create(
+               const noti = await this._commentLikesNotificationService.deleteALikeFromNotification(
                   validatedCommentLike
                );
 
                if (noti && (await isUserOnline(noti.reciverId))) {
-                  // we are creating notification and likeCount === 1 => fresh notificaion
-                  if (noti.metadata.likeCount && noti.metadata.likeCount === 1) {
-                     io.to(noti.reciverId).emit('push-noti', noti);
+                  if (noti.metadata.likeCount! <= 0) {
+                     io.to(noti.reciverId).emit('remove-noti', noti);
+                  } else {
+                     io.to(noti.reciverId).emit('update-noti', noti);
                   }
-                  io.to(noti.reciverId).emit('update-noti', noti);
                }
+
                logger.info(`processed-> ${event.eventType} ${event.eventId}`);
             } catch (e) {
                logger.error(`error processing: ${event.eventType} ${event.eventId}`);

@@ -202,7 +202,7 @@ export class MongoNotificationRepository implements INotificationRepository {
                $each: [
                   { userId: newLike.authorId, likeId: newLike.commentId + '|' + newLike.authorId },
                ],
-               $slice: -3, // restrict the size to 5
+               $slice: -2, // restrict the size to 3
             },
          },
          isRead: false, // make the notification as not read on each upadte
@@ -236,6 +236,40 @@ export class MongoNotificationRepository implements INotificationRepository {
       if (!newNoti) return null;
 
       return commentLikesNotiAutoMapper(newNoti);
+   };
+
+   deleteALikeFromCommentLikesNotification = async (
+      likeToDelete: CommnetLikeDTO,
+      likeNoti: CommentLikesNotification
+   ): Promise<Required<CommentLikesNotification> | null> => {
+      const filter: FilterQuery<ICommentLikesNotificationDocument> = {
+         reciverId: likeNoti.reciverId,
+         entityId: likeNoti.entityId,
+         type: likeNoti.type,
+      };
+
+      const updatedNotification = await commnetLikesNotificationModel.findOneAndUpdate(
+         filter,
+         {
+            $inc: { 'metadata.likeCount': -1 },
+            $pull: {
+               'metadata.recentLikes': {
+                  userId: likeToDelete.authorId,
+                  likeId: likeToDelete.commentId + '|' + likeToDelete.authorId,
+               },
+            },
+         },
+         { new: true }
+      );
+
+      if (!updatedNotification) return null;
+
+      if (updatedNotification.metadata.likeCount <= 0) {
+         await commnetLikesNotificationModel.deleteOne(filter);
+         logger.debug('commnet likes reached 0, so deleted full notification document');
+      }
+
+      return commentLikesNotiAutoMapper(updatedNotification);
    };
 
    deleteCommentLikesNotificationByCommentId = async (commentId: string) => {

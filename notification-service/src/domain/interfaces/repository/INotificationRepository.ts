@@ -54,5 +54,10 @@ export interface INotificationRepository {
       noti: CommentLikesNotification
    ): Promise<Required<CommentLikesNotification> | null>;
 
+   deleteALikeFromCommentLikesNotification(
+      likeToDelete: CommnetLikeDTO,
+      noti: CommentLikesNotification
+   ): Promise<Required<CommentLikesNotification> | null>;
+
    deleteCommentLikesNotificationByCommentId(commentId: string): Promise<void>;
 }
