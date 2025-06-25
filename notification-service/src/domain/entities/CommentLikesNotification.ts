@@ -7,6 +7,8 @@ export class CommentLikesNotification implements Partial<Notification> {
    public readonly createdAt?: string;
    public id?: string;
    public isRead?: boolean;
+   public readonly actorId?: string | undefined; // majority of the cases this notification will not have actorId, actors are in recentLikes
+
    constructor(
       public reciverId: string,
       public entityId: string, // here the entity reffered will be commentId

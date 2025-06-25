@@ -44,7 +44,7 @@ export class UserNotificationController {
 
          const notiToActionableUserMap = new Map<string, string>();
          noti.forEach((combinedNoti) => {
-            if (combinedNoti.actorId) {
+            if (combinedNoti?.actorId) {
                notiToActionableUserMap.set(combinedNoti.id!, combinedNoti.actorId);
             }
          });

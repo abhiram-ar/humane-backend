@@ -18,6 +18,7 @@ export const commentLikesNotiAutoMapper = (
          likeCount: doc.metadata.likeCount,
          recentLikes: doc.metadata.recentLikes,
       },
+      actorId: undefined!,
    };
    return domainCommnetLikesNoti;
 };

@@ -13,13 +13,15 @@ import { commentSchema } from '@application/dtos/Comment.dto';
 import { IPostGotCommentNotificationService } from '@application/usercase/interfaces/IPostGotCommentNotification.usecase';
 import { isUserOnline } from '@presentation/websocket/utils/isUserOnline';
 import { io } from '@presentation/websocket/ws';
+import { ICommentLikesNotificationService } from '@application/usercase/interfaces/ICommentLikesNotificationService.usecase';
 
 export class CommentDeletedEventConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(
       private readonly _kafka: KafkaSingleton,
-      private readonly _postGotCommentNotification: IPostGotCommentNotificationService
+      private readonly _postGotCommentNotification: IPostGotCommentNotificationService,
+      private readonly _commentlikedNotification: ICommentLikesNotificationService
    ) {
       this.consumer = this._kafka.createConsumer('notification-srv-comment-deleted-v1');
    }
@@ -54,12 +56,15 @@ export class CommentDeletedEventConsumer implements IConsumer {
                const noti = await this._postGotCommentNotification.deleteNotificationByCommentId(
                   validatedComment.data.id
                );
-
                if (noti && (await isUserOnline(noti.reciverId))) {
                   io.to(noti.reciverId).emit('remove-noti', {
                      ...noti,
                   });
                }
+
+               await this._commentlikedNotification.deleteCommentLikesNotificationByCommentId(
+                  validatedComment.data.id
+               );
 
                logger.info(`processed-> ${event.eventType} ${event.eventId}`);
             } catch (e) {

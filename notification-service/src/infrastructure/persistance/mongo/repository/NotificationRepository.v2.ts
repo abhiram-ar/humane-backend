@@ -23,10 +23,14 @@ import {
 import { postGotCommentNotiAutoMapper } from '../automapper/postGotCommnetNotiAutoMapper';
 import { friendReqNotificationAutoMapper } from '../automapper/friendReqNotification.automapper';
 import { friendReqAcceptedAutoMapper } from '../automapper/friendReqAcceptedNoti.automapper';
-import { CommentLikesNotification } from '@domain/entities/CommentLikesNotification';
+import {
+   COMMENT_LIKES_NOTIFICATION_TYPE,
+   CommentLikesNotification,
+} from '@domain/entities/CommentLikesNotification';
 import { FilterQuery, UpdateQuery } from 'mongoose';
 import { CommnetLikeDTO } from '@application/dtos/CommentLike.dto';
 import { commentLikesNotiAutoMapper } from '../automapper/commentLikesNotification.automapper';
+import { logger } from '@config/logger';
 
 export class MongoNotificationRepository implements INotificationRepository {
    constructor() {}
@@ -204,7 +208,7 @@ export class MongoNotificationRepository implements INotificationRepository {
          isRead: false, // make the notification as not read on each upadte
       };
 
-      const existing = await commnetLikesNotificationModel.find(filter);
+      const existing = await commnetLikesNotificationModel.findOne(filter);
       if (existing) {
          await commnetLikesNotificationModel.updateOne(filter, update, {
             upsert: true,
@@ -232,5 +236,15 @@ export class MongoNotificationRepository implements INotificationRepository {
       if (!newNoti) return null;
 
       return commentLikesNotiAutoMapper(newNoti);
+   };
+
+   deleteCommentLikesNotificationByCommentId = async (commentId: string) => {
+      const deleted = await commnetLikesNotificationModel.deleteMany({
+         entityId: commentId,
+         type: COMMENT_LIKES_NOTIFICATION_TYPE,
+      });
+      logger.debug(
+         `delted ${deleted.deletedCount} commentlikeNotification realted to comment(${commentId})`
+      );
    };
 }

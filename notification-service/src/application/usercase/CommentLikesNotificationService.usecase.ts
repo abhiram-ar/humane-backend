@@ -21,6 +21,9 @@ export class CommentLikesNotificationService implements ICommentLikesNotificatio
       );
       if (!commentDetails || !commentDetails[0]) return null;
 
+      // dont want notification if the comment author itself like the commnet
+      if (commentDetails[0].authorId === commnetLike.authorId) return null;
+
       const newCommentLikesNoti: CommentLikesNotification = {
          type: COMMENT_LIKES_NOTIFICATION_TYPE,
          reciverId: commentDetails[0].authorId,
@@ -37,5 +40,9 @@ export class CommentLikesNotificationService implements ICommentLikesNotificatio
       );
 
       return res;
+   };
+
+   deleteCommentLikesNotificationByCommentId = async (commentId: string): Promise<void> => {
+      await this._notificationReposotory.deleteCommentLikesNotificationByCommentId(commentId);
    };
 }
