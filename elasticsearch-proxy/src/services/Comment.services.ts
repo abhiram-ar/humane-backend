@@ -40,4 +40,7 @@ export class CommentService implements ICommentService {
       const res = await this._commentRepo.getPostComments(dto.postId, dto.from, dto.limit);
       return { comments: res.comments, pagination: { from: res.from, hasMore: res.hasMore } };
    };
+   getCommentByIds = async (commentId: string[]): Promise<(ICommentDocument | null)[]> => {
+      return this._commentRepo.getByIds(commentId);
+   };
 }

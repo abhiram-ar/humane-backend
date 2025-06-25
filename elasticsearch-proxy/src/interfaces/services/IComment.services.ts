@@ -11,4 +11,6 @@ export interface ICommentService {
    getPostComments(
       dto: GetCommentsInputDTO
    ): Promise<{ comments: ICommentDocument[]; pagination: InfiniteScrollParamsV2 }>;
+
+   getCommentByIds(commentId: string[]): Promise<(ICommentDocument | null)[]>;
 }
