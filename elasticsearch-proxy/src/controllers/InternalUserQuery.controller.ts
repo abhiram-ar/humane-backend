@@ -1,20 +1,22 @@
 import { paginatedSearchSchema } from 'interfaces/dto/paginatedSearch.dto';
-import { UserServices } from '@services/User.services';
 import { Request, Response, NextFunction } from 'express';
 import { GenericError, HttpStatusCodes, ZodValidationError } from 'humane-common';
 import {
    HydrartePostDetailsInputDTO,
    hydratePostDetailsSchema,
 } from 'interfaces/dto/post/HydratePostDetails.dto';
-import { PostService } from '@services/Post.services';
 import { GetBasicUserProfileFromIdsOutputDTO } from 'interfaces/dto/GetUserBasicProfileFromIDs';
 import { HttpStatusCode } from 'axios';
+import { ICommentService } from 'interfaces/services/IComment.services';
+import { IPostService } from 'interfaces/services/IPost.services';
+import { IUserServices } from 'interfaces/services/IUser.services';
 
 // TODO: rename to common internal controller
 export class InternalQueryController {
    constructor(
-      private readonly _userSerives: UserServices,
-      private readonly _postServices: PostService
+      private readonly _userSerives: IUserServices,
+      private readonly _postServices: IPostService,
+      private readonly _commnetServiecs: ICommentService
    ) {}
 
    searchUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -100,6 +102,26 @@ export class InternalQueryController {
          res.status(HttpStatusCodes.OK).json({
             data: { posts: authorDetailsHydratedPosts },
          });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getCommentDataFromIds = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const commentId = req.query.commentId;
+         let ids: string[];
+         if (typeof commentId === 'string') {
+            ids = [commentId];
+         } else if (Array.isArray(commentId)) {
+            ids = commentId as string[];
+         } else {
+            throw new GenericError('bad commentId');
+         }
+
+         const comments = await this._commnetServiecs.getCommentByIds(ids);
+
+         res.status(HttpStatusCode.Ok).json({ data: { comments } });
       } catch (error) {
          next(error);
       }

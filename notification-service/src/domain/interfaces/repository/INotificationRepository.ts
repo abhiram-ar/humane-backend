@@ -1,4 +1,6 @@
+import { CommnetLikeDTO } from '@application/dtos/CommentLike.dto';
 import { CombinedNotification } from '@domain/entities/CombinedNotification';
+import { CommentLikesNotification } from '@domain/entities/CommentLikesNotification';
 import { FriendReqAcceptedNotification } from '@domain/entities/FriendReqAcceptedNotification.entity';
 import {
    FriendReqNotification,
@@ -46,4 +48,16 @@ export interface INotificationRepository {
    ): Promise<Required<PostGotCommentNotification> | null>;
 
    deletePostGotCommentNotificationsByPostId(postId: string): Promise<{ deletedCount: number }>;
+
+   upsertCommentLikesNotification(
+      newLike: CommnetLikeDTO,
+      noti: CommentLikesNotification
+   ): Promise<Required<CommentLikesNotification> | null>;
+
+   deleteALikeFromCommentLikesNotification(
+      likeToDelete: CommnetLikeDTO,
+      noti: CommentLikesNotification
+   ): Promise<Required<CommentLikesNotification> | null>;
+
+   deleteCommentLikesNotificationByCommentId(commentId: string): Promise<void>;
 }

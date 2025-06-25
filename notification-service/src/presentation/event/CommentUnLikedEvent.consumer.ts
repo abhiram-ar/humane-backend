@@ -9,31 +9,30 @@ import {
 } from 'humane-common';
 import { Consumer } from 'kafkajs';
 import KafkaSingleton from '@infrastructure/event/KafkaSingleton';
-import { commentSchema } from '@application/dtos/Comment.dto';
-import { IPostGotCommentNotificationService } from '@application/usercase/interfaces/IPostGotCommentNotification.usecase';
-import { isUserOnline } from '@presentation/websocket/utils/isUserOnline';
-import { io } from '@presentation/websocket/ws';
+import { commnetLikeSchema } from '@application/dtos/CommentLike.dto';
 import { ICommentLikesNotificationService } from '@application/usercase/interfaces/ICommentLikesNotificationService.usecase';
+import { io } from '@presentation/websocket/ws';
+import { isUserOnline } from '@presentation/websocket/utils/isUserOnline';
 
-export class CommentDeletedEventConsumer implements IConsumer {
+export class CommentUnLikedEventConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(
       private readonly _kafka: KafkaSingleton,
-      private readonly _postGotCommentNotification: IPostGotCommentNotificationService,
-      private readonly _commentlikedNotification: ICommentLikesNotificationService
+      private readonly _commentLikesNotificationService: ICommentLikesNotificationService
    ) {
-      this.consumer = this._kafka.createConsumer('notification-srv-comment-deleted-v1');
+      this.consumer = this._kafka.createConsumer('notification-srv-comment-unliked-v1');
    }
 
    start = async () => {
       await this.consumer.connect();
-      logger.info('Comment deleted event consumer connected ');
+      logger.info('Comment unliked event consumer connected ');
 
       await this.consumer.subscribe({
-         topic: MessageBrokerTopics.COMMENT_DELTED_EVENTS_TOPIC,
+         topic: MessageBrokerTopics.COMMENT_UNLIKED_EVENT_TOPIC,
       });
 
+      // TODO: turn this into batched operation
       await this.consumer.run({
          eachMessage: async ({ message }) => {
             const event = JSON.parse(
@@ -44,27 +43,31 @@ export class CommentDeletedEventConsumer implements IConsumer {
             // logger.verbose(JSON.stringify(event, null, 2));
 
             try {
-               if (event.eventType != AppEventsTypes.COMMENT_DELTED) {
+               if (event.eventType != AppEventsTypes.COMMENT_UNLIKED) {
                   throw new EventConsumerMissMatchError();
                }
-               const validatedComment = commentSchema.safeParse(event.payload);
 
-               if (!validatedComment.success) {
-                  throw new ZodValidationError(validatedComment.error);
+               const {
+                  data: validatedCommentLike,
+                  error,
+                  success,
+               } = commnetLikeSchema.safeParse(event.payload);
+
+               if (!success) {
+                  throw new ZodValidationError(error);
                }
 
-               const noti = await this._postGotCommentNotification.deleteNotificationByCommentId(
-                  validatedComment.data.id
+               const noti = await this._commentLikesNotificationService.deleteALikeFromNotification(
+                  validatedCommentLike
                );
+
                if (noti && (await isUserOnline(noti.reciverId))) {
-                  io.to(noti.reciverId).emit('remove-noti', {
-                     ...noti,
-                  });
+                  if (noti.metadata.likeCount! <= 0) {
+                     io.to(noti.reciverId).emit('remove-noti', noti);
+                  } else {
+                     io.to(noti.reciverId).emit('update-noti', noti);
+                  }
                }
-
-               await this._commentlikedNotification.deleteCommentLikesNotificationByCommentId(
-                  validatedComment.data.id
-               );
 
                logger.info(`processed-> ${event.eventType} ${event.eventId}`);
             } catch (e) {

@@ -4,6 +4,8 @@ import { axiosESproxyService } from '@infrastructure/http/axiosESproxy';
 import { IElasticSearchProxyService } from '@ports/IElasticSearchProxyService';
 import { GetUserBasicDetailsResponse } from '@presentation/event/Types/GetUserBasicDetails Response';
 import { GetPostsAPIResponse } from './Types/GetPostAPIResponse';
+import { Comment } from '@application/dtos/Comment.dto';
+import { GetCommentsAPIResponse } from './Types/GetCommentsAPIResponse';
 
 export class ElasticSearchProxyService implements IElasticSearchProxyService {
    getUserBasicDetails = async (
@@ -33,5 +35,22 @@ export class ElasticSearchProxyService implements IElasticSearchProxyService {
          }
       );
       return res.data.data.posts;
+   };
+
+   getCommnetDetailsFromIds = async (
+      commentIds: string | string[]
+   ): Promise<(Comment | null)[]> => {
+      if (!commentIds || commentIds.length === 0) return [];
+
+      const res = await axiosESproxyService.get<GetCommentsAPIResponse>(
+         '/api/v1/query/internal/comment',
+         {
+            params: { commentId: commentIds },
+            paramsSerializer: {
+               indexes: null,
+            },
+         }
+      );
+      return res.data.data.comments;
    };
 }

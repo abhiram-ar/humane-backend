@@ -10,7 +10,11 @@ import { PublicUserQueryController } from 'controllers/PublicUserQuery.controlle
 import { PublicPostQueryControllet } from 'controllers/PublicPostQuery.controller';
 import { PublicCommentController } from 'controllers/PublicCommentQuery.controller';
 
-export const internalQueryController = new InternalQueryController(userServices, postServices);
+export const internalQueryController = new InternalQueryController(
+   userServices,
+   postServices,
+   commentServices
+);
 export const publicUserQueryController = new PublicUserQueryController(userServices);
 export const publicPostQueryController = new PublicPostQueryControllet(
    postServices,

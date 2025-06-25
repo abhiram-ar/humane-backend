@@ -1,4 +1,5 @@
 import { CombinedNotificationType } from '@domain/entities/CombinedNotification';
+import { COMMENT_LIKES_NOTIFICATION_TYPE } from '@domain/entities/CommentLikesNotification';
 import { FRIEND_REQ_ACCEPTED_NOTIFICATION_TYPE } from '@domain/entities/FriendReqAcceptedNotification.entity';
 import {
    FRIEND_REQ_NOTIFICATION_TYPE,
@@ -115,7 +116,10 @@ const postGotCommentNotificationSchema = new mongoose.Schema<IPostGotCommnetNoti
    },
    { discriminatorKey: 'type' }
 );
-postGotCommentNotificationSchema.index({ entityId: 1, 'metadata.postId': 1 }, { unique: true });
+postGotCommentNotificationSchema.index(
+   { type: 1, entityId: 1, 'metadata.postId': 1 },
+   { unique: true }
+);
 
 const postGotCommnetNotificationModel =
    notificationModel.discriminator<IPostGotCommnetNotificationDocument>(
@@ -123,16 +127,53 @@ const postGotCommnetNotificationModel =
       postGotCommentNotificationSchema
    );
 
+// ---------------------- Comment-liked distriminator ------------------
+export interface ICommentLikesNotificationDocument extends IBaseNotificationDocument {
+   metadata: {
+      postId: string;
+      likeCount: number;
+      recentLikes: { userId: string; likeId: string }[];
+   };
+   type: typeof COMMENT_LIKES_NOTIFICATION_TYPE; // ensure type discriminator is included
+}
+
+const commentLikesNotificationSchema = new mongoose.Schema<ICommentLikesNotificationDocument>(
+   {
+      metadata: {
+         postId: {
+            type: String,
+            required: true,
+         },
+         likeCount: { type: Number, required: true },
+         recentLikes: [
+            {
+               userId: { type: String, required: true },
+               likeId: { type: String, required: true },
+            },
+         ],
+      },
+   },
+   { discriminatorKey: 'type' }
+);
+
+const commnetLikesNotificationModel =
+   notificationModel.discriminator<ICommentLikesNotificationDocument>(
+      COMMENT_LIKES_NOTIFICATION_TYPE,
+      commentLikesNotificationSchema
+   );
+
 // ------------------ Combined notifcation Documents --------------------
 export type INotificationDocument =
    | IFriendRequestNotificationDocument
    | IFriendRequestAcceptedNotificationDocument
-   | IPostGotCommnetNotificationDocument;
+   | IPostGotCommnetNotificationDocument
+   | ICommentLikesNotificationDocument;
 
 // ----------------------------models-======================-----------
 export {
    friendReqNotificationModel,
    friendReqAcceptedNotificationModel,
    postGotCommnetNotificationModel,
+   commnetLikesNotificationModel,
 };
 export default notificationModel;

@@ -1,4 +1,8 @@
 import {
+   COMMENT_LIKES_NOTIFICATION_TYPE,
+   CommentLikesNotification,
+} from './CommentLikesNotification';
+import {
    FRIEND_REQ_ACCEPTED_NOTIFICATION_TYPE,
    FriendReqAcceptedNotification,
 } from './FriendReqAcceptedNotification.entity';
@@ -15,8 +19,10 @@ export const CombinedNotificationType = {
    FRIEND_REQ_NOTIFICATION_TYPE,
    FRIEND_REQ_ACCEPTED_NOTIFICATION_TYPE,
    POST_GOT_COMMNET_NOTIFICATION_TYPE,
+   COMMENT_LIKES_NOTIFICATION_TYPE,
 } as const;
 export type CombinedNotification =
    | FriendReqNotification
    | FriendReqAcceptedNotification
-   | PostGotCommentNotification;
+   | PostGotCommentNotification
+   | CommentLikesNotification;
