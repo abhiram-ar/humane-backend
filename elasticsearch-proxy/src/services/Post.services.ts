@@ -3,7 +3,7 @@ import { HydrartePostDetailsInputDTO } from 'interfaces/dto/post/HydratePostDeta
 import { PostInputDTO } from 'interfaces/dto/post/Post.dto';
 import { IPostRepository } from 'interfaces/repository/IPostRepository';
 import { CDNService } from './CDN.services';
-import { IPostDocument, PostVisibility } from 'interfaces/IPostDocument';
+import { IPostDocument } from 'interfaces/IPostDocument';
 import { GetUserTimelineInputDTO } from 'interfaces/dto/post/GetUserTimeline.dto';
 import { IPostService } from 'interfaces/services/IPost.services';
 

@@ -26,12 +26,20 @@ export class PostRepository implements IPostRepository {
                   id: { type: 'keyword' },
                   authorId: { type: 'keyword' },
                   content: { type: 'text' },
-                  posterKey: { type: 'keyword', index: false },
                   visibility: { type: 'keyword' },
+                  hashtags: { type: 'nested' },
+
+                  attachmentType: { type: 'keyword' },
+                  rawAttachmentKey: { type: 'keyword', index: false },
+                  attachmentStatus: { type: 'keyword' },
+                  processedAttachmentKey: { type: 'keyword', index: false },
+
                   moderationStatus: { type: 'keyword' },
                   moderationMetadata: { type: 'object' },
+
                   createdAt: { type: 'date' }, // this is interpreated as iso data string in elastic search, covert the toISODataString() before injesting
                   updatedAt: { type: 'date', index: false },
+
                   commentCount: { type: 'integer', index: false },
                },
             },

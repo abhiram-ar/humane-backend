@@ -1,23 +1,27 @@
-import { PostEventPayload } from 'humane-common';
+import {
+   ModerationStatus,
+   PostAttachmentStatus,
+   PostAttachmentType,
+   PostEventPayload,
+   PostVisibility,
+} from 'humane-common';
 import { z } from 'zod';
-
-export const PostVisibility = {
-   PUBLIC: 'public',
-   FRIENDS: 'friends',
-} as const;
-
-export const ModerationStatus = {
-   PENDING: 'pending',
-   OK: 'ok',
-   NOT_APPROPRIATE: 'notAppropriate',
-} as const;
 
 export const postSchema = z.object({
    id: z.string(),
    authorId: z.string(),
    content: z.string().nonempty().max(256),
-   posterKey: z.string().nullable(),
    visibility: z.enum([PostVisibility.FRIENDS, PostVisibility.PUBLIC]),
+   hashtags: z.array(z.string()),
+
+   attachmentType: z.enum([PostAttachmentType.PHOTO, PostAttachmentType.VIDEO]),
+   attachmentStatus: z.enum([
+      PostAttachmentStatus.READY,
+      PostAttachmentStatus.PROCESSING,
+      PostAttachmentStatus.ERROR,
+   ]),
+   rawAttachmentKey: z.string().nullish().optional(),
+   processedAttachmentKey: z.string().nullish().optional(),
 
    moderationStatus: z.enum([
       ModerationStatus.PENDING,
