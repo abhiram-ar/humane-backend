@@ -14,12 +14,14 @@ export const postSchema = z.object({
    visibility: z.enum([PostVisibility.FRIENDS, PostVisibility.PUBLIC]),
    hashtags: z.array(z.string()),
 
-   attachmentType: z.enum([PostAttachmentType.PHOTO, PostAttachmentType.VIDEO]),
-   attachmentStatus: z.enum([
-      PostAttachmentStatus.READY,
-      PostAttachmentStatus.PROCESSING,
-      PostAttachmentStatus.ERROR,
-   ]),
+   attachmentType: z.enum([PostAttachmentType.PHOTO, PostAttachmentType.VIDEO]).optional(),
+   attachmentStatus: z
+      .enum([
+         PostAttachmentStatus.READY,
+         PostAttachmentStatus.PROCESSING,
+         PostAttachmentStatus.ERROR,
+      ])
+      .optional(),
    rawAttachmentKey: z.string().nullish().optional(),
    processedAttachmentKey: z.string().nullish().optional(),
 
