@@ -1,9 +1,4 @@
-import {
-   ModerationStatus,
-   PostAttachmentStatus,
-   PostAttachmentType,
-   PostVisibility,
-} from 'humane-common';
+import { ModerationStatus, PostAttachmentStatus, PostVisibility } from 'humane-common';
 import { UserBasicDetails } from './UserBasicDetails';
 
 export type HydratedPost = {
@@ -15,7 +10,7 @@ export type HydratedPost = {
    visibility: (typeof PostVisibility)[keyof typeof PostVisibility];
    hashtags: string[];
 
-   attachmentType?: (typeof PostAttachmentType)[keyof typeof PostAttachmentType];
+   attachmentType?: string | null;
    rawAttachmentKey?: string | null;
    attachmentStatus?: (typeof PostAttachmentStatus)[keyof typeof PostAttachmentStatus];
    attachmentURL?: string | null;

@@ -1,7 +1,6 @@
 import {
    ModerationStatus,
    PostAttachmentStatus,
-   PostAttachmentType,
    PostEventPayload,
    PostVisibility,
 } from 'humane-common';
@@ -14,10 +13,7 @@ export const postSchema = z.object({
    visibility: z.enum([PostVisibility.FRIENDS, PostVisibility.PUBLIC]),
    hashtags: z.array(z.string()),
 
-   attachmentType: z
-      .enum([PostAttachmentType.PHOTO, PostAttachmentType.VIDEO])
-      .nullish()
-      .optional(),
+   attachmentType: z.string().nullish().optional(),
    attachmentStatus: z
       .enum([
          PostAttachmentStatus.READY,
