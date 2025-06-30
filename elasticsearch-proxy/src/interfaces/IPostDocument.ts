@@ -1,9 +1,4 @@
-import {
-   ModerationStatus,
-   PostAttachmentStatus,
-   PostAttachmentType,
-   PostVisibility,
-} from 'humane-common';
+import { ModerationStatus, PostAttachmentStatus, PostVisibility } from 'humane-common';
 
 export type IPostDocument = {
    id: string;
@@ -12,7 +7,7 @@ export type IPostDocument = {
    visibility: (typeof PostVisibility)[keyof typeof PostVisibility];
    hashtags: string[];
 
-   attachmentType?: (typeof PostAttachmentType)[keyof typeof PostAttachmentType];
+   attachmentType?: string | null;
    rawAttachmentKey?: string | null;
    attachmentStatus?: (typeof PostAttachmentStatus)[keyof typeof PostAttachmentStatus];
    processedAttachmentKey?: string | null;
