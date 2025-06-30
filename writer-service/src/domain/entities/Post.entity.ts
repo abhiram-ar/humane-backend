@@ -9,8 +9,7 @@ export const ModerationStatus = {
    NOT_APPROPRIATE: 'notAppropriate',
 } as const;
 
-export const PostAttachmentType = { PHOTO: 'photo', VIDEO: 'video' } as const;
-
+export const PostAttachmentType = { PHOTO: 'image', VIDEO: 'video' } as const;
 export const PostAttachmentStatus = {
    READY: 'ready',
    PROCESSING: 'processing',

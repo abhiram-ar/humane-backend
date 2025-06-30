@@ -1,4 +1,4 @@
-import { Post } from '@domain/entities/Post.entity';
+import { Post, PostAttachmentStatus } from '@domain/entities/Post.entity';
 import { IPostRepository } from '@domain/repository/IPostRepository';
 import postModel from '../Models/postModel';
 import { postAutoMapper } from '../mapper/postAutoMapper';
@@ -9,7 +9,11 @@ export class PostRepository implements IPostRepository {
          authorId: post.authorId,
          content: post.content,
          visibility: post.visibility,
-         posterKey: post.posterKey,
+         attachmentType: post.attachmentType,
+         rawAttachmentKey: post.rawAttachmentKey,
+         processedAttachmentKey: post.rawAttachmentKey,
+         attachmentStatus: PostAttachmentStatus.READY, // override - change this when there is a plan to transcode video
+         hashtags: post.hashtags,
       });
 
       return postAutoMapper(res);

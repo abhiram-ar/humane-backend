@@ -24,7 +24,7 @@ const postSchema = new mongoose.Schema<IPostDocumnet>(
       rawAttachmentKey: { type: String, required: false },
       attachmentStatus: {
          type: String,
-         enum: [...Object.values(PostAttachmentType)],
+         enum: [...Object.values(PostAttachmentStatus)],
          default: PostAttachmentStatus.PROCESSING,
       },
       processedAttachmentKey: { type: String, required: false },
