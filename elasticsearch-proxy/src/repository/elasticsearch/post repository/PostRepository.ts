@@ -27,7 +27,7 @@ export class PostRepository implements IPostRepository {
                   authorId: { type: 'keyword' },
                   content: { type: 'text' },
                   visibility: { type: 'keyword' },
-                  hashtags: { type: 'nested' },
+                  hashtags: { type: 'keyword' },
 
                   attachmentType: { type: 'keyword' },
                   rawAttachmentKey: { type: 'keyword', index: false },
