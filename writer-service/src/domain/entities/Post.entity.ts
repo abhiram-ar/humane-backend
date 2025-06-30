@@ -9,6 +9,14 @@ export const ModerationStatus = {
    NOT_APPROPRIATE: 'notAppropriate',
 } as const;
 
+export const PostAttachmentType = { PHOTO: 'photo', VIDEO: 'video' } as const;
+
+export const PostAttachmentStatus = {
+   READY: 'ready',
+   PROCESSING: 'processing',
+   ERROR: 'error',
+} as const;
+
 export class Post {
    public readonly id?: string;
    public readonly createdAt?: Date;
@@ -16,10 +24,16 @@ export class Post {
 
    public moderationStatus?: (typeof ModerationStatus)[keyof typeof ModerationStatus];
    public moderationMetadata: any | null;
+
+   public attachmentStatus?: (typeof PostAttachmentStatus)[keyof typeof PostAttachmentStatus];
+   public processedAttachmentKey?: string | null;
    constructor(
       public authorId: string,
       public content: string,
       public visibility: (typeof PostVisibility)[keyof typeof PostVisibility],
-      public posterKey?: string | null
+      public hashtags: string[],
+
+      public attachmentType?: (typeof PostAttachmentType)[keyof typeof PostAttachmentType],
+      public rawAttachmentKey?: string | null
    ) {}
 }

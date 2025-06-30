@@ -1,4 +1,10 @@
-import { ModerationStatus, Post, PostVisibility } from '@domain/entities/Post.entity';
+import {
+   ModerationStatus,
+   Post,
+   PostAttachmentStatus,
+   PostAttachmentType,
+   PostVisibility,
+} from '@domain/entities/Post.entity';
 import mongoose, { Document } from 'mongoose';
 
 export interface IPostDocumnet extends Required<Omit<Post, 'id'>>, Document {}
@@ -8,10 +14,24 @@ const postSchema = new mongoose.Schema<IPostDocumnet>(
       authorId: { type: String, required: true },
       content: { type: String, required: true },
       visibility: { type: String, enum: Object.values(PostVisibility) },
-      posterKey: { type: String, required: false },
+      hashtags: { type: [String], default: [] },
+
+      attachmentType: {
+         type: String,
+         enum: [...Object.values(PostAttachmentType)],
+         required: false,
+      },
+      rawAttachmentKey: { type: String, required: false },
+      attachmentStatus: {
+         type: String,
+         enum: [...Object.values(PostAttachmentType)],
+         default: PostAttachmentStatus.PROCESSING,
+      },
+      processedAttachmentKey: { type: String, required: false },
+
       moderationStatus: {
          type: String,
-         enum: [ModerationStatus.PENDING, ModerationStatus.OK, ModerationStatus.NOT_APPROPRIATE],
+         enum: [...Object.values(ModerationStatus)],
          default: ModerationStatus.PENDING,
       },
       moderationMetadata: { type: Object },
