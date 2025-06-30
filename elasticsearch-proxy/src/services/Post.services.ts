@@ -6,6 +6,7 @@ import { CDNService } from './CDN.services';
 import { IPostDocument } from 'interfaces/IPostDocument';
 import { GetUserTimelineInputDTO } from 'interfaces/dto/post/GetUserTimeline.dto';
 import { IPostService } from 'interfaces/services/IPost.services';
+import { PostVisibility } from 'humane-common';
 
 export class PostService implements IPostService {
    constructor(
@@ -40,19 +41,21 @@ export class PostService implements IPostService {
 
    getPostByIds = async (
       postIds: HydrartePostDetailsInputDTO
-   ): Promise<((Omit<IPostDocument, 'posterKey'> & { posterURL: string | null }) | null)[]> => {
+   ): Promise<
+      ((Omit<IPostDocument, 'processedAttachmentKey'> & { attachmentURL: string | null }) | null)[]
+   > => {
       const posts = await this._postRepo.getByIds(postIds);
 
       const MediaURLhydratedPosts = posts.map((post) => {
          if (!post) return null;
 
-         const { posterKey, ...data } = post;
-         let posterURL: string | null = null;
-         if (posterKey) {
-            posterURL = this._cdnService.getPublicCDNURL(posterKey);
+         const { processedAttachmentKey, ...data } = post;
+         let attachmentURL: string | null = null;
+         if (processedAttachmentKey) {
+            attachmentURL = this._cdnService.getPublicCDNURL(processedAttachmentKey);
          }
 
-         return { ...data, posterURL };
+         return { ...data, attachmentURL };
       });
 
       return MediaURLhydratedPosts;
@@ -62,7 +65,7 @@ export class PostService implements IPostService {
       dto: GetUserTimelineInputDTO,
       filter: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined = undefined
    ): Promise<{
-      posts: (Omit<IPostDocument, 'posterKey'> & { posterURL: string | null })[];
+      posts: (Omit<IPostDocument, 'processedAttachmentKey'> & { attachmentURL: string | null })[];
       pagination: { from: string | null; hasMore: boolean };
    }> => {
       const res = await this._postRepo.getUserPosts(
@@ -73,14 +76,14 @@ export class PostService implements IPostService {
       );
 
       const postURLHydratedPosts = res.posts.map((post) => {
-         const { posterKey, ...data } = post;
+         const { processedAttachmentKey, ...data } = post;
 
-         let posterURL: string | null = null;
-         if (posterKey) {
-            posterURL = this._cdnService.getPublicCDNURL(posterKey);
+         let attachmentURL: string | null = null;
+         if (processedAttachmentKey) {
+            attachmentURL = this._cdnService.getPublicCDNURL(processedAttachmentKey);
          }
 
-         return { ...data, posterURL };
+         return { ...data, attachmentURL };
       });
 
       return { posts: postURLHydratedPosts, pagination: { from: res.from, hasMore: res.hasMore } };
