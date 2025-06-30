@@ -8,8 +8,6 @@ export const ModerationStatus = {
    OK: 'ok',
    NOT_APPROPRIATE: 'notAppropriate',
 } as const;
-
-export const PostAttachmentType = { PHOTO: 'image', VIDEO: 'video' } as const;
 export const PostAttachmentStatus = {
    READY: 'ready',
    PROCESSING: 'processing',
@@ -32,7 +30,7 @@ export class Post {
       public visibility: (typeof PostVisibility)[keyof typeof PostVisibility],
       public hashtags: string[],
 
-      public attachmentType?: (typeof PostAttachmentType)[keyof typeof PostAttachmentType],
+      public attachmentType?: string, // mime type
       public rawAttachmentKey?: string | null
    ) {}
 }

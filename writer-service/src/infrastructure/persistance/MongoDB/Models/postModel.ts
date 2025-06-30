@@ -2,7 +2,6 @@ import {
    ModerationStatus,
    Post,
    PostAttachmentStatus,
-   PostAttachmentType,
    PostVisibility,
 } from '@domain/entities/Post.entity';
 import mongoose, { Document } from 'mongoose';
@@ -18,7 +17,6 @@ const postSchema = new mongoose.Schema<IPostDocumnet>(
 
       attachmentType: {
          type: String,
-         enum: [...Object.values(PostAttachmentType)],
          required: false,
       },
       rawAttachmentKey: { type: String, required: false },
