@@ -18,4 +18,6 @@ publicPostRouter.get(
    publicCommentController.getPostComments
 );
 
+publicPostRouter.get('/hashtag/:hashtag', publicPostQueryController.queryPostByHashtag);
+
 export default publicPostRouter;
