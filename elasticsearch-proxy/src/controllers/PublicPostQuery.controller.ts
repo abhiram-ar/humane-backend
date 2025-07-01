@@ -2,6 +2,7 @@ import { HttpStatusCode } from 'axios';
 import { PostNotFoundError } from 'errors/PostNotFound.error';
 import { NextFunction, Request, Response } from 'express';
 import { HttpStatusCodes, PostVisibility, ZodValidationError } from 'humane-common';
+import { BasicUserDetails } from 'interfaces/dto/GetUserBasicProfileFromIDs';
 import {
    GetPostsByHashtagInputDTO,
    getPostsByHashtagSchema,
@@ -111,7 +112,24 @@ export class PublicPostQueryControllet {
             validatedDTO.data
          );
 
-         res.status(HttpStatusCode.Ok).json({ data: { posts, pagination } });
+         const authorIdsSet = new Set<string>();
+         posts.forEach((post) => authorIdsSet.add(post.authorId));
+
+         const authorDetails = await this._userSerives.getBasicUserProfile(
+            Array.from(authorIdsSet)
+         );
+
+         const authorIdToDetailsMap = new Map<string, BasicUserDetails>();
+         authorDetails.forEach((author) => author && authorIdToDetailsMap.set(author.id, author));
+
+         const authorHydratedPosts = posts.map((post) => {
+            if (!authorIdToDetailsMap.has(post.authorId)) {
+               return post;
+            }
+            return { ...post, author: authorIdToDetailsMap.get(post.authorId) };
+         });
+
+         res.status(HttpStatusCode.Ok).json({ data: { posts: authorHydratedPosts, pagination } });
       } catch (error) {
          next(error);
       }
