@@ -7,6 +7,7 @@ import { IPostDocument } from 'interfaces/IPostDocument';
 import { GetUserTimelineInputDTO } from 'interfaces/dto/post/GetUserTimeline.dto';
 import { IPostService } from 'interfaces/services/IPost.services';
 import { PostVisibility } from 'humane-common';
+import { GetPostsByHashtagInputDTO } from 'interfaces/dto/post/GetPostsByHashtag.dto';
 
 export class PostService implements IPostService {
    constructor(
@@ -93,5 +94,31 @@ export class PostService implements IPostService {
       dto: { postId: string; delta: number }[]
    ): Promise<{ ack: boolean }> => {
       return await this._postRepo.bulkUpdateCommentsCount(dto);
+   };
+
+   getPublicPostsByHashtag = async (
+      dto: GetPostsByHashtagInputDTO
+   ): Promise<{
+      posts: (Omit<IPostDocument, 'processedAttachmentKey'> & { attachmentURL: string | null })[];
+      pagination: { from: string | null; hasMore: boolean };
+   }> => {
+      const res = await this._postRepo.getPublicPostByHashtag(
+         dto.hashtag,
+         dto.from || null,
+         dto.limit
+      );
+      
+      const postURLHydratedPosts = res.posts.map((post) => {
+         const { processedAttachmentKey, ...data } = post;
+
+         let attachmentURL: string | null = null;
+         if (processedAttachmentKey) {
+            attachmentURL = this._cdnService.getPublicCDNURL(processedAttachmentKey);
+         }
+
+         return { ...data, attachmentURL };
+      });
+
+      return { posts: postURLHydratedPosts, pagination: { from: res.from, hasMore: res.hasMore } };
    };
 }

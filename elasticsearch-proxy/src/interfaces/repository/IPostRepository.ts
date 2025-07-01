@@ -13,4 +13,10 @@ export interface IPostRepository extends IBaseRepository<IPostDocument> {
    ): Promise<{ posts: IPostDocument[]; from: string | null; hasMore: boolean }>;
 
    bulkUpdateCommentsCount(updates: { postId: string; delta: number }[]): Promise<{ ack: boolean }>;
+
+   getPublicPostByHashtag(
+      hashtag: string,
+      from: string | null,
+      limit: number
+   ): Promise<{ posts: IPostDocument[]; from: string | null; hasMore: boolean }>;
 }

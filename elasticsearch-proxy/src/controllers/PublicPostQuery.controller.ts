@@ -1,20 +1,24 @@
-import { PostService } from '@services/Post.services';
-import { UserServices } from '@services/User.services';
 import { HttpStatusCode } from 'axios';
 import { PostNotFoundError } from 'errors/PostNotFound.error';
 import { NextFunction, Request, Response } from 'express';
 import { HttpStatusCodes, PostVisibility, ZodValidationError } from 'humane-common';
+import {
+   GetPostsByHashtagInputDTO,
+   getPostsByHashtagSchema,
+} from 'interfaces/dto/post/GetPostsByHashtag.dto';
 import {
    GetUserTimelineInputDTO,
    getUserTimelineSchema,
 } from 'interfaces/dto/post/GetUserTimeline.dto';
 import { hydratePostDetailsSchema } from 'interfaces/dto/post/HydratePostDetails.dto';
 import { IExternalUserServices } from 'interfaces/services/IExternalUserService';
+import { IPostService } from 'interfaces/services/IPost.services';
+import { IUserServices } from 'interfaces/services/IUser.services';
 
 export class PublicPostQueryControllet {
    constructor(
-      private readonly _postServices: PostService,
-      private readonly _userSerives: UserServices,
+      private readonly _postServices: IPostService,
+      private readonly _userSerives: IUserServices,
       private readonly _externalUserService: IExternalUserServices
    ) {}
 
@@ -84,6 +88,30 @@ export class PublicPostQueryControllet {
          res.status(HttpStatusCodes.OK).json({
             data: { post: { ...postdetails, author: authorBasicDetails } },
          });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   queryPostByHashtag = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const { from, limit } = req.query;
+
+         const dto: GetPostsByHashtagInputDTO = {
+            hashtag: req.params.hashtag,
+            limit: limit ? parseInt(limit as string) : 10,
+            from: from as string | undefined,
+         };
+
+         const validatedDTO = getPostsByHashtagSchema.safeParse(dto);
+         if (!validatedDTO.success) {
+            throw new ZodValidationError(validatedDTO.error);
+         }
+         const { posts, pagination } = await this._postServices.getPublicPostsByHashtag(
+            validatedDTO.data
+         );
+
+         res.status(HttpStatusCode.Ok).json({ data: { posts, pagination } });
       } catch (error) {
          next(error);
       }

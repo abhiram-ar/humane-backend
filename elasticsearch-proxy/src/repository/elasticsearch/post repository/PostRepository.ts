@@ -177,4 +177,34 @@ export class PostRepository implements IPostRepository {
          return { ack: false };
       }
    };
+
+   getPublicPostByHashtag = async (
+      hashtag: string,
+      from: string | null,
+      limit: number
+   ): Promise<{ posts: IPostDocument[]; from: string | null; hasMore: boolean }> => {
+      const res = await this._client.search<IPostDocument>({
+         index: ES_INDEXES.POST_INDEX,
+         size: limit,
+         sort: [{ id: 'desc' }],
+         search_after: from ? [from] : undefined,
+         query: {
+            bool: {
+               filter: [
+                  { term: { visibility: PostVisibility.PUBLIC } },
+                  { term: { hashtags: hashtag } },
+               ],
+            },
+         },
+      });
+
+      const hits = res.hits.hits;
+
+      const parsedPostList = hits.map((hit) => ({ ...hit._source } as IPostDocument));
+
+      const searchAfter =
+         hits.length > 0 ? (hits[hits.length - 1].sort?.[0] as string) ?? null : null;
+
+      return { posts: parsedPostList, from: searchAfter, hasMore: hits.length === limit };
+   };
 }
