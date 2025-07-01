@@ -8,6 +8,11 @@ export const ModerationStatus = {
    OK: 'ok',
    NOT_APPROPRIATE: 'notAppropriate',
 } as const;
+export const PostAttachmentStatus = {
+   READY: 'ready',
+   PROCESSING: 'processing',
+   ERROR: 'error',
+} as const;
 
 export class Post {
    public readonly id?: string;
@@ -16,10 +21,16 @@ export class Post {
 
    public moderationStatus?: (typeof ModerationStatus)[keyof typeof ModerationStatus];
    public moderationMetadata: any | null;
+
+   public attachmentStatus?: (typeof PostAttachmentStatus)[keyof typeof PostAttachmentStatus];
+   public processedAttachmentKey?: string | null;
    constructor(
       public authorId: string,
       public content: string,
       public visibility: (typeof PostVisibility)[keyof typeof PostVisibility],
-      public posterKey?: string | null
+      public hashtags: string[],
+
+      public attachmentType?: string, // mime type
+      public rawAttachmentKey?: string | null
    ) {}
 }

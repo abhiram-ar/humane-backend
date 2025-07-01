@@ -1,20 +1,16 @@
-export const PostVisibility = {
-   PUBLIC: 'public',
-   FRIENDS: 'friends',
-} as const;
-
-export const ModerationStatus = {
-   PENDING: 'pending',
-   OK: 'ok',
-   NOT_APPROPRIATE: 'notAppropriate',
-} as const;
+import { ModerationStatus, PostAttachmentStatus, PostVisibility } from 'humane-common';
 
 export type IPostDocument = {
    id: string;
    authorId: string;
    content: string;
-   posterKey?: string | null;
    visibility: (typeof PostVisibility)[keyof typeof PostVisibility];
+   hashtags: string[];
+
+   attachmentType?: string | null;
+   rawAttachmentKey?: string | null;
+   attachmentStatus?: (typeof PostAttachmentStatus)[keyof typeof PostAttachmentStatus];
+   processedAttachmentKey?: string | null;
 
    moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus] | undefined; //TOTO: remove undfiend when mooderation service is implmented
    moderationMetadata?: any;

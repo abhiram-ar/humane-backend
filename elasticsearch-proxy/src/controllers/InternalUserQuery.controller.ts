@@ -11,7 +11,6 @@ import { ICommentService } from 'interfaces/services/IComment.services';
 import { IPostService } from 'interfaces/services/IPost.services';
 import { IUserServices } from 'interfaces/services/IUser.services';
 
-// TODO: rename to common internal controller
 export class InternalQueryController {
    constructor(
       private readonly _userSerives: IUserServices,

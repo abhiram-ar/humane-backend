@@ -1,18 +1,53 @@
-import { Post } from '@domain/entities/Post.entity';
+import { Post, PostAttachmentStatus } from '@domain/entities/Post.entity';
 import { IPostRepository } from '@domain/repository/IPostRepository';
 import postModel from '../Models/postModel';
 import { postAutoMapper } from '../mapper/postAutoMapper';
+import mongoose from 'mongoose';
+import hashtagModel from '../Models/hashtagModel';
 
 export class PostRepository implements IPostRepository {
    create = async (post: Post): Promise<Required<Post>> => {
-      const res = await postModel.create({
-         authorId: post.authorId,
-         content: post.content,
-         visibility: post.visibility,
-         posterKey: post.posterKey,
-      });
+      const session = await mongoose.startSession();
 
-      return postAutoMapper(res);
+      try {
+         session.startTransaction();
+         const res = await postModel.create(
+            [
+               {
+                  authorId: post.authorId,
+                  content: post.content,
+                  visibility: post.visibility,
+                  attachmentType: post.attachmentType,
+                  rawAttachmentKey: post.rawAttachmentKey,
+                  processedAttachmentKey: post.rawAttachmentKey,
+                  attachmentStatus: PostAttachmentStatus.READY, // override - change this when there is a plan to transcode video
+                  hashtags: post.hashtags,
+               },
+            ],
+            { session: session }
+         );
+
+         if (post.hashtags.length > 0) {
+            const operations = post.hashtags.map((tag) => ({
+               updateOne: {
+                  filter: { name: tag },
+                  update: {
+                     $inc: { count: 1 },
+                  },
+                  upsert: true,
+               },
+            }));
+
+            await hashtagModel.bulkWrite(operations, { session });
+         }
+         await session.commitTransaction();
+         await session.endSession();
+         return postAutoMapper(res[0]);
+      } catch (error) {
+         await session.abortTransaction();
+         await session.endSession();
+         throw error;
+      }
    };
    delete = async (authorId: string, postId: string): Promise<Required<Post> | null> => {
       const res = await postModel.findOneAndDelete({ authorId, _id: postId }).lean();

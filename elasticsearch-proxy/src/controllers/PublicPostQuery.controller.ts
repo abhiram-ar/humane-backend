@@ -3,13 +3,12 @@ import { UserServices } from '@services/User.services';
 import { HttpStatusCode } from 'axios';
 import { PostNotFoundError } from 'errors/PostNotFound.error';
 import { NextFunction, Request, Response } from 'express';
-import { HttpStatusCodes, ZodValidationError } from 'humane-common';
+import { HttpStatusCodes, PostVisibility, ZodValidationError } from 'humane-common';
 import {
    GetUserTimelineInputDTO,
    getUserTimelineSchema,
 } from 'interfaces/dto/post/GetUserTimeline.dto';
 import { hydratePostDetailsSchema } from 'interfaces/dto/post/HydratePostDetails.dto';
-import { PostVisibility } from 'interfaces/dto/post/Post.dto';
 import { IExternalUserServices } from 'interfaces/services/IExternalUserService';
 
 export class PublicPostQueryControllet {
