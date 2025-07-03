@@ -16,6 +16,7 @@ export interface ICommentService {
    ): Promise<Pick<Required<Comment>, 'id' | 'likeCount' | 'likedByPostAuthor'>[]>;
 
    setCommentLikedByPostAuthor(
-      like: Like
+      like: Like,
+      newCommnetLikedByAuthorState: boolean
    ): Promise<{ post: Required<Post>; comment: Required<Comment> } | void>;
 }

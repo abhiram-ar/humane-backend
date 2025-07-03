@@ -64,7 +64,8 @@ export class CommentService implements ICommentService {
 
    /** funtion ignores the cases in which comment is put by the post author and the corresponding likes */
    setCommentLikedByPostAuthor = async (
-      like: Like
+      like: Like,
+      newCommnetLikedByAuthorState: boolean
    ): Promise<{ post: Required<Post>; comment: Required<Comment> } | void> => {
       const data = await this._commentRepo.getCommnetWithPostData(like.commentId);
 
@@ -72,34 +73,36 @@ export class CommentService implements ICommentService {
          return;
       }
 
-      // skip processing, if reprocessing
-      if (data.comment.likedByPostAuthor) return;
-
       if (!(like.authorId === data.post.authorId && data.comment.authorId !== data.post.authorId)) {
          return;
       }
 
       //write back new state to comentModel
-      const updatedComment = await this._commentRepo.setLikedByPostAuthor(data.comment.id, true);
+      const updatedComment = await this._commentRepo.setLikedByPostAuthor(
+         data.comment.id,
+         newCommnetLikedByAuthorState
+      );
       if (!updatedComment) return;
 
       // publish event
-      const eventPayload: CommentLikedByPostAuthorPayload = {
-         commentId: updatedComment.id,
-         commentAutorId: updatedComment.authorId,
-         postId: data.post.id,
-         postAuthorId: data.post.authorId,
-      };
+      if (updatedComment.likedByPostAuthor === true) {
+         const eventPayload: CommentLikedByPostAuthorPayload = {
+            commentId: updatedComment.id,
+            commentAutorId: updatedComment.authorId,
+            postId: data.post.id,
+            postAuthorId: data.post.authorId,
+         };
 
-      const commentLikedByPostAuthorEvent = createEvent(
-         AppEventsTypes.COMMENT_LIKED_BY_POST_AUTHUR,
-         eventPayload
-      );
+         const commentLikedByPostAuthorEvent = createEvent(
+            AppEventsTypes.COMMENT_LIKED_BY_POST_AUTHUR,
+            eventPayload
+         );
 
-      await this._eventPublisher.send(
-         MessageBrokerTopics.COMMENT_LIKED_BY_POST_AUTHOR_TOPIC,
-         commentLikedByPostAuthorEvent
-      );
+         await this._eventPublisher.send(
+            MessageBrokerTopics.COMMENT_LIKED_BY_POST_AUTHOR_TOPIC,
+            commentLikedByPostAuthorEvent
+         );
+      }
 
       return { post: data.post, comment: updatedComment };
    };

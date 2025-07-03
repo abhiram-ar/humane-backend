@@ -12,22 +12,23 @@ import {
 } from 'humane-common';
 import { Consumer } from 'kafkajs';
 
-export class CommnetLikedByPostAuthorWorker implements IConsumer {
+export class CommnetUnLikedByPostAuthorWorker implements IConsumer {
    private consumer: Consumer;
 
    constructor(
       private readonly _kafka: KafkaSingleton,
       private readonly _commnetServices: ICommentService
    ) {
-      this.consumer = this._kafka.createConsumer('writer-Commnet-likedBy-post-author-v1');
+      this.consumer = this._kafka.createConsumer('writer-unCommnet-likedBy-post-author-v1');
    }
 
    start = async () => {
       await this.consumer.connect();
-      logger.info('comment-liked by post author consumer connected ');
+      logger.info('comment-unliked by post author consumer connected ');
 
       await this.consumer.subscribe({
-         topic: MessageBrokerTopics.COMMENT_LIKED_EVENT_TOPIC,
+         topic: MessageBrokerTopics.COMMENT_UNLIKED_EVENT_TOPIC,
+         fromBeginning: true,
       });
 
       await this.consumer.run({
@@ -40,7 +41,7 @@ export class CommnetLikedByPostAuthorWorker implements IConsumer {
             // logger.verbose(JSON.stringify(event, null, 2));
 
             try {
-               if (event.eventType != AppEventsTypes.COMMENT_LIKED) {
+               if (event.eventType != AppEventsTypes.COMMENT_UNLIKED) {
                   throw new EventConsumerMissMatchError();
                }
 
@@ -51,7 +52,7 @@ export class CommnetLikedByPostAuthorWorker implements IConsumer {
 
                await this._commnetServices.setCommentLikedByPostAuthor(
                   validatedCommentLike.data,
-                  true
+                  false
                );
 
                logger.info(`processed-> ${event.eventType} ${event.eventId}`);

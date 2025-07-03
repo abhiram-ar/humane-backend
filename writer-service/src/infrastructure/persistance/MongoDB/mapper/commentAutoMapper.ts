@@ -9,9 +9,9 @@ export const commentAutoMapper = (
    let postId: string | any;
    if (!doc.postId) {
       postId = '';
-   } else if (typeof doc.postId === 'string' || isValidObjectId(postId)) {
-      postId = String(doc.postId);
    } else if (typeof doc.postId === 'object') {
+      postId = String(doc.postId);
+   } else if (typeof doc.postId === 'string' || isValidObjectId(postId)) {
       const typedPostId = doc.postId as HydratedDocument<IPostDocumnet>;
       postId = typedPostId.id || String(typedPostId._id);
    }
