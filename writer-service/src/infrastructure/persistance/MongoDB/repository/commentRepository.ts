@@ -4,7 +4,10 @@ import commentModel from '../Models/commentModel';
 import { commentAutoMapper } from '../mapper/commentAutoMapper';
 import { BulkUpdateCommentLikeCountInputDTO } from '@application/dtos/BulkUpdateCommentLikeCount.dto';
 import { logger } from '@config/logget';
-import { isValidObjectId } from 'mongoose';
+import { FlattenMaps, isValidObjectId } from 'mongoose';
+import { postAutoMapper } from '../mapper/postAutoMapper';
+import { IPostDocumnet } from '../Models/postModel';
+import { Post } from '@domain/entities/Post.entity';
 
 export class CommentRepository implements ICommentRepository {
    create = async (comment: Comment): Promise<Required<Comment>> => {
@@ -75,5 +78,34 @@ export class CommentRepository implements ICommentRepository {
       );
 
       return parsed;
+   };
+
+   getCommnetWithPostData = async (
+      commnetId: string
+   ): Promise<{ comment: Required<Comment>; post: Required<Post> | undefined } | null> => {
+      const commentWithPostData = await commentModel.findById(commnetId).populate('postId');
+      if (!commentWithPostData) return null;
+
+      const comment = commentAutoMapper(commentWithPostData);
+
+      let post: Required<Post> | undefined;
+      if (commentWithPostData.postId) {
+         post = postAutoMapper(commentWithPostData.postId as FlattenMaps<IPostDocumnet>);
+      }
+
+      return { comment, post };
+   };
+
+   setLikedByPostAuthor = async (
+      commentId: string,
+      isLikedByPostAuthor: boolean
+   ): Promise<Required<Comment> | null> => {
+      const res = await commentModel.findByIdAndUpdate(
+         commentId,
+         { likedByPostAuthor: isLikedByPostAuthor },
+         { new: true }
+      );
+      if (!res) return null;
+      return commentAutoMapper(res);
    };
 }

@@ -12,10 +12,11 @@ import { AWSStorageService } from '@infrastructure/storage/aws-s3/AWSStorageServ
 import { LikeServices } from '@services/LikeServices';
 import { HashtagServices } from '@services/HashtagServices';
 
-export const postService = new PostService(postRepoitory);
-export const commentServices = new CommentService(commentRepository, postRepoitory);
-
 export const eventPubliser = new KafkaPublisher(KafkaSingleton.getInstance());
+
+export const postService = new PostService(postRepoitory);
+
+export const commentServices = new CommentService(commentRepository, postRepoitory, eventPubliser);
 
 export const storageService = new AWSStorageService();
 

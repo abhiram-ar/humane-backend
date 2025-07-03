@@ -2,6 +2,8 @@ import { BulkUpdateCommentLikeCountInputDTO } from '@application/dtos/BulkUpdate
 import { CreateCommentDTO } from '@application/dtos/CreateComment';
 import { DeleteCommentDTO } from '@application/dtos/DeleteComment.dto';
 import { Comment } from '@domain/entities/Comment.entity';
+import { Like } from '@domain/entities/Likes.entity';
+import { Post } from '@domain/entities/Post.entity';
 
 export interface ICommentService {
    create(dto: CreateCommentDTO): Promise<Required<Comment>>;
@@ -12,4 +14,8 @@ export interface ICommentService {
    getCommnetLikeMetadataByIds(
       commentIds: string[]
    ): Promise<Pick<Required<Comment>, 'id' | 'likeCount' | 'likedByPostAuthor'>[]>;
+
+   setCommentLikedByPostAuthor(
+      like: Like
+   ): Promise<{ post: Required<Post>; comment: Required<Comment> } | void>;
 }
