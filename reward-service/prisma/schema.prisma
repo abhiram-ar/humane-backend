@@ -22,14 +22,19 @@ model HumaneScore {
 
 model Rewards {
   actorId        String
-  type           String
-  idempotencyKey String   @id
+  type           RewardType
+  idempotencyKey String     @id
   pointsRewarded Int
-  createdAt      DateTime @default(now())
+  createdAt      DateTime   @default(now())
 
-  HumaneScore HumaneScore @relation("Rewards", fields: [actorId], references: [userId])
+  HumaneScore HumaneScore @relation("Rewards", fields: [actorId], references: [userId], onDelete: Cascade)
 
   @@index([actorId, idempotencyKey])
+}
+
+enum RewardType {
+  HELPFUL_COMMENT
+  CHAT_DAILY_CHECKIN
 }
 
 model OutBox {

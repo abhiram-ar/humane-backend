@@ -1,8 +1,8 @@
 import { AppEvent } from 'humane-common';
 import KafkaSingleton from './KafkaSingleton';
 import { Producer } from 'kafkajs';
-import { IEventPublisher } from '@ports/IEventProducer';
 import { logger } from '@config/logger';
+import { IEventPublisher } from '@ports/services/IEventProducer';
 
 export class KafkaPublisher implements IEventPublisher {
    producer: Producer;
