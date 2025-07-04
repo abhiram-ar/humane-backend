@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reward-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: humane
+      service: reward
+      type: web-server
+  template:
+    metadata:
+      labels:
+        app: humane
+        service: reward
+        type: web-server
+    spec:
+      # initContainers:
+      #   - name: prisma-migrate
+      #     image: abhiramar/humane-reward-service
+      #     command: ["npx", "prisma", "migrate", "deploy"]
+      #     envFrom:
+      #       - secretRef:
+      #           name: reward-pod-secret
+      containers:
+        - name: reward-server
+          image: abhiramar/humane-reward-service
+          envFrom:
+            - secretRef:
+                name: reward-pod-secret
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reward-srv
+spec:
+  selector:
+    app: humane
+    service: reward
+    type: web-server
+  ports:
+    - name: reward
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

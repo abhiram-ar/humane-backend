@@ -1,0 +1,35 @@
+{
+   "name": "reward-service",
+   "version": "1.0.0",
+   "description": "reward serviecs for humame",
+   "license": "ISC",
+   "author": "abhiram-ar",
+   "type": "commonjs",
+   "main": "./src/main.js",
+   "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "dev": "tsx watch --include \"./src/**/*\" ./src/main.ts",
+      "uc": "npm uninstall humane-common && npm i humane-common"
+   },
+   "dependencies": {
+      "@prisma/client": "^6.11.1",
+      "axios": "^1.10.0",
+      "cookie-parser": "^1.4.7",
+      "cors": "^2.8.5",
+      "date-fns": "^4.1.0",
+      "express": "^5.1.0",
+      "humane-common": "^1.0.88",
+      "kafkajs": "^2.2.4",
+      "morgan": "^1.10.0",
+      "winston": "^3.17.0",
+      "zod": "^3.25.73"
+   },
+   "devDependencies": {
+      "@tsconfig/node22": "^22.0.2",
+      "@types/cookie-parser": "^1.4.9",
+      "@types/express": "^5.0.3",
+      "prisma": "^6.11.1",
+      "tsx": "^4.20.3",
+      "typescript": "^5.8.3"
+   }
+}
