@@ -27,7 +27,7 @@ export class RewardRepository implements IRewardRepostory {
       } catch (e) {
          if (e instanceof Prisma.PrismaClientKnownRequestError) {
             if (e.code === 'P2002') {
-               logger.debug('Unique constaraint violation, Cannot issue reward');
+               logger.warn('Unique constaraint violation, Cannot issue reward');
                return null;
             }
          }

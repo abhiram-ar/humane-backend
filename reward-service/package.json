@@ -18,7 +18,7 @@
       "cors": "^2.8.5",
       "date-fns": "^4.1.0",
       "express": "^5.1.0",
-      "humane-common": "^1.0.88",
+      "humane-common": "^1.0.89",
       "kafkajs": "^2.2.4",
       "morgan": "^1.10.0",
       "winston": "^3.17.0",

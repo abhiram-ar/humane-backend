@@ -4,7 +4,6 @@ import { RelationshipStatus } from 'humane-common';
 import { RelationshipStatusResponse } from './Types/GetRelationshipStatus.type';
 import { IUserServices } from '@ports/services/IUserService';
 import { AxiosError } from 'axios';
-import { logger } from '@config/logger';
 
 export class ExternalUserServices implements IUserServices {
    getRelationshipStatus = async (

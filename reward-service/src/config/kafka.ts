@@ -1,3 +1,4 @@
+import { postAuthorLikedCommentEventConsumer } from '@di/consumer.container';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
 
 export async function connectKafkaProducer() {
@@ -9,3 +10,19 @@ export async function disconnectKafkaProducer() {
    await KafkaSingleton.getInstance().getProducer().disconnect();
    console.log('kafka producer disconnected');
 }
+
+const consumers = [postAuthorLikedCommentEventConsumer];
+
+export const startAllConsumer = async () => {
+   const promises = consumers.map(async (consumer) => {
+      await consumer.start();
+   });
+   await Promise.all(promises);
+};
+
+export const stopAllConsumer = async () => {
+   const promises = consumers.map(async (consumer) => {
+      await consumer.stop();
+   });
+   await Promise.all(promises);
+};
