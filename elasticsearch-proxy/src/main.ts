@@ -3,9 +3,11 @@ import { startAllConsumers, stopAllConsumer } from '@config/kafka';
 import { logger } from '@config/logger';
 import app from 'app';
 import { esClient } from '@config/esClient';
+import checkEnv from '@config/env';
 
 const bootstrap = async () => {
    try {
+      checkEnv();
       await userRepository.initializeUserIndex();
       await postRepository.initializePostIndex();
       await commentRepository.initializeCommentIndex();
