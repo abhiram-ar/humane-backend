@@ -31,12 +31,6 @@ export const startAllConsumers = async () => {
 };
 
 export const stopAllConsumer = async () => {
-   await userProfileConsumer.stop();
-   await postCreatedEventConsumer.stop();
-   await postDeletedEventConsumer.stop();
-   await commentCreatedEventConsumer.stop();
-   await commentDeletedEventConsumer.stop();
-   await commentCreatedEventAggreteComsumer.stop();
-   await commentDeletedEventAggreateConsumer.stop();
-   await rewardEventsAggregatorConsumer.stop();
+   const promises = consumers.map(async (consumer) => consumer.stop());
+   await Promise.allSettled(promises);
 };

@@ -10,4 +10,5 @@ export type GetUserProfileOutputDTO = {
    createdAt: string;
    avatarURL?: string;
    coverPhotoURL?: string;
+   humaneScore: number;
 };

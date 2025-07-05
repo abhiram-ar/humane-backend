@@ -172,6 +172,7 @@ export class UserServices implements IUserServices {
          createdAt: userDoc.createdAt,
          avatarURL,
          coverPhotoURL,
+         humaneScore: userDoc.humaneScore,
       };
    };
 

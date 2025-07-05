@@ -20,7 +20,7 @@ export class RewardEventsAggregatorConsumer implements IConsumer {
       private readonly _kafka: KafkaSingleton,
       private readonly _userServiec: IUserServices
    ) {
-      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-reward-aggregator-v1');
+      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-reward-aggregator-v2');
    }
 
    private readonly _FLUSH_INTERVAL = 3000; //3s
@@ -116,7 +116,7 @@ export class RewardEventsAggregatorConsumer implements IConsumer {
                const userId = data.userId;
                const prevAggregatedRewardDiff = this.activeBatch.updates.get(userId) || 0;
 
-               this.activeBatch.updates.set(userId, prevAggregatedRewardDiff + 1);
+               this.activeBatch.updates.set(userId, prevAggregatedRewardDiff + data.amount);
                const currentPartitionMax = this.activeBatch.partitionOffsets.get(partition) ?? -1;
 
                if (offset > currentPartitionMax) {
