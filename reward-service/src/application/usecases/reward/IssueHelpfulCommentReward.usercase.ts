@@ -52,13 +52,8 @@ export class IssueHelpfulCommnetReward implements IIssueHelpfulCommnetReward {
 
       const userRewardedEvent = createEvent(AppEventsTypes.USER_REWARDED, eventPayload);
 
-      await this._eventPubliser.send(
-         MessageBrokerTopics.USER_PROFILE_EVENTS_TOPIC,
-         userRewardedEvent
-      );
+      await this._eventPubliser.send(MessageBrokerTopics.REWARD_EVENTS_TOPIC, userRewardedEvent);
 
       return newReward;
-
-      // publish event
    };
 }
