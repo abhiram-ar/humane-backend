@@ -239,6 +239,14 @@ export class UserRepository implements IUserRepository {
       });
       return parsedUserDocList;
    };
+
+   /**
+    * Update only the humaneScore field in bulk.
+    *
+    * @remarks
+    * If the user docuemt does not exits.
+    * A minimal userdocument with userId is created with only humaneScore field
+    */
    bulkUpdateHumaneScoreFromDiff = async (
       updates: { userId: string; delta: number }[]
    ): Promise<{ ack: boolean }> => {
@@ -260,20 +268,22 @@ export class UserRepository implements IUserRepository {
                lang: 'painless',
                params: { delta: update.delta },
             },
+            upsert: {
+               // a minimal document for the upsert case.
+               // The user.created event will eventually fill in the rest.
+               humaneScore: update.delta,
+            },
          });
       });
 
       try {
-         const res = await this._client.bulk({
+         await this._client.bulk({
             operations: bulkBody,
          });
-
-         console.log('sucess', res);
 
          return { ack: true };
       } catch (error) {
          logger.error('error while bulk updating post comments');
-         console.log('err', error);
          return { ack: false };
       }
    };

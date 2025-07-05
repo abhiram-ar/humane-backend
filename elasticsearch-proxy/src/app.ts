@@ -24,9 +24,9 @@ app.get('/api/v1/query/health', (req, res) => {
    res.status(200).json({ status: 'OK' });
 });
 
-app.post('/api/v1/query/test', (req, res) => {
+app.post('/api/v1/query/test', async (req, res) => {
    try {
-      const result = userRepository.bulkUpdateHumaneScoreFromDiff(req.body);
+      const result = await userRepository.bulkUpdateHumaneScoreFromDiff(req.body);
       res.status(200).json(result);
    } catch (error) {
       res.status(500).json(error);
