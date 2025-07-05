@@ -19,7 +19,7 @@ export class PostAuthorLikedCommentEventConsumer implements IConsumer {
       private readonly _kafka: KafkaSingleton,
       private readonly _issueHelpfulCommentReward: IIssueHelpfulCommnetReward
    ) {
-      this.consumer = this._kafka.createConsumer('reward-service-postAuthorLikedComment-v2');
+      this.consumer = this._kafka.createConsumer('reward-service-postAuthorLikedComment-v11');
    }
 
    start = async () => {

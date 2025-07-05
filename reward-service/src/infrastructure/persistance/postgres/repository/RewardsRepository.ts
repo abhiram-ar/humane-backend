@@ -6,6 +6,8 @@ import { logger } from '@config/logger';
 
 export class RewardRepository implements IRewardRepostory {
    create = async (entity: Reward): Promise<Required<Reward> | null> => {
+      let res: Required<Reward> | null = null;
+
       try {
          await db.$transaction(async (tx) => {
             await tx.humaneScore.upsert({
@@ -14,7 +16,7 @@ export class RewardRepository implements IRewardRepostory {
                create: { userId: entity.actorId, score: entity.pointsRewarded },
             });
 
-            const res = await tx.rewards.create({
+            res = await tx.rewards.create({
                data: {
                   actorId: entity.actorId,
                   pointsRewarded: entity.pointsRewarded,
@@ -22,19 +24,18 @@ export class RewardRepository implements IRewardRepostory {
                   idempotencyKey: entity.idempotencyKey,
                },
             });
-            return res;
          });
       } catch (e) {
          if (e instanceof Prisma.PrismaClientKnownRequestError) {
             if (e.code === 'P2002') {
                logger.warn('Unique constaraint violation, Cannot issue reward');
-               return null;
+               res = null;
             }
+         } else {
+            throw e;
          }
-         throw e;
       }
-
-      return null;
+      return res;
    };
    get(id: string): Promise<Reward | null> {
       throw new Error('Method not implemented.');
