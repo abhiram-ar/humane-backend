@@ -16,9 +16,9 @@ import {
 } from 'interfaces/dto/GetUserBasicProfileFromIDs';
 
 export interface IUserServices {
-   create(dto: CreateUserDTO): Promise<void>;
+   createProfile(dto: CreateUserDTO): Promise<void>;
 
-   update(eventTimeStamp: string, dto: UpdateUserDTO): Promise<void>;
+   upsertProfile(eventTimeStamp: string, dto: UpdateUserDTO): Promise<void>;
 
    updateUserAvatarKey(eventTimestamp: string, dto: UpdateUserAvatarKeyDTO): Promise<void>;
 

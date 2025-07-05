@@ -27,16 +27,16 @@ export class UserServices implements IUserServices {
       private readonly _cdnService: CDNService
    ) {}
 
-   create = async (dto: CreateUserDTO): Promise<void> => {
+   createProfile = async (dto: CreateUserDTO): Promise<void> => {
       await this._userRepository.createCommand(dto);
    };
 
-   update = async (eventTimeStamp: string, dto: UpdateUserDTO) => {
+   upsertProfile = async (eventTimeStamp: string, dto: UpdateUserDTO) => {
       const incomingTimestamp = new Date(eventTimeStamp);
 
       const res = await this._userRepository.updatedAtQuery(dto.id);
-      if (!res) {
-         await this.create(dto);
+      if (res === null) {
+         await this.createProfile(dto);
          return;
       }
 

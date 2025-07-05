@@ -9,7 +9,6 @@ import { logger } from '@config/logger';
 export class UserRepository implements IUserRepository {
    private readonly _index = ES_INDEXES.USER_PROFILE_INDEX;
    constructor(public readonly _client: Client) {}
-  
 
    initializeUserIndex = async () => {
       const indexExists = await this._client.indices.exists({
@@ -76,7 +75,7 @@ export class UserRepository implements IUserRepository {
    };
 
    updateCommand = async (updatedAt: string, dto: UpdateUserDTO): Promise<void> => {
-      const { id, ...data } = dto;
+      const { id, humaneScore, ...data } = dto;
 
       await this._client.update({
          index: this._index,
