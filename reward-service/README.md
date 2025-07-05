@@ -12,9 +12,9 @@ Purpose: Issue and Store reward user earned
 
 ## API Endpoints
 
-| Method | Endpoint               | Description                |
-| ------ | ---------------------- | -------------------------- |
-| GET    | `/api/v1/reward/total` | total score earned by user |
+| Method | Endpoint               | QueryParams | Description                                                                                              |
+| ------ | ---------------------- | ----------- | -------------------------------------------------------------------------------------------------------- |
+| GET    | `/api/v1/reward/total` | userId?     | Total score earned by user.<br>`userId` can also be provided via jwt token.<br>Query param take priority |
 
 ## Kafka Events
 
