@@ -24,7 +24,7 @@ export class HumaneScoreController {
          }
 
          const score = await this._humneScoreServices.getUserScore(validatedUserId.data);
-         res.status(HttpStatusCode.Ok).json({ data: { score } });
+         res.status(HttpStatusCode.Ok).json({ data: score });
       } catch (error) {
          next(error);
       }
