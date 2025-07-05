@@ -202,4 +202,10 @@ export class UserServices implements IUserServices {
 
       return avatarURLHydratedUserList;
    };
+
+   bulkUpdateHumaneScoreFromDiff = async (
+      dto: { userId: string; delta: number }[]
+   ): Promise<{ ack: boolean }> => {
+      return await this._userRepository.bulkUpdateHumaneScoreFromDiff(dto);
+   };
 }

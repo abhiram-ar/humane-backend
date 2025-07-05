@@ -5,9 +5,20 @@ import {
    commentDeletedEventConsumer,
    postCreatedEventConsumer,
    postDeletedEventConsumer,
+   rewardEventsAggregatorConsumer,
    userProfileConsumer,
 } from '@di/consumers';
 
+const consumers = [
+   userProfileConsumer,
+   postCreatedEventConsumer,
+   postDeletedEventConsumer,
+   commentCreatedEventConsumer,
+   commentDeletedEventConsumer,
+   commentCreatedEventAggreteComsumer,
+   commentDeletedEventAggreateConsumer,
+   rewardEventsAggregatorConsumer,
+];
 export const startAllConsumers = async () => {
    await userProfileConsumer.start();
    await postCreatedEventConsumer.start();
@@ -16,6 +27,7 @@ export const startAllConsumers = async () => {
    await commentDeletedEventConsumer.start();
    await commentCreatedEventAggreteComsumer.start();
    await commentDeletedEventAggreateConsumer.start();
+   await rewardEventsAggregatorConsumer.start();
 };
 
 export const stopAllConsumer = async () => {
@@ -26,4 +38,5 @@ export const stopAllConsumer = async () => {
    await commentDeletedEventConsumer.stop();
    await commentCreatedEventAggreteComsumer.stop();
    await commentDeletedEventAggreateConsumer.stop();
+   await rewardEventsAggregatorConsumer.stop();
 };

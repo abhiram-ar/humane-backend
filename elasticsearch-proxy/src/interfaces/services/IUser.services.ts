@@ -34,4 +34,8 @@ export interface IUserServices {
    getBasicUserProfile(
       dto: GetUserBasicProfileFromIdsInputDTO
    ): Promise<GetBasicUserProfileFromIdsOutputDTO>;
+
+   bulkUpdateHumaneScoreFromDiff(
+      dto: { userId: string; delta: number }[]
+   ): Promise<{ ack: boolean }>;
 }

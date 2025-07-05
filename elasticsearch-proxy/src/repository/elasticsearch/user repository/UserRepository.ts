@@ -239,4 +239,42 @@ export class UserRepository implements IUserRepository {
       });
       return parsedUserDocList;
    };
+   bulkUpdateHumaneScoreFromDiff = async (
+      updates: { userId: string; delta: number }[]
+   ): Promise<{ ack: boolean }> => {
+      const bulkBody: any[] = [];
+      updates.forEach((update) => {
+         bulkBody.push({
+            update: { _index: this._index, _id: update.userId },
+         });
+
+         bulkBody.push({
+            script: {
+               source: `
+               if(ctx._source.humaneScore == null) {
+                  ctx._source.humaneScore = params.delta;
+                  } 
+               else {
+                  ctx._source.humaneScore += params.delta;
+               }`,
+               lang: 'painless',
+               params: { delta: update.delta },
+            },
+         });
+      });
+
+      try {
+         const res = await this._client.bulk({
+            operations: bulkBody,
+         });
+
+         console.log('sucess', res);
+
+         return { ack: true };
+      } catch (error) {
+         logger.error('error while bulk updating post comments');
+         console.log('err', error);
+         return { ack: false };
+      }
+   };
 }

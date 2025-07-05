@@ -9,23 +9,21 @@ import {
 } from 'humane-common';
 import KafkaSingleton from 'kafka/KafkaSingleton';
 import { Consumer } from 'kafkajs';
-import { commentSchema } from 'interfaces/dto/post/Comment.dto';
-import { IPostService } from 'interfaces/services/IPost.services';
 import { CommentAggreagateUpdateError } from 'errors/CommentAggreateUpdateError';
+import { rewardSchema } from 'interfaces/dto/Reward.dto';
+import { IUserServices } from 'interfaces/services/IUser.services';
 
-export class CommentDeletedEventAggregateConsumer implements IConsumer {
+export class RewardEventsAggregatorConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(
       private readonly _kafka: KafkaSingleton,
-      private readonly _postServices: IPostService
+      private readonly _userServiec: IUserServices
    ) {
-      this.consumer = this._kafka.createConsumer(
-         'elasticsearch-proxy-comment-deleted-aggregator-v1'
-      );
+      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-reward-aggregator-v1');
    }
 
-   private readonly _FLUSH_INTERVAL = 5000; //5s
+   private readonly _FLUSH_INTERVAL = 3000; //3s
    private readonly _MAX_BATCH_SIZE = 100;
 
    // dual buffer, one to handle events occuring while the other buffer is being flused
@@ -49,15 +47,15 @@ export class CommentDeletedEventAggregateConsumer implements IConsumer {
       this.activeBatch = this.flushingBatch;
       this.flushingBatch = temp;
 
-      logger.debug('🔃 Flushing comment delete count: ' + this.flushingBatch);
+      logger.debug(`🔃 Flushing ${this.flushingBatch.updates.size} reward diff`);
 
       try {
-         const ops: { postId: string; delta: number }[] = [];
-         for (const [postId, delta] of this.flushingBatch.updates.entries()) {
-            ops.push({ postId, delta });
+         const ops: { userId: string; delta: number }[] = [];
+         for (const [userId, delta] of this.flushingBatch.updates.entries()) {
+            ops.push({ userId, delta });
          }
 
-         const { ack } = await this._postServices.bulkUpdateCommentsCount(ops);
+         const { ack } = await this._userServiec.bulkUpdateHumaneScoreFromDiff(ops);
          if (!ack) {
             throw new CommentAggreagateUpdateError();
          }
@@ -65,14 +63,14 @@ export class CommentDeletedEventAggregateConsumer implements IConsumer {
          // Commit Kafka offsets
          const offsetEntries = Array.from(this.flushingBatch.partitionOffsets).map(
             ([partition, offset]) => ({
-               topic: MessageBrokerTopics.COMMENT_DELTED_EVENTS_TOPIC,
+               topic: MessageBrokerTopics.REWARD_EVENTS_TOPIC,
                partition,
                offset: String(offset + 1),
             })
          );
          await this.consumer.commitOffsets(offsetEntries);
       } catch (error) {
-         logger.error('error while bulk comment delete flush: ' + (error as Error)?.message);
+         logger.error('error while bulk reward diff flush: ' + (error as Error)?.message);
       } finally {
          this.flushingBatch.updates.clear();
          this.flushingBatch.partitionOffsets.clear();
@@ -81,10 +79,11 @@ export class CommentDeletedEventAggregateConsumer implements IConsumer {
 
    start = async () => {
       await this.consumer.connect();
-      logger.info('Comment created event aggretator consumer connected ');
+      logger.info('Reward event aggretator consumer connected ');
 
       await this.consumer.subscribe({
-         topic: MessageBrokerTopics.COMMENT_DELTED_EVENTS_TOPIC,
+         topic: MessageBrokerTopics.REWARD_EVENTS_TOPIC,
+         fromBeginning: true,
       });
 
       // timebased flushing
@@ -93,6 +92,7 @@ export class CommentDeletedEventAggregateConsumer implements IConsumer {
       }, this._FLUSH_INTERVAL);
 
       await this.consumer.run({
+         autoCommit: false,
          eachMessage: async ({ message, heartbeat, partition }) => {
             const event = JSON.parse(
                (message.value as Buffer<ArrayBufferLike>).toString()
@@ -104,19 +104,19 @@ export class CommentDeletedEventAggregateConsumer implements IConsumer {
             // logger.verbose(JSON.stringify(event, null, 2));
 
             try {
-               if (event.eventType != AppEventsTypes.COMMENT_DELTED) {
+               if (event.eventType !== AppEventsTypes.USER_REWARDED) {
                   throw new EventConsumerMissMatchError();
                }
-               const parsed = commentSchema.safeParse(event.payload);
+               const { data, error, success } = rewardSchema.safeParse(event.payload);
 
-               if (!parsed.success) {
-                  throw new ZodValidationError(parsed.error);
+               if (!success) {
+                  throw new ZodValidationError(error);
                }
 
-               const postId = parsed.data.postId;
-               const prevAggregatedCommentCountDiff = this.activeBatch.updates.get(postId) || 0;
+               const userId = data.userId;
+               const prevAggregatedRewardDiff = this.activeBatch.updates.get(userId) || 0;
 
-               this.activeBatch.updates.set(postId, prevAggregatedCommentCountDiff - 1);
+               this.activeBatch.updates.set(userId, prevAggregatedRewardDiff + 1);
                const currentPartitionMax = this.activeBatch.partitionOffsets.get(partition) ?? -1;
 
                if (offset > currentPartitionMax) {
