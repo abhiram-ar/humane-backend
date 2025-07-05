@@ -287,4 +287,22 @@ export class UserRepository implements IUserRepository {
          return { ack: false };
       }
    };
+
+   getUserHumaneScore = async (
+      userId: string
+   ): Promise<{ userId: string; score: number } | null> => {
+      try {
+         const res = await this._client.get<IUserDocument>({
+            index: this._index,
+            id: userId,
+            _source: ['humaneScore'] as (keyof IUserDocument)[],
+         });
+
+         if (res._source) {
+            return { userId: res._id, score: res._source.humaneScore };
+         } else return null;
+      } catch (error) {
+         return null;
+      }
+   };
 }

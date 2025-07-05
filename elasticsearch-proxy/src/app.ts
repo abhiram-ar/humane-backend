@@ -3,7 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import cookieParse from 'cookie-parser';
 import internalQueryRouter from 'routes/internalUserQuery.router';
-import publicQueryRouter from 'routes/publicUserQuery.router';
+import publicUserQueryRouter from 'routes/publicUserQuery.router';
 import { errorHandler } from 'humane-common';
 import publicPostRouter from 'routes/pubicPostRouter';
 import { userRepository } from '@di/repository';
@@ -35,7 +35,7 @@ app.post('/api/v1/query/test', async (req, res) => {
 
 app.use('/api/v1/query/internal', internalQueryRouter); //TODO" remove query and make this fully iternal
 
-app.use('/api/v1/query/public', publicQueryRouter);
+app.use('/api/v1/query/public/user', publicUserQueryRouter);
 app.use('/api/v1/query/post', publicPostRouter);
 
 app.use(errorHandler);

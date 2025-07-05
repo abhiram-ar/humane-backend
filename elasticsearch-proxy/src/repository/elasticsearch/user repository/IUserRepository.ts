@@ -50,4 +50,6 @@ export interface IUserRepository {
    bulkUpdateHumaneScoreFromDiff(
       updates: { userId: string; delta: number }[]
    ): Promise<{ ack: boolean }>;
+
+   getUserHumaneScore(userId: string): Promise<{ userId: string; score: number } | null>;
 }

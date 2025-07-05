@@ -20,6 +20,10 @@ import {
    GetUserBasicProfileFromIdsInputDTO,
 } from 'interfaces/dto/GetUserBasicProfileFromIDs';
 import { IUserServices } from 'interfaces/services/IUser.services';
+import {
+   GetUserHumaneScoreInputDTO,
+   GetUserHumaneScoreOutputDTO,
+} from 'interfaces/dto/GetUserHumaneScore.dto';
 
 export class UserServices implements IUserServices {
    constructor(
@@ -208,5 +212,11 @@ export class UserServices implements IUserServices {
       dto: { userId: string; delta: number }[]
    ): Promise<{ ack: boolean }> => {
       return await this._userRepository.bulkUpdateHumaneScoreFromDiff(dto);
+   };
+
+   getUserHumaneScore = async (
+      dto: GetUserHumaneScoreInputDTO
+   ): Promise<GetUserHumaneScoreOutputDTO | null> => {
+      return await this._userRepository.getUserHumaneScore(dto.userId);
    };
 }

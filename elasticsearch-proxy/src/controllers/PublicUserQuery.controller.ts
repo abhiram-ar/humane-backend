@@ -9,6 +9,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ZodValidationError } from 'humane-common';
 import { HttpStatusCode } from 'axios';
 import { InvalidUserIdsFormatError } from 'errors/InvalidUserIdsFormatError';
+import { getUserHumaneScoreInputSchema } from 'interfaces/dto/GetUserHumaneScore.dto';
 
 export class PublicUserQueryController {
    constructor(private readonly _userSerives: UserServices) {}
@@ -81,6 +82,22 @@ export class PublicUserQueryController {
          res.status(HttpStatusCode.Ok).json({
             data: result,
          });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getHumaneScore = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const { userId } = req.params;
+
+         const validatedUserId = getUserHumaneScoreInputSchema.safeParse({ userId });
+         if (!validatedUserId.success) {
+            throw new ZodValidationError(validatedUserId.error);
+         }
+
+         const score = await this._userSerives.getUserHumaneScore(validatedUserId.data);
+         res.status(HttpStatusCode.Ok).json({ data: score });
       } catch (error) {
          next(error);
       }

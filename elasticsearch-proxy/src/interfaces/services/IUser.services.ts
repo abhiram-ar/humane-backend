@@ -14,6 +14,10 @@ import {
    GetBasicUserProfileFromIdsOutputDTO,
    GetUserBasicProfileFromIdsInputDTO,
 } from 'interfaces/dto/GetUserBasicProfileFromIDs';
+import {
+   GetUserHumaneScoreInputDTO,
+   GetUserHumaneScoreOutputDTO,
+} from 'interfaces/dto/GetUserHumaneScore.dto';
 
 export interface IUserServices {
    createProfile(dto: CreateUserDTO): Promise<void>;
@@ -38,4 +42,6 @@ export interface IUserServices {
    bulkUpdateHumaneScoreFromDiff(
       dto: { userId: string; delta: number }[]
    ): Promise<{ ack: boolean }>;
+
+   getUserHumaneScore(dto: GetUserHumaneScoreInputDTO): Promise<GetUserHumaneScoreOutputDTO | null>;
 }

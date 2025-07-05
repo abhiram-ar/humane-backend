@@ -20,10 +20,10 @@ export class RewardEventsAggregatorConsumer implements IConsumer {
       private readonly _kafka: KafkaSingleton,
       private readonly _userServiec: IUserServices
    ) {
-      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-reward-aggregator-v2');
+      this.consumer = this._kafka.createConsumer('elasticsearch-proxy-reward-aggregator-v4');
    }
 
-   private readonly _FLUSH_INTERVAL = 3000; //3s
+   private readonly _FLUSH_INTERVAL = 1000; //3s
    private readonly _MAX_BATCH_SIZE = 100;
 
    // dual buffer, one to handle events occuring while the other buffer is being flused
@@ -83,7 +83,6 @@ export class RewardEventsAggregatorConsumer implements IConsumer {
 
       await this.consumer.subscribe({
          topic: MessageBrokerTopics.REWARD_EVENTS_TOPIC,
-         fromBeginning: true,
       });
 
       // timebased flushing
