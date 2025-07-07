@@ -29,7 +29,7 @@ app.use('/api/v1/writer/hashtag', hashtagRouter);
 app.use('/api/v1/internal', internalRouter);
 
 app.post('/api/v1/writer/test', async (req, res) => {
-   const result = 'no test';
+   const result = '';
 
    res.status(200).json(result);
 });

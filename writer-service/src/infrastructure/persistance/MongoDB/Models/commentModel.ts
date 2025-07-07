@@ -1,8 +1,9 @@
 import { Comment } from '@domain/entities/Comment.entity';
-import mongoose, { Document } from 'mongoose';
+import mongoose, { Document, HydratedDocument } from 'mongoose';
+import { IPostDocumnet } from './postModel';
 
 export interface ICommentDocument extends Required<Omit<Comment, 'id' | 'postId'>>, Document {
-   postId: mongoose.Schema.Types.ObjectId;
+   postId: mongoose.Schema.Types.ObjectId | HydratedDocument<IPostDocumnet>;
 }
 
 const commentSchema = new mongoose.Schema<ICommentDocument>(

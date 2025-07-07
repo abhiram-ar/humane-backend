@@ -85,7 +85,6 @@ export class CommentDeletedEventAggregateConsumer implements IConsumer {
 
       await this.consumer.subscribe({
          topic: MessageBrokerTopics.COMMENT_DELTED_EVENTS_TOPIC,
-         fromBeginning: true,
       });
 
       // timebased flushing

@@ -2,8 +2,10 @@ import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
 import { logger } from './logget';
 import {
    commentLikeCountWorker,
+   commentLikedByPostAuthorWorker,
    commentLikeWorker,
    commentUnlikedWorker,
+   commnetUnLikedByPostAuthorWorker,
 } from '@di/consumer.container';
 
 export async function connectKafkaProducer() {
@@ -20,10 +22,14 @@ export const startAllConsumer = async () => {
    await commentLikeWorker.start();
    await commentLikeCountWorker.start();
    await commentUnlikedWorker.start();
+   await commentLikedByPostAuthorWorker.start();
+   await commnetUnLikedByPostAuthorWorker.start();
 };
 
 export const stopAllConsumer = async () => {
    await commentLikeWorker.stop();
    await commentLikeCountWorker.stop();
    await commentUnlikedWorker.stop();
+   await commentLikedByPostAuthorWorker.stop();
+   await commnetUnLikedByPostAuthorWorker.stop();
 };

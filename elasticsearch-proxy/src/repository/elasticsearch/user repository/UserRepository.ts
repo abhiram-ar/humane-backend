@@ -9,7 +9,6 @@ import { logger } from '@config/logger';
 export class UserRepository implements IUserRepository {
    private readonly _index = ES_INDEXES.USER_PROFILE_INDEX;
    constructor(public readonly _client: Client) {}
-  
 
    initializeUserIndex = async () => {
       const indexExists = await this._client.indices.exists({
@@ -76,7 +75,7 @@ export class UserRepository implements IUserRepository {
    };
 
    updateCommand = async (updatedAt: string, dto: UpdateUserDTO): Promise<void> => {
-      const { id, ...data } = dto;
+      const { id, humaneScore, ...data } = dto;
 
       await this._client.update({
          index: this._index,
@@ -239,5 +238,71 @@ export class UserRepository implements IUserRepository {
          return typedDoc.found ? { ...typedDoc._source, id: doc._id } : null;
       });
       return parsedUserDocList;
+   };
+
+   /**
+    * Update only the humaneScore field in bulk.
+    *
+    * @remarks
+    * If the user docuemt does not exits.
+    * A minimal userdocument with userId is created with only humaneScore field
+    */
+   bulkUpdateHumaneScoreFromDiff = async (
+      updates: { userId: string; delta: number }[]
+   ): Promise<{ ack: boolean }> => {
+      const bulkBody: any[] = [];
+      updates.forEach((update) => {
+         bulkBody.push({
+            update: { _index: this._index, _id: update.userId },
+         });
+
+         bulkBody.push({
+            script: {
+               source: `
+               if(ctx._source.humaneScore == null) {
+                  ctx._source.humaneScore = params.delta;
+                  } 
+               else {
+                  ctx._source.humaneScore += params.delta;
+               }`,
+               lang: 'painless',
+               params: { delta: update.delta },
+            },
+            upsert: {
+               // a minimal document for the upsert case.
+               // The user.created event will eventually fill in the rest.
+               humaneScore: update.delta,
+            },
+         });
+      });
+
+      try {
+         await this._client.bulk({
+            operations: bulkBody,
+         });
+
+         return { ack: true };
+      } catch (error) {
+         logger.error('error while bulk updating post comments');
+         return { ack: false };
+      }
+   };
+
+   getUserHumaneScore = async (
+      userId: string
+   ): Promise<{ userId: string; score: number } | null> => {
+      try {
+         const res = await this._client.get<IUserDocument>({
+            index: this._index,
+            id: userId,
+            _source: ['humaneScore'] as (keyof IUserDocument)[],
+         });
+
+         if (res._source) {
+            return { userId: res._id, score: res._source.humaneScore };
+         } else return null;
+      } catch (error) {
+         return null;
+      }
    };
 }

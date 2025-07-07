@@ -1,3 +1,3 @@
-export interface IBaseRepository {
-   create(entiry: any): Promise<any>;
+export interface IBaseRepository<T = any> {
+   create(entiry: T): Promise<Required<T> | null>;
 }

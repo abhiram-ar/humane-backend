@@ -87,7 +87,6 @@ export class CommentCreatedEventAggregateConsumer implements IConsumer {
 
       await this.consumer.subscribe({
          topic: MessageBrokerTopics.COMMENT_CREATED_EVENTS_TOPIC,
-         fromBeginning: true,
       });
 
       // timebased flushing

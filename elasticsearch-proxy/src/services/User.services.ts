@@ -20,6 +20,10 @@ import {
    GetUserBasicProfileFromIdsInputDTO,
 } from 'interfaces/dto/GetUserBasicProfileFromIDs';
 import { IUserServices } from 'interfaces/services/IUser.services';
+import {
+   GetUserHumaneScoreInputDTO,
+   GetUserHumaneScoreOutputDTO,
+} from 'interfaces/dto/GetUserHumaneScore.dto';
 
 export class UserServices implements IUserServices {
    constructor(
@@ -27,16 +31,16 @@ export class UserServices implements IUserServices {
       private readonly _cdnService: CDNService
    ) {}
 
-   create = async (dto: CreateUserDTO): Promise<void> => {
+   createProfile = async (dto: CreateUserDTO): Promise<void> => {
       await this._userRepository.createCommand(dto);
    };
 
-   update = async (eventTimeStamp: string, dto: UpdateUserDTO) => {
+   upsertProfile = async (eventTimeStamp: string, dto: UpdateUserDTO) => {
       const incomingTimestamp = new Date(eventTimeStamp);
 
       const res = await this._userRepository.updatedAtQuery(dto.id);
-      if (!res) {
-         await this.create(dto);
+      if (res === null) {
+         await this.createProfile(dto);
          return;
       }
 
@@ -172,6 +176,7 @@ export class UserServices implements IUserServices {
          createdAt: userDoc.createdAt,
          avatarURL,
          coverPhotoURL,
+         humaneScore: userDoc.humaneScore,
       };
    };
 
@@ -201,5 +206,17 @@ export class UserServices implements IUserServices {
       });
 
       return avatarURLHydratedUserList;
+   };
+
+   bulkUpdateHumaneScoreFromDiff = async (
+      dto: { userId: string; delta: number }[]
+   ): Promise<{ ack: boolean }> => {
+      return await this._userRepository.bulkUpdateHumaneScoreFromDiff(dto);
+   };
+
+   getUserHumaneScore = async (
+      dto: GetUserHumaneScoreInputDTO
+   ): Promise<GetUserHumaneScoreOutputDTO | null> => {
+      return await this._userRepository.getUserHumaneScore(dto.userId);
    };
 }

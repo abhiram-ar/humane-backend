@@ -52,14 +52,14 @@ export class UserProfileEventsConsumer implements IConsumer {
                      throw new InvalidEventPayloadError();
                   }
 
-                  await this._userServices.create(parsed.data);
+                  await this._userServices.upsertProfile(event.timestamp, parsed.data);
                } else if (event.eventType === AppEventsTypes.USER_UPDATED) {
                   const parsed = updateUserSchema.safeParse(event.payload);
 
                   if (!parsed.success) {
                      throw new InvalidEventPayloadError();
                   }
-                  await this._userServices.update(event.timestamp, parsed.data);
+                  await this._userServices.upsertProfile(event.timestamp, parsed.data);
                } else if (event.eventType === AppEventsTypes.USER_AVATAR_UPDATED) {
                   const parsed = updateUserAvatarKeySchema.safeParse(event.payload);
 

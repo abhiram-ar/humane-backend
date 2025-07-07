@@ -7,6 +7,7 @@ import { CommentCreatedEventConsumer } from 'consumers/CommentCreatedEvent.consu
 import { CommentDeletedEventConsumer } from 'consumers/CommentDeletedEvent.consumer';
 import { CommentCreatedEventAggregateConsumer } from 'consumers/CommentCreatedEventAggregator.consumer';
 import { CommentDeletedEventAggregateConsumer } from 'consumers/CommentDeletedEventAggregator.consumer';
+import { RewardEventsAggregatorConsumer } from 'consumers/RewardEventsAggregator.consumer';
 
 export const userProfileConsumer = new UserProfileEventsConsumer(
    KafkaSingleton.getInstance(),
@@ -42,4 +43,9 @@ export const commentCreatedEventAggreteComsumer = new CommentCreatedEventAggrega
 export const commentDeletedEventAggreateConsumer = new CommentDeletedEventAggregateConsumer(
    KafkaSingleton.getInstance(),
    postServices
+);
+
+export const rewardEventsAggregatorConsumer = new RewardEventsAggregatorConsumer(
+   KafkaSingleton.getInstance(),
+   userServices
 );
