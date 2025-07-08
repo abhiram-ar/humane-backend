@@ -9,7 +9,7 @@ export class ConversataionRepository implements IConversationRepository {
    ): Promise<Required<Conversation> | null> => {
       const res = await conversationModel.findOne({
          type: conversationTypes.ONE_TO_ONE,
-         'participants.userId': { $all: [userIds] },
+         'participants.userId': { $all: userIds },
          'participants.2': { $exists: false }, // 2nd index does not exits, this ensure that we have atmost 2 user participants
       });
 

@@ -23,7 +23,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
    }
 );
 
-io.use(wsAuth);
+// io.use(wsAuth);
 io.on('connection', onConnectionHandler);
 
 io.engine.on('connection_error', (err) => {

@@ -1,11 +1,14 @@
 import { Message } from '@domain/Message';
 import mongoose, { Document } from 'mongoose';
 
-export interface IMessage extends Omit<Message, 'id' | 'conversationId'>, Document {
+export interface IMessageDocument
+   extends Omit<Message, 'id' | 'conversationId' | 'replyToMessageId'>,
+      Document {
    conversationId: mongoose.Schema.Types.ObjectId;
+   replyToMessageId: mongoose.Schema.Types.ObjectId;
 }
 
-const oneToOneMessageSchema = new mongoose.Schema<IMessage>({
+const messageSchema = new mongoose.Schema<IMessageDocument>({
    senderId: { type: String, required: true },
    conversationId: { type: mongoose.Types.ObjectId, ref: 'Conversation', required: true },
    message: { type: String, required: true },
@@ -18,6 +21,6 @@ const oneToOneMessageSchema = new mongoose.Schema<IMessage>({
    replyToMessageId: { type: mongoose.Types.ObjectId, ref: 'Message', required: false },
 });
 
-const oneToOneMessageModel = mongoose.model<IMessage>('Message', oneToOneMessageSchema);
+const messageModel = mongoose.model<IMessageDocument>('Message', messageSchema);
 
-export default oneToOneMessageModel;
+export default messageModel;

@@ -3,8 +3,9 @@ import { conversationTypes } from '@domain/Conversation';
 import { Message } from '@domain/Message';
 import { IMessageRepository } from '@ports/repository/IMessageRepository';
 import { IConversationServices } from '@ports/usecases/IConversationServices';
+import { IOneToOneMessageServices } from '@ports/usecases/IOneToOneMessage.services';
 
-export class OneToOneMessageServices {
+export class OneToOneMessageServices implements IOneToOneMessageServices {
    constructor(
       private readonly _messageRepo: IMessageRepository,
       private readonly _conversationServices: IConversationServices
