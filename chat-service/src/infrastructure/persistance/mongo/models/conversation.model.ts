@@ -1,7 +1,11 @@
 import { Conversation, conversationTypes } from '@domain/Conversation';
 import mongoose, { Document } from 'mongoose';
 
-interface IConversationDocument extends Required<Omit<Conversation, 'id'>>, Document {}
+interface IConversationDocument
+   extends Required<Omit<Conversation, 'id' | 'lastMessageId'>>,
+      Document {
+   lastMessageId: mongoose.Schema.Types.ObjectId;
+}
 
 const conversationSchema = new mongoose.Schema<IConversationDocument>(
    {
@@ -16,11 +20,17 @@ const conversationSchema = new mongoose.Schema<IConversationDocument>(
 
       participants: { type: [String], required: true, default: [] },
 
-      lastMessage: {
-         senderId: String,
-         message: String,
-         isRead: Boolean,
+      lastMessageId: {
+         type: mongoose.Types.ObjectId,
+         ref: 'Message',
       },
+
+      clearedChats: [
+         {
+            userId: { type: String },
+            clearedAt: { type: Date, default: null },
+         },
+      ],
    },
    { timestamps: true }
 );

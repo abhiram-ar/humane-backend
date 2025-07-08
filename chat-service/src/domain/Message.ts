@@ -1,4 +1,4 @@
-export class OneToOneMessage {
+export class Message {
    public readonly id?: string;
 
    public readonly senderId: string;
@@ -6,8 +6,8 @@ export class OneToOneMessage {
    public readonly message: string;
 
    public readonly sendAt: Date = new Date();
-   public isReadByRecipient: boolean = false;
-   public isSoftDeleted: boolean = false;
+   public isReadBy: string[] = [];
+   public deletededFor: string[] = [];
 
    public attachment: { attachmentType: string; attachmentKey: string } | undefined;
    public replyToMessageId: string | undefined;

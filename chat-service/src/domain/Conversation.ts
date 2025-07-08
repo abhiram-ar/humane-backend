@@ -14,11 +14,9 @@ export class Conversation {
 
    public participants: string[];
 
-   public lastMessage?: {
-      senderId: string;
-      message: string;
-      isRead: boolean; //only for one-to-one, ignore for groups
-   };
+   public clearedChats?: { userId: string; clearedAt: Date }[] = [];
+
+   public lastMessageId?: string;
    constructor(fields: {
       type: (typeof conversationTypes)[keyof typeof conversationTypes];
       participants: string[];
