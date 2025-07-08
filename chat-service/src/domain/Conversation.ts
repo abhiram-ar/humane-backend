@@ -13,6 +13,12 @@ export class Conversation {
    public updatedAt?: Date;
 
    public participants: string[];
+
+   public lastMessage?: {
+      senderId: string;
+      message: string;
+      isRead: boolean; //only for one-to-one, ignore for groups
+   };
    constructor(fields: {
       type: (typeof conversationTypes)[keyof typeof conversationTypes];
       participants: string[];

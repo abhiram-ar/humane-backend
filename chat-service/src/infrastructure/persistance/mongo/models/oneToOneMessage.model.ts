@@ -10,7 +10,7 @@ const oneToOneMessageSchema = new mongoose.Schema<IOneToOneMessage>({
    conversationId: { type: mongoose.Types.ObjectId, ref: 'Conversation', required: true },
    message: { type: String, required: true },
 
-   sendAt: { type: Date, default: new Date() },
+   sendAt: { type: Date, default: Date.now },
    isReadByRecipient: { type: Boolean, default: false, required: true },
    isSoftDeleted: { type: Boolean, default: false },
 

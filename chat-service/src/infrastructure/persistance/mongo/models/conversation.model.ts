@@ -15,6 +15,12 @@ const conversationSchema = new mongoose.Schema<IConversationDocument>(
       groupPicKey: { type: String, required: false },
 
       participants: { type: [String], required: true, default: [] },
+
+      lastMessage: {
+         senderId: String,
+         message: String,
+         isRead: Boolean,
+      },
    },
    { timestamps: true }
 );
