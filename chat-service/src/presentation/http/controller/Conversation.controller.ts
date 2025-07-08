@@ -16,6 +16,8 @@ export class ConversationController {
       const dto: CreateConversationInputDTO = {
          type: req.body.type,
          participants: [req.user.userId, ...req.body.OtherParticipants],
+         groupName: req.body.groupName,
+         groupPicKey: req.body.groupPicKey,
       };
 
       const validtedDTO = createConversationSchema.safeParse(dto);

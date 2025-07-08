@@ -1,7 +1,7 @@
 import { Conversation, conversationTypes } from '@domain/Conversation';
 import mongoose, { Document } from 'mongoose';
 
-interface IConversationDocument
+export interface IConversationDocument
    extends Required<Omit<Conversation, 'id' | 'lastMessageId'>>,
       Document {
    lastMessageId: mongoose.Schema.Types.ObjectId;
@@ -18,22 +18,23 @@ const conversationSchema = new mongoose.Schema<IConversationDocument>(
       groupName: { type: String, required: false },
       groupPicKey: { type: String, required: false },
 
-      participants: { type: [String], required: true, default: [] },
+      participants: [
+         {
+            userId: { type: String, required: true },
+            joinedAt: { type: Date, default: Date.now },
+            clearedAt: Date,
+         },
+      ],
 
       lastMessageId: {
          type: mongoose.Types.ObjectId,
          ref: 'Message',
       },
-
-      clearedChats: [
-         {
-            userId: { type: String },
-            clearedAt: { type: Date, default: null },
-         },
-      ],
    },
    { timestamps: true }
 );
+
+conversationSchema.index({ type: 1, participants: 1 });
 
 const conversationModel = mongoose.model<IConversationDocument>('Conversation', conversationSchema);
 
