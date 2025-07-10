@@ -12,7 +12,7 @@ export const messageAutoMapper = (doc: HydratedDocument<IMessageDocument>): Requ
       isReadBy: doc.isReadBy,
       deletededFor: doc.deletededFor,
       attachment: doc.attachment,
-      replyToMessageId: String(doc.replyToMessageId),
+      replyToMessageId: doc.replyToMessageId ? String(doc.replyToMessageId) : undefined,
    };
 
    return entity;

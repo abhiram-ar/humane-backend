@@ -1,10 +1,11 @@
 import { Conversation, conversationTypes } from '@domain/Conversation';
-import mongoose, { Document } from 'mongoose';
+import mongoose, { Document, HydratedDocument } from 'mongoose';
+import { IMessageDocument } from './Message.model';
 
 export interface IConversationDocument
    extends Required<Omit<Conversation, 'id' | 'lastMessageId'>>,
       Document {
-   lastMessageId: mongoose.Schema.Types.ObjectId;
+   lastMessageId: mongoose.Schema.Types.ObjectId | HydratedDocument<IMessageDocument>;
 }
 
 const conversationSchema = new mongoose.Schema<IConversationDocument>(

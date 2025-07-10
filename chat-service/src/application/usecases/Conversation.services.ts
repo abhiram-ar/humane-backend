@@ -1,5 +1,7 @@
 import { CreateConversationInputDTO } from '@application/dto/CreateConversation.dto';
+import { CurosrPagination } from '@application/Types/CursorPagination.type';
 import { Conversation } from '@domain/Conversation';
+import { ConversationWithLastMessage } from '@infrastructure/persistance/mongo/automapper/conversationWithLastMessageAutomapper';
 import { IConversationRepository } from '@ports/repository/IConversationRepository';
 import { IConversationServices } from '@ports/usecases/IConversationServices';
 
@@ -24,5 +26,18 @@ export class ConversationServices implements IConversationServices {
       // TODO: read through cache
 
       return await this._conversationRepo.getOneToOneConversationByParticipantIds(userIds);
+   };
+
+   getUserConversation = async (dto: {
+      userId: string;
+      from: string | null;
+      limit: number;
+   }): Promise<{ conversations: ConversationWithLastMessage[]; pagination: CurosrPagination }> => {
+      const { conversations, from, hasMore } = await this._conversationRepo.getUserConversations(
+         dto.userId,
+         dto.from,
+         dto.limit
+      );
+      return { conversations, pagination: { from, hasMore } };
    };
 }
