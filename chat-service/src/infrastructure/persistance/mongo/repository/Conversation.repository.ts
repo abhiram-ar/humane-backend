@@ -139,13 +139,6 @@ export class ConversataionRepository implements IConversationRepository {
          },
       ]);
 
-      // old query
-      // const res = await conversationModel
-      //    .find()
-      //    .sort({ updatedAt: -1, _id: -1 })
-      //    .limit(limit)
-      //    .populate('lastMessageId');
-
       const lastEntry = res.at(-1);
       const newFrom = lastEntry
          ? lastEntry.updatedAt.toISOString() + '|' + String(lastEntry._id)
