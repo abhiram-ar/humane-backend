@@ -40,4 +40,8 @@ export class ConversationServices implements IConversationServices {
       );
       return { conversations, pagination: { from, hasMore } };
    };
+
+   setLastOpenedAt = async (dto: { conversationId: string; userId: string; time: Date }) => {
+      await this._conversationRepo.setUserLastOpenedAt(dto.conversationId, dto.userId, dto.time);
+   };
 }

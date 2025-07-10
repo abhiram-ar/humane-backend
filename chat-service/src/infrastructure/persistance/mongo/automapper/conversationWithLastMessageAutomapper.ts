@@ -7,10 +7,14 @@ import { messageAutoMapper } from './message.automapper';
 
 export type ConversationWithLastMessage = Omit<Required<Conversation>, 'lastMessageId'> & {
    lastMessage: Required<Message> | undefined;
+   unreadCount: number;
 };
 
 export const conversationWithLastMessageAutoMapper = (
-   doc: HydratedDocument<IConversationDocument>
+   doc: HydratedDocument<IConversationDocument> & {
+      unreadCount: number;
+      lastMessage: HydratedDocument<IMessageDocument>;
+   }
 ): ConversationWithLastMessage => {
    const conversation: Omit<Required<Conversation>, 'lastMessageId'> = {
       id: doc.id ?? String(doc._id),
@@ -26,10 +30,10 @@ export const conversationWithLastMessageAutoMapper = (
       })),
    };
 
-   const lastMessageDoc = doc.lastMessageId as HydratedDocument<IMessageDocument>;
+   const lastMessageDoc = doc.lastMessage;
    const lastMessage: Required<Message> | undefined = lastMessageDoc
       ? messageAutoMapper(lastMessageDoc)
       : undefined;
 
-   return { ...conversation, lastMessage };
+   return { ...conversation, lastMessage, unreadCount: doc.unreadCount || 0 };
 };

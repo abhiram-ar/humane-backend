@@ -9,7 +9,6 @@ export const messageAutoMapper = (doc: HydratedDocument<IMessageDocument>): Requ
       conversationId: String(doc.conversationId),
       message: doc.message,
       sendAt: doc.sendAt,
-      isReadBy: doc.isReadBy,
       deletededFor: doc.deletededFor,
       attachment: doc.attachment,
       replyToMessageId: doc.replyToMessageId ? String(doc.replyToMessageId) : undefined,

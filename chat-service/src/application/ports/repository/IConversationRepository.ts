@@ -16,4 +16,6 @@ export interface IConversationRepository extends IBaseRepository<Conversation> {
       from: string | null;
       hasMore: boolean;
    }>;
+
+   setUserLastOpenedAt(conversationId: string, userId: string, time: Date): Promise<void>;
 }
