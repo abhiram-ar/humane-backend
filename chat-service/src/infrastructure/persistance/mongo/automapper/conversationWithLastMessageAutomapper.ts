@@ -22,6 +22,7 @@ export const conversationWithLastMessageAutoMapper = (
       participants: doc.participants.map((entry) => ({
          userId: entry.userId,
          joinedAt: entry.joinedAt,
+         lastOpenedAt: entry.lastOpenedAt,
       })),
    };
 

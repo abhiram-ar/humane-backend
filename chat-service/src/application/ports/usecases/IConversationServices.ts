@@ -1,11 +1,15 @@
 import { CreateConversationInputDTO } from '@application/dto/CreateConversation.dto';
 import { GetUserConversationInputDTO } from '@application/dto/GetUserConversations.dto';
+import { CurosrPagination } from '@application/Types/CursorPagination.type';
 import { Conversation } from '@domain/Conversation';
+import { ConversationWithLastMessage } from '@infrastructure/persistance/mongo/automapper/conversationWithLastMessageAutomapper';
 
 export interface IConversationServices {
    create(dto: CreateConversationInputDTO): Promise<Required<Conversation>>;
 
    getConversationByParticipantIds(userIds: string[]): Promise<Required<Conversation> | null>;
 
-   getUserConversation(dto: GetUserConversationInputDTO): Promise<unknown>;
+   getUserConversation(
+      dto: GetUserConversationInputDTO
+   ): Promise<{ conversations: ConversationWithLastMessage[]; pagination: CurosrPagination }>;
 }

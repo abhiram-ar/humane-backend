@@ -23,6 +23,7 @@ const conversationSchema = new mongoose.Schema<IConversationDocument>(
          {
             userId: { type: String, required: true },
             joinedAt: { type: Date, default: Date.now },
+            lastOpenedAt: { type: Date, default: Date.now },
             clearedAt: Date,
          },
       ],

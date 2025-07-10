@@ -15,6 +15,7 @@ export class Conversation {
    public participants: {
       userId: string;
       joinedAt: Date;
+      lastOpenedAt: Date;
       clearedAt?: Date;
    }[];
 
@@ -25,7 +26,7 @@ export class Conversation {
       groupName?: string;
       groupPicKey?: string;
    }) {
-      this.participants = fields.participants.map((userId) => ({ userId, joinedAt: new Date() }));
+      this.participants = fields.participants.map((userId) => ({ userId, joinedAt: new Date(), lastOpenedAt: new Date() }));
       this.type = fields.type;
       (this.groupName = fields.groupName), (this.groupPicKey = fields.groupPicKey);
    }
