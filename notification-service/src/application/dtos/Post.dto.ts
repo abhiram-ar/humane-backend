@@ -16,7 +16,7 @@ export const postSchema = z.object({
    id: z.string(),
    authorId: z.string(),
    content: z.string().nonempty().max(256),
-   posterKey: z.string().nullable(),
+   posterKey: z.string().nullish().optional(),
    visibility: z.enum([PostVisibility.FRIENDS, PostVisibility.PUBLIC]),
 
    moderationStatus: z.enum([
