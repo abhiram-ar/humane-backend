@@ -2,6 +2,7 @@ export const ENV = {
    NODE_ENV: process.env.NODE_ENV as 'production' | 'development',
    SERVER_PORT: '3000',
    MONGODB_URI: process.env.MONGODB_URI,
+   ELASTICSEARCH_PROXY_BASE_URL: process.env.ELASTICSEARCH_PROXY_BASE_URL,
 } as const;
 
 function checkEnv() {

@@ -1,4 +1,9 @@
 import { ConversationController } from '@presentation/http/controller/Conversation.controller';
-import { conversationServices } from './usecases.container';
+import { conversationServices, findOtherParticipantOfOneToOneConvo } from './usecases.container';
+import { esproxyService } from './services.container';
 
-export const conversationController = new ConversationController(conversationServices);
+export const conversationController = new ConversationController(
+   conversationServices,
+   findOtherParticipantOfOneToOneConvo,
+   esproxyService
+);

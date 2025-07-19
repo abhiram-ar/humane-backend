@@ -10,13 +10,20 @@ import {
    getUserConversaionsInputSchema,
    GetUserConversationInputDTO,
 } from '@application/dto/GetUserConversations.dto';
+import { BasicUserDetails } from '@application/Types/BasicUserDetails.type';
+import { IElasticSearchProxyService } from '@ports/services/IElasticSearchProxyService';
+import { IFindOtherParticipantOfOneToOneConvo } from '@ports/usecases/FindOtherParticipantOfOneToOneConvo';
 import { IConversationServices } from '@ports/usecases/IConversationServices';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 import { UnAuthenticatedError, ZodValidationError } from 'humane-common';
 
 export class ConversationController {
-   constructor(private readonly _conversationServices: IConversationServices) {}
+   constructor(
+      private readonly _conversationServices: IConversationServices,
+      private readonly _findOtherParticipantOfOneToOneConvo: IFindOtherParticipantOfOneToOneConvo,
+      private readonly _ESproxyService: IElasticSearchProxyService
+   ) {}
 
    createConversation = async (req: Request, res: Response, next: NextFunction) => {
       if (!req.user || req.user.type !== 'user') throw new UnAuthenticatedError();
@@ -53,9 +60,44 @@ export class ConversationController {
          if (!validtedDTO.success) {
             throw new ZodValidationError(validtedDTO.error);
          }
-         const result = await this._conversationServices.getUserConversation(validtedDTO.data);
+         const { pagination, conversations } = await this._conversationServices.getUserConversation(
+            validtedDTO.data
+         );
 
-         res.status(HttpStatusCode.Ok).json({ data: result });
+         const OneToOneConversationByParticipants = conversations
+            .filter((convo) => convo.type === 'one-to-one')
+            .map((convo) => convo.participants);
+
+         const otherUserIds = OneToOneConversationByParticipants.map((participants) =>
+            this._findOtherParticipantOfOneToOneConvo.execute(participants, validtedDTO.data.userId)
+         );
+
+         const basicUserDetails = await this._ESproxyService.getUserBasicDetails(otherUserIds);
+         const userIdToTheirBasicDetailsMap = new Map<string, BasicUserDetails>();
+         basicUserDetails.forEach((details) => {
+            if (!details) return;
+            userIdToTheirBasicDetailsMap.set(details.id, details);
+         });
+
+         const conversationWithParticipantHydrationForOneToOneConvo = conversations.map((convo) => {
+            const otherUserId = this._findOtherParticipantOfOneToOneConvo.execute(
+               convo.participants,
+               validtedDTO.data.userId
+            );
+
+            if (!userIdToTheirBasicDetailsMap.has(otherUserId)) {
+               return convo;
+            }
+
+            return { ...convo, otherUser: userIdToTheirBasicDetailsMap.get(otherUserId) };
+         });
+
+         res.status(HttpStatusCode.Ok).json({
+            data: {
+               conversations: conversationWithParticipantHydrationForOneToOneConvo,
+               pagination,
+            },
+         });
       } catch (error) {
          next(error);
       }
