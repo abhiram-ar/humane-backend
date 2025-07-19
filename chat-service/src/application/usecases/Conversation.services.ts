@@ -18,7 +18,7 @@ export class ConversationServices implements IConversationServices {
       return await this._conversationRepo.create(tempconvo);
    };
 
-   getConversationByParticipantIds = async (
+   getOneToOneConversationByParticipantIds = async (
       userIds: string[]
    ): Promise<Required<Conversation> | null> => {
       if (userIds.length === 0) return null;

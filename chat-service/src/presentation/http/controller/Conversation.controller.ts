@@ -3,6 +3,10 @@ import {
    createConversationSchema,
 } from '@application/dto/CreateConversation.dto';
 import {
+   GetOneToOneConversationInputDTO,
+   getOneToOneConversationInputSchema,
+} from '@application/dto/GetOneToOneConversation';
+import {
    getUserConversaionsInputSchema,
    GetUserConversationInputDTO,
 } from '@application/dto/GetUserConversations.dto';
@@ -52,6 +56,32 @@ export class ConversationController {
          const result = await this._conversationServices.getUserConversation(validtedDTO.data);
 
          res.status(HttpStatusCode.Ok).json({ data: result });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getOneToOneConversation = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         if (!req.user || req.user.type !== 'user') throw new UnAuthenticatedError();
+
+         const { otherUserId } = req.query;
+
+         const dto: GetOneToOneConversationInputDTO = {
+            participants: [req.user.userId, otherUserId as string],
+         };
+
+         const { data, error, success } = getOneToOneConversationInputSchema.safeParse(dto);
+         if (!success) {
+            throw new ZodValidationError(error);
+         }
+
+         const conversation =
+            await this._conversationServices.getOneToOneConversationByParticipantIds(
+               data.participants
+            );
+
+         res.status(HttpStatusCode.Ok).json({ data: { conversation } });
       } catch (error) {
          next(error);
       }

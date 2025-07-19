@@ -13,7 +13,7 @@ export class OneToOneMessageServices implements IOneToOneMessageServices {
 
    create = async (dto: CreateOneToOneMessageInputDTO): Promise<Required<Message>> => {
       // retrive the conversation - read through cache
-      let conversation = await this._conversationServices.getConversationByParticipantIds([
+      let conversation = await this._conversationServices.getOneToOneConversationByParticipantIds([
          dto.from,
          dto.to,
       ]);
