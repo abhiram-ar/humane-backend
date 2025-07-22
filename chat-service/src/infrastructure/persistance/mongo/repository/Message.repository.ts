@@ -44,4 +44,40 @@ export class MessageRepository implements IMessageRepository {
    delete(entity: Message): Promise<Required<Message> | null> {
       throw new Error('Method not implemented.');
    }
+
+   getOneToOneMessages = async (
+      converstionId: string,
+      from: string | null,
+      limit: number
+   ): Promise<{ messages: Required<Message>[]; from: string | null; hasMore: boolean }> => {
+      let lastMessageId: string | undefined;
+      let lastSendAt: string | undefined;
+      if (from) {
+         [lastSendAt, lastMessageId] = from.split('|');
+      }
+
+      console.log(from, lastSendAt, lastMessageId);
+
+      const result = await messageModel
+         .find({
+            conversationId: converstionId,
+            $or: from
+               ? [
+                    { sendAt: { $lt: lastSendAt } },
+                    { sendAt: { $lte: lastSendAt }, _id: { $lt: lastMessageId } },
+                 ]
+               : [],
+         })
+         .sort({ sendAt: -1, id: -1 })
+         .limit(limit);
+
+      let hasMore = result.length === limit;
+      let newFrom: string | undefined;
+      let lastElem = result.at(-1);
+      if (lastElem) {
+         newFrom = `${lastElem.sendAt.toISOString()}|${lastElem.id}`;
+      }
+
+      return { messages: result.map(messageAutoMapper), from: newFrom ?? null, hasMore };
+   };
 }

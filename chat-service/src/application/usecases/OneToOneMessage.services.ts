@@ -1,4 +1,5 @@
 import { CreateOneToOneMessageInputDTO } from '@application/dto/CreateOneToOneMessage.dto';
+import { CurosrPagination } from '@application/Types/CursorPagination.type';
 import { conversationTypes } from '@domain/Conversation';
 import { Message } from '@domain/Message';
 import { IMessageRepository } from '@ports/repository/IMessageRepository';
@@ -38,5 +39,24 @@ export class OneToOneMessageServices implements IOneToOneMessageServices {
 
       // send messge to the recipinet or coversation room
       return newMessage;
+   };
+
+   getMessages = async (dto: {
+      conversationId: string;
+      from: string | null;
+      limit: number;
+   }): Promise<{ messages: Required<Message>[]; pagination: CurosrPagination }> => {
+      const result = await this._messageRepo.getOneToOneMessages(
+         dto.conversationId,
+         dto.from,
+         dto.limit
+      );
+
+      // todo: attachment saturation
+
+      return {
+         messages: result.messages,
+         pagination: { from: result.from, hasMore: result.hasMore },
+      };
    };
 }

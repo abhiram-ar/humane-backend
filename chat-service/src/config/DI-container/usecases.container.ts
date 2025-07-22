@@ -2,6 +2,7 @@ import { ConversationServices } from '@application/usecases/Conversation.service
 import { conversationRepository, messageRepository } from './repository.container';
 import { OneToOneMessageServices } from '@application/usecases/OneToOneMessage.services';
 import { FindOtherParticipantOfOneToOneConvo } from '@application/usecases/FindOtherParticipantOfOneToOneConvo';
+import { GetOneToOneConversaionMessages } from '@application/usecases/GetOneToOneConversationMessages';
 
 export const conversationServices = new ConversationServices(conversationRepository);
 
@@ -10,4 +11,9 @@ export const oneToOneMessageServices = new OneToOneMessageServices(
    conversationServices
 );
 
-export const findOtherParticipantOfOneToOneConvo = new FindOtherParticipantOfOneToOneConvo()
+export const findOtherParticipantOfOneToOneConvo = new FindOtherParticipantOfOneToOneConvo();
+
+export const getOneToOneConversationMessages = new GetOneToOneConversaionMessages(
+   conversationServices,
+   oneToOneMessageServices
+);
