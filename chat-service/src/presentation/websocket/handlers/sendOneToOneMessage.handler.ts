@@ -6,11 +6,12 @@ import { oneToOneMessageServices } from '@di/usecases.container';
 import { ZodValidationError } from 'humane-common';
 import { TypedSocket } from '../Types/TypedSocket';
 import { isUserOnline } from '../utils/isUserOnline';
+import { Message } from '@domain/Message';
 
 export const sendOneToOneMessageHandler = async (
    socket: TypedSocket,
    event: Omit<CreateOneToOneMessageInputDTO, 'from'>,
-   callback: (ack: boolean) => void
+   callback: (data: { message: Required<Message> | undefined; success: boolean }) => void
 ) => {
    try {
       const validatedDTO = createOneToOneMessageSchema.safeParse({
@@ -23,12 +24,12 @@ export const sendOneToOneMessageHandler = async (
 
       const message = await oneToOneMessageServices.create(validatedDTO.data);
       if (await isUserOnline(event.to)) {
-         socket.to(event.to).emit('new-message', message);
+         socket.to(event.to).emit('new-one-to-one-message', message);
       }
-      callback(true);
+      callback({ message: message, success: true });
    } catch (e) {
       console.log('error while one to one message');
       console.log(e);
-      callback(false);
+      callback({ message: undefined, success: false });
    }
 };

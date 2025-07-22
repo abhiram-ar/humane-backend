@@ -3,7 +3,7 @@ import { Message } from '@domain/Message';
 
 export interface ServerToClientEvents {
    test: (msg: any) => void;
-   'new-message': (message: Required<Message>) => void;
+   'new-one-to-one-message': (message: Required<Message>) => void;
    'remove-noti': (noti: unknown) => void;
    'update-noti': (noti: unknown) => void;
    withAck: (d: string, callback: (e: number) => void) => void;
@@ -13,7 +13,7 @@ export interface ClientToServerEvents {
    hello: () => void;
    'send-one-to-one-message': (
       dto: Omit<CreateOneToOneMessageInputDTO, 'from'>,
-      callback: (ack: boolean) => void
+      callback: (data: { message: Required<Message> | undefined; success: boolean }) => void
    ) => void;
 }
 
