@@ -6,12 +6,15 @@ import { oneToOneMessageServices } from '@di/usecases.container';
 import { ZodValidationError } from 'humane-common';
 import { TypedSocket } from '../Types/TypedSocket';
 import { isUserOnline } from '../utils/isUserOnline';
-import { Message } from '@domain/Message';
+import { AttachementURLHydratedMessage } from '@application/Types/AttachmentURLHydratedMessage';
 
 export const sendOneToOneMessageHandler = async (
    socket: TypedSocket,
    event: Omit<CreateOneToOneMessageInputDTO, 'from'>,
-   callback: (data: { message: Required<Message> | undefined; success: boolean }) => void
+   callback: (data: {
+      message: AttachementURLHydratedMessage | undefined;
+      success: boolean;
+   }) => void
 ) => {
    try {
       const validatedDTO = createOneToOneMessageSchema.safeParse({

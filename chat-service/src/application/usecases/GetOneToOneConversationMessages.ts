@@ -1,7 +1,8 @@
 import { GetOneToOneConvoMessagesInputDTO } from '@application/dto/GetOneToOneConvoMessages.dto';
 import { ConversationNotFoundError } from '@application/errors/ConversationNotFoundError';
+import { AttachementURLHydratedMessage } from '@application/Types/AttachmentURLHydratedMessage';
 import { CurosrPagination } from '@application/Types/CursorPagination.type';
-import { Message } from '@domain/Message';
+import { IStorageService } from '@ports/services/IStorageService';
 import { IConversationServices } from '@ports/usecases/IConversationServices';
 import { IGetOneToOneConversaionMessages } from '@ports/usecases/IGetOneToOneConversationMessages';
 import { IOneToOneMessageServices } from '@ports/usecases/IOneToOneMessage.services';
@@ -9,22 +10,50 @@ import { IOneToOneMessageServices } from '@ports/usecases/IOneToOneMessage.servi
 export class GetOneToOneConversaionMessages implements IGetOneToOneConversaionMessages {
    constructor(
       private readonly _coverstionServices: IConversationServices,
-      private readonly _oneToOneMessageServices: IOneToOneMessageServices
+      private readonly _oneToOneMessageServices: IOneToOneMessageServices,
+      private readonly _storageServices: IStorageService
    ) {}
 
    execute = async (
       dto: GetOneToOneConvoMessagesInputDTO
-   ): Promise<{ messages: Required<Message>[]; pagination: CurosrPagination }> => {
+   ): Promise<{
+      messages: AttachementURLHydratedMessage[];
+      pagination: CurosrPagination;
+   }> => {
       const conversation = await this._coverstionServices.getOneToOneConversationByParticipantIds([
          dto.userId,
          dto.otherUserId,
       ]);
       if (!conversation) throw new ConversationNotFoundError();
 
-      return await this._oneToOneMessageServices.getMessages({
+      const { messages, pagination } = await this._oneToOneMessageServices.getMessages({
          conversationId: conversation.id,
          from: dto.from,
          limit: dto.limit,
       });
+
+      const attachmentURLHydratedMessages = messages.map((msg) => {
+         const { attachment, ...data } = msg;
+
+         let hydratedAttachment: { attachmentType: string; attachmentURL: string | undefined };
+         if (attachment && attachment.attachmentKey) {
+            hydratedAttachment = {
+               attachmentType: attachment.attachmentType,
+               attachmentURL: this._storageServices.getPublicCDNURL(attachment.attachmentKey),
+            };
+         } else {
+            hydratedAttachment = {
+               attachmentType: attachment ? attachment.attachmentType : '',
+               attachmentURL: undefined,
+            };
+         }
+
+         return {
+            ...data,
+            attachment: hydratedAttachment,
+         };
+      });
+
+      return { messages: attachmentURLHydratedMessages, pagination };
    };
 }

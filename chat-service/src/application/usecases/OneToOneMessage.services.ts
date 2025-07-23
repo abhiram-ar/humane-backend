@@ -1,18 +1,21 @@
 import { CreateOneToOneMessageInputDTO } from '@application/dto/CreateOneToOneMessage.dto';
+import { AttachementURLHydratedMessage } from '@application/Types/AttachmentURLHydratedMessage';
 import { CurosrPagination } from '@application/Types/CursorPagination.type';
 import { conversationTypes } from '@domain/Conversation';
 import { Message } from '@domain/Message';
 import { IMessageRepository } from '@ports/repository/IMessageRepository';
+import { IStorageService } from '@ports/services/IStorageService';
 import { IConversationServices } from '@ports/usecases/IConversationServices';
 import { IOneToOneMessageServices } from '@ports/usecases/IOneToOneMessage.services';
 
 export class OneToOneMessageServices implements IOneToOneMessageServices {
    constructor(
       private readonly _messageRepo: IMessageRepository,
-      private readonly _conversationServices: IConversationServices
+      private readonly _conversationServices: IConversationServices,
+      private readonly _storageServices: IStorageService
    ) {}
 
-   create = async (dto: CreateOneToOneMessageInputDTO): Promise<Required<Message>> => {
+   create = async (dto: CreateOneToOneMessageInputDTO): Promise<AttachementURLHydratedMessage> => {
       // retrive the conversation - read through cache
       let conversation = await this._conversationServices.getOneToOneConversationByParticipantIds([
          dto.from,
@@ -38,7 +41,25 @@ export class OneToOneMessageServices implements IOneToOneMessageServices {
       const newMessage = await this._messageRepo.create(tempMessage);
 
       // send messge to the recipinet or coversation room
-      return newMessage;
+      const { attachment, ...data } = newMessage;
+
+      let hydratedAttachment: { attachmentType: string; attachmentURL: string | undefined };
+      if (attachment && attachment.attachmentKey) {
+         hydratedAttachment = {
+            attachmentType: attachment.attachmentType,
+            attachmentURL: this._storageServices.getPublicCDNURL(attachment.attachmentKey),
+         };
+      } else {
+         hydratedAttachment = {
+            attachmentType: attachment ? attachment.attachmentType : '',
+            attachmentURL: undefined,
+         };
+      }
+
+      return {
+         ...data,
+         attachment: hydratedAttachment,
+      };
    };
 
    getMessages = async (dto: {

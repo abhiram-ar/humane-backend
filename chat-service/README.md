@@ -20,9 +20,10 @@ Purpose: Implement and handle HTTP and websocket traffic for chat related featur
 
 ## API Endpoints
 
-| Method | Endpoint                        | QueryParams   | Description                                                                                                                                                                                   |
-| ------ | ------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| POST   | `/api/v1/chat/convo/one-to-one` | `otherUserId` | Get one to one conversation details from `userId`'s <br> One `userId` will be taken from authenticated user jwt token.<br> Other `userId` should be provided as `otherUserId` as query params |
+| Method | Endpoint                                | QueryParams                       | Description                                                                                                                                                                                   |
+| ------ | --------------------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | `/api/v1/chat/convo/one-to-one`         | `otherUserId`                     | Get one to one conversation details from `userId`'s <br> One `userId` will be taken from authenticated user jwt token.<br> Other `userId` should be provided as `otherUserId` as query params |
+| GET    | `/api/v1/chat/convo/one-to-one/message` | `otherUserId` `from?` `limit?=10` | Retive one to one conversion from authenticated user and `otherUser`                                                                                                                          |
 
 ## Kafka Events
 
@@ -39,6 +40,7 @@ nill
 -  NODE_ENV: 'production' | 'development',
 -  SERVER_PORT: default(3000),
 -  MONGODB_URI
+-  ELASTICSEARCH_PROXY_BASE_URL
 
 ### notes
 
