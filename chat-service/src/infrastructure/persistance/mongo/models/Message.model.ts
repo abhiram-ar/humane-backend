@@ -11,7 +11,7 @@ export interface IMessageDocument
 const messageSchema = new mongoose.Schema<IMessageDocument>({
    senderId: { type: String, required: true },
    conversationId: { type: mongoose.Types.ObjectId, ref: 'Conversation', required: true },
-   message: { type: String, required: true },
+   message: { type: String },
 
    sendAt: { type: Date, default: Date.now },
    deletededFor: { type: [String], default: [] },

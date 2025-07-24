@@ -56,8 +56,6 @@ export class MessageRepository implements IMessageRepository {
          [lastSendAt, lastMessageId] = from.split('|');
       }
 
-      console.log(from, lastSendAt, lastMessageId);
-
       const result = await messageModel
          .find({
             conversationId: converstionId,
