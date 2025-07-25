@@ -21,7 +21,6 @@ import {
    getUserConvoByIdInputSchema,
    GetUserCovoByIdInputDTO,
 } from '@application/dto/GetUserConversationById.dto';
-import { logger } from '@config/logger';
 
 export class ConversationController {
    constructor(
