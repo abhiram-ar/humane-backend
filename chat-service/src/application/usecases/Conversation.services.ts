@@ -1,4 +1,5 @@
 import { CreateConversationInputDTO } from '@application/dto/CreateConversation.dto';
+import { SetConvoLastOpenedInputDTO } from '@application/dto/SetCovoLastOpened.dto';
 import { CurosrPagination } from '@application/Types/CursorPagination.type';
 import { Conversation } from '@domain/Conversation';
 import { ConversationWithLastMessage } from '@infrastructure/persistance/mongo/automapper/conversationWithLastMessageAutomapper';
@@ -41,7 +42,7 @@ export class ConversationServices implements IConversationServices {
       return { conversations, pagination: { from, hasMore } };
    };
 
-   setLastOpenedAt = async (dto: { conversationId: string; userId: string; time: Date }) => {
+   setLastOpenedAt = async (dto: SetConvoLastOpenedInputDTO) => {
       await this._conversationRepo.setUserLastOpenedAt(dto.conversationId, dto.userId, dto.time);
    };
 }

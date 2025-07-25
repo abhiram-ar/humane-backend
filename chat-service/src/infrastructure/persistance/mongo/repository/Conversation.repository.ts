@@ -99,7 +99,7 @@ export class ConversataionRepository implements IConversationRepository {
                from: 'messages',
                let: {
                   roomId: '$_id',
-                  lastSeenAt: '$currentUser.lastSeenAt',
+                  lastSeenAt: '$currentUser.lastOpenedAt',
                },
                pipeline: [
                   {
@@ -156,9 +156,11 @@ export class ConversataionRepository implements IConversationRepository {
       userId: string,
       time: Date
    ): Promise<void> => {
-      await conversationModel.updateOne(
+      const res = await conversationModel.updateOne(
          { _id: conversationId, 'participants.userId': userId },
          { $set: { 'participants.$.lastOpenedAt': time } }
       );
+
+      console.log(res);
    };
 }

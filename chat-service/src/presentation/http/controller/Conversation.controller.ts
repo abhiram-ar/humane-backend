@@ -12,7 +12,7 @@ import {
 } from '@application/dto/GetUserConversations.dto';
 import { BasicUserDetails } from '@application/Types/BasicUserDetails.type';
 import { IElasticSearchProxyService } from '@ports/services/IElasticSearchProxyService';
-import { IFindOtherParticipantOfOneToOneConvo } from '@ports/usecases/FindOtherParticipantOfOneToOneConvo';
+import { IFindOtherParticipantOfOneToOneConvo } from '@ports/usecases/IFindOtherParticipantOfOneToOneConvo';
 import { IConversationServices } from '@ports/usecases/IConversationServices';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
