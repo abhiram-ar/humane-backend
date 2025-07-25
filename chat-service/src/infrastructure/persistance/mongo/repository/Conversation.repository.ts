@@ -8,6 +8,7 @@ import {
    conversationWithLastMessageAutoMapper,
 } from '../automapper/conversationWithLastMessageAutomapper';
 export class ConversataionRepository implements IConversationRepository {
+   
    getOneToOneConversationByParticipantIds = async (
       userIds: string[]
    ): Promise<Required<Conversation> | null> => {
@@ -162,4 +163,10 @@ export class ConversataionRepository implements IConversationRepository {
          { timestamps: false }
       );
    };
+
+   getUserConversationById = async(userId: string, convoId: string): Promise<Required<Conversation> | null> => {
+      const res = await conversationModel.findOne({_id: convoId, "participants.userId": userId})
+      
+      return res ? conversationAutomapper(res) : null
+   }
 }

@@ -1,4 +1,5 @@
 import { CreateConversationInputDTO } from '@application/dto/CreateConversation.dto';
+import { GetUserCovoByIdInputDTO } from '@application/dto/GetUserConversationById.dto';
 import { SetConvoLastOpenedInputDTO } from '@application/dto/SetCovoLastOpened.dto';
 import { CurosrPagination } from '@application/Types/CursorPagination.type';
 import { Conversation } from '@domain/Conversation';
@@ -44,5 +45,11 @@ export class ConversationServices implements IConversationServices {
 
    setLastOpenedAt = async (dto: SetConvoLastOpenedInputDTO) => {
       await this._conversationRepo.setUserLastOpenedAt(dto.conversationId, dto.userId, dto.time);
+   };
+
+   getUserConversationById = async (
+      dto: GetUserCovoByIdInputDTO
+   ): Promise<Required<Conversation> | null> => {
+      return this._conversationRepo.getUserConversationById(dto.userId, dto.convoId);
    };
 }

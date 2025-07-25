@@ -1,4 +1,5 @@
 import { CreateConversationInputDTO } from '@application/dto/CreateConversation.dto';
+import { GetUserCovoByIdInputDTO } from '@application/dto/GetUserConversationById.dto';
 import { GetUserConversationInputDTO } from '@application/dto/GetUserConversations.dto';
 import { SetConvoLastOpenedInputDTO } from '@application/dto/SetCovoLastOpened.dto';
 import { CurosrPagination } from '@application/Types/CursorPagination.type';
@@ -17,4 +18,6 @@ export interface IConversationServices {
    ): Promise<{ conversations: ConversationWithLastMessage[]; pagination: CurosrPagination }>;
 
    setLastOpenedAt(dto: SetConvoLastOpenedInputDTO): Promise<void>;
+
+   getUserConversationById(dto: GetUserCovoByIdInputDTO): Promise<Required<Conversation> | null>;
 }

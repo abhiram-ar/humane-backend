@@ -17,6 +17,11 @@ import { IConversationServices } from '@ports/usecases/IConversationServices';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 import { UnAuthenticatedError, ZodValidationError } from 'humane-common';
+import {
+   getUserConvoByIdInputSchema,
+   GetUserCovoByIdInputDTO,
+} from '@application/dto/GetUserConversationById.dto';
+import { logger } from '@config/logger';
 
 export class ConversationController {
    constructor(
@@ -105,6 +110,7 @@ export class ConversationController {
 
    getOneToOneConversation = async (req: Request, res: Response, next: NextFunction) => {
       try {
+         console.log('hit');
          if (!req.user || req.user.type !== 'user') throw new UnAuthenticatedError();
 
          const { otherUserId } = req.query;
@@ -124,6 +130,30 @@ export class ConversationController {
             );
 
          res.status(HttpStatusCode.Ok).json({ data: { conversation } });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getUserConvoById = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         if (!req.user || req.user.type !== 'user') throw new UnAuthenticatedError();
+
+         const { convoId } = req.params;
+
+         const dto: GetUserCovoByIdInputDTO = {
+            userId: req.user.userId,
+            convoId: convoId,
+         };
+
+         const validatedDTO = getUserConvoByIdInputSchema.safeParse(dto);
+         if (!validatedDTO.success) {
+            throw new ZodValidationError(validatedDTO.error);
+         }
+
+         const result = await this._conversationServices.getUserConversationById(dto);
+
+         res.status(HttpStatusCode.Ok).json({ data: { convo: result } });
       } catch (error) {
          next(error);
       }
