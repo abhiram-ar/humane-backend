@@ -156,11 +156,10 @@ export class ConversataionRepository implements IConversationRepository {
       userId: string,
       time: Date
    ): Promise<void> => {
-      const res = await conversationModel.updateOne(
+      await conversationModel.updateOne(
          { _id: conversationId, 'participants.userId': userId },
-         { $set: { 'participants.$.lastOpenedAt': time } }
+         { $set: { 'participants.$.lastOpenedAt': time } },
+         { timestamps: false }
       );
-
-      console.log(res);
    };
 }
