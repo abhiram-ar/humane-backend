@@ -11,7 +11,7 @@ export const searchUserConvoInputSchema = z.object({
 
 export type SearchUserConvoInputDTO = z.infer<typeof searchUserConvoInputSchema>;
 
-export type StartNewConvo = { otherUserDetails: UserDetailsFromES };
+export type StartNewConvo = { otherUser: UserDetailsFromES };
 export type ExistingConvo = ConversationWithLastMessage & StartNewConvo;
 
 export type SearchUserConvoOutputDTO = {

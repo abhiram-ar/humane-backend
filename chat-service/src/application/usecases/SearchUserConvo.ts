@@ -57,9 +57,9 @@ export class SearchUserCovo {
       result.users.forEach((user) => {
          const convo = userIdToConvoWithLastMsgMap.get(user.id);
          if (convo) {
-            existingConvos.push({ ...convo, otherUserDetails: user });
+            existingConvos.push({ ...convo, otherUser: user });
          } else {
-            startNewConvos.push({ otherUserDetails: user });
+            startNewConvos.push({ otherUser: user });
          }
       });
 
