@@ -8,7 +8,6 @@ import {
    conversationWithLastMessageAutoMapper,
 } from '../automapper/conversationWithLastMessageAutomapper';
 export class ConversataionRepository implements IConversationRepository {
-   
    getOneToOneConversationByParticipantIds = async (
       userIds: string[]
    ): Promise<Required<Conversation> | null> => {
@@ -164,9 +163,109 @@ export class ConversataionRepository implements IConversationRepository {
       );
    };
 
-   getUserConversationById = async(userId: string, convoId: string): Promise<Required<Conversation> | null> => {
-      const res = await conversationModel.findOne({_id: convoId, "participants.userId": userId})
-      
-      return res ? conversationAutomapper(res) : null
-   }
+   getUserConversationById = async (
+      userId: string,
+      convoId: string
+   ): Promise<Required<Conversation> | null> => {
+      const res = await conversationModel.findOne({ _id: convoId, 'participants.userId': userId });
+
+      return res ? conversationAutomapper(res) : null;
+   };
+
+   findManyUserOneToOneConvoByParticipantIds = async (
+      userId: string,
+      otherUserIds: string[],
+      limit: number
+   ): Promise<ConversationWithLastMessage[]> => {
+      if (otherUserIds.length === 0) return [];
+
+      const res = await conversationModel.aggregate([
+         {
+            $match: {
+               type: conversationTypes.ONE_TO_ONE,
+               $and: [
+                  { 'participants.userId': userId },
+                  { 'participants.userId': { $in: otherUserIds } },
+               ],
+            },
+         },
+         {
+            $sort: { updatedAt: -1, _id: -1 },
+         },
+         { $limit: limit },
+
+         // Stage 4: lookup the latest message
+         {
+            $lookup: {
+               from: 'messages',
+               localField: 'lastMessageId',
+               foreignField: '_id',
+               as: 'lastMessage',
+            },
+         },
+         { $unwind: { path: '$lastMessage', preserveNullAndEmptyArrays: true } },
+
+         // Stage 5: add current users lastSeenAt to top-level (for easy lookup)
+         {
+            $addFields: {
+               currentUser: {
+                  $first: {
+                     $filter: {
+                        input: '$participants',
+                        as: 'p',
+                        cond: { $eq: ['$$p.userId', userId] },
+                     },
+                  },
+               },
+            },
+         },
+
+         // Stage 6: lookup unread messages for each conversation
+         {
+            $lookup: {
+               from: 'messages',
+               let: {
+                  roomId: '$_id',
+                  lastSeenAt: '$currentUser.lastOpenedAt',
+               },
+               pipeline: [
+                  {
+                     $match: {
+                        $expr: {
+                           $and: [
+                              { $eq: ['$conversationId', '$$roomId'] },
+                              { $ne: ['$senderId', userId] },
+                              {
+                                 $gt: ['$sendAt', { $ifNull: ['$$lastSeenAt', new Date(0)] }],
+                              },
+                           ],
+                        },
+                     },
+                  },
+                  { $count: 'unreadCount' },
+               ],
+               as: 'unreadMeta',
+            },
+         },
+
+         // Stage 7: flatten unreadCount
+         {
+            $addFields: {
+               unreadCount: {
+                  $ifNull: [{ $arrayElemAt: ['$unreadMeta.unreadCount', 0] }, 0],
+               },
+            },
+         },
+
+         // optional: clean up
+         {
+            $project: {
+               unreadMeta: 0,
+               currentUser: 0,
+            },
+         },
+      ]);
+
+      return res.map((doc) => conversationWithLastMessageAutoMapper(doc));
+   };
 }

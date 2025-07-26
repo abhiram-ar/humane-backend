@@ -3,7 +3,8 @@ import { conversationRepository, messageRepository } from './repository.containe
 import { OneToOneMessageServices } from '@application/usecases/OneToOneMessage.services';
 import { FindOtherParticipantOfOneToOneConvo } from '@application/usecases/FindOtherParticipantOfOneToOneConvo';
 import { GetOneToOneConversaionMessages } from '@application/usecases/GetOneToOneConversationMessages';
-import { storageService } from './services.container';
+import { esproxyService, storageService } from './services.container';
+import { SearchUserCovo } from '@application/usecases/SearchUserConvo';
 
 export const conversationServices = new ConversationServices(conversationRepository);
 
@@ -19,4 +20,10 @@ export const getOneToOneConversationMessages = new GetOneToOneConversaionMessage
    conversationServices,
    oneToOneMessageServices,
    storageService
+);
+
+export const searchUserConvo = new SearchUserCovo(
+   esproxyService,
+   conversationRepository,
+   findOtherParticipantOfOneToOneConvo
 );

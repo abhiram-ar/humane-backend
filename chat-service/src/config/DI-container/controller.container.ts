@@ -3,6 +3,7 @@ import {
    conversationServices,
    findOtherParticipantOfOneToOneConvo,
    getOneToOneConversationMessages,
+   searchUserConvo,
 } from './usecases.container';
 import { esproxyService } from './services.container';
 import { MessageController } from '@presentation/http/controller/Message.controller';
@@ -10,7 +11,8 @@ import { MessageController } from '@presentation/http/controller/Message.control
 export const conversationController = new ConversationController(
    conversationServices,
    findOtherParticipantOfOneToOneConvo,
-   esproxyService
+   esproxyService,
+   searchUserConvo
 );
 
 export const messsageController = new MessageController(getOneToOneConversationMessages);

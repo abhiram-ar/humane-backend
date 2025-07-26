@@ -3,7 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import { errorHandler } from 'humane-common';
 import chatRouter from './router/chat.router';
-import {  messageRepository } from '@di/repository.container';
+import { conversationRepository } from '@di/repository.container';
 
 const expressApp = express();
 
@@ -23,9 +23,9 @@ expressApp.get('/api/v1/chat/health', (req, res) => {
 
 expressApp.get('/api/v1/chat/test', async (req, res, next) => {
    try {
-      const result = await messageRepository.getOneToOneMessages(
-         '686e362ea6c7d7c57a3038df',
-         null,
+      const result = await conversationRepository.findManyUserOneToOneConvoByParticipantIds(
+         '5315c3dd-a5bc-4754-9ce7-817018f97f7d',
+         ['4208d67b-1af8-488b-97e7-a719d632af33'],
          10
       );
       res.status(200).json(result);

@@ -21,12 +21,18 @@ import {
    getUserConvoByIdInputSchema,
    GetUserCovoByIdInputDTO,
 } from '@application/dto/GetUserConversationById.dto';
+import {
+   SearchUserConvoInputDTO,
+   searchUserConvoInputSchema,
+} from '@application/dto/SearchUserConvo.dto';
+import { ISearchUserCovo } from '@ports/usecases/ISearchUserConvo';
 
 export class ConversationController {
    constructor(
       private readonly _conversationServices: IConversationServices,
       private readonly _findOtherParticipantOfOneToOneConvo: IFindOtherParticipantOfOneToOneConvo,
-      private readonly _ESproxyService: IElasticSearchProxyService
+      private readonly _ESproxyService: IElasticSearchProxyService,
+      private readonly _searchUserConvo: ISearchUserCovo
    ) {}
 
    createConversation = async (req: Request, res: Response, next: NextFunction) => {
@@ -153,6 +159,32 @@ export class ConversationController {
          const result = await this._conversationServices.getUserConversationById(dto);
 
          res.status(HttpStatusCode.Ok).json({ data: { convo: result } });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   searchUserConvo = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         if (!req.user || req.user.type !== 'user') throw new UnAuthenticatedError();
+
+         const { limit = '10', page = '1', searchQuery } = req.query;
+
+         const dto: SearchUserConvoInputDTO = {
+            currentUserId: req.user.userId,
+            limit: parseInt(limit as string),
+            page: parseInt(page as string),
+            searchQuery: searchQuery as string,
+         };
+
+         const validatedDTO = searchUserConvoInputSchema.safeParse(dto);
+         if (!validatedDTO.success) {
+            throw new ZodValidationError(validatedDTO.error);
+         }
+
+         const result = await this._searchUserConvo.execute(validatedDTO.data);
+
+         res.status(HttpStatusCode.Ok).json({ data: result });
       } catch (error) {
          next(error);
       }

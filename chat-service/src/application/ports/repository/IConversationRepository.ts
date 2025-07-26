@@ -20,4 +20,10 @@ export interface IConversationRepository extends IBaseRepository<Conversation> {
    setUserLastOpenedAt(conversationId: string, userId: string, time: Date): Promise<void>;
 
    getUserConversationById(userId: string, convoId: string): Promise<Required<Conversation> | null>;
+
+   findManyUserOneToOneConvoByParticipantIds(
+      userId: string,
+      otherUserIds: string[],
+      limit: number
+   ): Promise<ConversationWithLastMessage[]>;
 }
