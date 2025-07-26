@@ -124,6 +124,7 @@ export class UserServices implements IUserServices {
          id: user.id,
          firstName: user.firstName,
          lastName: user.lastName,
+         avatarURL: user.avatarKey ? this._cdnService.getPublicCDNURL(user.avatarKey) : null,
       }));
 
       return { users: parsedUser, pagination };
