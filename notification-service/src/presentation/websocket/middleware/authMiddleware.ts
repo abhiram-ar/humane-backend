@@ -7,12 +7,16 @@ export const wsAuth = (socket: Socket, next: (err?: ExtendedError) => void) => {
    if (!accessToken) {
       next(new Error('No token in socket.io request'));
    }
-   const payload = verifyAccessToken.execute(accessToken);
+   try {
+      const payload = verifyAccessToken.execute(accessToken);
 
-   if (payload.type === 'user') {
-      socket.data.userId = payload.userId;
-      next();
-   } else {
-      next(new Error('Invalid user type while verifying accessToken'));
+      if (payload.type === 'user') {
+         socket.data.userId = payload.userId;
+         next();
+      } else {
+         next(new Error('Invalid user type while verifying accessToken'));
+      }
+   } catch (error) {
+      next(error as Error);
    }
 };
