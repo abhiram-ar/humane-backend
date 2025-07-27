@@ -3,16 +3,16 @@ import { Server } from 'socket.io';
 import { wsAuth } from './middleware/authMiddleware';
 import { onConnectionHandler } from './handlers/onConnectionHandler';
 import {
-   ClientToServerEvents,
+   IClientToServerEvents,
    InterServerEvents,
-   ServerToClientEvents,
+   IServerToClientEvents,
    SocketData,
 } from './Types/SocketIOConfig.types';
 import expressApp from '@presentation/http/app';
 
 const httpServer = createServer(expressApp);
 
-const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(
+const io = new Server<IClientToServerEvents, IServerToClientEvents, InterServerEvents, SocketData>(
    httpServer,
    {
       path: '/api/v1/chat/socket.io',

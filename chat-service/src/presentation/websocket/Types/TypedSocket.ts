@@ -1,14 +1,14 @@
 import { Socket } from 'socket.io';
 import {
-   ClientToServerEvents,
+   IClientToServerEvents,
    InterServerEvents,
-   ServerToClientEvents,
+   IServerToClientEvents,
    SocketData,
 } from './SocketIOConfig.types';
 
 export type TypedSocket = Socket<
-   ClientToServerEvents,
-   ServerToClientEvents,
+   IClientToServerEvents,
+   IServerToClientEvents,
    InterServerEvents,
    SocketData
 >;

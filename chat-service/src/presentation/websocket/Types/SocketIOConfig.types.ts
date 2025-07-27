@@ -1,7 +1,7 @@
 import { CreateOneToOneMessageInputDTO } from '@application/dto/CreateOneToOneMessage.dto';
 import { AttachementURLHydratedMessage } from '@application/Types/AttachmentURLHydratedMessage';
 
-export interface ServerToClientEvents {
+export interface IServerToClientEvents {
    test: (msg: any) => void;
    'new-one-to-one-message': (message: AttachementURLHydratedMessage) => void;
    'remove-noti': (noti: unknown) => void;
@@ -9,9 +9,13 @@ export interface ServerToClientEvents {
    withAck: (d: string, callback: (e: number) => void) => void;
 }
 
-export interface ClientToServerEvents {
+export interface IClientToServerEvents {
    hello: () => void;
    'convo-opened': (dto: { time: Date; convoId: string }) => void;
+   'delete-message': (
+      dto: { convoId: string; messageId: string },
+      callback: (ack: boolean) => void
+   ) => void;
    'send-one-to-one-message': (
       dto: Omit<CreateOneToOneMessageInputDTO, 'from'>,
       callback: (data: {
