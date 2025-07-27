@@ -1,6 +1,7 @@
 import { CreateConversationInputDTO } from '@application/dto/CreateConversation.dto';
 import { GetUserCovoByIdInputDTO } from '@application/dto/GetUserConversationById.dto';
 import { SetConvoLastOpenedInputDTO } from '@application/dto/SetCovoLastOpened.dto';
+import { ConversationNotFoundError } from '@application/errors/ConversationNotFoundError';
 import { CurosrPagination } from '@application/Types/CursorPagination.type';
 import { Conversation } from '@domain/Conversation';
 import { ConversationWithLastMessage } from '@infrastructure/persistance/mongo/automapper/conversationWithLastMessageAutomapper';
@@ -18,6 +19,11 @@ export class ConversationServices implements IConversationServices {
          groupPicKey: dto.groupPicKey,
       });
       return await this._conversationRepo.create(tempconvo);
+   };
+   getConvoById = async (convoId: string): Promise<Required<Conversation>> => {
+      const result = await this._conversationRepo.getConversationById(convoId);
+      if (!result) throw new ConversationNotFoundError();
+      return result;
    };
 
    getOneToOneConversationByParticipantIds = async (

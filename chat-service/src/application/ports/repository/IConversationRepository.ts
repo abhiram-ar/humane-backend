@@ -26,4 +26,6 @@ export interface IConversationRepository extends IBaseRepository<Conversation> {
       otherUserIds: string[],
       limit: number
    ): Promise<ConversationWithLastMessage[]>;
+
+   getConversationById(converstionId: string): Promise<Required<Conversation> | null>;
 }

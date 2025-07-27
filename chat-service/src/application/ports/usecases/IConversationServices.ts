@@ -9,6 +9,8 @@ import { ConversationWithLastMessage } from '@infrastructure/persistance/mongo/a
 export interface IConversationServices {
    create(dto: CreateConversationInputDTO): Promise<Required<Conversation>>;
 
+   getConvoById(convoId: string): Promise<Required<Conversation>>;
+
    getOneToOneConversationByParticipantIds(
       userIds: string[]
    ): Promise<Required<Conversation> | null>;

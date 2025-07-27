@@ -1,23 +1,28 @@
 import { CreateOneToOneMessageInputDTO } from '@application/dto/CreateOneToOneMessage.dto';
 import { AttachementURLHydratedMessage } from '@application/Types/AttachmentURLHydratedMessage';
+import { Conversation } from '@domain/Conversation';
+import { Message } from '@domain/Message';
 
 export interface IServerToClientEvents {
    test: (msg: any) => void;
    'new-one-to-one-message': (message: AttachementURLHydratedMessage) => void;
-   'remove-noti': (noti: unknown) => void;
+   'message-deleted': (event: {
+      message: Required<Message>;
+      convoType: Conversation['type'];
+   }) => void;
    'update-noti': (noti: unknown) => void;
    withAck: (d: string, callback: (e: number) => void) => void;
 }
 
 export interface IClientToServerEvents {
    hello: () => void;
-   'convo-opened': (dto: { time: Date; convoId: string }) => void;
+   'convo-opened': (event: { time: Date; convoId: string }) => void;
    'delete-message': (
-      dto: { convoId: string; messageId: string },
+      event: { convoId: string; messageId: string },
       callback: (ack: boolean) => void
    ) => void;
    'send-one-to-one-message': (
-      dto: Omit<CreateOneToOneMessageInputDTO, 'from'>,
+      event: Omit<CreateOneToOneMessageInputDTO, 'from'>,
       callback: (data: {
          message: AttachementURLHydratedMessage | undefined;
          success: boolean;

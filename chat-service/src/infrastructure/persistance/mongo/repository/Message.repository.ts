@@ -4,6 +4,7 @@ import messageModel from '../models/Message.model';
 import { messageAutoMapper } from '../automapper/message.automapper';
 import mongoose from 'mongoose';
 import conversationModel from '../models/conversation.model';
+import { DeleteUserMessageInputDTO } from '@application/dto/DeleteUserMessage.dto';
 
 export class MessageRepository implements IMessageRepository {
    create = async (entity: Message): Promise<Required<Message>> => {
@@ -77,5 +78,23 @@ export class MessageRepository implements IMessageRepository {
       }
 
       return { messages: result.map(messageAutoMapper), from: newFrom ?? null, hasMore };
+   };
+
+   deleteUserMessageById = async (
+      dto: DeleteUserMessageInputDTO
+   ): Promise<Required<Message> | null> => {
+      try {
+         const result = await messageModel.findOneAndDelete({
+            senderId: dto.userId,
+            conversationId: dto.convoId,
+            _id: dto.messageId,
+         });
+
+         if (!result) return null;
+
+         return messageAutoMapper(result);
+      } catch (error) {
+         return null;
+      }
    };
 }

@@ -5,6 +5,7 @@ import { FindOtherParticipantOfOneToOneConvo } from '@application/usecases/FindO
 import { GetOneToOneConversaionMessages } from '@application/usecases/GetOneToOneConversationMessages';
 import { esproxyService, storageService } from './services.container';
 import { SearchUserCovo } from '@application/usecases/SearchUserConvo';
+import { MessageService } from '@application/usecases/Message.services';
 
 export const conversationServices = new ConversationServices(conversationRepository);
 
@@ -25,5 +26,7 @@ export const getOneToOneConversationMessages = new GetOneToOneConversaionMessage
 export const searchUserConvo = new SearchUserCovo(
    esproxyService,
    conversationRepository,
-   findOtherParticipantOfOneToOneConvo
+   findOtherParticipantOfOneToOneConvo,
 );
+
+export const messageServices = new MessageService(messageRepository)
