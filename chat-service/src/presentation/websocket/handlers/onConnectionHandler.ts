@@ -1,13 +1,6 @@
 import { logger } from '@config/logger';
 import { TypedSocket } from '../Types/TypedSocket';
-import { sendOneToOneMessageHandler } from './sendOneToOneMessage.handler';
-import { CreateOneToOneMessageInputDTO } from '@application/dto/CreateOneToOneMessage.dto';
 import { conversationServices, oneToOneMessageServices } from '@di/usecases.container';
-import {
-   SetConvoLastOpenedInputDTO,
-   setConvoLastOpenedInputSchema,
-} from '@application/dto/SetCovoLastOpened.dto';
-import { ZodValidationError } from 'humane-common';
 import { ClientEventHandler } from './ClientEventHandler';
 
 export const onConnectionHandler = (socket: TypedSocket) => {
