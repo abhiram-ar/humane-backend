@@ -20,6 +20,8 @@ const messageSchema = new mongoose.Schema<IMessageDocument>({
    replyToMessageId: { type: mongoose.Types.ObjectId, ref: 'Message', required: false },
 });
 
+messageSchema.index({ conversationId: 1 });
+
 const messageModel = mongoose.model<IMessageDocument>('Message', messageSchema);
 
 export default messageModel;

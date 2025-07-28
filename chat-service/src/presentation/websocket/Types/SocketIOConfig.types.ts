@@ -16,7 +16,7 @@ export interface IServerToClientEvents {
       participants: Conversation['participants'];
    }) => void;
 
-   'update-noti': (noti: unknown) => void;
+   'typing-one-to-one-message': (event: { typingUser: string; convoId: string }) => void;
 
    withAck: (d: string, callback: (e: number) => void) => void;
 }
@@ -39,6 +39,8 @@ export interface IClientToServerEvents {
    ) => void;
 
    'is-user-online': (userId: string, callback: (ack: boolean) => void) => void;
+
+   'typing-one-to-one-message': (event: { otherUserId: string; convoId: string }) => void;
 }
 
 export interface InterServerEvents {
