@@ -14,7 +14,7 @@ const messageSchema = new mongoose.Schema<IMessageDocument>({
    message: { type: String },
 
    sendAt: { type: Date, default: Date.now },
-   deletededFor: { type: [String], default: [] },
+   status: { deleted: Boolean, deletedAt: Date },
 
    attachment: { attachmentType: String, attachmentKey: String },
    replyToMessageId: { type: mongoose.Types.ObjectId, ref: 'Message', required: false },

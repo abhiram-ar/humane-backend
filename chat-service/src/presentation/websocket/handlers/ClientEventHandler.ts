@@ -13,12 +13,13 @@ import {
 } from '@application/dto/CreateOneToOneMessage.dto';
 import { AttachementURLHydratedMessage } from '@application/Types/AttachmentURLHydratedMessage';
 import { IOneToOneMessageServices } from '@ports/usecases/IOneToOneMessage.services';
-import { isUserOnline } from '../utils/isUserOnline';
+import { isUserHasMulipleSocketConnected, isUserOnline } from '../utils/isUserOnline';
 import { IMessageService } from '@ports/usecases/IMessage.services';
 import {
    DeleteUserMessageInputDTO,
    deleteUserMessageSchema,
 } from '@application/dto/DeleteUserMessage.dto';
+import { ConversationNotFoundError } from '@application/errors/ConversationNotFoundError';
 
 export class ClientEventHandler implements IClientToServerEvents {
    constructor(
@@ -27,14 +28,13 @@ export class ClientEventHandler implements IClientToServerEvents {
       private readonly _oneToOneMessageSerives: IOneToOneMessageServices,
       private readonly _messageServices: IMessageService
    ) {}
-   'delete-message' = async (
-      eventPayload: { convoId: string; messageId: string },
+   'delete-one-to-one-message' = async (
+      eventPayload: { otherUserId: string; messageId: string },
       callback: (ack: boolean) => void
    ) => {
       try {
          const dto: DeleteUserMessageInputDTO = {
             userId: this._clientSocket.data.userId,
-            convoId: eventPayload.convoId,
             messageId: eventPayload.messageId,
          };
          const validatedDTO = deleteUserMessageSchema.safeParse(dto);
@@ -42,20 +42,27 @@ export class ClientEventHandler implements IClientToServerEvents {
             throw new ZodValidationError(validatedDTO.error);
          }
 
-         const deletedMessage = await this._messageServices.deleteUserMessage(validatedDTO.data);
+         const convo = await this._conversationServices.getOneToOneConversationByParticipantIds([
+            validatedDTO.data.userId,
+            eventPayload.otherUserId,
+         ]);
+         if (!convo) {
+            throw new ConversationNotFoundError();
+         }
 
-         const convo = await this._conversationServices.getConvoById(validatedDTO.data.convoId);
+         const deletedMessage = await this._messageServices.softDeleteUserMessage(
+            validatedDTO.data
+         );
 
-         const deleteMessageFromOtherUserPromises = convo.participants
-            .filter((user) => user.userId !== validatedDTO.data.userId)
-            .map(async (user) => {
-               if (await isUserOnline(user.userId)) {
-                  this._clientSocket.emit('message-deleted', {
-                     message: deletedMessage,
-                     convoType: convo.type,
-                  });
-               }
-            });
+         const deleteMessageFromOtherUserPromises = convo.participants.map(async (user) => {
+            console.log('emmit', user.userId);
+            if (await isUserOnline(user.userId)) {
+               this._clientSocket.to(user.userId).emit('one-to-one-message-deleted', {
+                  message: deletedMessage,
+                  participants: convo.participants,
+               });
+            }
+         });
 
          await Promise.allSettled(deleteMessageFromOtherUserPromises);
 
@@ -82,10 +89,19 @@ export class ClientEventHandler implements IClientToServerEvents {
             throw new ZodValidationError(validatedDTO.error);
          }
 
-         const message = await this._oneToOneMessageSerives.create(validatedDTO.data);
+         const { message, convo } = await this._oneToOneMessageSerives.create(validatedDTO.data);
          if (await isUserOnline(event.to)) {
-            this._clientSocket.to(event.to).emit('new-one-to-one-message', message);
+            this._clientSocket
+               .to(event.to)
+               .emit('new-one-to-one-message', message, convo.participants);
          }
+
+         if (await isUserHasMulipleSocketConnected(message.senderId)) {
+            this._clientSocket
+               .to(message.senderId)
+               .emit('new-one-to-one-message', message, convo.participants);
+         }
+
          callback({ message: message, success: true });
       } catch (e) {
          console.log('error while one to one message');

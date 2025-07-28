@@ -1,7 +1,7 @@
 import { CreateOneToOneMessageInputDTO } from '@application/dto/CreateOneToOneMessage.dto';
 import { AttachementURLHydratedMessage } from '@application/Types/AttachmentURLHydratedMessage';
 import { CurosrPagination } from '@application/Types/CursorPagination.type';
-import { conversationTypes } from '@domain/Conversation';
+import { Conversation, conversationTypes } from '@domain/Conversation';
 import { Message } from '@domain/Message';
 import { IMessageRepository } from '@ports/repository/IMessageRepository';
 import { IStorageService } from '@ports/services/IStorageService';
@@ -15,7 +15,9 @@ export class OneToOneMessageServices implements IOneToOneMessageServices {
       private readonly _storageServices: IStorageService
    ) {}
 
-   create = async (dto: CreateOneToOneMessageInputDTO): Promise<AttachementURLHydratedMessage> => {
+   create = async (
+      dto: CreateOneToOneMessageInputDTO
+   ): Promise<{ message: AttachementURLHydratedMessage; convo: Required<Conversation> }> => {
       // retrive the conversation - read through cache
       let conversation = await this._conversationServices.getOneToOneConversationByParticipantIds([
          dto.from,
@@ -57,8 +59,11 @@ export class OneToOneMessageServices implements IOneToOneMessageServices {
       }
 
       return {
-         ...data,
-         attachment: hydratedAttachment,
+         message: {
+            ...data,
+            attachment: hydratedAttachment,
+         },
+         convo: conversation,
       };
    };
 

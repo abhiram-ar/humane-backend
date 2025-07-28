@@ -6,7 +6,7 @@ export class Message {
    public readonly message: string;
 
    public readonly sendAt: Date = new Date();
-   public deletededFor: string[] = [];
+   public status: { deleted: boolean; deletedAt: Date } | undefined;
 
    public attachment: { attachmentType: string; attachmentKey: string } | undefined;
    public replyToMessageId: string | undefined;

@@ -2,5 +2,5 @@ import { DeleteUserMessageInputDTO } from '@application/dto/DeleteUserMessage.dt
 import { Message } from '@domain/Message';
 
 export interface IMessageService {
-   deleteUserMessage(dto: DeleteUserMessageInputDTO): Promise<Required<Message>>;
+   softDeleteUserMessage(dto: DeleteUserMessageInputDTO): Promise<Required<Message>>;
 }

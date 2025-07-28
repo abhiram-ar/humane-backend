@@ -26,7 +26,7 @@ export const onConnectionHandler = (socket: TypedSocket) => {
 
    socket.on('convo-opened', clientEventHandler['convo-opened']);
 
-   socket.on('delete-message', clientEventHandler['delete-message']);
+   socket.on('delete-one-to-one-message', clientEventHandler['delete-one-to-one-message']);
 
    socket.on('disconnect', () => {
       logger.debug(`socket disconnected userId:${socket.data.userId}`);

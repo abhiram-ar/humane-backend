@@ -80,15 +80,20 @@ export class MessageRepository implements IMessageRepository {
       return { messages: result.map(messageAutoMapper), from: newFrom ?? null, hasMore };
    };
 
-   deleteUserMessageById = async (
+   softDeleteUserMessageById = async (
       dto: DeleteUserMessageInputDTO
    ): Promise<Required<Message> | null> => {
       try {
-         const result = await messageModel.findOneAndDelete({
-            senderId: dto.userId,
-            conversationId: dto.convoId,
-            _id: dto.messageId,
-         });
+         const result = await messageModel.findOneAndUpdate(
+            {
+               senderId: dto.userId,
+               _id: dto.messageId,
+            },
+            { $unset: { message: '' }, $set: { status: { deleted: true, deletedAt: new Date() } } },
+            { new: true }
+         );
+
+         console.log(result);
 
          if (!result) return null;
 

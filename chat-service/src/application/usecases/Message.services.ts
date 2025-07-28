@@ -7,8 +7,8 @@ import { IMessageService } from '@ports/usecases/IMessage.services';
 export class MessageService implements IMessageService {
    constructor(private readonly _messageRepository: IMessageRepository) {}
 
-   deleteUserMessage = async (dto: DeleteUserMessageInputDTO): Promise<Required<Message>> => {
-      const deltedMessage = await this._messageRepository.deleteUserMessageById(dto);
+   softDeleteUserMessage = async (dto: DeleteUserMessageInputDTO): Promise<Required<Message>> => {
+      const deltedMessage = await this._messageRepository.softDeleteUserMessageById(dto);
       if (!deltedMessage) throw new MessageNotFoundError();
       return deltedMessage;
    };

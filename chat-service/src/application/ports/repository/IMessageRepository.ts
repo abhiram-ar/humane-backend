@@ -9,5 +9,5 @@ export interface IMessageRepository extends IBaseRepository<Message> {
       limit: number
    ): Promise<{ messages: Required<Message>[]; from: string | null; hasMore: boolean }>;
 
-   deleteUserMessageById(dto: DeleteUserMessageInputDTO): Promise<Required<Message> | null>;
+   softDeleteUserMessageById(dto: DeleteUserMessageInputDTO): Promise<Required<Message> | null>;
 }
