@@ -28,6 +28,8 @@ export const onConnectionHandler = (socket: TypedSocket) => {
 
    socket.on('delete-one-to-one-message', clientEventHandler['delete-one-to-one-message']);
 
+   socket.on('is-user-online', clientEventHandler['is-user-online']);
+
    socket.on('disconnect', () => {
       logger.debug(`socket disconnected userId:${socket.data.userId}`);
    });

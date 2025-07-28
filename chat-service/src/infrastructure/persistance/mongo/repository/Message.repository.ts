@@ -93,8 +93,6 @@ export class MessageRepository implements IMessageRepository {
             { new: true }
          );
 
-         console.log(result);
-
          if (!result) return null;
 
          return messageAutoMapper(result);

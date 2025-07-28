@@ -5,25 +5,31 @@ import { Message } from '@domain/Message';
 
 export interface IServerToClientEvents {
    test: (msg: any) => void;
+
    'new-one-to-one-message': (
       message: AttachementURLHydratedMessage,
       participants: Conversation['participants']
    ) => void;
+
    'one-to-one-message-deleted': (event: {
       message: Required<Message>;
       participants: Conversation['participants'];
    }) => void;
+
    'update-noti': (noti: unknown) => void;
+
    withAck: (d: string, callback: (e: number) => void) => void;
 }
 
 export interface IClientToServerEvents {
    hello: () => void;
    'convo-opened': (event: { time: Date; convoId: string }) => void;
+
    'delete-one-to-one-message': (
       event: { otherUserId: string; messageId: string },
       callback: (ack: boolean) => void
    ) => void;
+
    'send-one-to-one-message': (
       event: Omit<CreateOneToOneMessageInputDTO, 'from'>,
       callback: (data: {
@@ -31,6 +37,8 @@ export interface IClientToServerEvents {
          success: boolean;
       }) => void
    ) => void;
+
+   'is-user-online': (userId: string, callback: (ack: boolean) => void) => void;
 }
 
 export interface InterServerEvents {

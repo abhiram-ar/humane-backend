@@ -28,6 +28,16 @@ export class ClientEventHandler implements IClientToServerEvents {
       private readonly _oneToOneMessageSerives: IOneToOneMessageServices,
       private readonly _messageServices: IMessageService
    ) {}
+   'is-user-online' = async (userId: string, callback: (ack: boolean) => void) => {
+      try {
+         const userOnlineStatus = await isUserOnline(userId);
+         callback(userOnlineStatus);
+      } catch (error) {
+         logger.error(error);
+         callback(false);
+      }
+   };
+
    'delete-one-to-one-message' = async (
       eventPayload: { otherUserId: string; messageId: string },
       callback: (ack: boolean) => void
