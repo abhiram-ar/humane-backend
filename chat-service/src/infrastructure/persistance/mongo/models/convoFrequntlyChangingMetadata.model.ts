@@ -11,7 +11,7 @@ export interface IConvoFrequentlyChangingMetadata
 const conovFrequentlyChangingMetadataSchema = new mongoose.Schema<IConvoFrequentlyChangingMetadata>(
    {
       convoId: { type: mongoose.Schema.Types.ObjectId, ref: 'Conversation', required: true },
-      lastMsgSendAt: { type: Date },
+      updatedAt: { type: Date },
    }
 );
 
