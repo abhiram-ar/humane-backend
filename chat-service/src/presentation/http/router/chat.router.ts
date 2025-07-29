@@ -14,14 +14,18 @@ chatRouter.get(
    conversationController.getOneToOneConversation
 );
 
-chatRouter.get('/convo/search', isAuthenticated, conversationController.searchUserConvo);
-
-chatRouter.get('/convo/:convoId', isAuthenticated, conversationController.getUserConvoById);
-
 chatRouter.get(
    '/convo/one-to-one/messages',
    isAuthenticated,
    messsageController.getOneToOneConvoMessages
 );
+
+chatRouter.get('/convo/search', isAuthenticated, conversationController.searchUserConvo);
+
+
+chatRouter.get('/convo/:convoId', isAuthenticated, conversationController.getUserConvoById);
+
+chatRouter.patch("/convo/:convoId/clearedAt", isAuthenticated ,conversationController.setUserConvoClearedAt)
+
 
 export default chatRouter;

@@ -28,4 +28,6 @@ export interface IConversationRepository extends IBaseRepository<Conversation> {
    ): Promise<ConversationWithLastMessage[]>;
 
    getConversationById(converstionId: string): Promise<Required<Conversation> | null>;
+
+   setUserConvoClearedAt(userId: string, convoId: string): Promise<Required<Conversation | null>>;
 }

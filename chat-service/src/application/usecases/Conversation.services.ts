@@ -1,3 +1,4 @@
+import { ClearUserConvoInputDTO } from '@application/dto/ClearUserConov.dto';
 import { CreateConversationInputDTO } from '@application/dto/CreateConversation.dto';
 import { GetUserCovoByIdInputDTO } from '@application/dto/GetUserConversationById.dto';
 import { SetConvoLastOpenedInputDTO } from '@application/dto/SetCovoLastOpened.dto';
@@ -57,5 +58,13 @@ export class ConversationServices implements IConversationServices {
       dto: GetUserCovoByIdInputDTO
    ): Promise<Required<Conversation> | null> => {
       return this._conversationRepo.getUserConversationById(dto.userId, dto.convoId);
+   };
+
+   clearUserConvo = async (dto: ClearUserConvoInputDTO): Promise<Required<Conversation>> => {
+      const convo = await this._conversationRepo.setUserConvoClearedAt(dto.userId, dto.convoId);
+      if (!convo) {
+         throw new ConversationNotFoundError();
+      }
+      return convo;
    };
 }

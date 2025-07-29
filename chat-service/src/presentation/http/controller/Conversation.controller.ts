@@ -26,6 +26,10 @@ import {
    searchUserConvoInputSchema,
 } from '@application/dto/SearchUserConvo.dto';
 import { ISearchUserCovo } from '@ports/usecases/ISearchUserConvo';
+import {
+   clearUserConovInputSchema,
+   ClearUserConvoInputDTO,
+} from '@application/dto/ClearUserConov.dto';
 
 export class ConversationController {
    constructor(
@@ -185,6 +189,27 @@ export class ConversationController {
          const result = await this._searchUserConvo.execute(validatedDTO.data);
 
          res.status(HttpStatusCode.Ok).json({ data: result });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   setUserConvoClearedAt = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         if (!req.user || req.user.type !== 'user') throw new UnAuthenticatedError();
+
+         const validatedDTO = clearUserConovInputSchema.safeParse({
+            convoId: req.params.convoId,
+            userId: req.user.userId,
+         } as ClearUserConvoInputDTO);
+
+         if (!validatedDTO.success) {
+            throw new ZodValidationError(validatedDTO.error);
+         }
+
+         const result = await this._conversationServices.clearUserConvo(validatedDTO.data);
+
+         res.status(HttpStatusCode.Accepted).json({ data: { convo: result } });
       } catch (error) {
          next(error);
       }

@@ -274,4 +274,23 @@ export class ConversataionRepository implements IConversationRepository {
 
       return res.map((doc) => conversationWithLastMessageAutoMapper(doc));
    };
+
+   setUserConvoClearedAt = async (
+      userId: string,
+      convoId: string
+   ): Promise<Required<Conversation | null>> => {
+      const res = await conversationModel.findOneAndUpdate(
+         {
+            _id: convoId,
+            'participants.userId': userId,
+         },
+         {
+            $set: {
+               'participants.$.clearedAt': new Date(), // $ updates the first matching element if there are multiple matches.
+            },
+         },
+         { new: true, timestamps: false }
+      );
+      return res ? conversationAutomapper(res) : null;
+   };
 }

@@ -1,3 +1,4 @@
+import { ClearUserConvoInputDTO } from '@application/dto/ClearUserConov.dto';
 import { CreateConversationInputDTO } from '@application/dto/CreateConversation.dto';
 import { GetUserCovoByIdInputDTO } from '@application/dto/GetUserConversationById.dto';
 import { GetUserConversationInputDTO } from '@application/dto/GetUserConversations.dto';
@@ -22,4 +23,6 @@ export interface IConversationServices {
    setLastOpenedAt(dto: SetConvoLastOpenedInputDTO): Promise<void>;
 
    getUserConversationById(dto: GetUserCovoByIdInputDTO): Promise<Required<Conversation> | null>;
+
+   clearUserConvo(dto: ClearUserConvoInputDTO): Promise<Required<Conversation>>;
 }
