@@ -1,4 +1,4 @@
 export interface ConvoLastMessageSendAt {
    convoId: string;
-   lastMsgSendAt: Date;
+   lastMsgSendAt?: Date;
 }
