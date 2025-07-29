@@ -120,12 +120,20 @@ export class ClientEventHandler implements IClientToServerEvents {
       }
    };
 
-   'typing-one-to-one-message' = async (event: { otherUserId: string; convoId: string }) => {
+   'typing-one-to-one-message' = async (event: {
+      otherUserId: string;
+      convoId: string;
+      time: Date;
+   }) => {
       if (await isUserOnline(event.otherUserId)) {
          const typingUser = this._clientSocket.data.userId;
          this._clientSocket
             .to(event.otherUserId)
-            .emit('typing-one-to-one-message', { typingUser, convoId: event.convoId });
+            .emit('typing-one-to-one-message', {
+               typingUser,
+               convoId: event.convoId,
+               time: event.time,
+            });
       }
    };
 
