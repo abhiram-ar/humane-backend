@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: humane
+      service: chat
+      type: web-server
+  template:
+    metadata:
+      labels:
+        app: humane
+        service: chat
+        type: web-server
+    spec:
+      containers:
+        - name: chat-service
+          image: abhiramar/humane-chat-service
+          envFrom:
+            - secretRef:
+                name: chat-pod-secret
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-srv
+spec:
+  selector:
+    app: humane
+    service: chat
+    type: web-server
+  ports:
+    - name: user
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

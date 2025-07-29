@@ -53,3 +53,10 @@ spec:
                 name: reward-srv
                 port:
                   number: 3000
+          - pathType: ImplementationSpecific
+            path: /api/v[0-9]+/chat/.*
+            backend:
+              service:
+                name: chat-srv
+                port:
+                  number: 3000

@@ -68,6 +68,14 @@ build:
         manual:
           - dest: .
             src: "src/**/*.ts"
+    - image: abhiramar/humane-chat-service
+      context: chat-service
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: "src/**/*.ts"
 
 deploy:
   kubectl: {}
