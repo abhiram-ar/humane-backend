@@ -10,6 +10,9 @@ import {
 import convoUserMetadataModel from '../models/convoUserMetadata.model';
 import { convoUserMetaAutomapper } from '../automapper/convoUserMeta.automapper';
 import { ConvoUserMetadata } from '@domain/ConvoUserMetadata';
+import { ConvoFrequentlyChagingMetadata } from '@domain/ConvoFrequentlyChangingMetadata';
+import convoFreqChangingMetadataModel from '../models/convoFrequntlyChangingMetadata.model';
+import { convoFreqChangingMetaAutomapper } from '../automapper/convoFreqChangingMeta.automapper';
 export class ConversataionRepository implements IConversationRepository {
    getUserConvoMetadata = async (
       userId: string,
@@ -418,5 +421,12 @@ export class ConversataionRepository implements IConversationRepository {
          { new: true, upsert: true }
       );
       return res ? convoUserMetaAutomapper(res) : null;
+   };
+
+   getFrequentlyUpdatedMetadata = async (
+      convoId: string
+   ): Promise<ConvoFrequentlyChagingMetadata | null> => {
+      const res = await convoFreqChangingMetadataModel.findOne({ convoId });
+      return res ? convoFreqChangingMetaAutomapper(res) : null;
    };
 }

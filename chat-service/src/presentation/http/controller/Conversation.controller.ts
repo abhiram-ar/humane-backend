@@ -119,7 +119,6 @@ export class ConversationController {
 
    getOneToOneConversation = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         console.log('hit');
          if (!req.user || req.user.type !== 'user') throw new UnAuthenticatedError();
 
          const { otherUserId } = req.query;

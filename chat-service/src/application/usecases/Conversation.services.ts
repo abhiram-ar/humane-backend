@@ -56,8 +56,13 @@ export class ConversationServices implements IConversationServices {
 
    getUserConversationById = async (
       dto: GetUserCovoByIdInputDTO
-   ): Promise<Required<Conversation> | null> => {
-      return this._conversationRepo.getUserConversationById(dto.userId, dto.convoId);
+   ): Promise<(Required<Conversation> & { updatedAt: Date | undefined }) | null> => {
+      const convo = await this._conversationRepo.getUserConversationById(dto.userId, dto.convoId);
+      if (!convo) return null;
+
+      const convoMeta = await this._conversationRepo.getFrequentlyUpdatedMetadata(dto.convoId);
+
+      return { ...convo, updatedAt: convoMeta?.updatedAt || undefined };
    };
 
    clearUserConvo = async (dto: ClearUserConvoInputDTO): Promise<Required<Conversation>> => {
