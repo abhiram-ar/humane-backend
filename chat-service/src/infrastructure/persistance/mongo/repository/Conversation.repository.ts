@@ -68,23 +68,14 @@ export class ConversataionRepository implements IConversationRepository {
                ...formFilter,
             },
          },
+
          {
             $sort: { updatedAt: -1, _id: -1 },
          },
+
          { $limit: limit },
 
-         // Stage 4: lookup the latest message
-         {
-            $lookup: {
-               from: 'messages',
-               localField: 'lastMessageId',
-               foreignField: '_id',
-               as: 'lastMessage',
-            },
-         },
-         { $unwind: { path: '$lastMessage', preserveNullAndEmptyArrays: true } },
-
-         // Stage 5: add current users lastSeenAt to top-level (for easy lookup)
+         /* stage 4: extract current users participant info (for clearedAt & lastOpenedAt) */
          {
             $addFields: {
                currentUser: {
@@ -99,13 +90,46 @@ export class ConversataionRepository implements IConversationRepository {
             },
          },
 
-         // Stage 6: lookup unread messages for each conversation
+         /* stage 5: lookup latest message (after clearedAt) */
+         {
+            $lookup: {
+               from: 'messages',
+               let: {
+                  convoId: '$_id',
+                  clearedAt: '$currentUser.clearedAt',
+               },
+               pipeline: [
+                  {
+                     $match: {
+                        $expr: {
+                           $and: [
+                              { $eq: ['$conversationId', '$$convoId'] },
+                              {
+                                 $or: [
+                                    { $eq: ['$$clearedAt', null] },
+                                    { $gt: ['$sendAt', '$$clearedAt'] },
+                                 ],
+                              },
+                           ],
+                        },
+                     },
+                  },
+                  { $sort: { sendAt: -1, _id: -1 } },
+                  { $limit: 1 },
+               ],
+               as: 'lastMessage',
+            },
+         },
+         { $unwind: { path: '$lastMessage', preserveNullAndEmptyArrays: true } },
+
+         /* stage 6: lookup unread messages count (respect clearedAt) */
          {
             $lookup: {
                from: 'messages',
                let: {
                   roomId: '$_id',
                   lastSeenAt: '$currentUser.lastOpenedAt',
+                  clearedAt: '$currentUser.clearedAt',
                },
                pipeline: [
                   {
@@ -114,8 +138,12 @@ export class ConversataionRepository implements IConversationRepository {
                            $and: [
                               { $eq: ['$conversationId', '$$roomId'] },
                               { $ne: ['$senderId', userId] },
+                              { $gt: ['$sendAt', { $ifNull: ['$$lastSeenAt', new Date(0)] }] },
                               {
-                                 $gt: ['$sendAt', { $ifNull: ['$$lastSeenAt', new Date(0)] }],
+                                 $or: [
+                                    { $eq: ['$$clearedAt', null] },
+                                    { $gt: ['$sendAt', '$$clearedAt'] },
+                                 ],
                               },
                            ],
                         },
@@ -127,7 +155,7 @@ export class ConversataionRepository implements IConversationRepository {
             },
          },
 
-         // Stage 7: flatten unreadCount
+         /* stage 7: flatten unreadCount */
          {
             $addFields: {
                unreadCount: {
@@ -136,7 +164,7 @@ export class ConversataionRepository implements IConversationRepository {
             },
          },
 
-         // optional: clean up
+         /* stage 8: cleanup */
          {
             $project: {
                unreadMeta: 0,
@@ -200,18 +228,7 @@ export class ConversataionRepository implements IConversationRepository {
          },
          { $limit: limit },
 
-         // Stage 4: lookup the latest message
-         {
-            $lookup: {
-               from: 'messages',
-               localField: 'lastMessageId',
-               foreignField: '_id',
-               as: 'lastMessage',
-            },
-         },
-         { $unwind: { path: '$lastMessage', preserveNullAndEmptyArrays: true } },
-
-         // Stage 5: add current users lastSeenAt to top-level (for easy lookup)
+         /** Stage 4: extract current user's participant info (for clearedAt & lastOpenedAt) */
          {
             $addFields: {
                currentUser: {
@@ -226,13 +243,46 @@ export class ConversataionRepository implements IConversationRepository {
             },
          },
 
-         // Stage 6: lookup unread messages for each conversation
+         /** Stage 5: lookup latest message (excluding cleared messages) */
+         {
+            $lookup: {
+               from: 'messages',
+               let: {
+                  convoId: '$_id',
+                  clearedAt: '$currentUser.clearedAt',
+               },
+               pipeline: [
+                  {
+                     $match: {
+                        $expr: {
+                           $and: [
+                              { $eq: ['$conversationId', '$$convoId'] },
+                              {
+                                 $or: [
+                                    { $eq: ['$$clearedAt', null] },
+                                    { $gt: ['$sendAt', '$$clearedAt'] },
+                                 ],
+                              },
+                           ],
+                        },
+                     },
+                  },
+                  { $sort: { sendAt: -1, _id: -1 } },
+                  { $limit: 1 },
+               ],
+               as: 'lastMessage',
+            },
+         },
+         { $unwind: { path: '$lastMessage', preserveNullAndEmptyArrays: true } },
+
+         /** Stage 6: lookup unread messages count (respecting clearedAt) */
          {
             $lookup: {
                from: 'messages',
                let: {
                   roomId: '$_id',
                   lastSeenAt: '$currentUser.lastOpenedAt',
+                  clearedAt: '$currentUser.clearedAt',
                },
                pipeline: [
                   {
@@ -241,8 +291,12 @@ export class ConversataionRepository implements IConversationRepository {
                            $and: [
                               { $eq: ['$conversationId', '$$roomId'] },
                               { $ne: ['$senderId', userId] },
+                              { $gt: ['$sendAt', { $ifNull: ['$$lastSeenAt', new Date(0)] }] },
                               {
-                                 $gt: ['$sendAt', { $ifNull: ['$$lastSeenAt', new Date(0)] }],
+                                 $or: [
+                                    { $eq: ['$$clearedAt', null] },
+                                    { $gt: ['$sendAt', '$$clearedAt'] },
+                                 ],
                               },
                            ],
                         },
@@ -254,7 +308,7 @@ export class ConversataionRepository implements IConversationRepository {
             },
          },
 
-         // Stage 7: flatten unreadCount
+         /* stage 7: flatten unreadCount */
          {
             $addFields: {
                unreadCount: {
@@ -263,7 +317,7 @@ export class ConversataionRepository implements IConversationRepository {
             },
          },
 
-         // optional: clean up
+         /* stage 8: cleanup fields */
          {
             $project: {
                unreadMeta: 0,
