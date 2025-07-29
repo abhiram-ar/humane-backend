@@ -28,7 +28,7 @@ export class MessageRepository implements IMessageRepository {
 
          await conversationModel.findByIdAndUpdate(
             entity.conversationId,
-            { lastMessageId: message[0].id },
+            { updatedAt: new Date() },
             { session }
          );
 

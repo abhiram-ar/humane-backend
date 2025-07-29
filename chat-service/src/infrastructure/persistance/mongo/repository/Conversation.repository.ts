@@ -228,7 +228,7 @@ export class ConversataionRepository implements IConversationRepository {
          },
          { $limit: limit },
 
-         /** Stage 4: extract current user's participant info (for clearedAt & lastOpenedAt) */
+         /* stage 4: extract current user's participant info (for clearedAt & lastOpenedAt) */
          {
             $addFields: {
                currentUser: {
@@ -243,7 +243,7 @@ export class ConversataionRepository implements IConversationRepository {
             },
          },
 
-         /** Stage 5: lookup latest message (excluding cleared messages) */
+         /* stage 5: lookup latest message (excluding cleared messages) */
          {
             $lookup: {
                from: 'messages',
@@ -275,7 +275,7 @@ export class ConversataionRepository implements IConversationRepository {
          },
          { $unwind: { path: '$lastMessage', preserveNullAndEmptyArrays: true } },
 
-         /** Stage 6: lookup unread messages count (respecting clearedAt) */
+         /* stage 6: lookup unread messages count (respecting clearedAt) */
          {
             $lookup: {
                from: 'messages',

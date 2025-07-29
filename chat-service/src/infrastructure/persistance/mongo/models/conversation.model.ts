@@ -27,11 +27,6 @@ const conversationSchema = new mongoose.Schema<IConversationDocument>(
             clearedAt: Date,
          },
       ],
-
-      lastMessageId: {
-         type: mongoose.Types.ObjectId,
-         ref: 'Message',
-      },
    },
    { timestamps: true }
 );
