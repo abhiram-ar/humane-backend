@@ -11,6 +11,13 @@ import convoUserMetadataModel from '../models/convoUserMetadata.model';
 import { convoUserMetaAutomapper } from '../automapper/convoUserMeta.automapper';
 import { ConvoUserMetadata } from '@domain/ConvoUserMetadata';
 export class ConversataionRepository implements IConversationRepository {
+   getUserConvoMetadata = async (
+      userId: string,
+      convoId: string
+   ): Promise<ConvoUserMetadata | null> => {
+      const res = await convoUserMetadataModel.findOne({ userId, convoId });
+      return res ? convoUserMetaAutomapper(res) : null;
+   };
    getConversationById = async (converstionId: string): Promise<Required<Conversation> | null> => {
       const result = await conversationModel.findById(converstionId);
       if (!result) return null;
@@ -227,10 +234,10 @@ export class ConversataionRepository implements IConversationRepository {
       userId: string,
       time: Date
    ): Promise<void> => {
-      await conversationModel.updateOne(
-         { _id: conversationId, 'participants.userId': userId },
-         { $set: { 'participants.$.lastOpenedAt': time } },
-         { timestamps: false }
+      await convoUserMetadataModel.updateOne(
+         { convoId: conversationId, userId: userId },
+         { $set: { lastOpenedAt: time } },
+         { upsert: true }
       );
    };
 

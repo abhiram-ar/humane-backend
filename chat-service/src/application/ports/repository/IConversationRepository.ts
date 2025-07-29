@@ -31,4 +31,6 @@ export interface IConversationRepository extends IBaseRepository<Conversation> {
    getConversationById(converstionId: string): Promise<Required<Conversation> | null>;
 
    setUserConvoClearedAt(userId: string, convoId: string): Promise<ConvoUserMetadata | null>;
+
+   getUserConvoMetadata(userId: string, convoId: string): Promise<ConvoUserMetadata | null>;
 }

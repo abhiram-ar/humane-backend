@@ -61,10 +61,17 @@ export class ConversationServices implements IConversationServices {
    };
 
    clearUserConvo = async (dto: ClearUserConvoInputDTO): Promise<Required<Conversation>> => {
-      const convo = await this._conversationRepo.setUserConvoClearedAt(dto.userId, dto.convoId);
-      if (!convo) {
+      const convoUserMetadata = await this._conversationRepo.setUserConvoClearedAt(
+         dto.userId,
+         dto.convoId
+      );
+      if (!convoUserMetadata) {
          throw new ConversationNotFoundError();
       }
+
+      const convo = await this._conversationRepo.getUserConversationById(dto.userId, dto.convoId);
+      if (!convo) throw new ConversationNotFoundError();
+
       return convo;
    };
 }
