@@ -49,7 +49,8 @@ export class MessageRepository implements IMessageRepository {
    getOneToOneMessages = async (
       converstionId: string,
       from: string | null,
-      limit: number
+      limit: number,
+      convoClearedAt: Date | undefined
    ): Promise<{ messages: Required<Message>[]; from: string | null; hasMore: boolean }> => {
       let lastMessageId: string | undefined;
       let lastSendAt: string | undefined;
@@ -57,9 +58,12 @@ export class MessageRepository implements IMessageRepository {
          [lastSendAt, lastMessageId] = from.split('|');
       }
 
+      console.log(convoClearedAt);
+
       const result = await messageModel
          .find({
             conversationId: converstionId,
+            sendAt: { $gt: convoClearedAt || new Date(0) },
             $or: from
                ? [
                     { sendAt: { $lt: lastSendAt } },

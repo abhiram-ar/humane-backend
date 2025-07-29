@@ -6,7 +6,8 @@ export interface IMessageRepository extends IBaseRepository<Message> {
    getOneToOneMessages(
       converstionId: string,
       from: string | null,
-      limit: number
+      limit: number,
+      convoClearedAt: Date | undefined
    ): Promise<{ messages: Required<Message>[]; from: string | null; hasMore: boolean }>;
 
    softDeleteUserMessageById(dto: DeleteUserMessageInputDTO): Promise<Required<Message> | null>;

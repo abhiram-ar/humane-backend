@@ -26,10 +26,13 @@ export class GetOneToOneConversaionMessages implements IGetOneToOneConversaionMe
       ]);
       if (!conversation) throw new ConversationNotFoundError();
 
+      const convoUserData = conversation.participants.find((user) => user.userId === dto.userId);
+
       const { messages, pagination } = await this._oneToOneMessageServices.getMessages({
          conversationId: conversation.id,
          from: dto.from,
          limit: dto.limit,
+         convoClearedAt: convoUserData?.clearedAt,
       });
 
       const attachmentURLHydratedMessages = messages.map((msg) => {

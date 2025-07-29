@@ -13,5 +13,6 @@ export interface IOneToOneMessageServices {
       conversationId: string;
       from: string | null;
       limit: number;
+      convoClearedAt: Date | undefined;
    }): Promise<{ messages: Required<Message>[]; pagination: CurosrPagination }>;
 }

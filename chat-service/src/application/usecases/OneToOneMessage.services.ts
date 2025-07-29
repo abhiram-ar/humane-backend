@@ -71,11 +71,13 @@ export class OneToOneMessageServices implements IOneToOneMessageServices {
       conversationId: string;
       from: string | null;
       limit: number;
+      convoClearedAt: Date | undefined;
    }): Promise<{ messages: Required<Message>[]; pagination: CurosrPagination }> => {
       const result = await this._messageRepo.getOneToOneMessages(
          dto.conversationId,
          dto.from,
-         dto.limit
+         dto.limit,
+         dto.convoClearedAt
       );
 
       // todo: attachment saturation
