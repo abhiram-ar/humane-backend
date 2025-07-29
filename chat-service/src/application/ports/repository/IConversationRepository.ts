@@ -1,6 +1,8 @@
 import { Conversation } from '@domain/Conversation';
 import { IBaseRepository } from './IBaseRepository';
 import { ConversationWithLastMessage } from '@infrastructure/persistance/mongo/automapper/conversationWithLastMessageAutomapper';
+import { ConvoUserMetadata } from '@domain/ConvoUserMetadata';
+import { ConvoFrequentlyChagingMetadata } from '@domain/ConvoFrequentlyChangingMetadata';
 
 export interface IConversationRepository extends IBaseRepository<Conversation> {
    getOneToOneConversationByParticipantIds(
@@ -29,5 +31,9 @@ export interface IConversationRepository extends IBaseRepository<Conversation> {
 
    getConversationById(converstionId: string): Promise<Required<Conversation> | null>;
 
-   setUserConvoClearedAt(userId: string, convoId: string): Promise<Required<Conversation | null>>;
+   setUserConvoClearedAt(userId: string, convoId: string): Promise<ConvoUserMetadata | null>;
+
+   getUserConvoMetadata(userId: string, convoId: string): Promise<ConvoUserMetadata | null>;
+
+   getFrequentlyUpdatedMetadata(convoId: string): Promise<ConvoFrequentlyChagingMetadata | null>;
 }

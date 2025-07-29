@@ -3,8 +3,8 @@ import { IMessageRepository } from '@ports/repository/IMessageRepository';
 import messageModel from '../models/Message.model';
 import { messageAutoMapper } from '../automapper/message.automapper';
 import mongoose from 'mongoose';
-import conversationModel from '../models/conversation.model';
 import { DeleteUserMessageInputDTO } from '@application/dto/DeleteUserMessage.dto';
+import convoFreqChangingMetadataModel from '../models/convoFrequntlyChangingMetadata.model';
 
 export class MessageRepository implements IMessageRepository {
    create = async (entity: Message): Promise<Required<Message>> => {
@@ -26,10 +26,10 @@ export class MessageRepository implements IMessageRepository {
             { session }
          );
 
-         await conversationModel.findByIdAndUpdate(
-            entity.conversationId,
+         await convoFreqChangingMetadataModel.updateOne(
+            { convoId: entity.conversationId },
             { updatedAt: new Date() },
-            { session }
+            { session, upsert: true }
          );
 
          await session.commitTransaction();

@@ -1,13 +1,26 @@
 import { Conversation, conversationTypes } from '@domain/Conversation';
 import { IConversationRepository } from '@ports/repository/IConversationRepository';
-import conversationModel, { IConversationDocument } from '../models/conversation.model';
+import conversationModel from '../models/conversation.model';
 import { conversationAutomapper } from '../automapper/conversation.automapper';
-import { FilterQuery } from 'mongoose';
+import mongoose from 'mongoose';
 import {
    ConversationWithLastMessage,
    conversationWithLastMessageAutoMapper,
 } from '../automapper/conversationWithLastMessageAutomapper';
+import convoUserMetadataModel from '../models/convoUserMetadata.model';
+import { convoUserMetaAutomapper } from '../automapper/convoUserMeta.automapper';
+import { ConvoUserMetadata } from '@domain/ConvoUserMetadata';
+import { ConvoFrequentlyChagingMetadata } from '@domain/ConvoFrequentlyChangingMetadata';
+import convoFreqChangingMetadataModel from '../models/convoFrequntlyChangingMetadata.model';
+import { convoFreqChangingMetaAutomapper } from '../automapper/convoFreqChangingMeta.automapper';
 export class ConversataionRepository implements IConversationRepository {
+   getUserConvoMetadata = async (
+      userId: string,
+      convoId: string
+   ): Promise<ConvoUserMetadata | null> => {
+      const res = await convoUserMetadataModel.findOne({ userId, convoId });
+      return res ? convoUserMetaAutomapper(res) : null;
+   };
    getConversationById = async (converstionId: string): Promise<Required<Conversation> | null> => {
       const result = await conversationModel.findById(converstionId);
       if (!result) return null;
@@ -51,52 +64,87 @@ export class ConversataionRepository implements IConversationRepository {
       hasMore: boolean;
    }> => {
       const [fromUpdatedAt, fromId] = from ? from.split('|') : [];
-
-      const formFilter: FilterQuery<IConversationDocument> | undefined = from
-         ? {
-              $or: [
-                 { updatedAt: { $lt: fromUpdatedAt } },
-                 { updatedAt: { $lte: fromUpdatedAt }, id: { $lt: fromId } },
-              ],
-           }
-         : {};
+      const fromDate = fromUpdatedAt ? new Date(fromUpdatedAt) : null;
+      const fromObjectId = fromId ? new mongoose.Types.ObjectId(fromId) : null;
+      console.log(from, fromUpdatedAt, fromId);
 
       const res = await conversationModel.aggregate([
+         // Stage 1: Match conversations where user is a participant
+         { $match: { 'participants.userId': userId } },
+
+         // Stage 2: Lookup frequently changing metadata
          {
-            $match: {
-               'participants.userId': userId,
-               ...formFilter,
+            $lookup: {
+               from: 'convofreqchangingmetadatas',
+               localField: '_id',
+               foreignField: 'convoId',
+               as: 'freqMeta',
             },
          },
+         { $unwind: { path: '$freqMeta', preserveNullAndEmptyArrays: true } },
 
+         // Stage 3: Lookup user-specific metadata
          {
-            $sort: { updatedAt: -1, _id: -1 },
+            $lookup: {
+               from: 'conovusermetadatas',
+               let: { convoId: '$_id' },
+               pipeline: [
+                  {
+                     $match: {
+                        $expr: {
+                           $and: [{ $eq: ['$convoId', '$$convoId'] }, { $eq: ['$userId', userId] }],
+                        },
+                     },
+                  },
+               ],
+               as: 'userMeta',
+            },
          },
+         { $unwind: { path: '$userMeta', preserveNullAndEmptyArrays: true } },
 
-         { $limit: limit },
-
-         /* stage 4: extract current users participant info (for clearedAt & lastOpenedAt) */
+         // Stage 4: Compute effective updatedAt
          {
             $addFields: {
-               currentUser: {
-                  $first: {
-                     $filter: {
-                        input: '$participants',
-                        as: 'p',
-                        cond: { $eq: ['$$p.userId', userId] },
-                     },
+               effectiveUpdatedAt: {
+                  $cond: {
+                     if: { $ifNull: ['$freqMeta.updatedAt', false] },
+                     then: '$freqMeta.updatedAt',
+                     else: '$createdAt',
                   },
                },
             },
          },
 
-         /* stage 5: lookup latest message (after clearedAt) */
+         // Stage 5: Apply cursor filter AFTER metadata join
+         ...(from
+            ? [
+                 {
+                    $match: {
+                       $or: [
+                          { effectiveUpdatedAt: { $lt: fromDate } },
+                          {
+                             effectiveUpdatedAt: fromDate,
+                             _id: { $lt: fromObjectId },
+                          },
+                       ],
+                    },
+                 },
+              ]
+            : []),
+
+         // Stage 6: Proper sorting
+         { $sort: { effectiveUpdatedAt: -1, _id: -1 } },
+
+         // Stage 7: Limit +1 to check for more items
+         { $limit: limit },
+
+         // Stage 8: Lookup last message
          {
             $lookup: {
                from: 'messages',
                let: {
                   convoId: '$_id',
-                  clearedAt: '$currentUser.clearedAt',
+                  clearedAt: '$userMeta.clearedAt',
                },
                pipeline: [
                   {
@@ -122,23 +170,23 @@ export class ConversataionRepository implements IConversationRepository {
          },
          { $unwind: { path: '$lastMessage', preserveNullAndEmptyArrays: true } },
 
-         /* stage 6: lookup unread messages count (respect clearedAt) */
+         // Stage 9: Calculate unread count
          {
             $lookup: {
                from: 'messages',
                let: {
-                  roomId: '$_id',
-                  lastSeenAt: '$currentUser.lastOpenedAt',
-                  clearedAt: '$currentUser.clearedAt',
+                  convoId: '$_id',
+                  lastOpenedAt: '$userMeta.lastOpenedAt',
+                  clearedAt: '$userMeta.clearedAt',
                },
                pipeline: [
                   {
                      $match: {
                         $expr: {
                            $and: [
-                              { $eq: ['$conversationId', '$$roomId'] },
+                              { $eq: ['$conversationId', '$$convoId'] },
                               { $ne: ['$senderId', userId] },
-                              { $gt: ['$sendAt', { $ifNull: ['$$lastSeenAt', new Date(0)] }] },
+                              { $gt: ['$sendAt', { $ifNull: ['$$lastOpenedAt', new Date(0)] }] },
                               {
                                  $or: [
                                     { $eq: ['$$clearedAt', null] },
@@ -154,21 +202,20 @@ export class ConversataionRepository implements IConversationRepository {
                as: 'unreadMeta',
             },
          },
-
-         /* stage 7: flatten unreadCount */
          {
             $addFields: {
-               unreadCount: {
-                  $ifNull: [{ $arrayElemAt: ['$unreadMeta.unreadCount', 0] }, 0],
-               },
+               unreadCount: { $ifNull: [{ $arrayElemAt: ['$unreadMeta.unreadCount', 0] }, 0] },
+               updatedAt: '$effectiveUpdatedAt',
             },
          },
 
-         /* stage 8: cleanup */
+         // Cleanup temporary fields
          {
             $project: {
+               effectiveUpdatedAt: 0,
+               freqMeta: 0,
+               userMeta: 0,
                unreadMeta: 0,
-               currentUser: 0,
             },
          },
       ]);
@@ -190,10 +237,10 @@ export class ConversataionRepository implements IConversationRepository {
       userId: string,
       time: Date
    ): Promise<void> => {
-      await conversationModel.updateOne(
-         { _id: conversationId, 'participants.userId': userId },
-         { $set: { 'participants.$.lastOpenedAt': time } },
-         { timestamps: false }
+      await convoUserMetadataModel.updateOne(
+         { convoId: conversationId, userId: userId },
+         { $set: { lastOpenedAt: time } },
+         { upsert: true }
       );
    };
 
@@ -223,33 +270,62 @@ export class ConversataionRepository implements IConversationRepository {
                ],
             },
          },
+         // Stage 2: Lookup frequently changing metadata
          {
-            $sort: { updatedAt: -1, _id: -1 },
+            $lookup: {
+               from: 'convofreqchangingmetadatas',
+               localField: '_id',
+               foreignField: 'convoId',
+               as: 'freqMeta',
+            },
          },
-         { $limit: limit },
+         { $unwind: { path: '$freqMeta', preserveNullAndEmptyArrays: true } },
 
-         /* stage 4: extract current user's participant info (for clearedAt & lastOpenedAt) */
+         // Stage 3: Lookup user-specific metadata
+         {
+            $lookup: {
+               from: 'conovusermetadatas',
+               let: { convoId: '$_id' },
+               pipeline: [
+                  {
+                     $match: {
+                        $expr: {
+                           $and: [{ $eq: ['$convoId', '$$convoId'] }, { $eq: ['$userId', userId] }],
+                        },
+                     },
+                  },
+               ],
+               as: 'userMeta',
+            },
+         },
+         { $unwind: { path: '$userMeta', preserveNullAndEmptyArrays: true } },
+
+         // Stage 4: Compute effective updatedAt
          {
             $addFields: {
-               currentUser: {
-                  $first: {
-                     $filter: {
-                        input: '$participants',
-                        as: 'p',
-                        cond: { $eq: ['$$p.userId', userId] },
-                     },
+               effectiveUpdatedAt: {
+                  $cond: {
+                     if: { $ifNull: ['$freqMeta.updatedAt', false] },
+                     then: '$freqMeta.updatedAt',
+                     else: '$createdAt',
                   },
                },
             },
          },
 
-         /* stage 5: lookup latest message (excluding cleared messages) */
+         // Stage 6: Proper sorting
+         { $sort: { effectiveUpdatedAt: -1, _id: -1 } },
+
+         // Stage 7: Limit +1 to check for more items
+         { $limit: limit },
+
+         // Stage 8: Lookup last message
          {
             $lookup: {
                from: 'messages',
                let: {
                   convoId: '$_id',
-                  clearedAt: '$currentUser.clearedAt',
+                  clearedAt: '$userMeta.clearedAt',
                },
                pipeline: [
                   {
@@ -275,23 +351,23 @@ export class ConversataionRepository implements IConversationRepository {
          },
          { $unwind: { path: '$lastMessage', preserveNullAndEmptyArrays: true } },
 
-         /* stage 6: lookup unread messages count (respecting clearedAt) */
+         // Stage 9: Calculate unread count
          {
             $lookup: {
                from: 'messages',
                let: {
-                  roomId: '$_id',
-                  lastSeenAt: '$currentUser.lastOpenedAt',
-                  clearedAt: '$currentUser.clearedAt',
+                  convoId: '$_id',
+                  lastOpenedAt: '$userMeta.lastOpenedAt',
+                  clearedAt: '$userMeta.clearedAt',
                },
                pipeline: [
                   {
                      $match: {
                         $expr: {
                            $and: [
-                              { $eq: ['$conversationId', '$$roomId'] },
+                              { $eq: ['$conversationId', '$$convoId'] },
                               { $ne: ['$senderId', userId] },
-                              { $gt: ['$sendAt', { $ifNull: ['$$lastSeenAt', new Date(0)] }] },
+                              { $gt: ['$sendAt', { $ifNull: ['$$lastOpenedAt', new Date(0)] }] },
                               {
                                  $or: [
                                     { $eq: ['$$clearedAt', null] },
@@ -307,21 +383,20 @@ export class ConversataionRepository implements IConversationRepository {
                as: 'unreadMeta',
             },
          },
-
-         /* stage 7: flatten unreadCount */
          {
             $addFields: {
-               unreadCount: {
-                  $ifNull: [{ $arrayElemAt: ['$unreadMeta.unreadCount', 0] }, 0],
-               },
+               unreadCount: { $ifNull: [{ $arrayElemAt: ['$unreadMeta.unreadCount', 0] }, 0] },
+               updatedAt: '$effectiveUpdatedAt',
             },
          },
 
-         /* stage 8: cleanup fields */
+         // Cleanup temporary fields
          {
             $project: {
+               effectiveUpdatedAt: 0,
+               freqMeta: 0,
+               userMeta: 0,
                unreadMeta: 0,
-               currentUser: 0,
             },
          },
       ]);
@@ -332,19 +407,26 @@ export class ConversataionRepository implements IConversationRepository {
    setUserConvoClearedAt = async (
       userId: string,
       convoId: string
-   ): Promise<Required<Conversation | null>> => {
-      const res = await conversationModel.findOneAndUpdate(
+   ): Promise<ConvoUserMetadata | null> => {
+      const res = await convoUserMetadataModel.findOneAndUpdate(
          {
-            _id: convoId,
-            'participants.userId': userId,
+            convoId: convoId,
+            userId: userId,
          },
          {
             $set: {
-               'participants.$.clearedAt': new Date(), // $ updates the first matching element if there are multiple matches.
+               clearedAt: new Date(),
             },
          },
-         { new: true, timestamps: false }
+         { new: true, upsert: true }
       );
-      return res ? conversationAutomapper(res) : null;
+      return res ? convoUserMetaAutomapper(res) : null;
+   };
+
+   getFrequentlyUpdatedMetadata = async (
+      convoId: string
+   ): Promise<ConvoFrequentlyChagingMetadata | null> => {
+      const res = await convoFreqChangingMetadataModel.findOne({ convoId });
+      return res ? convoFreqChangingMetaAutomapper(res) : null;
    };
 }

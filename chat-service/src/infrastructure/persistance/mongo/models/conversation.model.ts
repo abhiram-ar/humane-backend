@@ -8,28 +8,25 @@ export interface IConversationDocument
    lastMessageId: mongoose.Schema.Types.ObjectId | HydratedDocument<IMessageDocument>;
 }
 
-const conversationSchema = new mongoose.Schema<IConversationDocument>(
-   {
-      type: {
-         type: String,
-         enum: [conversationTypes.ONE_TO_ONE, conversationTypes.GROUP],
-         required: true,
-      },
-
-      groupName: { type: String, required: false },
-      groupPicKey: { type: String, required: false },
-
-      participants: [
-         {
-            userId: { type: String, required: true },
-            joinedAt: { type: Date, default: Date.now },
-            lastOpenedAt: { type: Date, default: Date.now },
-            clearedAt: Date,
-         },
-      ],
+const conversationSchema = new mongoose.Schema<IConversationDocument>({
+   type: {
+      type: String,
+      enum: [conversationTypes.ONE_TO_ONE, conversationTypes.GROUP],
+      required: true,
    },
-   { timestamps: true }
-);
+
+   groupName: { type: String, required: false },
+   groupPicKey: { type: String, required: false },
+
+   participants: [
+      {
+         userId: { type: String, required: true },
+         joinedAt: { type: Date, default: Date.now },
+      },
+   ],
+
+   createdAt: { type: Date, default: Date.now() },
+});
 
 conversationSchema.index({ type: 1, participants: 1 });
 

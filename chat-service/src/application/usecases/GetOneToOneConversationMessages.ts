@@ -4,6 +4,7 @@ import { AttachementURLHydratedMessage } from '@application/Types/AttachmentURLH
 import { CurosrPagination } from '@application/Types/CursorPagination.type';
 import { IStorageService } from '@ports/services/IStorageService';
 import { IConversationServices } from '@ports/usecases/IConversationServices';
+import { IConvoUserMetadataServices } from '@ports/usecases/IConvoUserMetadataServices';
 import { IGetOneToOneConversaionMessages } from '@ports/usecases/IGetOneToOneConversationMessages';
 import { IOneToOneMessageServices } from '@ports/usecases/IOneToOneMessage.services';
 
@@ -11,7 +12,8 @@ export class GetOneToOneConversaionMessages implements IGetOneToOneConversaionMe
    constructor(
       private readonly _coverstionServices: IConversationServices,
       private readonly _oneToOneMessageServices: IOneToOneMessageServices,
-      private readonly _storageServices: IStorageService
+      private readonly _storageServices: IStorageService,
+      private readonly _convoUserMetaService: IConvoUserMetadataServices
    ) {}
 
    execute = async (
@@ -26,7 +28,10 @@ export class GetOneToOneConversaionMessages implements IGetOneToOneConversaionMe
       ]);
       if (!conversation) throw new ConversationNotFoundError();
 
-      const convoUserData = conversation.participants.find((user) => user.userId === dto.userId);
+      const convoUserData = await this._convoUserMetaService.get({
+         userId: dto.userId,
+         convoId: conversation.id,
+      });
 
       const { messages, pagination } = await this._oneToOneMessageServices.getMessages({
          conversationId: conversation.id,
@@ -39,7 +44,7 @@ export class GetOneToOneConversaionMessages implements IGetOneToOneConversaionMe
          const { attachment, ...data } = msg;
 
          let hydratedAttachment: { attachmentType: string; attachmentURL: string | undefined };
-         if (attachment && attachment.attachmentKey) {
+         if (attachment && attachment.attachmentKey && !data.status?.deleted) {
             hydratedAttachment = {
                attachmentType: attachment.attachmentType,
                attachmentURL: this._storageServices.getPublicCDNURL(attachment.attachmentKey),

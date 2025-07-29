@@ -8,12 +8,14 @@ import { messageAutoMapper } from './message.automapper';
 export type ConversationWithLastMessage = Omit<Required<Conversation>, 'lastMessageId'> & {
    lastMessage: Required<Message> | undefined;
    unreadCount: number;
+   updatedAt: Date;
 };
 
 export const conversationWithLastMessageAutoMapper = (
    doc: HydratedDocument<IConversationDocument> & {
       unreadCount: number;
       lastMessage: HydratedDocument<IMessageDocument>;
+      updatedAt?: Date;
    }
 ): ConversationWithLastMessage => {
    const conversation: Required<Conversation> = {
@@ -22,11 +24,9 @@ export const conversationWithLastMessageAutoMapper = (
       groupName: doc.groupName,
       groupPicKey: doc.groupPicKey,
       createdAt: doc.createdAt,
-      updatedAt: doc.updatedAt,
       participants: doc.participants.map((entry) => ({
          userId: entry.userId,
          joinedAt: entry.joinedAt,
-         lastOpenedAt: entry.lastOpenedAt,
       })),
    };
 
@@ -35,5 +35,10 @@ export const conversationWithLastMessageAutoMapper = (
       ? messageAutoMapper(lastMessageDoc)
       : undefined;
 
-   return { ...conversation, lastMessage, unreadCount: doc.unreadCount || 0 };
+   return {
+      ...conversation,
+      lastMessage,
+      unreadCount: doc.unreadCount || 0,
+      updatedAt: doc.updatedAt || doc.createdAt,
+   };
 };

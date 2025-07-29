@@ -10,13 +10,10 @@ export class Conversation {
    public groupPicKey?: string; // only for groups
 
    public createdAt?: Date;
-   public updatedAt?: Date;
 
    public participants: {
       userId: string;
       joinedAt: Date;
-      lastOpenedAt: Date;
-      clearedAt?: Date;
    }[];
 
    constructor(fields: {
