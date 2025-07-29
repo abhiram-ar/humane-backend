@@ -19,14 +19,17 @@ export class Conversation {
       clearedAt?: Date;
    }[];
 
-   public lastMessageId?: string;
    constructor(fields: {
       type: (typeof conversationTypes)[keyof typeof conversationTypes];
       participants: string[];
       groupName?: string;
       groupPicKey?: string;
    }) {
-      this.participants = fields.participants.map((userId) => ({ userId, joinedAt: new Date(), lastOpenedAt: new Date() }));
+      this.participants = fields.participants.map((userId) => ({
+         userId,
+         joinedAt: new Date(),
+         lastOpenedAt: new Date(),
+      }));
       this.type = fields.type;
       (this.groupName = fields.groupName), (this.groupPicKey = fields.groupPicKey);
    }

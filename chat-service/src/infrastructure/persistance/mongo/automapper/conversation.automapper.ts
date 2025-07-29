@@ -12,7 +12,6 @@ export const conversationAutomapper = (
       groupPicKey: doc.groupPicKey,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
-      lastMessageId: String(doc.lastMessageId),
       participants: doc.participants.map((user) => ({
          userId: user.userId,
          joinedAt: user.joinedAt,

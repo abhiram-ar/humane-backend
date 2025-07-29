@@ -16,7 +16,7 @@ export const conversationWithLastMessageAutoMapper = (
       lastMessage: HydratedDocument<IMessageDocument>;
    }
 ): ConversationWithLastMessage => {
-   const conversation: Omit<Required<Conversation>, 'lastMessageId'> = {
+   const conversation: Required<Conversation> = {
       id: doc.id ?? String(doc._id),
       type: doc.type,
       groupName: doc.groupName,
