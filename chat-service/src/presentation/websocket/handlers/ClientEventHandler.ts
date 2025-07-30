@@ -7,7 +7,6 @@ import { IClientToServerEvents } from '../Types/SocketIOConfig.types';
 import {
    AppEventsTypes,
    createEvent,
-   EventBusError,
    MessageBrokerTopics,
    ZodValidationError,
 } from 'humane-common';
