@@ -1,5 +1,10 @@
 import checkEnv from '@config/env';
-import { connectKafkaProducer, disconnectKafkaProducer } from '@config/kafka';
+import {
+   connectKafkaProducer,
+   disconnectKafkaProducer,
+   startAllConsumer,
+   stopAllConsumer,
+} from '@config/kafka';
 import { logger } from '@config/logger';
 import connectDB from '@infrastructure/persistance/mongo/client';
 import httpServer from '@presentation/websocket/ws';
@@ -8,13 +13,16 @@ const bootStrap = async () => {
    try {
       checkEnv();
       await connectDB();
+      process.on('SIGINT', shutdown);
+      process.on('SIGTERM', shutdown);
+
       await connectKafkaProducer();
+
       httpServer.listen(3000, () => {
          logger.info('http+socket.io server running on port 3000');
       });
 
-      process.on('SIGINT', shutdown);
-      process.on('SIGTERM', shutdown);
+      await startAllConsumer();
    } catch (error) {
       logger.error('error while starting chat-service-pod');
       console.log(error);
@@ -23,6 +31,7 @@ const bootStrap = async () => {
 
 const shutdown = async () => {
    disconnectKafkaProducer();
+   stopAllConsumer();
 };
 
 bootStrap();
