@@ -4,7 +4,13 @@ import {
 } from '@application/dto/SetCovoLastOpened.dto';
 import { TypedSocket } from '../Types/TypedSocket';
 import { IClientToServerEvents } from '../Types/SocketIOConfig.types';
-import { ZodValidationError } from 'humane-common';
+import {
+   AppEventsTypes,
+   createEvent,
+   EventBusError,
+   MessageBrokerTopics,
+   ZodValidationError,
+} from 'humane-common';
 import { IConversationServices } from '@ports/usecases/IConversationServices';
 import { logger } from '@config/logger';
 import {
@@ -20,13 +26,15 @@ import {
    deleteUserMessageSchema,
 } from '@application/dto/DeleteUserMessage.dto';
 import { ConversationNotFoundError } from '@application/errors/ConversationNotFoundError';
+import { IEventPublisher } from '@ports/services/IEventProducer';
 
 export class ClientEventHandler implements IClientToServerEvents {
    constructor(
       private readonly _clientSocket: TypedSocket,
       private readonly _conversationServices: IConversationServices,
       private readonly _oneToOneMessageSerives: IOneToOneMessageServices,
-      private readonly _messageServices: IMessageService
+      private readonly _messageServices: IMessageService,
+      private readonly _eventPublisher: IEventPublisher
    ) {}
    'is-user-online' = async (userId: string, callback: (ack: boolean) => void) => {
       try {
@@ -113,6 +121,21 @@ export class ClientEventHandler implements IClientToServerEvents {
          }
 
          callback({ message: message, success: true });
+
+         // publish the message for furthor processing without keeping the client on wait
+         const { attachment, ...data } = message;
+         const newMessageEvent = createEvent(AppEventsTypes.NEW_MESSAGE, {
+            ...data,
+            attachment: validatedDTO.data.attachment,
+         });
+
+         const { ack } = await this._eventPublisher.send(
+            MessageBrokerTopics.MESSAGE_EVENTS_TOPIC,
+            newMessageEvent
+         );
+         if (!ack) {
+            logger.error('failed to publising new message created event');
+         }
       } catch (e) {
          console.log('error while one to one message');
          console.log(e);
@@ -127,13 +150,11 @@ export class ClientEventHandler implements IClientToServerEvents {
    }) => {
       if (await isUserOnline(event.otherUserId)) {
          const typingUser = this._clientSocket.data.userId;
-         this._clientSocket
-            .to(event.otherUserId)
-            .emit('typing-one-to-one-message', {
-               typingUser,
-               convoId: event.convoId,
-               time: event.time,
-            });
+         this._clientSocket.to(event.otherUserId).emit('typing-one-to-one-message', {
+            typingUser,
+            convoId: event.convoId,
+            time: event.time,
+         });
       }
    };
 

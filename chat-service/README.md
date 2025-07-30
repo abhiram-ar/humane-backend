@@ -69,3 +69,7 @@ nill
    -  why use `query.token` in the firstplace?
    -  `auth.token` is derived from internal protocol used by socket.io, we cannot set it via postman for testing purpose. So the we wennt with the legacy option to use query parsms to send authentication header
    -  query params is not secure. as it is readily visible in URL
+
+### Why dont we only check if the user has rewarded in last 24 hr from cache and emit `replied.in.24hr.first` event
+
+-  because a user can spam another user in 24 hour interval without getting any reply. and we dont want to give reward for that
