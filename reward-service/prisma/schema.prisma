@@ -34,7 +34,7 @@ model Rewards {
 
 enum RewardType {
   HELPFUL_COMMENT
-  CHAT_DAILY_CHECKIN
+  CHAT_CHECKIN
 }
 
 model OutBox {
