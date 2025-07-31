@@ -1,15 +1,19 @@
-import { RepliedWithin24HrsInputDTO } from '@application/dto/RepliedWithin24Hrs.dto';
+import { RepliedWithinIntervalUserMsgIngputDTO } from '@application/dto/RepliedWithinInterval.dto';
 import { logger } from '@config/logger';
 import { Message } from '@domain/Message';
 import { IMessageRepository } from '@ports/repository/IMessageRepository';
-import { IRepliedWithin24Hrs } from '@ports/usecases/IRepliedWithin24Hrs.usecase';
+import { IRepliedWithin } from '@ports/usecases/IRepliedWithinInterval.usecase';
 
-export class RepliedWithin24Hrs implements IRepliedWithin24Hrs {
+export class RepliedWithin implements IRepliedWithin {
    constructor(private readonly _messageRepo: IMessageRepository) {}
 
-   execute = async (
-      userMsg: RepliedWithin24HrsInputDTO
-   ): Promise<{ otherUserLastMsg: Required<Message> } | undefined> => {
+   interval = async ({
+      interval,
+      userMsg,
+   }: {
+      interval: number;
+      userMsg: RepliedWithinIntervalUserMsgIngputDTO;
+   }): Promise<{ otherUserLastMsg: Required<Message> } | undefined> => {
       const otherUserLastMessage =
          await this._messageRepo.getLastMessageOfOtherUserBeforeThisMessage({
             messageId: userMsg.messageId,
@@ -18,15 +22,19 @@ export class RepliedWithin24Hrs implements IRepliedWithin24Hrs {
             senderId: userMsg.senderId,
          });
       if (!otherUserLastMessage) {
-         logger.debug(`${RepliedWithin24Hrs.name}: no other user last message`);
+         logger.debug(`${RepliedWithin.name}: no other user last message`);
 
          return;
       }
 
       const sendTimeDelta = userMsg.sendAt.getTime() - otherUserLastMessage.sendAt.getTime();
       // 24hrs
-      if (sendTimeDelta > 86400000) {
-         logger.debug(`${RepliedWithin24Hrs.name}: other user last message is older than 24hrs`);
+      if (sendTimeDelta > interval) {
+         logger.debug(
+            `${RepliedWithin.name}: other user last message is older than interval period(${
+               interval / 3600000
+            }hrs)`
+         );
          return;
       }
 

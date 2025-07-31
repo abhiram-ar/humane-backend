@@ -1,11 +1,12 @@
 import {
-   RepliedWithin24HrsInputDTO,
-   repliedWithin24HrsInputSchema,
-} from '@application/dto/RepliedWithin24Hrs.dto';
+   RepliedWithinIntervalUserMsgIngputDTO,
+   repliedWithinIntervalUserMsgSchema,
+} from '@application/dto/RepliedWithinInterval.dto';
+import { AppConstants } from '@config/constants';
 import { logger } from '@config/logger';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
 import { IEventPublisher } from '@ports/services/IEventProducer';
-import { IRepliedWithin24Hrs } from '@ports/usecases/IRepliedWithin24Hrs.usecase';
+import { IRepliedWithin } from '@ports/usecases/IRepliedWithinInterval.usecase';
 import {
    AppEvent,
    AppEventsTypes,
@@ -23,7 +24,7 @@ export class RepliedWithinResonableTimeWorker implements IConsumer {
 
    constructor(
       private readonly _kafka: KafkaSingleton,
-      private readonly _repliedWithIn24hrs: IRepliedWithin24Hrs,
+      private readonly _repliedWithIn: IRepliedWithin,
       private readonly _eventPubliser: IEventPublisher
    ) {
       this.consumer = this._kafka.createConsumer('chat-srv-RepliedWithinResonableAmount-worker-v7');
@@ -54,7 +55,7 @@ export class RepliedWithinResonableTimeWorker implements IConsumer {
                }
 
                const userMessage = event.payload;
-               const dto: RepliedWithin24HrsInputDTO = {
+               const dto: RepliedWithinIntervalUserMsgIngputDTO = {
                   messageId: userMessage.id,
                   senderId: userMessage.senderId,
                   conversationId: userMessage.conversationId,
@@ -65,15 +66,16 @@ export class RepliedWithinResonableTimeWorker implements IConsumer {
                   data: validatedUserMsg,
                   success,
                   error,
-               } = repliedWithin24HrsInputSchema.safeParse(dto);
+               } = repliedWithinIntervalUserMsgSchema.safeParse(dto);
                if (!success) {
                   throw new ZodValidationError(error);
                }
 
-               
-
                //check if other message exist in chat other than user within last 24 hr
-               const res = await this._repliedWithIn24hrs.execute(validatedUserMsg);
+               const res = await this._repliedWithIn.interval({
+                  interval: AppConstants.TIME_24HRS,
+                  userMsg: validatedUserMsg,
+               });
                if (!res) return;
 
                const firstReplyWithin24HrEvent: FirstReplyWithin24HrEventPayload = {

@@ -1,6 +1,6 @@
 import z from 'zod';
 
-export const repliedWithin24HrsInputSchema = z.object({
+export const repliedWithinIntervalUserMsgSchema = z.object({
    messageId: z.string(),
 
    senderId: z.string(),
@@ -10,4 +10,4 @@ export const repliedWithin24HrsInputSchema = z.object({
    sendAt: z.coerce.date(),
 });
 
-export type RepliedWithin24HrsInputDTO = z.infer<typeof repliedWithin24HrsInputSchema>;
+export type RepliedWithinIntervalUserMsgIngputDTO = z.infer<typeof repliedWithinIntervalUserMsgSchema>;
