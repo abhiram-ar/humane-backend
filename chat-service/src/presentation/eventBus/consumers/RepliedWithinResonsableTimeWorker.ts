@@ -5,6 +5,7 @@ import {
 import { AppConstants } from '@config/constants';
 import { logger } from '@config/logger';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
+import { ICacheService } from '@ports/services/ICacheService';
 import { IEventPublisher } from '@ports/services/IEventProducer';
 import { IRepliedWithin } from '@ports/usecases/IRepliedWithinInterval.usecase';
 import {
@@ -20,12 +21,32 @@ import { FirstReplyWithin24HrEventPayload } from 'humane-common/build/events/cha
 import { Consumer } from 'kafkajs';
 
 export class RepliedWithinResonableTimeWorker implements IConsumer {
+   static resonableTimeInMs = AppConstants.TIME_24HRS;
+
+   static msgProcessedInIntervalKey = (input: { convoID: string; senderId: string }) => {
+      const cacheKey = `repliedIn24Hr:conv-${input.convoID}:user-${input.senderId}`;
+      return cacheKey;
+   };
+
+   static checkIfUserIsAlreadyProcessedInInterval = (input: {
+      userCovoLastProcessedAt: string | null;
+      newMsgSentAt: Date;
+   }): boolean => {
+      if (!input.userCovoLastProcessedAt) return false;
+
+      let lastUserConvoProcessedAt = new Date(input.userCovoLastProcessedAt).getTime();
+      let timeDelta = new Date(input.newMsgSentAt).getTime() - lastUserConvoProcessedAt;
+
+      return timeDelta < RepliedWithinResonableTimeWorker.resonableTimeInMs ? true : false;
+   };
+
    private consumer: Consumer;
 
    constructor(
       private readonly _kafka: KafkaSingleton,
       private readonly _repliedWithIn: IRepliedWithin,
-      private readonly _eventPubliser: IEventPublisher
+      private readonly _eventPubliser: IEventPublisher,
+      private readonly _cache: ICacheService
    ) {
       this.consumer = this._kafka.createConsumer('chat-srv-RepliedWithinResonableAmount-worker-v7');
    }
@@ -71,9 +92,27 @@ export class RepliedWithinResonableTimeWorker implements IConsumer {
                   throw new ZodValidationError(error);
                }
 
+               const cacheKey = RepliedWithinResonableTimeWorker.msgProcessedInIntervalKey({
+                  convoID: validatedUserMsg.conversationId,
+                  senderId: validatedUserMsg.senderId,
+               });
+               const userCovoLastProcessedAt = await this._cache.get(cacheKey);
+
+               if (
+                  RepliedWithinResonableTimeWorker.checkIfUserIsAlreadyProcessedInInterval({
+                     userCovoLastProcessedAt,
+                     newMsgSentAt: validatedUserMsg.sendAt,
+                  })
+               ) {
+                  logger.debug(
+                     'already processed user-msg for this convo in provided internal: skipped processing'
+                  );
+                  return;
+               }
+
                //check if other message exist in chat other than user within last 24 hr
                const res = await this._repliedWithIn.interval({
-                  interval: AppConstants.TIME_24HRS,
+                  interval: RepliedWithinResonableTimeWorker.resonableTimeInMs,
                   userMsg: validatedUserMsg,
                });
                if (!res) return;
@@ -97,6 +136,10 @@ export class RepliedWithinResonableTimeWorker implements IConsumer {
                   firstReplyWithin24HrEventPayload
                );
                if (!ack) return;
+
+               await this._cache.set(cacheKey, validatedUserMsg.sendAt.toISOString(), {
+                  expiryInMS: RepliedWithinResonableTimeWorker.resonableTimeInMs,
+               });
 
                logger.info(`processed-> ${event.eventId}`);
             } catch (e) {

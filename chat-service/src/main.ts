@@ -6,6 +6,7 @@ import {
    stopAllConsumer,
 } from '@config/kafka';
 import { logger } from '@config/logger';
+import { connectRedis, disconnectRedis } from '@infrastructure/cache/redis/client';
 import connectDB from '@infrastructure/persistance/mongo/client';
 import httpServer from '@presentation/websocket/ws';
 
@@ -13,6 +14,7 @@ const bootStrap = async () => {
    try {
       checkEnv();
       await connectDB();
+      await connectRedis();
       process.on('SIGINT', shutdown);
       process.on('SIGTERM', shutdown);
 
@@ -32,6 +34,7 @@ const bootStrap = async () => {
 const shutdown = async () => {
    disconnectKafkaProducer();
    stopAllConsumer();
+   disconnectRedis();
 };
 
 bootStrap();
