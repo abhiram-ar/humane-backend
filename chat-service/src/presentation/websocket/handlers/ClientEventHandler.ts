@@ -128,13 +128,7 @@ export class ClientEventHandler implements IClientToServerEvents {
             attachment: validatedDTO.data.attachment,
          });
 
-         const { ack } = await this._eventPublisher.send(
-            MessageBrokerTopics.MESSAGE_EVENTS_TOPIC,
-            newMessageEvent
-         );
-         if (!ack) {
-            logger.error('failed to publising new message created event');
-         }
+         await this._eventPublisher.send(MessageBrokerTopics.MESSAGE_EVENTS_TOPIC, newMessageEvent);
       } catch (e) {
          console.log('error while one to one message');
          console.log(e);

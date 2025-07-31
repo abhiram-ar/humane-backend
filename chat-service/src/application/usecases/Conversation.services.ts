@@ -4,13 +4,18 @@ import { GetUserCovoByIdInputDTO } from '@application/dto/GetUserConversationByI
 import { SetConvoLastOpenedInputDTO } from '@application/dto/SetCovoLastOpened.dto';
 import { ConversationNotFoundError } from '@application/errors/ConversationNotFoundError';
 import { CurosrPagination } from '@application/Types/CursorPagination.type';
+import { AppConstants } from '@config/constants';
 import { Conversation } from '@domain/Conversation';
 import { ConversationWithLastMessage } from '@infrastructure/persistance/mongo/automapper/conversationWithLastMessageAutomapper';
 import { IConversationRepository } from '@ports/repository/IConversationRepository';
+import { ICacheService } from '@ports/services/ICacheService';
 import { IConversationServices } from '@ports/usecases/IConversationServices';
 
 export class ConversationServices implements IConversationServices {
-   constructor(private readonly _conversationRepo: IConversationRepository) {}
+   constructor(
+      private readonly _conversationRepo: IConversationRepository,
+      private readonly _cache: ICacheService
+   ) {}
 
    create = async (dto: CreateConversationInputDTO): Promise<Required<Conversation>> => {
       const tempconvo = new Conversation({
@@ -32,9 +37,24 @@ export class ConversationServices implements IConversationServices {
    ): Promise<Required<Conversation> | null> => {
       if (userIds.length === 0) return null;
 
-      // TODO: read through cache
+      //read through cache
+      const cacheKey = `conov1-1:${userIds.sort().join('|')}`;
+      const cacheResult = await this._cache.get(cacheKey);
+      if (cacheResult) {
+         return JSON.parse(cacheResult);
+      }
 
-      return await this._conversationRepo.getOneToOneConversationByParticipantIds(userIds);
+      const conversation = await this._conversationRepo.getOneToOneConversationByParticipantIds(
+         userIds
+      );
+
+      if (conversation) {
+         await this._cache.set(cacheKey, JSON.stringify(conversation), {
+            expiryInMS: AppConstants.TIME_10MIN,
+         });
+      }
+
+      return conversation;
    };
 
    getUserConversation = async (dto: {
