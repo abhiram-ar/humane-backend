@@ -12,7 +12,8 @@ export class KafkaPublisher implements IEventPublisher {
    }
 
    send = async (topic: string, event: AppEvent): Promise<{ ack: boolean }> => {
-      logger.verbose(JSON.stringify({ topic, event }, null, 2));
+      logger.debug(`🔼 Published ${event.eventType} ${event.eventId}`);
+      // logger.verbose(JSON.stringify({ topic, event }, null, 2));
       try {
          await this.producer.send({
             topic,

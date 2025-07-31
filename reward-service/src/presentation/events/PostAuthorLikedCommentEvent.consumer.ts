@@ -28,7 +28,6 @@ export class PostAuthorLikedCommentEventConsumer implements IConsumer {
 
       await this.consumer.subscribe({
          topic: MessageBrokerTopics.COMMENT_LIKED_BY_POST_AUTHOR_TOPIC,
-         fromBeginning: true,
       });
 
       await this.consumer.run({

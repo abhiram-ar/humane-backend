@@ -28,7 +28,6 @@ export class ChatMessagesSpecialEventsConsumer implements IConsumer {
 
       await this.consumer.subscribe({
          topic: MessageBrokerTopics.MESSAGE_SPECAIAL_EVENTS_TOPIC,
-         fromBeginning: true,
       });
 
       await this.consumer.run({

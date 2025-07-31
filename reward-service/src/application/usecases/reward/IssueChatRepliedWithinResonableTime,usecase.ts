@@ -26,6 +26,14 @@ export class IssueChatRepliedWithinResonableTimeReward
    static generateIdempotencyKey = (dto: IssueChatRepliedWithinResonableTimeInputDTO): string => {
       return [dto.conversationId, dto.senderId, dto.sendAt.getTime().toString()].join('|');
    };
+
+   static parseIdempotencyKey = (
+      key: string | undefined
+   ): { convoId: string; senderId: string; sendAt: Date } | null => {
+      if (!key) return null;
+      const [convoId, senderId, sendAt] = key.split('|');
+      return { convoId, senderId, sendAt: new Date(sendAt) };
+   };
    execute = async (
       dto: IssueChatRepliedWithinResonableTimeInputDTO
    ): Promise<Required<Reward> | null> => {
@@ -43,7 +51,12 @@ export class IssueChatRepliedWithinResonableTimeReward
          type: 'CHAT_CHECKIN',
          userId: dto.senderId,
       });
-      if (lastReward) {
+
+      const lastRewardData = IssueChatRepliedWithinResonableTimeReward.parseIdempotencyKey(
+         lastReward?.idempotencyKey
+      );
+
+      if (lastReward && lastRewardData && lastRewardData.convoId === dto.conversationId) {
          let timeDiff = dto.sendAt.getTime() - lastReward.createdAt.getTime();
          if (timeDiff < parseInt(ENV.CHAT_REWARED_COOLOFF_INTERFVAL)) {
             logger.warn(RewardErrorMsg.CHAT_REWARED_RATE_LIMIT);
