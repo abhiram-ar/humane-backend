@@ -1,7 +1,7 @@
 import { Reward } from '@domain/Reward.entity';
 import { IRewardRepostory } from '@ports/repository/IRewardRepository';
 import db from '../prisma-client';
-import { Prisma } from '../../../../../generated/prisma';
+import { Prisma, RewardType } from '../../../../../generated/prisma';
 import { logger } from '@config/logger';
 
 export class RewardRepository implements IRewardRepostory {
@@ -35,6 +35,17 @@ export class RewardRepository implements IRewardRepostory {
             throw e;
          }
       }
+      return res;
+   };
+
+   findLastReward = async (dto: {
+      type: RewardType;
+      userId: string;
+   }): Promise<Required<Reward> | null> => {
+      const res = db.rewards.findFirst({
+         where: { actorId: dto.userId, type: dto.type },
+         orderBy: { createdAt: 'desc' },
+      });
       return res;
    };
    get(id: string): Promise<Reward | null> {

@@ -1,5 +1,6 @@
 import { IssueChatRepliedWithinResonableTimeInputDTO } from '@application/dto/IssueChatRepliedWithinResonableTimeReward.dto,';
 import { RewardErrorMsg } from '@application/errors/FriendshipError';
+import { ENV } from '@config/env';
 import { logger } from '@config/logger';
 import { Reward } from '@domain/Reward.entity';
 import { IRewardRepostory } from '@ports/repository/IRewardRepository';
@@ -23,17 +24,7 @@ export class IssueChatRepliedWithinResonableTimeReward
    ) {}
 
    static generateIdempotencyKey = (dto: IssueChatRepliedWithinResonableTimeInputDTO): string => {
-      const timeAfter24Hours = new Date(dto.sendAt.getTime() + 86400000);
-      // a user can get only one reward in 24hrs / chat
-      return (
-         dto.conversationId +
-         '|' +
-         dto.senderId +
-         '|' +
-         dto.sendAt.getTime() +
-         '|' +
-         timeAfter24Hours.getTime()
-      );
+      return [dto.conversationId, dto.senderId, dto.sendAt.getTime().toString()].join('|');
    };
    execute = async (
       dto: IssueChatRepliedWithinResonableTimeInputDTO
@@ -46,6 +37,18 @@ export class IssueChatRepliedWithinResonableTimeReward
       if (relationShipStatus !== 'friends') {
          logger.warn(RewardErrorMsg.NOT_FRIENDS);
          return null;
+      }
+
+      const lastReward = await this._rewardRepo.findLastReward({
+         type: 'CHAT_CHECKIN',
+         userId: dto.senderId,
+      });
+      if (lastReward) {
+         let timeDiff = dto.sendAt.getTime() - lastReward.createdAt.getTime();
+         if (timeDiff < parseInt(ENV.CHAT_REWARED_COOLOFF_INTERFVAL)) {
+            logger.warn(RewardErrorMsg.CHAT_REWARED_RATE_LIMIT);
+            return null;
+         }
       }
 
       const idempotencyKey = IssueChatRepliedWithinResonableTimeReward.generateIdempotencyKey(dto);

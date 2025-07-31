@@ -3,6 +3,7 @@ import { AppError } from 'humane-common';
 export const RewardErrorMsg = {
    NOT_FRIENDS: 'Cannot issue reward if the parties are not friends',
    FAILED_TO_CREATE: 'unable to create a reward',
+   CHAT_REWARED_RATE_LIMIT: 'user rewared in rate limited',
 } as const;
 export class RewardError extends AppError {
    public statusCode = 400;
