@@ -3,6 +3,7 @@ import { logger } from '@config/logger';
 import { Message } from '@domain/Message';
 import { IMessageRepository } from '@ports/repository/IMessageRepository';
 import { IRepliedWithin } from '@ports/usecases/IRepliedWithinInterval.usecase';
+import { format } from 'date-fns';
 
 export class RepliedWithin implements IRepliedWithin {
    constructor(private readonly _messageRepo: IMessageRepository) {}
@@ -30,10 +31,9 @@ export class RepliedWithin implements IRepliedWithin {
       const sendTimeDelta = userMsg.sendAt.getTime() - otherUserLastMessage.sendAt.getTime();
       // 24hrs
       if (sendTimeDelta > interval) {
+         const duration = format(new Date(interval), 'HH:mm:ss');
          logger.debug(
-            `${RepliedWithin.name}: other user last message is older than interval period(${
-               interval / 3600000
-            }hrs)`
+            `${RepliedWithin.name}: other user last message is older than interval period(${duration})`
          );
          return;
       }
