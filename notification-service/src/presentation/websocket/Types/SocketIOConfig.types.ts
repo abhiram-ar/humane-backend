@@ -6,6 +6,8 @@ export interface ServerToClientEvents {
    'push-noti': (noti: CombinedNotificationWithActionableUser) => void;
    'remove-noti': (noti: CombinedNotification) => void;
    'update-noti': (noti: CombinedNotificationWithActionableUser) => void;
+
+   'user-rewarded': (amount: number, rewardedAt: string) => void;
    withAck: (d: string, callback: (e: number) => void) => void;
 }
 

@@ -12,17 +12,19 @@ const bootstrap = async () => {
          logger.info('http+socket.io server running on port 3000');
       });
 
-      process.on('SIGINT', async () => {
-         await stopAllConsumer();
-      });
-      process.on('SIGTERM', async () => {
-         await stopAllConsumer();
-      });
+      process.on('SIGINT', shutdown);
+      process.on('SIGTERM', shutdown);
       await startAllConsumers();
+
       logger.info('notification service fully operational');
    } catch (error) {
       logger.error('Error while starting notificaion serviec');
       logger.error(error);
    }
 };
+
+const shutdown = async () => {
+   stopAllConsumer();
+};
+
 bootstrap();
