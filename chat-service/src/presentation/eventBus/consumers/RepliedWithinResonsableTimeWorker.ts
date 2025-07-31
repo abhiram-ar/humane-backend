@@ -4,15 +4,18 @@ import {
 } from '@application/dto/RepliedWithin24Hrs.dto';
 import { logger } from '@config/logger';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
+import { IEventPublisher } from '@ports/services/IEventProducer';
 import { IRepliedWithin24Hrs } from '@ports/usecases/IRepliedWithin24Hrs.usecase';
 import {
    AppEvent,
    AppEventsTypes,
+   createEvent,
    EventConsumerMissMatchError,
    IConsumer,
    MessageBrokerTopics,
    ZodValidationError,
 } from 'humane-common';
+import { FirstReplyWithin24HrEventPayload } from 'humane-common/build/events/chat-service-events';
 import { Consumer } from 'kafkajs';
 
 export class RepliedWithinResonableTimeWorker implements IConsumer {
@@ -20,7 +23,8 @@ export class RepliedWithinResonableTimeWorker implements IConsumer {
 
    constructor(
       private readonly _kafka: KafkaSingleton,
-      private readonly _repliedWithIn24hrs: IRepliedWithin24Hrs
+      private readonly _repliedWithIn24hrs: IRepliedWithin24Hrs,
+      private readonly _eventPubliser: IEventPublisher
    ) {
       this.consumer = this._kafka.createConsumer('chat-srv-RepliedWithinResonableAmount-worker-v7');
    }
@@ -49,7 +53,6 @@ export class RepliedWithinResonableTimeWorker implements IConsumer {
                   throw new EventConsumerMissMatchError();
                }
 
-               //validate
                const userMessage = event.payload;
                const dto: RepliedWithin24HrsInputDTO = {
                   messageId: userMessage.id,
@@ -58,13 +61,40 @@ export class RepliedWithinResonableTimeWorker implements IConsumer {
                   sendAt: userMessage.sendAt,
                };
 
-               const validatedDTO = repliedWithin24HrsInputSchema.safeParse(dto);
-               if (!validatedDTO.success) {
-                  throw new ZodValidationError(validatedDTO.error);
+               const {
+                  data: validatedUserMsg,
+                  success,
+                  error,
+               } = repliedWithin24HrsInputSchema.safeParse(dto);
+               if (!success) {
+                  throw new ZodValidationError(error);
                }
 
+               
+
                //check if other message exist in chat other than user within last 24 hr
-               await this._repliedWithIn24hrs.execute(validatedDTO.data);
+               const res = await this._repliedWithIn24hrs.execute(validatedUserMsg);
+               if (!res) return;
+
+               const firstReplyWithin24HrEvent: FirstReplyWithin24HrEventPayload = {
+                  messageId: validatedUserMsg.messageId,
+                  senderId: validatedUserMsg.senderId,
+                  conversationId: validatedUserMsg.conversationId,
+                  sendAt: validatedUserMsg.sendAt,
+                  repliedToUserId: res.otherUserLastMsg.senderId,
+                  message: validatedUserMsg.message,
+               };
+
+               const firstReplyWithin24HrEventPayload = createEvent(
+                  AppEventsTypes.FIRST_REPLY_WITHIN_24_HR,
+                  firstReplyWithin24HrEvent
+               );
+
+               const { ack } = await this._eventPubliser.send(
+                  MessageBrokerTopics.MESSAGE_SPECAIAL_EVENTS_TOPIC,
+                  firstReplyWithin24HrEventPayload
+               );
+               if (!ack) return;
 
                logger.info(`processed-> ${event.eventId}`);
             } catch (e) {

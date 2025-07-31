@@ -1,8 +1,10 @@
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
 import { RepliedWithinResonableTimeWorker } from '@presentation/eventBus/consumers/RepliedWithinResonsableTimeWorker';
 import { repliedWithin24Hrs } from './usecases.container';
+import { eventPubliser } from './services.container';
 
 export const repliedWithinResonableTimeWorkerConsumer = new RepliedWithinResonableTimeWorker(
    KafkaSingleton.getInstance(),
-   repliedWithin24Hrs
+   repliedWithin24Hrs,
+   eventPubliser
 );
