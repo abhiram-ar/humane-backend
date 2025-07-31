@@ -1,7 +1,7 @@
-import { issueHelpfulCommentRewardInputSchema } from '@application/dto/IssueHelpfulCommentReward.dto';
+import { issueChatRepliedWithinResonableTimeInputSchema } from '@application/dto/IssueChatRepliedWithinResonableTimeReward.dto,';
 import { logger } from '@config/logger';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
-import { IIssueHelpfulCommnetReward } from '@ports/usecases/reward/IIssueHelpfulCommentReward.usercase';
+import { IIssueChatRepliedWithinResonableTimeReward } from '@ports/usecases/reward/IIssueChatRepliedWithinResonableTime,usecase';
 import {
    AppEvent,
    AppEventsTypes,
@@ -12,22 +12,22 @@ import {
 } from 'humane-common';
 import { Consumer } from 'kafkajs';
 
-export class PostAuthorLikedCommentEventConsumer implements IConsumer {
+export class ChatMessagesSpecialEventsConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(
       private readonly _kafka: KafkaSingleton,
-      private readonly _issueHelpfulCommentReward: IIssueHelpfulCommnetReward
+      private readonly _issueChatRepliedInResonableTime: IIssueChatRepliedWithinResonableTimeReward
    ) {
-      this.consumer = this._kafka.createConsumer('reward-service-postAuthorLikedComment-v11');
+      this.consumer = this._kafka.createConsumer('reward-service-chat-messages-special-v1');
    }
 
    start = async () => {
       await this.consumer.connect();
-      logger.info('post.author.liked.comment event consumer connected ');
+      logger.info('chat-messages special events consumer connected');
 
       await this.consumer.subscribe({
-         topic: MessageBrokerTopics.COMMENT_LIKED_BY_POST_AUTHOR_TOPIC,
+         topic: MessageBrokerTopics.MESSAGE_SPECAIAL_EVENTS_TOPIC,
       });
 
       await this.consumer.run({
@@ -40,16 +40,18 @@ export class PostAuthorLikedCommentEventConsumer implements IConsumer {
             // logger.verbose(JSON.stringify(event, null, 2));
 
             try {
-               if (event.eventType != AppEventsTypes.COMMENT_LIKED_BY_POST_AUTHUR) {
+               if (event.eventType != AppEventsTypes.FIRST_REPLY_WITHIN_24_HR) {
                   throw new EventConsumerMissMatchError();
                }
-               const parsed = issueHelpfulCommentRewardInputSchema.safeParse(event.payload);
 
-               if (!parsed.success) {
-                  throw new ZodValidationError(parsed.error);
+               const validatedDTO = issueChatRepliedWithinResonableTimeInputSchema.safeParse(
+                  event.payload
+               );
+               if (!validatedDTO.success) {
+                  throw new ZodValidationError(validatedDTO.error);
                }
 
-               await this._issueHelpfulCommentReward.execute(parsed.data);
+               await this._issueChatRepliedInResonableTime.execute(validatedDTO.data);
 
                logger.info(`processed-> ${event.eventType} ${event.eventId}`);
             } catch (e) {

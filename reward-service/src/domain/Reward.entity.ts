@@ -1,6 +1,6 @@
 export const RewardPoints = {
    HELPFUL_COMMENT: 30,
-   CHAT_DAILY_CHECKIN: 10,
+   CHAT_CHECKIN: 10,
 } as const;
 
 export class Reward {

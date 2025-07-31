@@ -11,4 +11,11 @@ export interface IMessageRepository extends IBaseRepository<Message> {
    ): Promise<{ messages: Required<Message>[]; from: string | null; hasMore: boolean }>;
 
    softDeleteUserMessageById(dto: DeleteUserMessageInputDTO): Promise<Required<Message> | null>;
+
+   getLastMessageOfOtherUserBeforeThisMessage(userMessage: {
+      messageId: string;
+      convoId: string;
+      senderId: string;
+      sendAt: Date;
+   }): Promise<Required<Message> | null>;
 }

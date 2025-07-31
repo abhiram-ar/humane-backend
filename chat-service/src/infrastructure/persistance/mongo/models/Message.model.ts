@@ -10,7 +10,7 @@ export interface IMessageDocument
 
 const messageSchema = new mongoose.Schema<IMessageDocument>({
    senderId: { type: String, required: true },
-   conversationId: { type: mongoose.Types.ObjectId, ref: 'Conversation', required: true },
+   conversationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Conversation', required: true },
    message: { type: String },
 
    sendAt: { type: Date, default: Date.now },

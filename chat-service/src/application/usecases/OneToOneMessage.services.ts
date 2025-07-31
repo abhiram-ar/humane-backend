@@ -32,7 +32,6 @@ export class OneToOneMessageServices implements IOneToOneMessageServices {
          });
       }
 
-      // crete a message
       const tempMessage = new Message({
          senderId: dto.from,
          conversationId: conversation.id,
@@ -41,8 +40,6 @@ export class OneToOneMessageServices implements IOneToOneMessageServices {
       });
 
       const newMessage = await this._messageRepo.create(tempMessage);
-
-      // send messge to the recipinet or coversation room
       const { attachment, ...data } = newMessage;
 
       let hydratedAttachment: { attachmentType: string; attachmentURL: string | undefined };
@@ -79,8 +76,6 @@ export class OneToOneMessageServices implements IOneToOneMessageServices {
          dto.limit,
          dto.convoClearedAt
       );
-
-      // todo: attachment saturation
 
       return {
          messages: result.messages,

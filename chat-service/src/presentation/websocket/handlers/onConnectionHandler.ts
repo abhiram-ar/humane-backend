@@ -6,6 +6,7 @@ import {
    oneToOneMessageServices,
 } from '@di/usecases.container';
 import { ClientEventHandler } from './ClientEventHandler';
+import { eventPubliser } from '@di/services.container';
 
 export const onConnectionHandler = (socket: TypedSocket) => {
    logger.info(`New connection from ${socket.data.userId}`);
@@ -17,7 +18,8 @@ export const onConnectionHandler = (socket: TypedSocket) => {
       socket,
       conversationServices,
       oneToOneMessageServices,
-      messageServices
+      messageServices,
+      eventPubliser
    );
 
    socket.on('hello', clientEventHandler.hello);

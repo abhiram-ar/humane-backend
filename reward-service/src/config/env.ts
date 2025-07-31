@@ -3,6 +3,7 @@ export const ENV = {
    SERVER_PORT: '3000',
    POSTGRES_URI: process.env.POSTGRES_URI,
    USER_SERVICE_BASE_URL: process.env.USER_SERVICE_BASE_URL,
+   CHAT_REWARED_COOLOFF_INTERFVAL: process.env.CHAT_REWARED_COOLOFF_INTERFVAL ?? '86400000', // 24hrs
 };
 
 function checkEnv() {

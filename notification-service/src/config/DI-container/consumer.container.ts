@@ -12,6 +12,7 @@ import { CommentDeletedEventConsumer } from '@presentation/event/CommentDeletedE
 import { PostDeletedEventConsumer } from '@presentation/event/PostDeletedEvent.consumer';
 import { CommentLikedEventConsumer } from '@presentation/event/CommentLikedEvent.consumer';
 import { CommentUnLikedEventConsumer } from '@presentation/event/CommentUnLikedEvent.consumer';
+import { UserRewardedEventConsumer } from '@presentation/event/UserRewardedEventConsumer';
 
 export const friendReqEventConsumer = new FriendReqEventConsumer(
    KafkaSingleton.getInstance(),
@@ -45,4 +46,8 @@ export const commentLikedEventConsumer = new CommentLikedEventConsumer(
 export const commentUnlikedEventConsumer = new CommentUnLikedEventConsumer(
    KafkaSingleton.getInstance(),
    commentLikesNotificationService
+);
+
+export const userRewardedEventConsumer = new UserRewardedEventConsumer(
+   KafkaSingleton.getInstance()
 );

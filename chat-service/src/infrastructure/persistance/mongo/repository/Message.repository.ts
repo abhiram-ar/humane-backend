@@ -104,4 +104,21 @@ export class MessageRepository implements IMessageRepository {
          return null;
       }
    };
+
+   getLastMessageOfOtherUserBeforeThisMessage = async (userMessage: {
+      messageId: string;
+      convoId: string;
+      senderId: string;
+      sendAt: Date;
+   }): Promise<Required<Message> | null> => {
+      const res = await messageModel
+         .findOne({
+            conversationId: new mongoose.Types.ObjectId(userMessage.convoId),
+            senderId: { $ne: userMessage.senderId },
+            sendAt: { $lt: userMessage.sendAt },
+         })
+         .sort({ _id: -1 });
+
+      return res ? messageAutoMapper(res) : null;
+   };
 }

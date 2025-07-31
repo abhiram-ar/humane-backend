@@ -5,6 +5,7 @@ import {
    commentUnlikedEventConsumer,
    friendReqEventConsumer,
    postDeletedEventConsumer,
+   userRewardedEventConsumer,
 } from '@di/consumer.container';
 
 export const startAllConsumers = async () => {
@@ -14,13 +15,14 @@ export const startAllConsumers = async () => {
    await postDeletedEventConsumer.start();
    await commentLikedEventConsumer.start();
    await commentUnlikedEventConsumer.start();
+   await userRewardedEventConsumer.start();
 };
 
-export const stopAllConsumer = async () => {
-   await friendReqEventConsumer.stop();
-   await commentCreatedEventConsumer.stop();
-   await commentDeltedEventConsumer.stop();
-   await postDeletedEventConsumer.stop();
-   await commentLikedEventConsumer.stop();
-   await commentUnlikedEventConsumer.stop();
+export const stopAllConsumer = () => {
+   friendReqEventConsumer.stop();
+   commentCreatedEventConsumer.stop();
+   commentDeltedEventConsumer.stop();
+   postDeletedEventConsumer.stop();
+   commentLikedEventConsumer.stop();
+   commentUnlikedEventConsumer.stop();
 };

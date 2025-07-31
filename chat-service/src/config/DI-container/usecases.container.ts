@@ -3,12 +3,13 @@ import { conversationRepository, messageRepository } from './repository.containe
 import { OneToOneMessageServices } from '@application/usecases/OneToOneMessage.services';
 import { FindOtherParticipantOfOneToOneConvo } from '@application/usecases/FindOtherParticipantOfOneToOneConvo';
 import { GetOneToOneConversaionMessages } from '@application/usecases/GetOneToOneConversationMessages';
-import { esproxyService, storageService } from './services.container';
+import { cacheService, esproxyService, storageService } from './services.container';
 import { SearchUserCovo } from '@application/usecases/SearchUserConvo';
 import { MessageService } from '@application/usecases/Message.services';
 import { ConovUserMetadataServices } from '@application/usecases/ConovUserMetadataServices';
+import { RepliedWithin } from '@application/usecases/RepliedWithinInterval.usecase';
 
-export const conversationServices = new ConversationServices(conversationRepository);
+export const conversationServices = new ConversationServices(conversationRepository, cacheService);
 
 export const oneToOneMessageServices = new OneToOneMessageServices(
    messageRepository,
@@ -34,3 +35,5 @@ export const searchUserConvo = new SearchUserCovo(
 );
 
 export const messageServices = new MessageService(messageRepository);
+
+export const repliedWithin24Hrs = new RepliedWithin(messageRepository);

@@ -1,8 +1,8 @@
 import { AppEvent } from 'humane-common';
 import KafkaSingleton from './KafkaSingleton';
-import { Producer } from 'kafkajs';
 import { logger } from '@config/logger';
 import { IEventPublisher } from '@ports/services/IEventProducer';
+import { Producer } from 'kafkajs';
 
 export class KafkaPublisher implements IEventPublisher {
    producer: Producer;
@@ -13,7 +13,6 @@ export class KafkaPublisher implements IEventPublisher {
 
    send = async (topic: string, event: AppEvent): Promise<{ ack: boolean }> => {
       logger.debug(`🔼 Published ${event.eventType} ${event.eventId}`);
-      // logger.verbose(JSON.stringify({ topic, event }, null, 2));
       try {
          await this.producer.send({
             topic,
@@ -22,6 +21,7 @@ export class KafkaPublisher implements IEventPublisher {
 
          return { ack: true };
       } catch (error) {
+         logger.error(`Failed to send ${event.eventType}`);
          console.log(error);
          return { ack: false };
       }
