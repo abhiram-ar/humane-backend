@@ -50,7 +50,7 @@ export class ConversationServices implements IConversationServices {
 
       if (conversation) {
          await this._cache.set(cacheKey, JSON.stringify(conversation), {
-            expiryInMS: AppConstants.TIME_10MIN,
+            expiryInMS: AppConstants.TIME_5MIN,
          });
       }
 
