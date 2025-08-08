@@ -35,6 +35,7 @@ export class ClientEventHandler implements IClientToServerEvents {
       private readonly _messageServices: IMessageService,
       private readonly _eventPublisher: IEventPublisher
    ) {}
+
    'is-user-online' = async (userId: string, callback: (ack: boolean) => void) => {
       try {
          const userOnlineStatus = await isUserOnline(userId);
@@ -180,4 +181,15 @@ export class ClientEventHandler implements IClientToServerEvents {
    hello = () => {
       console.log('client say hello');
    };
+
+   'call.requested' = async (event: {
+      recipientId: string;
+      callback: (res: { ringing: boolean; callId: string }) => void;
+   }) => {};
+
+   'call.action': (event: { callId: string; action: 'answered' | 'declined' | 'timeout' }) => void;
+
+   'call.sdp.offer': (event: { callId: string; offerSDP: string }) => void;
+
+   'call.sdp.answer': (event: { callId: string; answerSDP: string }) => void;
 }
