@@ -2,7 +2,9 @@ import { logger } from '@config/logger';
 import { TypedSocket } from '../Types/TypedSocket';
 import {
    conversationServices,
+   mduccProtocolService,
    messageServices,
+   oneToOneCallServices,
    oneToOneMessageServices,
 } from '@di/usecases.container';
 import { ClientEventHandler } from './ClientEventHandler';
@@ -14,12 +16,15 @@ export const onConnectionHandler = (socket: TypedSocket) => {
    socket.join(socket.data.userId);
    socket.emit('test', `Connected to server, UserId:${socket.data.userId}`);
 
+   // TODO: replace with factory
    const clientEventHandler = new ClientEventHandler(
       socket,
       conversationServices,
       oneToOneMessageServices,
       messageServices,
-      eventPubliser
+      eventPubliser,
+      oneToOneCallServices,
+      mduccProtocolService
    );
 
    socket.on('hello', clientEventHandler.hello);
@@ -33,6 +38,8 @@ export const onConnectionHandler = (socket: TypedSocket) => {
    socket.on('is-user-online', clientEventHandler['is-user-online']);
 
    socket.on('typing-one-to-one-message', clientEventHandler['typing-one-to-one-message']);
+
+   socket.on('call.initiate', clientEventHandler['call.initiate']);
 
    socket.on('disconnect', () => {
       logger.debug(`socket disconnected userId:${socket.data.userId}`);

@@ -21,6 +21,8 @@ export class MessageRepository implements IMessageRepository {
                   sendAt: entity.sendAt,
                   attachment: entity.attachment,
                   replyToMessageId: entity.replyToMessageId,
+                  type: entity.type,
+                  callConnected: entity.callConnected,
                },
             ],
             { session }

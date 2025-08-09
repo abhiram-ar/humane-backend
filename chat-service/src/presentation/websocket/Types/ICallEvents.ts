@@ -11,12 +11,19 @@ export interface IServerToClientCallEvents {
 }
 
 export interface IClientToServerCallEvents {
-   'call.requested': (event: {
-      recipientId: string;
-      callback: (res: { ringing: boolean; callId: string }) => void;
-   }) => void;
+   'call.initiate': (
+      recipientId: string,
+      callback: (
+         res: { ringing: boolean; callId: string } | { ringing: false; error: string }
+      ) => void
+   ) => void;
 
-   'call.action': (event: { callId: string; action: 'answered' | 'declined' | 'timeout' }) => void;
+   'call.handup': (event: { callId: string }) => void;
+
+   'call.action': (
+      event: { callId: string; action: 'answered' | 'declined' | 'timeout' },
+      callback: (arg: { status: 'connected' | 'callTakenOnOtherDevice' | 'callCancelled' }) => void
+   ) => void;
 
    'call.sdp.offer': (event: { callId: string; offerSDP: string }) => void;
 

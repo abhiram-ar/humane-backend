@@ -5,6 +5,7 @@ import {
 import { TypedSocket } from '../Types/TypedSocket';
 import { IClientToServerEvents } from '../Types/SocketIOConfig.types';
 import {
+   AppError,
    AppEventsTypes,
    createEvent,
    MessageBrokerTopics,
@@ -26,6 +27,9 @@ import {
 } from '@application/dto/DeleteUserMessage.dto';
 import { ConversationNotFoundError } from '@application/errors/ConversationNotFoundError';
 import { IEventPublisher } from '@ports/services/IEventProducer';
+import { IMDUCCProtocolServices } from '@ports/usecases/IMDUCCProtocol.service';
+import { IOneToOneCallServices } from '@ports/usecases/IOneToOneCallServices';
+import { createOneToOneCallSchema } from '@application/dto/CreateOneToOneCall.dto';
 
 export class ClientEventHandler implements IClientToServerEvents {
    constructor(
@@ -33,7 +37,9 @@ export class ClientEventHandler implements IClientToServerEvents {
       private readonly _conversationServices: IConversationServices,
       private readonly _oneToOneMessageSerives: IOneToOneMessageServices,
       private readonly _messageServices: IMessageService,
-      private readonly _eventPublisher: IEventPublisher
+      private readonly _eventPublisher: IEventPublisher,
+      private readonly _oneToOneCallServices: IOneToOneCallServices,
+      private readonly _MDUCCProtocolServices: IMDUCCProtocolServices
    ) {}
 
    'is-user-online' = async (userId: string, callback: (ack: boolean) => void) => {
@@ -182,10 +188,62 @@ export class ClientEventHandler implements IClientToServerEvents {
       console.log('client say hello');
    };
 
-   'call.requested' = async (event: {
-      recipientId: string;
-      callback: (res: { ringing: boolean; callId: string }) => void;
-   }) => {};
+   'call.initiate' = async (
+      recipientId: string,
+      callback: (
+         res: { ringing: boolean; callId: string } | { ringing: false; error: string }
+      ) => void
+   ) => {
+      // write to db
+
+      console.log(recipientId, callback);
+
+      try {
+         const {
+            data: validatedCreateCallDTO,
+            error,
+            success,
+         } = createOneToOneCallSchema.safeParse({
+            from: this._clientSocket.data.userId,
+            to: recipientId,
+         });
+         if (!success) {
+            throw new ZodValidationError(error);
+         }
+
+         // we can use the convo, to show optimistically update the convo messages
+         const { callMessage, convo } = await this._oneToOneCallServices.create(
+            validatedCreateCallDTO
+         );
+
+         const callDescription = await this._MDUCCProtocolServices.initializeCall({
+            callId: callMessage.id,
+            callerId: validatedCreateCallDTO.from,
+            callerDeviceId: this._clientSocket.id,
+            recipientId: validatedCreateCallDTO.to,
+         });
+
+         const recipientOnline = await isUserOnline(callDescription.recipientId);
+         if (recipientOnline) {
+            this._clientSocket.to(callDescription.recipientId).emit('call.incoming', {
+               callerId: callDescription.callerId,
+               callId: callDescription.callId,
+            });
+            callback({ ringing: true, callId: callDescription.callId });
+         } else {
+            callback({ ringing: false, callId: callDescription.callId });
+         }
+      } catch (error) {
+         logger.error(error);
+         if (error instanceof AppError) {
+            callback({ ringing: false, error: error.message });
+         } else {
+            callback({ ringing: false, error: 'Error while initiating call' });
+         }
+      }
+   };
+
+   'call.handup': (event: { callId: string }) => void;
 
    'call.action': (event: { callId: string; action: 'answered' | 'declined' | 'timeout' }) => void;
 

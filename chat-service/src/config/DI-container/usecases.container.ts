@@ -8,6 +8,8 @@ import { SearchUserCovo } from '@application/usecases/SearchUserConvo';
 import { MessageService } from '@application/usecases/Message.services';
 import { ConovUserMetadataServices } from '@application/usecases/ConovUserMetadataServices';
 import { RepliedWithin } from '@application/usecases/RepliedWithinInterval.usecase';
+import { OneToOneCallServices } from '@application/usecases/OneToOneCallServices';
+import { MDUCCProtocolServices } from '@application/usecases/MDUCCProtocol.service';
 
 export const conversationServices = new ConversationServices(conversationRepository, cacheService);
 
@@ -37,3 +39,10 @@ export const searchUserConvo = new SearchUserCovo(
 export const messageServices = new MessageService(messageRepository);
 
 export const repliedWithin24Hrs = new RepliedWithin(messageRepository);
+
+export const oneToOneCallServices = new OneToOneCallServices(
+   messageRepository,
+   conversationServices
+);
+
+export const mduccProtocolService = new MDUCCProtocolServices(cacheService);
