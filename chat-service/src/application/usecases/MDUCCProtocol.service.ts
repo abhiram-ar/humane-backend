@@ -1,6 +1,8 @@
 import { AcquireCallRecipientDeviceLockInputDTO } from '@application/dto/AcquireCallRecipientDeviceLock.dto';
+import { HangupCallInputDTO } from '@application/dto/HandupCall.dto';
 import { InitiateCallInputDTO, InitiateCallOutputDTO } from '@application/dto/InitiateCall.dto';
 import { AppConstants } from '@config/constants';
+import { logger } from '@config/logger';
 import { ICallDescription } from '@domain/ICallDescription';
 import { redisClient } from '@infrastructure/cache/redis/client';
 import { ICacheService } from '@ports/services/ICacheService';
@@ -42,7 +44,7 @@ export class MDUCCProtocolServices implements IMDUCCProtocolServices {
       if (!callDesc) {
          return null;
       }
-      return callDesc as unknown as ICallDescription;
+      return { callId, ...callDesc } as unknown as ICallDescription;
    };
 
    acquireRecipientDeviceLock = async (
@@ -59,5 +61,29 @@ export class MDUCCProtocolServices implements IMDUCCProtocolServices {
 
       const callDesc = await this.getCallDescription(dto.callId);
       return { callDescription: callDesc, mutex: true };
+   };
+
+   hangUpCall = async (
+      dto: HangupCallInputDTO
+   ): Promise<{ handup: boolean; callDescription?: ICallDescription }> => {
+      const calldesc = await this.getCallDescription(dto.callId);
+      if (!calldesc) return { handup: false };
+
+      if (
+         !(calldesc.callerDeviceId === dto.clientDeviceId) &&
+         !(calldesc.recipientDeviceId === dto.clientDeviceId)
+      ) {
+         logger.warn(`${MDUCCProtocolServices.name}: foreign device cannot end call`);
+         return { handup: false };
+      }
+
+      if (calldesc.endedAt) return { handup: false, callDescription: calldesc };
+
+      const key = MDUCCProtocolServices.getCallKeyById(dto.callId);
+      const field: keyof ICallDescription = 'endedAt';
+
+      // this should be first field entry, we already handled the exiting state above
+      await redisClient.hSetNX(key, field, new Date().toISOString());
+      return { handup: true, callDescription: calldesc };
    };
 }

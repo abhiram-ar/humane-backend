@@ -36,6 +36,7 @@ import {
    acquireCallRecipientDeviceLockSchema,
 } from '@application/dto/AcquireCallRecipientDeviceLock.dto';
 import { CallDescriptionNotFoundError } from '@application/errors/CallDescriptionNotFoundError';
+import { HangupCallInputDTO, hangupCallInputSchema } from '@application/dto/HandupCall.dto';
 
 export class ClientEventHandler implements IClientToServerEvents {
    constructor(
@@ -255,7 +256,6 @@ export class ClientEventHandler implements IClientToServerEvents {
       callback?: (arg: { status: 'connected' | 'callTakenOnOtherDevice' | 'callEnded' }) => void
    ) => {
       try {
-         logger.warn('1');
          const {
             data: validatedDTO,
             success,
@@ -268,7 +268,6 @@ export class ClientEventHandler implements IClientToServerEvents {
             throw new ZodValidationError(error);
          }
 
-         logger.warn('2');
          const { mutex, callDescription } =
             await this._MDUCCProtocolServices.acquireRecipientDeviceLock(validatedDTO);
 
@@ -280,29 +279,32 @@ export class ClientEventHandler implements IClientToServerEvents {
             return;
          }
 
-         logger.warn('3');
          if (!callDescription) {
             throw new CallDescriptionNotFoundError();
          }
 
          // -------------------recipient device acquierd lock--------------------------
 
-         logger.warn('4');
          // let other recipient devices know call is acted by this device
          this._clientSocket.to(callDescription.recipientId).emit('call.acted.by_other_device', {
             callId: callDescription.callId,
             callerId: callDescription.callerId,
          });
 
+         if (callDescription.endedAt && callback) {
+            callback({ status: 'callEnded' });
+         }
+
          if (event.action === 'answered') {
+            // TODO: write to DB
             this._clientSocket.to(callDescription.callerDeviceId).emit('call.connected', {
                callId: callDescription.callId,
                recipientId: callDescription.recipientId,
             });
          }
 
-         logger.warn('5');
          if (event.action === 'declined') {
+            //TODO: write to Db
             this._clientSocket.to(callDescription.callerDeviceId).emit('call.declined', {
                callId: callDescription.callId,
                recipientId: callDescription.recipientId,
@@ -315,7 +317,63 @@ export class ClientEventHandler implements IClientToServerEvents {
       }
    };
 
-   'call.handup': (event: { callId: string }) => void;
+   'call.handup' = async (event: { callId: string }) => {
+      logger.warn(1);
+      try {
+         const {
+            data: validatedDTO,
+            success,
+            error,
+         } = hangupCallInputSchema.safeParse({
+            callId: event.callId,
+            clientDeviceId: this._clientSocket.id,
+         } as HangupCallInputDTO);
+         if (!success) {
+            throw new ZodValidationError(error);
+         }
+
+         logger.warn(2);
+         const { handup, callDescription } = await this._MDUCCProtocolServices.hangUpCall(
+            validatedDTO
+         );
+
+         logger.warn(3);
+         // user was not able to hangup - or other user hangedup
+         if (!handup) return;
+
+         // case 1: call not connected
+         logger.warn(4);
+         if (callDescription && !callDescription.recipientDeviceId) {
+            this._clientSocket.to(callDescription.recipientId).emit('call.incoming.cancelled', {
+               callerId: callDescription.callerId,
+               callId: callDescription.callId,
+            });
+            return;
+         }
+
+         logger.warn(5);
+         // case 2: call connected
+         if (callDescription && callDescription.recipientDeviceId) {
+            logger.warn(6);
+            const currentSocketId = this._clientSocket.id;
+            if (currentSocketId === callDescription.callerDeviceId) {
+               logger.warn(7);
+               this._clientSocket.to(callDescription.recipientDeviceId).emit('call.ended', {
+                  callId: callDescription.callId,
+                  at: callDescription.endedAt ?? new Date().toUTCString(),
+               });
+            } else if (currentSocketId === callDescription.recipientDeviceId) {
+               logger.warn(8);
+               this._clientSocket.to(callDescription.callerDeviceId).emit('call.ended', {
+                  callId: callDescription.callId,
+                  at: callDescription.endedAt ?? new Date().toUTCString(),
+               });
+            }
+         }
+      } catch (error) {
+         logger.error(error);
+      }
+   };
 
    'call.sdp.offer': (event: { callId: string; offerSDP: string }) => void;
 

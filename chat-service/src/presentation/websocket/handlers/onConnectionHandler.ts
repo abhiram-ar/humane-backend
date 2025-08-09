@@ -43,6 +43,8 @@ export const onConnectionHandler = (socket: TypedSocket) => {
 
    socket.on('call.action', clientEventHandler['call.action']);
 
+   socket.on('call.handup', clientEventHandler['call.handup']);
+
    socket.on('disconnect', () => {
       logger.debug(`socket disconnected userId:${socket.data.userId}`);
    });

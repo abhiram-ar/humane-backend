@@ -1,4 +1,5 @@
 import { AcquireCallRecipientDeviceLockInputDTO } from '@application/dto/AcquireCallRecipientDeviceLock.dto';
+import { HangupCallInputDTO } from '@application/dto/HandupCall.dto';
 import { InitiateCallInputDTO, InitiateCallOutputDTO } from '@application/dto/InitiateCall.dto';
 import { ICallDescription } from '@domain/ICallDescription';
 
@@ -14,4 +15,8 @@ export interface IMDUCCProtocolServices {
       | { callDescription: ICallDescription | null; mutex: true }
       | { callDescription?: null; mutex: false }
    >;
+
+   hangUpCall(
+      dto: HangupCallInputDTO
+   ): Promise<{ handup: boolean; callDescription?: ICallDescription }>;
 }
