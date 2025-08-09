@@ -19,14 +19,15 @@ export class MDUCCProtocolServices {
       }
 
       const key = MDUCCProtocolServices.getCallKeyById(callId);
-
+      const initiatedAt = new Date().toString();
       await redisClient.hSet(key, {
          callerId: dto.callerId,
          callerDeviceId: dto.callerDeviceId,
          recipientId: dto.recipientId,
+         initiatedAt,
       });
       await redisClient.pExpire(key, AppConstants.TIME_5MIN);
 
-      return { callId, ...callMetadata };
+      return { callId, initiatedAt, ...callMetadata };
    };
 }

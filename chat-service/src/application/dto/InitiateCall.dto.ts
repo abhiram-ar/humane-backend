@@ -9,4 +9,4 @@ const initiateCallInputSchema = z.object({
 
 export type InitiateCallInputDTO = z.infer<typeof initiateCallInputSchema>;
 
-export type InitiateCallOutputDTO = Required<InitiateCallInputDTO>;
+export type InitiateCallOutputDTO = Required<InitiateCallInputDTO> & { initiatedAt: string };

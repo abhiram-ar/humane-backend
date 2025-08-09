@@ -228,6 +228,7 @@ export class ClientEventHandler implements IClientToServerEvents {
             this._clientSocket.to(callDescription.recipientId).emit('call.incoming', {
                callerId: callDescription.callerId,
                callId: callDescription.callId,
+               at: callDescription.initiatedAt,
             });
             callback({ ringing: true, callId: callDescription.callId });
          } else {
