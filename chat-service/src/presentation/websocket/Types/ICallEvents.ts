@@ -1,9 +1,11 @@
 export interface IServerToClientCallEvents {
    'call.incoming': (event: { callerId: string; callId: string; at: string }) => void;
 
-   'call.answered.by_other_device': (event: { callId: string; callerId: string }) => void;
+   'call.acted.by_other_device': (event: { callId: string; callerId: string }) => void;
 
    'call.connected': (event: { callId: string; recipientId: string }) => void;
+
+   'call.declined': (event: { callId: string; recipientId: string }) => void;
 
    'call.sdp.offer': (event: { callId: string; offerSDP: string }) => void;
 
@@ -22,7 +24,7 @@ export interface IClientToServerCallEvents {
 
    'call.action': (
       event: { callId: string; action: 'answered' | 'declined' | 'timeout' },
-      callback?: (arg: { status: 'connected' | 'callTakenOnOtherDevice' | 'callCancelled' }) => void
+      callback: (arg: { status: 'connected' | 'callTakenOnOtherDevice' | 'callEnded' }) => void
    ) => void;
 
    'call.sdp.offer': (event: { callId: string; offerSDP: string }) => void;

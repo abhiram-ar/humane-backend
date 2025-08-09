@@ -8,6 +8,7 @@ import {
    AppError,
    AppEventsTypes,
    createEvent,
+   GenericError,
    MessageBrokerTopics,
    ZodValidationError,
 } from 'humane-common';
@@ -30,6 +31,11 @@ import { IEventPublisher } from '@ports/services/IEventProducer';
 import { IMDUCCProtocolServices } from '@ports/usecases/IMDUCCProtocol.service';
 import { IOneToOneCallServices } from '@ports/usecases/IOneToOneCallServices';
 import { createOneToOneCallSchema } from '@application/dto/CreateOneToOneCall.dto';
+import {
+   AcquireCallRecipientDeviceLockInputDTO,
+   acquireCallRecipientDeviceLockSchema,
+} from '@application/dto/AcquireCallRecipientDeviceLock.dto';
+import { CallDescriptionNotFoundError } from '@application/errors/CallDescriptionNotFoundError';
 
 export class ClientEventHandler implements IClientToServerEvents {
    constructor(
@@ -244,9 +250,72 @@ export class ClientEventHandler implements IClientToServerEvents {
       }
    };
 
-   'call.handup': (event: { callId: string }) => void;
+   'call.action' = async (
+      event: { callId: string; action: 'answered' | 'declined' | 'timeout' },
+      callback?: (arg: { status: 'connected' | 'callTakenOnOtherDevice' | 'callEnded' }) => void
+   ) => {
+      try {
+         logger.warn('1');
+         const {
+            data: validatedDTO,
+            success,
+            error,
+         } = acquireCallRecipientDeviceLockSchema.safeParse({
+            callId: event.callId,
+            recipientDeviceId: this._clientSocket.id,
+         });
+         if (!success) {
+            throw new ZodValidationError(error);
+         }
 
-   'call.action': (event: { callId: string; action: 'answered' | 'declined' | 'timeout' }) => void;
+         logger.warn('2');
+         const { mutex, callDescription } =
+            await this._MDUCCProtocolServices.acquireRecipientDeviceLock(validatedDTO);
+
+         if (!mutex) {
+            if (event.action === 'answered' && callback) {
+               callback({ status: 'callTakenOnOtherDevice' });
+            }
+            logger.debug('call lock acquired by other user device');
+            return;
+         }
+
+         logger.warn('3');
+         if (!callDescription) {
+            throw new CallDescriptionNotFoundError();
+         }
+
+         // -------------------recipient device acquierd lock--------------------------
+
+         logger.warn('4');
+         // let other recipient devices know call is acted by this device
+         this._clientSocket.to(callDescription.recipientId).emit('call.acted.by_other_device', {
+            callId: callDescription.callId,
+            callerId: callDescription.callerId,
+         });
+
+         if (event.action === 'answered') {
+            this._clientSocket.to(callDescription.callerDeviceId).emit('call.connected', {
+               callId: callDescription.callId,
+               recipientId: callDescription.recipientId,
+            });
+         }
+
+         logger.warn('5');
+         if (event.action === 'declined') {
+            this._clientSocket.to(callDescription.callerDeviceId).emit('call.declined', {
+               callId: callDescription.callId,
+               recipientId: callDescription.recipientId,
+            });
+         }
+         if (callback) callback({ status: 'connected' });
+      } catch (error) {
+         logger.error(error);
+         if (callback) callback({ status: 'callEnded' });
+      }
+   };
+
+   'call.handup': (event: { callId: string }) => void;
 
    'call.sdp.offer': (event: { callId: string; offerSDP: string }) => void;
 
