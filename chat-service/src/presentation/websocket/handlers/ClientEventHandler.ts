@@ -216,7 +216,7 @@ export class ClientEventHandler implements IClientToServerEvents {
             throw new ZodValidationError(error);
          }
 
-         // we can use the convo, to show optimistically update the convo messages
+         // TODO: we can use the convo, to show optimistically update the convo messages
          const { callMessage } = await this._oneToOneCallServices.create(validatedCreateCallDTO);
 
          const callDescription = await this._MDUCCProtocolServices.initializeCall({
