@@ -217,9 +217,7 @@ export class ClientEventHandler implements IClientToServerEvents {
          }
 
          // we can use the convo, to show optimistically update the convo messages
-         const { callMessage, convo } = await this._oneToOneCallServices.create(
-            validatedCreateCallDTO
-         );
+         const { callMessage } = await this._oneToOneCallServices.create(validatedCreateCallDTO);
 
          const callDescription = await this._MDUCCProtocolServices.initializeCall({
             callId: callMessage.id,
