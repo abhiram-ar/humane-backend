@@ -1,4 +1,4 @@
-import { Message } from '@domain/Message';
+import { Message, messageType } from '@domain/Message';
 import mongoose, { Document } from 'mongoose';
 
 export interface IMessageDocument
@@ -18,6 +18,14 @@ const messageSchema = new mongoose.Schema<IMessageDocument>({
 
    attachment: { attachmentType: String, attachmentKey: String },
    replyToMessageId: { type: mongoose.Types.ObjectId, ref: 'Message', required: false },
+
+   type: {
+      type: String,
+      required: true,
+      enum: [messageType.CALL, messageType.REGULAR],
+      default: messageType.REGULAR,
+   },
+   callConnected: { type: Boolean },
 });
 
 messageSchema.index({ conversationId: 1 });

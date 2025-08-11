@@ -12,6 +12,8 @@ export const messageAutoMapper = (doc: HydratedDocument<IMessageDocument>): Requ
       status: doc.status,
       attachment: doc.attachment,
       replyToMessageId: doc.replyToMessageId ? String(doc.replyToMessageId) : undefined,
+      type: doc.type,
+      callConnected: doc.callConnected,
    };
 
    return entity;

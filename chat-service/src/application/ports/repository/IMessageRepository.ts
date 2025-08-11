@@ -18,4 +18,9 @@ export interface IMessageRepository extends IBaseRepository<Message> {
       senderId: string;
       sendAt: Date;
    }): Promise<Required<Message> | null>;
+
+   setCallMessageConnected(dto: {
+      callId: string;
+      callTaken: boolean;
+   }): Promise<Required<Message> | null>;
 }

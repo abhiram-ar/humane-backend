@@ -21,6 +21,8 @@ export class MessageRepository implements IMessageRepository {
                   sendAt: entity.sendAt,
                   attachment: entity.attachment,
                   replyToMessageId: entity.replyToMessageId,
+                  type: entity.type,
+                  callConnected: entity.callConnected,
                },
             ],
             { session }
@@ -120,5 +122,19 @@ export class MessageRepository implements IMessageRepository {
          .sort({ _id: -1 });
 
       return res ? messageAutoMapper(res) : null;
+   };
+
+   setCallMessageConnected = async (dto: {
+      callId: string;
+      callTaken: boolean;
+   }): Promise<Required<Message> | null> => {
+      const res = await messageModel.findByIdAndUpdate(
+         dto.callId,
+         { callConnected: dto.callTaken },
+         { new: true }
+      );
+      if (!res) return null;
+
+      return messageAutoMapper(res);
    };
 }

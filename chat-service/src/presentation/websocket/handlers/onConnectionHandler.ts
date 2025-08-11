@@ -2,7 +2,9 @@ import { logger } from '@config/logger';
 import { TypedSocket } from '../Types/TypedSocket';
 import {
    conversationServices,
+   mduccProtocolService,
    messageServices,
+   oneToOneCallServices,
    oneToOneMessageServices,
 } from '@di/usecases.container';
 import { ClientEventHandler } from './ClientEventHandler';
@@ -14,12 +16,15 @@ export const onConnectionHandler = (socket: TypedSocket) => {
    socket.join(socket.data.userId);
    socket.emit('test', `Connected to server, UserId:${socket.data.userId}`);
 
+   // TODO: replace with factory
    const clientEventHandler = new ClientEventHandler(
       socket,
       conversationServices,
       oneToOneMessageServices,
       messageServices,
-      eventPubliser
+      eventPubliser,
+      oneToOneCallServices,
+      mduccProtocolService
    );
 
    socket.on('hello', clientEventHandler.hello);
@@ -33,6 +38,21 @@ export const onConnectionHandler = (socket: TypedSocket) => {
    socket.on('is-user-online', clientEventHandler['is-user-online']);
 
    socket.on('typing-one-to-one-message', clientEventHandler['typing-one-to-one-message']);
+
+   //call events
+   socket.on('call.initiate', clientEventHandler['call.initiate']);
+
+   socket.on('call.action', clientEventHandler['call.action']);
+
+   socket.on('call.handup', clientEventHandler['call.handup']);
+
+   socket.on('call.sdp.offer', clientEventHandler['call.sdp.offer']);
+
+   socket.on('call.sdp.answer', clientEventHandler['call.sdp.answer']);
+
+   socket.on('call.ice-candidates', clientEventHandler['call.ice-candidates']);
+
+   socket.on('call.media.state', clientEventHandler['call.media.state']);
 
    socket.on('disconnect', () => {
       logger.debug(`socket disconnected userId:${socket.data.userId}`);
