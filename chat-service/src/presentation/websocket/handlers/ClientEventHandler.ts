@@ -31,12 +31,10 @@ import { IEventPublisher } from '@ports/services/IEventProducer';
 import { IMDUCCProtocolServices } from '@ports/usecases/IMDUCCProtocol.service';
 import { IOneToOneCallServices } from '@ports/usecases/IOneToOneCallServices';
 import { createOneToOneCallSchema } from '@application/dto/CreateOneToOneCall.dto';
-import {
-   AcquireCallRecipientDeviceLockInputDTO,
-   acquireCallRecipientDeviceLockSchema,
-} from '@application/dto/AcquireCallRecipientDeviceLock.dto';
+import { acquireCallRecipientDeviceLockSchema } from '@application/dto/AcquireCallRecipientDeviceLock.dto';
 import { CallDescriptionNotFoundError } from '@application/errors/CallDescriptionNotFoundError';
 import { HangupCallInputDTO, hangupCallInputSchema } from '@application/dto/HandupCall.dto';
+import { CallDeviceNotFoundError } from '@application/errors/CallDeviceNotFoundError';
 
 export class ClientEventHandler implements IClientToServerEvents {
    constructor(
@@ -318,7 +316,6 @@ export class ClientEventHandler implements IClientToServerEvents {
    };
 
    'call.handup' = async (event: { callId: string }) => {
-      logger.warn(1);
       try {
          const {
             data: validatedDTO,
@@ -332,17 +329,14 @@ export class ClientEventHandler implements IClientToServerEvents {
             throw new ZodValidationError(error);
          }
 
-         logger.warn(2);
          const { handup, callDescription } = await this._MDUCCProtocolServices.hangUpCall(
             validatedDTO
          );
 
-         logger.warn(3);
          // user was not able to hangup - or other user hangedup
          if (!handup) return;
 
          // case 1: call not connected
-         logger.warn(4);
          if (callDescription && !callDescription.recipientDeviceId) {
             this._clientSocket.to(callDescription.recipientId).emit('call.incoming.cancelled', {
                callerId: callDescription.callerId,
@@ -351,19 +345,15 @@ export class ClientEventHandler implements IClientToServerEvents {
             return;
          }
 
-         logger.warn(5);
          // case 2: call connected
          if (callDescription && callDescription.recipientDeviceId) {
-            logger.warn(6);
             const currentSocketId = this._clientSocket.id;
             if (currentSocketId === callDescription.callerDeviceId) {
-               logger.warn(7);
                this._clientSocket.to(callDescription.recipientDeviceId).emit('call.ended', {
                   callId: callDescription.callId,
                   at: callDescription.endedAt ?? new Date().toUTCString(),
                });
             } else if (currentSocketId === callDescription.recipientDeviceId) {
-               logger.warn(8);
                this._clientSocket.to(callDescription.callerDeviceId).emit('call.ended', {
                   callId: callDescription.callId,
                   at: callDescription.endedAt ?? new Date().toUTCString(),
@@ -375,7 +365,83 @@ export class ClientEventHandler implements IClientToServerEvents {
       }
    };
 
-   'call.sdp.offer': (event: { callId: string; offerSDP: string }) => void;
+   'call.ice-candidates' = async (event: { callId: string; ice: string }) => {
+      try {
+         if (!event.callId) throw new GenericError('No callId');
 
-   'call.sdp.answer': (event: { callId: string; answerSDP: string }) => void;
+         const callDesc = await this._MDUCCProtocolServices.getCallDescription(event.callId);
+         if (!callDesc) throw new CallDescriptionNotFoundError();
+
+         const currentDeviceId = this._clientSocket.id;
+         if (currentDeviceId === callDesc.callerDeviceId) {
+            this._clientSocket.to(callDesc.recipientDeviceId!).emit('call.ice-candidates', event);
+         } else if (currentDeviceId === callDesc.recipientDeviceId) {
+            this._clientSocket.to(callDesc.callerDeviceId).emit('call.ice-candidates', event);
+         } else {
+            throw new CallDeviceNotFoundError();
+         }
+      } catch (error) {
+         logger.error(error);
+      }
+   };
+
+   'call.media.state' = async (event: { callId: string; micOn: boolean; videoOn: boolean }) => {
+      try {
+         if (!event.callId) throw new GenericError('No callId');
+
+         const callDesc = await this._MDUCCProtocolServices.getCallDescription(event.callId);
+         if (!callDesc) throw new CallDescriptionNotFoundError();
+
+         const currentDeviceId = this._clientSocket.id;
+         if (currentDeviceId === callDesc.callerDeviceId) {
+            this._clientSocket.to(callDesc.recipientDeviceId!).emit("call.media.state", event);
+         } else if (currentDeviceId === callDesc.recipientDeviceId) {
+            this._clientSocket.to(callDesc.callerDeviceId).emit("call.media.state", event);
+         } else {
+            throw new CallDeviceNotFoundError();
+         }
+      } catch (error) {
+         logger.error(error);
+      }
+   };
+
+   'call.sdp.offer' = async (event: { callId: string; offerSDP: string }) => {
+      try {
+         if (!event.callId) throw new GenericError('No callId');
+
+         const callDesc = await this._MDUCCProtocolServices.getCallDescription(event.callId);
+         if (!callDesc) throw new CallDescriptionNotFoundError();
+
+         const currentDeviceId = this._clientSocket.id;
+         if (currentDeviceId === callDesc.callerDeviceId) {
+            this._clientSocket.to(callDesc.recipientDeviceId!).emit('call.sdp.offer', event);
+         } else if (currentDeviceId === callDesc.recipientDeviceId) {
+            this._clientSocket.to(callDesc.callerDeviceId).emit('call.sdp.offer', event);
+         } else {
+            throw new CallDeviceNotFoundError();
+         }
+      } catch (error) {
+         logger.error(error);
+      }
+   };
+
+   'call.sdp.answer' = async (event: { callId: string; answerSDP: string }) => {
+      try {
+         if (!event.callId) throw new GenericError('No callId');
+
+         const callDesc = await this._MDUCCProtocolServices.getCallDescription(event.callId);
+         if (!callDesc) throw new CallDescriptionNotFoundError();
+
+         const currentDeviceId = this._clientSocket.id;
+         if (currentDeviceId === callDesc.callerDeviceId) {
+            this._clientSocket.to(callDesc.recipientDeviceId!).emit('call.sdp.answer', event);
+         } else if (currentDeviceId === callDesc.recipientDeviceId) {
+            this._clientSocket.to(callDesc.callerDeviceId).emit('call.sdp.answer', event);
+         } else {
+            throw new CallDeviceNotFoundError();
+         }
+      } catch (error) {
+         logger.error(error);
+      }
+   };
 }

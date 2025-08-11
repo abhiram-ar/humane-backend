@@ -73,3 +73,7 @@ nill
 ### Why dont we only check if the user has rewarded in last 24 hr from cache and emit `replied.in.24hr.first` event
 
 -  because a user can spam another user in 24 hour interval without getting any reply. and we dont want to give reward for that
+
+## TODO
+
+-  increment the call description expity on read or on a ping mechanism
