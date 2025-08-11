@@ -6,4 +6,6 @@ export interface IOneToOneCallServices {
    create(
       dto: CreateOneToOneCallInputDTO
    ): Promise<{ callMessage: Required<Message>; convo: Required<Conversation> }>;
+
+   callTaken(dto: { callId: string }): Promise<Required<Message> | null>;
 }

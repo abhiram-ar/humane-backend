@@ -289,26 +289,33 @@ export class ClientEventHandler implements IClientToServerEvents {
             callerId: callDescription.callerId,
          });
 
+         // call alreay ended
          if (callDescription.endedAt && callback) {
             callback({ status: 'callEnded' });
          }
 
          if (event.action === 'answered') {
-            // TODO: write to DB
+            await this._oneToOneCallServices.callTaken({ callId: callDescription.callId });
             this._clientSocket.to(callDescription.callerDeviceId).emit('call.connected', {
                callId: callDescription.callId,
                recipientId: callDescription.recipientId,
             });
+            if (callback) callback({ status: 'connected' });
          }
 
          if (event.action === 'declined') {
-            //TODO: write to Db
             this._clientSocket.to(callDescription.callerDeviceId).emit('call.declined', {
                callId: callDescription.callId,
                recipientId: callDescription.recipientId,
             });
          }
-         if (callback) callback({ status: 'connected' });
+
+         if (event.action === 'timeout') {
+            this._clientSocket.to(callDescription.callerDeviceId).emit('call.ended', {
+               callId: callDescription.callId,
+               at: new Date().toUTCString(),
+            });
+         }
       } catch (error) {
          logger.error(error);
          if (callback) callback({ status: 'callEnded' });
@@ -394,9 +401,9 @@ export class ClientEventHandler implements IClientToServerEvents {
 
          const currentDeviceId = this._clientSocket.id;
          if (currentDeviceId === callDesc.callerDeviceId) {
-            this._clientSocket.to(callDesc.recipientDeviceId!).emit("call.media.state", event);
+            this._clientSocket.to(callDesc.recipientDeviceId!).emit('call.media.state', event);
          } else if (currentDeviceId === callDesc.recipientDeviceId) {
-            this._clientSocket.to(callDesc.callerDeviceId).emit("call.media.state", event);
+            this._clientSocket.to(callDesc.callerDeviceId).emit('call.media.state', event);
          } else {
             throw new CallDeviceNotFoundError();
          }

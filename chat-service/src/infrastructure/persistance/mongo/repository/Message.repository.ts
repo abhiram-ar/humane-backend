@@ -123,4 +123,18 @@ export class MessageRepository implements IMessageRepository {
 
       return res ? messageAutoMapper(res) : null;
    };
+
+   setCallMessageConnected = async (dto: {
+      callId: string;
+      callTaken: boolean;
+   }): Promise<Required<Message> | null> => {
+      const res = await messageModel.findByIdAndUpdate(
+         dto.callId,
+         { callConnected: dto.callTaken },
+         { new: true }
+      );
+      if (!res) return null;
+
+      return messageAutoMapper(res);
+   };
 }

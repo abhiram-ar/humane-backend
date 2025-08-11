@@ -40,4 +40,11 @@ export class OneToOneCallServices implements IOneToOneCallServices {
          convo: conversation,
       };
    };
+
+   callTaken = async (dto: { callId: string }): Promise<Required<Message> | null> => {
+      return await this._messageRepo.setCallMessageConnected({
+         callId: dto.callId,
+         callTaken: true,
+      });
+   };
 }
