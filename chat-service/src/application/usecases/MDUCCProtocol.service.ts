@@ -4,7 +4,6 @@ import { InitiateCallInputDTO, InitiateCallOutputDTO } from '@application/dto/In
 import { AppConstants } from '@config/constants';
 import { logger } from '@config/logger';
 import { ICallDescription } from '@domain/ICallDescription';
-import { redisClient } from '@infrastructure/cache/redis/client';
 import { ICacheService } from '@ports/services/ICacheService';
 import { IMDUCCProtocolServices } from '@ports/usecases/IMDUCCProtocol.service';
 
@@ -25,13 +24,15 @@ export class MDUCCProtocolServices implements IMDUCCProtocolServices {
 
       const key = MDUCCProtocolServices.getCallKeyById(callId);
       const initiatedAt = new Date().toISOString();
-      await redisClient.hSet(key, {
+
+      await this._cache.hSet(key, {
          callerId: dto.callerId,
          callerDeviceId: dto.callerDeviceId,
          recipientId: dto.recipientId,
          initiatedAt,
       });
-      await redisClient.pExpire(key, AppConstants.TIME_5MIN);
+
+      await this._cache.setKeyExpiryInSeconds(key, AppConstants.TIME_5MIN);
 
       return { callId, initiatedAt, ...callMetadata };
    };
@@ -40,10 +41,14 @@ export class MDUCCProtocolServices implements IMDUCCProtocolServices {
       if (!callId) return null;
 
       const key = MDUCCProtocolServices.getCallKeyById(callId);
-      const callDesc = await redisClient.hGetAll(key);
+      const callDesc = await this._cache.hGetAll(key);
       if (!callDesc) {
          return null;
       }
+
+      // for each successsive call
+      await this._cache.setKeyExpiryInSeconds(key, AppConstants.TIME_8HRS, 'GT');
+
       return { callId, ...callDesc } as unknown as ICallDescription;
    };
 
@@ -55,7 +60,12 @@ export class MDUCCProtocolServices implements IMDUCCProtocolServices {
    > => {
       const key = MDUCCProtocolServices.getCallKeyById(dto.callId);
       const field: keyof ICallDescription = 'recipientDeviceId';
-      const firstFieldEntry = await redisClient.hSetNX(key, field, dto.recipientDeviceId);
+
+      const firstFieldEntry = await this._cache.hSetNotExistingField(
+         key,
+         field,
+         dto.recipientDeviceId
+      );
 
       if (!firstFieldEntry) return { mutex: false, callDescription: null };
 
@@ -83,7 +93,11 @@ export class MDUCCProtocolServices implements IMDUCCProtocolServices {
       const field: keyof ICallDescription = 'endedAt';
 
       // this should be first field entry, we already handled the exiting state above
-      await redisClient.hSetNX(key, field, new Date().toISOString());
+      await this._cache.hSetNotExistingField(key, field, new Date().toISOString());
+
+      // reduce the expiry on call handup
+      await this._cache.setKeyExpiryInSeconds(key, AppConstants.TIME_5MIN, 'LT');
+
       return { handup: true, callDescription: calldesc };
    };
 }

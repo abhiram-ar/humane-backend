@@ -304,6 +304,10 @@ export class ClientEventHandler implements IClientToServerEvents {
          }
 
          if (event.action === 'declined') {
+            await this._MDUCCProtocolServices.hangUpCall({
+               callId: callDescription.callId,
+               clientDeviceId: this._clientSocket.id,
+            });
             this._clientSocket.to(callDescription.callerDeviceId).emit('call.declined', {
                callId: callDescription.callId,
                recipientId: callDescription.recipientId,
@@ -311,6 +315,10 @@ export class ClientEventHandler implements IClientToServerEvents {
          }
 
          if (event.action === 'timeout') {
+            this._MDUCCProtocolServices.hangUpCall({
+               callId: callDescription.callId,
+               clientDeviceId: this._clientSocket.id,
+            });
             this._clientSocket.to(callDescription.callerDeviceId).emit('call.ended', {
                callId: callDescription.callId,
                at: new Date().toUTCString(),

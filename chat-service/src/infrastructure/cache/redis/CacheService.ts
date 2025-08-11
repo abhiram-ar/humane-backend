@@ -4,6 +4,22 @@ import { AppConstants } from '@config/constants';
 import { logger } from '@config/logger';
 
 export class RedisCacheService implements ICacheService {
+   hGetAll = async (key: string): Promise<Record<string, string>> => {
+      return await redisClient.hGetAll(key);
+   };
+   hSet = async (key: string, field: {}): Promise<number> => {
+      return await redisClient.hSet(key, field);
+   };
+   setKeyExpiryInSeconds = async (
+      key: string,
+      expiryTime: number,
+      mode?: 'NX' | 'GT' | 'LT'
+   ): Promise<number> => {
+      return await redisClient.pExpire(key, expiryTime, mode);
+   };
+   hSetNotExistingField = async (key: string, field: string, value: string): Promise<1 | 0> => {
+      return await redisClient.hSetNX(key, field, value);
+   };
    set = async (
       key: string,
       value: string,
