@@ -6,7 +6,7 @@ const bootstrap = async () => {
    try {
       // TOOD: add env check
 
-      const modelPath = path.resolve('./models/inception_v3/model.json');
+      const modelPath = path.resolve('./ML-models/inception_v3/model.json');
       await nsfwImageClassifierService.loadModel(modelPath);
 
       const filePath = path.resolve('./test-images/sunny.png');
