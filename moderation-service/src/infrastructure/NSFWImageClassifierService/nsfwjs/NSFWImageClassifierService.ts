@@ -3,21 +3,21 @@ import * as nsfwjs from 'nsfwjs';
 import * as tf from '@tensorflow/tfjs-node';
 import fs from 'fs/promises';
 import { FileSystemError, fileSystemErrorMessages } from '@application/errors/FileSystemError';
+import { Prediction } from '@domain/Prediction';
+import { ModelNotLoadedError } from './errors/ModelNotLoadedError';
 export class NSFWJSImageClassifierService {
    private _model: nsfwjs.NSFWJS | undefined;
    constructor() {}
 
-   loadModel = async (modelPath: string) => {
+   loadModel = async (dto:{modelPath: string, imageSize: number}) => {
       // file://  required for tfjs-node local loading
-      this._model = await nsfwjs.load(`file://${modelPath}`, { size: 299 });
+      this._model = await nsfwjs.load(`file://${dto.modelPath}`, { size: dto.imageSize });
       logger.info('model loaded');
    };
 
-   classify = async (dto: {
-      absImagePath: string;
-   }): Promise<{ className: string; probability: number }[] | null> => {
+   classify = async (dto: { absImagePath: string }): Promise<Prediction[] | null> => {
       if (!this._model) {
-         logger.error('model not loaded');
+         logger.error(ModelNotLoadedError.name);
          return null;
       }
 

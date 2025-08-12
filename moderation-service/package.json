@@ -17,9 +17,12 @@
       "typescript": "^5.9.2"
    },
    "dependencies": {
+      "@aws-sdk/client-s3": "^3.864.0",
       "@tensorflow/tfjs-node": "^4.22.0",
       "date-fns": "^4.1.0",
+      "dotenv": "^17.2.1",
       "humane-common": "^1.0.94",
+      "kafkajs": "^2.2.4",
       "nsfwjs": "^4.2.1",
       "winston": "^3.17.0"
    }

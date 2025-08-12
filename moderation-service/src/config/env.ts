@@ -7,6 +7,8 @@ type ENVConfig = {
    readonly AWS_SECRET_KEY: ENVValue;
    readonly AWS_REGION: ENVValue;
    readonly AWS_S3_BUCKET_NAME: ENVValue;
+   readonly KAFKA_CLIENT_ID: ENVValue;
+   readonly KAFKA_BROKER_URI: ENVValue;
 };
 
 export const ENV: ENVConfig = {
@@ -16,6 +18,8 @@ export const ENV: ENVConfig = {
    AWS_SECRET_KEY: process.env.AWS_SECRET_KEY,
    AWS_REGION: process.env.AWS_REGION,
    AWS_S3_BUCKET_NAME: process.env.AWS_S3_BUCKET_NAME,
+   KAFKA_BROKER_URI: process.env.KAFKA_BROKER_URI,
+   KAFKA_CLIENT_ID: process.env.KAFKA_CLIENT_ID,
 };
 
 function checkEnv() {
