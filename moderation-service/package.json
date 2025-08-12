@@ -13,6 +13,7 @@
    },
    "devDependencies": {
       "@tsconfig/node22": "^22.0.2",
+      "@types/fluent-ffmpeg": "^2.1.27",
       "tsx": "^4.20.3",
       "typescript": "^5.9.2"
    },
@@ -21,6 +22,7 @@
       "@tensorflow/tfjs-node": "^4.22.0",
       "date-fns": "^4.1.0",
       "dotenv": "^17.2.1",
+      "fluent-ffmpeg": "^2.1.3",
       "humane-common": "^1.0.94",
       "kafkajs": "^2.2.4",
       "nsfwjs": "^4.2.1",
