@@ -5,19 +5,22 @@ import fs from 'fs/promises';
 import { FileSystemError, fileSystemErrorMessages } from '@application/errors/FileSystemError';
 import { Prediction } from '@domain/Prediction';
 import { ModelNotLoadedError } from './errors/ModelNotLoadedError';
-export class NSFWJSImageClassifierService {
+import { INSFWJSImageClassifierService } from '@application/port/INSFWImageClassifierService';
+import { NSFWJSClassNames } from './Types/NSFWJSClassNames.type';
+
+export class NSFWJSImageClassifierService<T extends NSFWJSClassNames>
+   implements INSFWJSImageClassifierService<T>
+{
    private _model: nsfwjs.NSFWJS | undefined;
    constructor() {}
 
    loadModel = async (dto: { modelPath: string; imageSize: number }) => {
-      // file://  required for tfjs-node local loading
+      // file://  required for tfjs-node local model loading
       this._model = await nsfwjs.load(`file://${dto.modelPath}`, { size: dto.imageSize });
       logger.info('model loaded');
    };
 
-   classify = async <T extends string>(dto: {
-      absImagePath: string;
-   }): Promise<Prediction<T>[] | null> => {
+   classify = async (dto: { absImagePath: string }): Promise<Prediction<T>[] | null> => {
       if (!this._model) {
          logger.error(ModelNotLoadedError.name);
          return null;

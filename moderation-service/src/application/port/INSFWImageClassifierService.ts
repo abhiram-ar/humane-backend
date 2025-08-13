@@ -1,4 +1,4 @@
 import { Prediction } from '@domain/Prediction';
-export interface INSFWJSImageClassifierService {
-   classify<T extends string>(dto: { absImagePath: string }): Promise<Prediction<T>[] | null>;
+export interface INSFWJSImageClassifierService<T extends string> {
+   classify(dto: { absImagePath: string }): Promise<Prediction<T>[] | null>;
 }

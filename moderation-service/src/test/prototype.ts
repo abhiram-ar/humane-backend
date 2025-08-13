@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import * as tf from '@tensorflow/tfjs-node';
 import * as nsfwjs from 'nsfwjs';
 import fs from 'fs';
