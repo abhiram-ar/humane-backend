@@ -62,6 +62,7 @@ export class ModerateMedia<ClassNames extends string> {
             logger.warn(`${ModerateMedia.name}: un-supported media`);
             return { success: false };
          }
+         
          if (!result) {
             logger.debug(`${ModerateMedia.name}: no moderation result, skipping`);
             return { success: false };
