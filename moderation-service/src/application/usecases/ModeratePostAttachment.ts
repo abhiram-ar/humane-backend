@@ -1,25 +1,23 @@
-import 'dotenv/config';
+import { INSFWJSImageClassifierService } from '@application/port/INSFWImageClassifierService';
+import { IStorageService } from '@application/port/IStorageService';
 import { logger } from '@config/logger';
-import { nsfwImageClassifierService, storageService, videoService } from '@di/services.container';
 import path from 'path';
-import { ENV } from '@config/env';
-import fs from 'fs';
-import { readdir } from 'fs/promises';
+export class ModerateMediaService {
+   constructor(
+      private readonly _nsfwImageClassifierService: INSFWJSImageClassifierService,
+      private readonly _storeageService: IStorageService,
 
-const bootstrap = async () => {
-   try {
-      // TOOD: add env check
-      console.log(ENV.AWS_REGION);
-      const modelPath = path.resolve('./ML-models/inception_v3/model.json');
-      await nsfwImageClassifierService.loadModel({ modelPath, imageSize: 299 });
+      public readonly tempDownloadPath: string = '/home/abhiram/Bootcamp/week-23-to-27/humane/backend/moderation-service/temp'
+   ) {}
 
-      let type: 'image' | 'video' = 'video';
+   execute = async (dto: { attachmentType: string; attachmentKey: string; bucketName: string }) => {
+      const tempResourceName = crypto.randomUUID();
 
-      const download = await storageService.getObject({
-         key: "4208d67b-1af8-488b-97e7-a719d632af33/1753265225060-mariasibyyy's2025-3-9-19.13.542 story.mp4",
-         bucket: ENV.AWS_S3_BUCKET_NAME as string,
-         tempFileName: 'firsttest3',
-         saveDirPath: path.resolve('./temp/'),
+      const download = await this._storeageService.getObject({
+         key: dto.attachmentKey,
+         bucket: dto.bucketName,
+         tempFileName: tempResourceName,
+         saveDirPath: path.join(this.tempDownloadPath, tempResourceName),
       });
 
       if (!download.ok) {
@@ -27,12 +25,12 @@ const bootstrap = async () => {
          return;
       }
 
-      if (type === 'image') {
-         const res = await nsfwImageClassifierService.classify({
+      if (dto.attachmentType.toLowerCase().startsWith('image')) {
+         const res = await this._nsfwImageClassifierService.classify({
             absImagePath: download.fullFilePath,
          });
          console.log(res);
-      } else {
+      } else if (dto.attachmentType.toLowerCase().startsWith('video')) {
          const outputDir =
             '/home/abhiram/Bootcamp/week-23-to-27/humane/backend/moderation-service/temp/frames';
 
@@ -73,10 +71,9 @@ const bootstrap = async () => {
             console.log(result[maxIdx]);
          }
       }
-   } catch (error) {
-      logger.error('Error while starting moderation service');
-      console.log(error);
-   }
-};
+   };
 
-bootstrap();
+   image = () => {};
+
+   video = () => {};
+}

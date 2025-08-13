@@ -4,7 +4,8 @@ import fs from 'fs';
 import path from 'path';
 import { Readable } from 'stream';
 import { logger } from '@config/logger';
-export class AWSStorageService {
+import { IStorageService } from '@application/port/IStorageService';
+export class AWSStorageService implements IStorageService {
    constructor(private readonly _s3Client: S3Client) {}
 
    getObject = async (dto: {
@@ -15,10 +16,12 @@ export class AWSStorageService {
    }): Promise<{ ok: false } | { ok: true; fullFilePath: string }> => {
       const command = new GetObjectCommand({ Bucket: dto.bucket, Key: dto.key });
       const res = await this._s3Client.send(command);
+      const parsedKey = path.parse(dto.key);
 
       if (!res.Body) return { ok: false };
 
-      const fullFilePath = path.join(dto.saveDirPath, dto.tempFileName);
+      const fullFileName = [dto.tempFileName, parsedKey.ext].join('');
+      const fullFilePath = path.join(dto.saveDirPath, fullFileName);
       const writeDir = path.parse(fullFilePath);
 
       // directory exisiting check

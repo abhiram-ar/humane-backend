@@ -9,13 +9,15 @@ export class NSFWJSImageClassifierService {
    private _model: nsfwjs.NSFWJS | undefined;
    constructor() {}
 
-   loadModel = async (dto:{modelPath: string, imageSize: number}) => {
+   loadModel = async (dto: { modelPath: string; imageSize: number }) => {
       // file://  required for tfjs-node local loading
       this._model = await nsfwjs.load(`file://${dto.modelPath}`, { size: dto.imageSize });
       logger.info('model loaded');
    };
 
-   classify = async (dto: { absImagePath: string }): Promise<Prediction[] | null> => {
+   classify = async <T extends string>(dto: {
+      absImagePath: string;
+   }): Promise<Prediction<T>[] | null> => {
       if (!this._model) {
          logger.error(ModelNotLoadedError.name);
          return null;
@@ -41,6 +43,6 @@ export class NSFWJSImageClassifierService {
 
       imageTensor.dispose();
 
-      return predictions;
+      return predictions as unknown as Prediction<T>[];
    };
 }

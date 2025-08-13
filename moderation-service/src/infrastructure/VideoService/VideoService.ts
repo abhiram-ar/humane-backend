@@ -10,13 +10,13 @@ export class FFMPEGVideoService {
       videoPath: string;
       outputDir: string;
       fps: number;
-   }): Promise<boolean> => {
+   }): Promise<{ ok: true; error?: never } | { ok: false; error: unknown }> => {
       const fps = dto.fps > 0 ? dto.fps : 1;
 
       if (!fs.existsSync(dto.outputDir)) {
          await mkdir(dto.outputDir, { recursive: true });
       }
-      
+
       return new Promise((res, rej) => {
          // %d: represent a decimal integer which will be the frame number
          // 06: pad the number with leading zeros to ensure a minimum of six digits, overflow is handled gracefully
@@ -26,11 +26,11 @@ export class FFMPEGVideoService {
             .on('start', (cmd) => logger.debug('FFmpeg started: ' + cmd))
             .on('end', () => {
                logger.info('FFMPEG extraction completed');
-               res(true);
+               res({ ok: true });
             })
             .on('error', (err) => {
                console.log(err);
-               rej(false);
+               rej({ ok: false, error: err });
             })
             .run();
       });
