@@ -26,8 +26,8 @@ const classify = async (modelPath: string, filePath: string) => {
    }
 };
 
-const modelPath = path.resolve('./models/inception_v3/model.json');
-const filePath = path.resolve('./test-images/sunny.png');
+const modelPath = path.resolve('./ML-models/inception_v3/model.json');
+const filePath = path.resolve('./test-images/workout.png');
 console.log('model path', modelPath);
 
 classify(modelPath, filePath);
