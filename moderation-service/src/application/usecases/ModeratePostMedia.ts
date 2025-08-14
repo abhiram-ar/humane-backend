@@ -7,8 +7,11 @@ import fs from 'fs';
 import { readdir, rm } from 'fs/promises';
 import { Prediction } from '@domain/Prediction';
 import { ENV } from '@config/env';
+import { IModeratePostMedia } from '@application/port/usecases/IModeratePostMedia';
 
-export class ModerateMedia<ClassNames extends string> {
+export class ModeratePostMedia<ClassNames extends string>
+   implements IModeratePostMedia<ClassNames>
+{
    constructor(
       private readonly _nsfwImageClassifierService: INSFWJSImageClassifierService<ClassNames>,
       private readonly _storeageService: IStorageService,
@@ -65,7 +68,7 @@ export class ModerateMedia<ClassNames extends string> {
             }
 
             if (!result) {
-               logger.debug(`${ModerateMedia.name}: no moderation result, skipping`);
+               logger.debug(`${ModeratePostMedia.name}: no moderation result, skipping`);
                return { success: false };
             }
 
@@ -87,7 +90,7 @@ export class ModerateMedia<ClassNames extends string> {
             }
 
             if (!result) {
-               logger.debug(`${ModerateMedia.name}: no moderation result, skipping`);
+               logger.debug(`${ModeratePostMedia.name}: no moderation result, skipping`);
                return { success: false };
             }
 
@@ -108,7 +111,7 @@ export class ModerateMedia<ClassNames extends string> {
                tempResourceName: !dto.cleanup ? tempResourceName : undefined,
             };
          } else {
-            logger.warn(`${ModerateMedia.name}: un-supported media`);
+            logger.warn(`${ModeratePostMedia.name}: un-supported media`);
             return { success: false };
          }
       } catch (err) {
@@ -170,7 +173,7 @@ export class ModerateMedia<ClassNames extends string> {
             if (!dto.hotClassNames.includes(prediction.className)) return;
 
             if (prediction.probability < flagThreshold) return;
-            
+
             if (!resultAddedToHotFrameFlag) {
                hotFrames.push(res);
                resultAddedToHotFrameFlag = true; // prevent adding frame duplicate result
