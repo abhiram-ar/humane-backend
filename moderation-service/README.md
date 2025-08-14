@@ -3,9 +3,10 @@
 ## Responsibility
 
 This service moderates media content on the Humane platform by:
-- Consuming media creation events
-- Processing content through moderation pipelines
-- Emitting moderation result events
+
+-  Consuming media creation events
+-  Processing content through moderation pipelines
+-  Emitting moderation result events
 
 <br>
 
@@ -15,3 +16,5 @@ This service moderates media content on the Humane platform by:
 
 This service uses machine learning models for content moderation.
 For detailed information about the ML evaluation processes, benchmarks, and results, please refer to the [ML-evals README](./ML-evals/README.md).
+
+{{include:ML-evals/README.md}}
