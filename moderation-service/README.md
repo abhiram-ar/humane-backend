@@ -6,8 +6,6 @@ This service moderates media content on the Humane platform by:
 -  Processing content through moderation pipelines
 -  Emitting moderation result events
 
-<br>
-
 > note: we are not moderating chat media as these are private and its not appropriate to read it
 
 ## ML Evaluations
