@@ -17,7 +17,7 @@ For detailed information about the ML evaluation processes, benchmarks, and resu
 
 -  the model seems to be very sensitive to explicit content
 -  any form of glamour has high probability(>90%) being in `Porn` class
--  bollywood video song frames are flagged in NSFW class
+-  bollywood video song frames has high probability of being in NSFW class
 -  Male Body astetics like body builers are not flagged as explicit which is good
 
 ## Notes
