@@ -26,7 +26,9 @@ export class ModerateMedia<ClassNames extends string> {
       | { success: false }
       | {
            success: true;
-           moderdationData: Prediction<ClassNames>[];
+           moderdationData:
+              | { type: 'singleFrame'; result: Prediction<ClassNames>[] }
+              | { type: 'multiFrame'; result: any };
            flagged: boolean;
            tempResourceName?: string;
         }
@@ -46,38 +48,62 @@ export class ModerateMedia<ClassNames extends string> {
             return { success: false };
          }
 
-         let result: Prediction<ClassNames>[] | null;
          if (dto.attachmentType.toLowerCase().startsWith('image')) {
-            result = await this._nsfwImageClassifierService.classify({
+            const result = await this._nsfwImageClassifierService.classify({
                absImagePath: download.fullFilePath,
             });
-            console.log(result);
+
+            if (dto.cleanup) {
+               await this.cleanup(tempResourceName);
+            }
+
+            if (!result) {
+               logger.debug(`${ModerateMedia.name}: no moderation result, skipping`);
+               return { success: false };
+            }
+
+            return {
+               success: true,
+               flagged: this.isImageFlagged(result, dto.hotClassNames),
+               moderdationData: { type: 'singleFrame', result },
+               tempResourceName: !dto.cleanup ? tempResourceName : undefined,
+            };
          } else if (dto.attachmentType.toLowerCase().startsWith('video')) {
-            result = await this.handleVideoFrameClassification({
+            const result = await this.handleVideoFrameClassification({
                tempResourceName,
                absFilePath: download.fullFilePath,
                hotClassNames: dto.hotClassNames,
             });
+
+            if (dto.cleanup) {
+               await this.cleanup(tempResourceName);
+            }
+
+            if (!result) {
+               logger.debug(`${ModerateMedia.name}: no moderation result, skipping`);
+               return { success: false };
+            }
+
+            if (!result.hottestFrame) {
+               return {
+                  success: true,
+                  moderdationData: { type: 'multiFrame', result },
+                  flagged: false,
+               };
+            }
+
+            const flagged = await this.isVideoFlagged(result);
+
+            return {
+               success: true,
+               flagged,
+               moderdationData: { type: 'multiFrame', result },
+               tempResourceName: !dto.cleanup ? tempResourceName : undefined,
+            };
          } else {
             logger.warn(`${ModerateMedia.name}: un-supported media`);
             return { success: false };
          }
-         
-         if (!result) {
-            logger.debug(`${ModerateMedia.name}: no moderation result, skipping`);
-            return { success: false };
-         }
-
-         if (dto.cleanup) {
-            await this.cleanup(tempResourceName);
-         }
-
-         return {
-            success: true,
-            flagged: this.isContentFlagged(result, dto.hotClassNames),
-            moderdationData: result,
-            tempResourceName: !dto.cleanup ? tempResourceName : undefined,
-         };
       } catch (err) {
          await this.cleanup(tempResourceName);
          throw err;
@@ -88,7 +114,11 @@ export class ModerateMedia<ClassNames extends string> {
       tempResourceName: string;
       absFilePath: string;
       hotClassNames: ClassNames[];
-   }): Promise<Prediction<ClassNames>[] | null> => {
+   }): Promise<{
+      hottestFrame: Prediction<ClassNames>[] | null;
+      hotFrames: Prediction<ClassNames>[][];
+      totalFrames: number;
+   } | null> => {
       const outputDir = path.join(this.tempDownloadPath, dto.tempResourceName, 'frames');
       const { ok, error } = await this._videoServices.extractFrames({
          videoPath: dto.absFilePath,
@@ -121,25 +151,36 @@ export class ModerateMedia<ClassNames extends string> {
 
       const frameClassificationResult = await Promise.all(promises);
 
+      const flagThreshold = parseFloat(ENV.MEDIA_CONTENT_FLAG_THRESHOLD as string);
       let largestHotClassPropability = 0;
-      let hotestFrameIdx = 0;
+      let hotestFrameIdx = -1;
+      let hotFrames: Prediction<ClassNames>[][] = [];
 
       frameClassificationResult.forEach((res, idx) => {
          if (!res) return;
+         let resultAddedToHotFrameFlag = false;
          res.forEach((prediction) => {
-            if (
-               dto.hotClassNames.includes(prediction.className) &&
-               prediction.probability > largestHotClassPropability
-            ) {
+            if (!dto.hotClassNames.includes(prediction.className)) return;
+
+            if (prediction.probability < flagThreshold) return;
+            hotFrames.push(res);
+            resultAddedToHotFrameFlag = true; // prevent adding frame duplicate result
+
+            if (prediction.probability > largestHotClassPropability) {
                largestHotClassPropability = prediction.probability;
                hotestFrameIdx = idx;
             }
          });
       });
-      return frameClassificationResult[hotestFrameIdx] as unknown as Prediction<ClassNames>[];
+
+      return {
+         hottestFrame: hotestFrameIdx > 0 ? frameClassificationResult[hotestFrameIdx] : null,
+         hotFrames,
+         totalFrames: frameFiles.length,
+      };
    };
 
-   isContentFlagged = (predictions: Prediction<ClassNames>[], hotFields: ClassNames[]): boolean => {
+   isImageFlagged = (predictions: Prediction<ClassNames>[], hotFields: ClassNames[]): boolean => {
       const flagThreshold = parseFloat(ENV.MEDIA_CONTENT_FLAG_THRESHOLD as string);
 
       for (const prediction of predictions) {
@@ -149,6 +190,20 @@ export class ModerateMedia<ClassNames extends string> {
       }
 
       return false;
+   };
+
+   isVideoFlagged = async (dto: {
+      hotFrames: Prediction<ClassNames>[][];
+      totalFrames: number;
+   }): Promise<boolean> => {
+      if (!dto.totalFrames) return false;
+
+      const hottestFrameCount = dto.hotFrames.length;
+      const hotVideoProbability = dto.totalFrames / hottestFrameCount;
+
+      // flagging strategy - percentatge is for videos less than 10s
+      if (hottestFrameCount > 10 || hotVideoProbability > 0.2) return true;
+      else return false;
    };
 
    cleanup = async (tempResourceName: string) => {

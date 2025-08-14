@@ -11,15 +11,15 @@ const bootstrap = async () => {
       await nsfwImageClassifierService.loadModel({ modelPath, imageSize: 299 });
 
       let res = await moderationService.execute({
-         attachmentKey:
-            "4208d67b-1af8-488b-97e7-a719d632af33/1753265225060-mariasibyyy's2025-3-9-19.13.542 story.mp4",
+         attachmentKey: 'moderation0-test/Aashiq-Banaya.mp4',
          attachmentType: 'video/mp4',
          bucketName: ENV.AWS_S3_BUCKET_NAME as string,
          hotClassNames: ['Porn', 'Hentai'],
          cleanup: true,
-         
       });
       console.log(res);
+      if (res.success && res.moderdationData.type === 'multiFrame')
+         console.log(res.moderdationData.result.hotFrames.length);
    } catch (error) {
       logger.error('Error while starting moderation service');
       console.log(error);

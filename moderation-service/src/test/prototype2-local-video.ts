@@ -14,7 +14,7 @@ const bootstrap = async () => {
       await nsfwImageClassifierService.loadModel({ modelPath, imageSize: 299 });
 
       const outputDir =
-         '/home/abhiram/Bootcamp/week-23-to-27/humane/backend/moderation-service/temp/prn1/frames';
+         '/home/abhiram/Bootcamp/week-23-to-27/humane/backend/moderation-service/temp/tauba-tauba-song/frames';
 
       const { ok, error } = await videoService.extractFrames({
          videoPath:
@@ -57,7 +57,7 @@ const bootstrap = async () => {
                   maxIdx = idx;
                }
 
-               if (prediction.className === 'Porn' && prediction.probability > 0.97) {
+               if (prediction.className === 'Porn' && prediction.probability > 0.98) {
                   explicitframes.push(res);
                }
             });
