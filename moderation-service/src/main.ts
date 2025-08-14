@@ -11,7 +11,7 @@ const bootstrap = async () => {
       await nsfwImageClassifierService.loadModel({ modelPath, imageSize: 299 });
 
       let res = await moderationService.execute({
-         attachmentKey: 'moderation0-test/Aashiq-Banaya.mp4',
+         attachmentKey: 'moderation0-test/tauta-tauba-song.mp4',
          attachmentType: 'video/mp4',
          bucketName: ENV.AWS_S3_BUCKET_NAME as string,
          hotClassNames: ['Porn', 'Hentai'],

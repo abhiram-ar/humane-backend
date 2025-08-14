@@ -37,7 +37,7 @@ const bootstrap = async () => {
             logger.debug(`classified ${idx + 1}/${frameFiles.length} video frames`);
             console.log(res);
             fs.writeFileSync(
-               '/home/abhiram/Bootcamp/week-23-to-27/humane/backend/moderation-service/temp/prn2.txt',
+               '/home/abhiram/Bootcamp/week-23-to-27/humane/backend/moderation-service/temp/prn1.txt',
                JSON.stringify({ time: idx + 1, res }) + os.EOL,
                { flag: 'a' }
             );

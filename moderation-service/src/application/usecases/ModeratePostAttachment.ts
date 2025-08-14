@@ -28,7 +28,14 @@ export class ModerateMedia<ClassNames extends string> {
            success: true;
            moderdationData:
               | { type: 'singleFrame'; result: Prediction<ClassNames>[] }
-              | { type: 'multiFrame'; result: any };
+              | {
+                   type: 'multiFrame';
+                   result: {
+                      hottestFrame: Prediction<ClassNames>[] | null;
+                      hotFrames: Prediction<ClassNames>[][];
+                      totalFrames: number;
+                   };
+                };
            flagged: boolean;
            tempResourceName?: string;
         }
@@ -163,8 +170,11 @@ export class ModerateMedia<ClassNames extends string> {
             if (!dto.hotClassNames.includes(prediction.className)) return;
 
             if (prediction.probability < flagThreshold) return;
-            hotFrames.push(res);
-            resultAddedToHotFrameFlag = true; // prevent adding frame duplicate result
+            
+            if (!resultAddedToHotFrameFlag) {
+               hotFrames.push(res);
+               resultAddedToHotFrameFlag = true; // prevent adding frame duplicate result
+            }
 
             if (prediction.probability > largestHotClassPropability) {
                largestHotClassPropability = prediction.probability;
