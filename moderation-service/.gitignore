@@ -1,4 +1,4 @@
 node_modules
 .env
 temp
-test-images/nsfw/
+ML-evals/test-images/nsfw/

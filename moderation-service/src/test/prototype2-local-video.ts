@@ -14,20 +14,20 @@ const bootstrap = async () => {
       await nsfwImageClassifierService.loadModel({ modelPath, imageSize: 299 });
 
       const outputDir =
-         '/home/abhiram/Bootcamp/week-23-to-27/humane/backend/moderation-service/temp/ashique-banaya/frames';
+         '/home/abhiram/Bootcamp/week-23-to-27/humane/backend/moderation-service/temp/prn1/frames';
 
-      // const { ok, error } = await videoService.extractFrames({
-      //    videoPath:
-      //       '/home/abhiram/Bootcamp/week-23-to-27/humane/backend/moderation-service/temp/Aashiq-Banaya.mp4',
-      //    outputDir,
-      //    fps: 1,
-      // });
+      const { ok, error } = await videoService.extractFrames({
+         videoPath:
+            '/home/abhiram/Bootcamp/week-23-to-27/humane/backend/moderation-service/temp/prn1.mp4',
+         outputDir,
+         fps: 1,
+      });
 
-      // if (!ok) {
-      //    logger.warn('unable to extract frames');
-      //    console.log(error);
-      //    return;
-      // }
+      if (!ok) {
+         logger.warn('unable to extract frames');
+         console.log(error);
+         return;
+      }
 
       if (fs.existsSync(outputDir)) {
          const frameFiles = await readdir(outputDir);
@@ -36,11 +36,11 @@ const bootstrap = async () => {
             const res = await nsfwImageClassifierService.classify({ absImagePath: fullPath });
             logger.debug(`classified ${idx + 1}/${frameFiles.length} video frames`);
             console.log(res);
-            // fs.writeFileSync(
-            //    '/home/abhiram/Bootcamp/week-23-to-27/humane/backend/moderation-service/temp/ashique-banaya-song-result.txt',
-            //    JSON.stringify({ time: idx + 1, res }) + os.EOL,
-            //    { flag: 'a' }
-            // );
+            fs.writeFileSync(
+               '/home/abhiram/Bootcamp/week-23-to-27/humane/backend/moderation-service/temp/prn2.txt',
+               JSON.stringify({ time: idx + 1, res }) + os.EOL,
+               { flag: 'a' }
+            );
 
             return res;
          });
