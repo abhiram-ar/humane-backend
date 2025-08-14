@@ -1,6 +1,4 @@
-# Humane Moderation service
-
-## Responsibility
+# Responsibility
 
 This service moderates media content on the Humane platform by:
 
@@ -12,7 +10,7 @@ This service moderates media content on the Humane platform by:
 
 > note: we are not moderating chat media as these are private and its not appropriate to read it
 
-## ML Evaluations
+# ML Evaluations
 
 This service uses machine learning models for content moderation.
 For detailed information about the ML evaluation processes, benchmarks, and results, please refer to the [ML-evals README](./ML-evals/README.md).
