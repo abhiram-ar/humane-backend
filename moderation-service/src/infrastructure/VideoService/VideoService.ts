@@ -22,7 +22,7 @@ export class FFMPEGVideoService {
          // 06: pad the number with leading zeros to ensure a minimum of six digits, overflow is handled gracefully
          ffmpeg(dto.videoPath)
             .output(path.join(dto.outputDir, 'frame-%06d.jpg')) //
-            .outputOptions([`-vf fps=${fps}`])
+            .outputOptions(['-threads 1', `-vf fps=${fps}`])
             .on('start', (cmd) => logger.debug('FFmpeg started: ' + cmd))
             .on('end', () => {
                logger.info('FFMPEG extraction completed');

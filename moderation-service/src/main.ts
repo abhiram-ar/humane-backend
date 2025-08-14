@@ -10,6 +10,7 @@ const bootstrap = async () => {
       const modelPath = path.resolve('./ML-models/inception_v3/model.json');
       await nsfwImageClassifierService.loadModel({ modelPath, imageSize: 299 });
 
+      logger.info('starting job');
       let res = await moderationService.execute({
          attachmentKey: 'moderation0-test/tauta-tauba-song.mp4',
          attachmentType: 'video/mp4',

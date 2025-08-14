@@ -20,6 +20,32 @@ For detailed information about the ML evaluation processes, benchmarks, and resu
 -  bollywood video song frames has high probability of being in NSFW class
 -  Male Body astetics like body builers are not flagged as explicit which is good
 
+## Kafka Events
+
+### Produces
+
+-  post.moderated
+
+### Consumes
+
+-  post.created
+
+## Environment Variables
+
+The following environment variables are used to configure the moderation service:
+
+| Variable                       | Description                                              | Default |
+| ------------------------------ | -------------------------------------------------------- | ------- |
+| `NODE_ENV`                     | Environment mode ('production' or 'development')         | -       |
+| `SERVER_PORT`                  | Port on which the server runs                            | '3000'  |
+| `AWS_ACCESS_KEY`               | AWS access key for authentication                        | -       |
+| `AWS_SECRET_KEY`               | AWS secret key for authentication                        | -       |
+| `AWS_REGION`                   | AWS region for services                                  | -       |
+| `AWS_S3_BUCKET_NAME`           | Name of the S3 bucket for storing data                   | -       |
+| `KAFKA_BROKER_URI`             | URI for connecting to Kafka broker                       | -       |
+| `KAFKA_CLIENT_ID`              | Client ID for Kafka connection                           | -       |
+| `MEDIA_CONTENT_FLAG_THRESHOLD` | Threshold value for flagging inappropriate media content | '0.98'  |
+
 ## Notes
 
 ### How video is flagged as explicit?
