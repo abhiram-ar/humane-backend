@@ -211,11 +211,11 @@ export class ModeratePostMedia<ClassNames extends string>
    }): Promise<boolean> => {
       if (!dto.totalFrames) return false;
 
-      const hottestFrameCount = dto.hotFrames.length;
-      const hotVideoProbability = dto.totalFrames / hottestFrameCount;
+      const hotFrameCount = dto.hotFrames.length;
+      const hotVideoProbability = hotFrameCount / dto.totalFrames;
 
       // flagging strategy - percentatge is for videos less than 10s
-      if (hottestFrameCount > 10 || hotVideoProbability > 0.2) return true;
+      if (hotFrameCount > 10 || hotVideoProbability > 0.2) return true;
       else return false;
    };
 
