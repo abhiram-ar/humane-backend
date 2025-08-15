@@ -22,6 +22,10 @@ class KafkaSingleton {
       return KafkaSingleton._instance;
    }
 
+   public getInstance = () => {
+      return this._kafka;
+   };
+
    public getProducer(): Producer {
       if (!this._producer) {
          this._producer = this._kafka.producer();
@@ -29,8 +33,11 @@ class KafkaSingleton {
       return this._producer;
    }
 
-   public createConsumer(groupId: string): Consumer {
-      return this._kafka.consumer({ groupId });
+   public createConsumer(
+      groupId: string,
+      options?: { heartbeatInterval: number; sessionTimeout: number; rebalanceTimeout: number }
+   ): Consumer {
+      return this._kafka.consumer({ groupId, ...options });
    }
 }
 

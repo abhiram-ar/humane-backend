@@ -1,7 +1,7 @@
 import { logger } from '@config/logger';
 import { nsfwImageClassifierService } from '@di/services.container';
 import path from 'path';
-import checkEnv from '@config/env';
+import checkEnv, { ENV } from '@config/env';
 import {
    connectKafkaProducer,
    disconnectKafkaProducer,
