@@ -46,7 +46,7 @@ export class PostModerationCompletedEventConsumer implements IConsumer {
 
             try {
                if (event.eventType !== AppEventsTypes.POST_MODERATION_COMPLETED) {
-                  logger.warn('foreign event');
+                  logger.warn(`foregin event-> ${event.eventType} ${event.eventId}, skipped`);
                   return;
                }
 

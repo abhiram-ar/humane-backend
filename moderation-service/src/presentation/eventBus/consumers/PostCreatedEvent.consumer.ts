@@ -55,7 +55,7 @@ export class PostCreatedEventConsumer implements IConsumer {
             // logger.verbose(JSON.stringify(event, null, 2));
 
             if (event.eventType !== AppEventsTypes.POST_CREATED) {
-               logger.warn('foreign event');
+               logger.warn(`foregin event-> ${event.eventType} ${event.eventId}, skipped`);
                return;
             }
             const { data: post, success, error } = postSchema.safeParse(event.payload);

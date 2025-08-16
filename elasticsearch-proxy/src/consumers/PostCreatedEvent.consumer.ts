@@ -2,7 +2,6 @@ import { logger } from '@config/logger';
 import {
    AppEvent,
    AppEventsTypes,
-   EventConsumerMissMatchError,
    IConsumer,
    MessageBrokerTopics,
    ZodValidationError,
@@ -54,7 +53,7 @@ export class PostCreatedEventConsumer implements IConsumer {
 
                   logger.info(`processed-> ${event.eventId}`);
                } else {
-                  logger.error(new EventConsumerMissMatchError());
+                  logger.warn(`foregin event-> ${event.eventType} ${event.eventId}, skipped`);
                }
             } catch (e) {
                logger.error(`error processing: ${event.eventId}`);
