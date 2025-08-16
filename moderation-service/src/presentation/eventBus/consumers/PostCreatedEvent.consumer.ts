@@ -4,7 +4,6 @@ import {
    AppEventsTypes,
    createEvent,
    EventBusError,
-   EventConsumerMissMatchError,
    IConsumer,
    MessageBrokerTopics,
    postSchema,
@@ -56,7 +55,7 @@ export class PostCreatedEventConsumer implements IConsumer {
             // logger.verbose(JSON.stringify(event, null, 2));
 
             if (event.eventType !== AppEventsTypes.POST_CREATED) {
-               logger.error(new EventConsumerMissMatchError());
+               logger.warn('foreign event');
                return;
             }
             const { data: post, success, error } = postSchema.safeParse(event.payload);
