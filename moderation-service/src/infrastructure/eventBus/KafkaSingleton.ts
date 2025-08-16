@@ -10,7 +10,7 @@ class KafkaSingleton {
    // esures single instance throughout the app
    private constructor() {
       this._kafka = new Kafka({
-         clientId: ENV.KAFKA_CLIENT_ID,
+         clientId: `${ENV.KAFKA_CLIENT_ID}-pid:${process.pid}`,
          brokers: [ENV.KAFKA_BROKER_URI as string],
       });
    }

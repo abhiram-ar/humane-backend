@@ -1,20 +1,21 @@
 import { postCreatedEventConsumer } from '@di/consumers.container';
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
+import { logger } from './logger';
 
 export async function connectKafkaProducer() {
    await KafkaSingleton.getInstance().getProducer().connect();
-   console.log('kafka producer connected');
+   logger.info('kafka producer connected');
 }
 
 export async function disconnectKafkaProducer() {
    await KafkaSingleton.getInstance().getProducer().disconnect();
-   console.log('kafka producer disconnected');
+   logger.info('kafka producer disconnected');
 }
 
-export const startAllConsumers = async () => {
+export const startAllKafkaConsumers = async () => {
    await postCreatedEventConsumer.start();
 };
 
-export const stopAllConsumers = () => {
+export const stopAllKafkaConsumers = () => {
    postCreatedEventConsumer.stop();
 };

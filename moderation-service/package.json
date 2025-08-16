@@ -13,6 +13,7 @@
    },
    "devDependencies": {
       "@tsconfig/node22": "^22.0.2",
+      "@types/amqplib": "^0.10.7",
       "@types/fluent-ffmpeg": "^2.1.27",
       "tsx": "^4.20.3",
       "typescript": "^5.9.2"
@@ -20,6 +21,7 @@
    "dependencies": {
       "@aws-sdk/client-s3": "^3.864.0",
       "@tensorflow/tfjs-node": "^4.22.0",
+      "amqplib": "^0.10.8",
       "date-fns": "^4.1.0",
       "dotenv": "^17.2.1",
       "fluent-ffmpeg": "^2.1.3",
