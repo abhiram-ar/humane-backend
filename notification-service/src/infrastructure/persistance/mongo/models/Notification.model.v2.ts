@@ -6,6 +6,8 @@ import {
    FriendReqStatus,
 } from '@domain/entities/FriendReqNotification.entity';
 import { POST_GOT_COMMNET_NOTIFICATION_TYPE } from '@domain/entities/PostGotCommnetNotification';
+import { POST_MODERATION_FAILED_TYPE } from '@domain/entities/PostModerationFailedNotification.entity';
+import { POST_MODERATION_FLAGGED_TYPE } from '@domain/entities/PostModerationFlaggedNotification.entity';
 import mongoose, { Document, Schema } from 'mongoose';
 
 // --------------------- Base Notification -------------------
@@ -162,12 +164,64 @@ const commnetLikesNotificationModel =
       commentLikesNotificationSchema
    );
 
+// -------------------------- Post Moderation failed noti---------------
+
+export interface IPostModerationFailedNoficationDocument extends IBaseNotificationDocument {
+   metadata: {
+      moderationResult: any;
+   };
+   type: typeof POST_MODERATION_FAILED_TYPE; // ensure type discriminator is included
+}
+
+const postModerationFailedNoficaionSchema =
+   new mongoose.Schema<IPostModerationFailedNoficationDocument>(
+      {
+         metadata: {
+            moderationResult: mongoose.Schema.Types.Mixed,
+         },
+      },
+      { discriminatorKey: 'type' }
+   );
+
+const postModerationFailedNofiticationModel =
+   notificationModel.discriminator<IPostModerationFailedNoficationDocument>(
+      POST_MODERATION_FAILED_TYPE,
+      postModerationFailedNoficaionSchema
+   );
+
+// -------------------------- Post Moderation flagged noti---------------
+
+export interface IPostModerationFlaggedNoficationDocument extends IBaseNotificationDocument {
+   metadata: {
+      moderationResult: any;
+   };
+   type: typeof POST_MODERATION_FLAGGED_TYPE; // ensure type discriminator is included
+}
+
+const postModerationFlaggedNoficaionSchema =
+   new mongoose.Schema<IPostModerationFlaggedNoficationDocument>(
+      {
+         metadata: {
+            moderationResult: mongoose.Schema.Types.Mixed,
+         },
+      },
+      { discriminatorKey: 'type' }
+   );
+
+const postModerationFlaggedNofiticationModel =
+   notificationModel.discriminator<IPostModerationFlaggedNoficationDocument>(
+      POST_MODERATION_FLAGGED_TYPE,
+      postModerationFlaggedNoficaionSchema
+   );
+
 // ------------------ Combined notifcation Documents --------------------
 export type INotificationDocument =
    | IFriendRequestNotificationDocument
    | IFriendRequestAcceptedNotificationDocument
    | IPostGotCommnetNotificationDocument
-   | ICommentLikesNotificationDocument;
+   | ICommentLikesNotificationDocument
+   | IPostModerationFailedNoficationDocument
+   | IPostModerationFlaggedNoficationDocument;
 
 // ----------------------------models-======================-----------
 export {
@@ -175,5 +229,7 @@ export {
    friendReqAcceptedNotificationModel,
    postGotCommnetNotificationModel,
    commnetLikesNotificationModel,
+   postModerationFailedNofiticationModel,
+   postModerationFlaggedNofiticationModel,
 };
 export default notificationModel;

@@ -5,6 +5,7 @@ import {
    friendReqAcceptedNotificationService,
    friendReqNotificationService,
    postGotCommnetNotificationService,
+   postModerationNotificationServices,
 } from './usecases/notificationUsercase.container';
 import { elasticSearchProxyService } from './services.contaner';
 import { CommentCreatedEventConsumer } from '@presentation/event/CommentCreatedEvent.consumer';
@@ -13,6 +14,7 @@ import { PostDeletedEventConsumer } from '@presentation/event/PostDeletedEvent.c
 import { CommentLikedEventConsumer } from '@presentation/event/CommentLikedEvent.consumer';
 import { CommentUnLikedEventConsumer } from '@presentation/event/CommentUnLikedEvent.consumer';
 import { UserRewardedEventConsumer } from '@presentation/event/UserRewardedEventConsumer';
+import { PostModerationCompletedEventConsumer } from '@presentation/event/PostModerationCompletedEventConsumer';
 
 export const friendReqEventConsumer = new FriendReqEventConsumer(
    KafkaSingleton.getInstance(),
@@ -50,4 +52,9 @@ export const commentUnlikedEventConsumer = new CommentUnLikedEventConsumer(
 
 export const userRewardedEventConsumer = new UserRewardedEventConsumer(
    KafkaSingleton.getInstance()
+);
+
+export const postModerationCompleteEventConsumer = new PostModerationCompletedEventConsumer(
+   KafkaSingleton.getInstance(),
+   postModerationNotificationServices
 );

@@ -7,6 +7,8 @@ import {
    FriendReqStatus,
 } from '@domain/entities/FriendReqNotification.entity';
 import { PostGotCommentNotification } from '@domain/entities/PostGotCommnetNotification';
+import { PostModerationFailedNotification } from '@domain/entities/PostModerationFailedNotification.entity';
+import { PostModerationFlaggedNotification } from '@domain/entities/PostModerationFlaggedNotification.entity';
 
 export interface INotificationRepository {
    retriveFriendReqNoti(friendshipId: string): Promise<Required<FriendReqNotification> | null>;
@@ -60,4 +62,12 @@ export interface INotificationRepository {
    ): Promise<Required<CommentLikesNotification> | null>;
 
    deleteCommentLikesNotificationByCommentId(commentId: string): Promise<void>;
+
+   createPostModerationFailedNotification(
+      noti: PostModerationFailedNotification
+   ): Promise<Required<PostModerationFailedNotification>>;
+
+   createPostModerationFlaggedNotification(
+      noti: PostModerationFlaggedNotification
+   ): Promise<Required<PostModerationFlaggedNotification>>;
 }

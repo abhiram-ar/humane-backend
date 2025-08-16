@@ -1,15 +1,9 @@
-import { PostEventPayload } from 'humane-common';
+import { ModerationStatus, PostEventPayload } from 'humane-common';
 import { z } from 'zod';
 
 export const PostVisibility = {
    PUBLIC: 'public',
    FRIENDS: 'friends',
-} as const;
-
-export const ModerationStatus = {
-   PENDING: 'pending',
-   OK: 'ok',
-   NOT_APPROPRIATE: 'notAppropriate',
 } as const;
 
 export const postSchema = z.object({
@@ -23,6 +17,7 @@ export const postSchema = z.object({
       ModerationStatus.PENDING,
       ModerationStatus.OK,
       ModerationStatus.NOT_APPROPRIATE,
+      ModerationStatus.FAILED,
    ]),
    moderationMetadata: z.any().nullish().optional(),
 
