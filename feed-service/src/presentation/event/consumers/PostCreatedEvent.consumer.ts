@@ -45,8 +45,9 @@ export class PostCreatedEventConsumer implements IConsumer {
             logger.verbose(JSON.stringify(event, null, 2));
 
             try {
-               if (event.eventType != AppEventsTypes.POST_CREATED) {
-                  throw new EventConsumerMissMatchError();
+               if (event.eventType !== AppEventsTypes.POST_CREATED) {
+                  logger.error(new EventConsumerMissMatchError());
+                  return;
                }
 
                const validatedPost = postSchema.safeParse(event.payload);

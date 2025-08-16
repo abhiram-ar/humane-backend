@@ -41,7 +41,7 @@ export class PostDeletedEventConsumer implements IConsumer {
             logger.verbose(JSON.stringify(event, null, 2));
 
             try {
-               if (event.eventType != AppEventsTypes.POST_DELETED) {
+               if (event.eventType !== AppEventsTypes.POST_DELETED) {
                   throw new EventConsumerMissMatchError();
                }
 
