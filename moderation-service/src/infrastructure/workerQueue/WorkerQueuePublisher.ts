@@ -1,3 +1,4 @@
+import { ENV } from '@config/env';
 import { logger } from '@config/logger';
 import amqplib, { ChannelModel, ConfirmChannel } from 'amqplib';
 import { AppEvent } from 'humane-common';
@@ -8,9 +9,7 @@ export class RabbitMQWorkerQueuePublisher {
    constructor() {}
 
    connect = async () => {
-      this._connection = await amqplib.connect(
-         'amqp://default_user_F5IPFQJd2jJ0ZgZXyYI:owQfj94b0JNHne4K3wMIke7r4cqPs94A@humane-rabbitmq'
-      );
+      this._connection = await amqplib.connect(ENV.RABBITMQ_CONNECTION_STRING as string);
    };
 
    disconnect = async () => {

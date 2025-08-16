@@ -9,7 +9,8 @@ type ENVConfig = {
    readonly AWS_S3_BUCKET_NAME: ENVValue;
    readonly KAFKA_CLIENT_ID: ENVValue;
    readonly KAFKA_BROKER_URI: ENVValue;
-   readonly MEDIA_CONTENT_FLAG_THRESHOLD: ENVValue
+   readonly MEDIA_CONTENT_FLAG_THRESHOLD: ENVValue;
+   readonly RABBITMQ_CONNECTION_STRING: ENVValue;
 };
 
 export const ENV: ENVConfig = {
@@ -21,7 +22,8 @@ export const ENV: ENVConfig = {
    AWS_S3_BUCKET_NAME: process.env.AWS_S3_BUCKET_NAME,
    KAFKA_BROKER_URI: process.env.KAFKA_BROKER_URI,
    KAFKA_CLIENT_ID: process.env.KAFKA_CLIENT_ID,
-   MEDIA_CONTENT_FLAG_THRESHOLD: process.env.MEDIA_CONTENT_FLAG_THRESHOLD ?? "0.98"
+   MEDIA_CONTENT_FLAG_THRESHOLD: process.env.MEDIA_CONTENT_FLAG_THRESHOLD ?? '0.98',
+   RABBITMQ_CONNECTION_STRING: process.env.RABBITMQ_CONNECTION_STRING,
 };
 
 function checkEnv() {

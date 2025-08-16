@@ -33,9 +33,7 @@ export class RabbitMQPostMediaModerationWorker implements IConsumer {
    ) {}
 
    connect = async () => {
-      this._connection = await amqplib.connect(
-         'amqp://default_user_F5IPFQJd2jJ0ZgZXyYI:owQfj94b0JNHne4K3wMIke7r4cqPs94A@humane-rabbitmq'
-      );
+      this._connection = await amqplib.connect(ENV.RABBITMQ_CONNECTION_STRING as string);
    };
 
    getConsumerChannel = async (): Promise<Channel | undefined> => {
