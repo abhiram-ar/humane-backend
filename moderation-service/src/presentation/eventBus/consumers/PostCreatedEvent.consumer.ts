@@ -36,6 +36,15 @@ export class PostCreatedEventConsumer implements IConsumer {
       });
    }
 
+   private readonly _commitOffset = async (offset: string, partition: number) => {
+      const config = {
+         topic: this._topic,
+         partition,
+         offset: String(Number(offset) + 1),
+      };
+      await this._consumer.commitOffsets([config]);
+   };
+
    start = async () => {
       await this._consumer.connect();
       logger.info('Post created event consumer connected ');
@@ -56,6 +65,7 @@ export class PostCreatedEventConsumer implements IConsumer {
 
             if (event.eventType !== AppEventsTypes.POST_CREATED) {
                logger.warn(`foregin event-> ${event.eventType} ${event.eventId}, skipped`);
+               await this._commitOffset(message.offset, partition);
                return;
             }
             const { data: post, success, error } = postSchema.safeParse(event.payload);
@@ -99,12 +109,7 @@ export class PostCreatedEventConsumer implements IConsumer {
                   throw new WorkerQueueError(WorkerQueueErrorMsg.PRODUCER_MAX_RETRY_REACED);
                }
 
-               const offset = {
-                  topic: MessageBrokerTopics.POST_CREATE_EVENTS_TOPIC,
-                  partition,
-                  offset: String(Number(message.offset) + 1),
-               };
-               await this._consumer.commitOffsets([offset]);
+               await this._commitOffset(message.offset, partition);
                logger.info(`Processed event -> ${event.eventId}`);
             } catch (e) {
                logger.error(`consumer: error processing: ${event.eventId}`);
@@ -129,12 +134,7 @@ export class PostCreatedEventConsumer implements IConsumer {
                } catch (commitErr) {
                   // @ts-ignore
                   logger.error(`consumer: Failed to commit or send to retry: ${commitErr.message}`);
-                  const offset = {
-                     topic: MessageBrokerTopics.POST_CREATE_EVENTS_TOPIC,
-                     partition,
-                     offset: String(Number(message.offset) + 1),
-                  };
-                  await this._consumer.commitOffsets([offset]);
+                  await this._commitOffset(message.offset, partition);
                }
             }
          },

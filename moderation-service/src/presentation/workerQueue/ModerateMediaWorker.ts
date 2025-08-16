@@ -26,6 +26,7 @@ export class RabbitMQPostMediaModerationWorker implements IConsumer {
    private _connection: ChannelModel | undefined;
    private _consumerChannel: Channel | undefined;
 
+   private _forceConnClosed: boolean = false; // just to keep not on how the connection closed, was it manual or forced
    constructor(
       private readonly _moderationService: IModeratePostMedia<NSFWJSClassNames>,
       private readonly _eventPublisher: IEventPublisher,
@@ -33,7 +34,15 @@ export class RabbitMQPostMediaModerationWorker implements IConsumer {
    ) {}
 
    connect = async () => {
+      this._forceConnClosed = false;
       this._connection = await amqplib.connect(ENV.RABBITMQ_CONNECTION_STRING as string);
+      this._connection.on('close', () => {
+         if (this._forceConnClosed) return;
+         process.nextTick(() => {
+            logger.debug('nextTick: rabbimq worker re-connect callback fired');
+            this.connect();
+         });
+      });
    };
 
    getConsumerChannel = async (): Promise<Channel | undefined> => {
@@ -57,6 +66,8 @@ export class RabbitMQPostMediaModerationWorker implements IConsumer {
    };
 
    start = async (): Promise<void> => {
+      this._forceConnClosed = false; 
+
       let consumerChan = await this.getConsumerChannel();
       if (!consumerChan) {
          throw new WorkerQueueError(WorkerQueueErrorMsg.NO_CHANNEL);
@@ -208,6 +219,7 @@ export class RabbitMQPostMediaModerationWorker implements IConsumer {
    };
 
    stop = async (): Promise<void> => {
+      this._forceConnClosed = true;
       await this._consumerChannel?.close();
       this._consumerChannel = undefined;
       await this._connection?.close();

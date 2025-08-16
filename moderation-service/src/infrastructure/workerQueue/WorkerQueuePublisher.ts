@@ -6,13 +6,23 @@ import { AppEvent } from 'humane-common';
 export class RabbitMQWorkerQueuePublisher {
    private _connection: ChannelModel | undefined;
    private _publisherChannel: ConfirmChannel | undefined;
+   private _forceConnClosed: boolean = false; // just to keep not on how the connection closed, was it manual or forced
    constructor() {}
 
    connect = async () => {
+      this._forceConnClosed = false;
       this._connection = await amqplib.connect(ENV.RABBITMQ_CONNECTION_STRING as string);
+      this._connection.on('close', () => {
+         if (this._forceConnClosed) return;
+         process.nextTick(() => {
+            logger.debug('next tick rabbimq conn fired');
+            this.connect();
+         });
+      });
    };
 
    disconnect = async () => {
+      this._forceConnClosed = true;
       await this._publisherChannel?.close();
       this._publisherChannel = undefined;
       await this._connection?.close();
