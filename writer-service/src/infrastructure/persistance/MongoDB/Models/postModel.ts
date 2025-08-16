@@ -32,7 +32,7 @@ const postSchema = new mongoose.Schema<IPostDocumnet>(
          enum: [...Object.values(ModerationStatus)],
          default: ModerationStatus.PENDING,
       },
-      moderationMetadata: { type: Object },
+      moderationMetadata: { type: Object, select: false },
    },
    { timestamps: true }
 );
