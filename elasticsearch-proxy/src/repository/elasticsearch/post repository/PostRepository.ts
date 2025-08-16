@@ -47,10 +47,11 @@ export class PostRepository implements IPostRepository {
    };
 
    create = async (post: IPostDocument): Promise<void> => {
+      const { moderationMetadata, ...safePost } = post; // exlusde heavy metadata
       await this._client.index({
          index: this._index,
          id: post.id,
-         document: { ...post, commentCount: 0 },
+         document: { ...safePost, commentCount: 0 },
       });
    };
    deleteById = async (itemId: string): Promise<{ found: boolean; deleted: boolean }> => {
