@@ -11,7 +11,9 @@ export class RabbitMQWorkerQueuePublisher {
 
    connect = async () => {
       this._forceConnClosed = false;
-      this._connection = await amqplib.connect(ENV.RABBITMQ_CONNECTION_STRING as string);
+      this._connection = await amqplib.connect(ENV.RABBITMQ_CONNECTION_STRING as string, {
+         timeout: 10 * 60 * 1000,
+      });
       this._connection.on('close', () => {
          if (this._forceConnClosed) return;
          process.nextTick(() => {
