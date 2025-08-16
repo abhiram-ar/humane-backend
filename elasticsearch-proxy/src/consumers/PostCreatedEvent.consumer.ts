@@ -9,15 +9,15 @@ import {
 } from 'humane-common';
 import KafkaSingleton from 'kafka/KafkaSingleton';
 import { Consumer } from 'kafkajs';
-import { PostService } from '@services/Post.services';
 import { postSchema } from 'interfaces/dto/post/Post.dto';
+import { IPostService } from 'interfaces/services/IPost.services';
 
 export class PostCreatedEventConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(
       private readonly _kafka: KafkaSingleton,
-      private readonly _PostServices: PostService
+      private readonly _PostServices: IPostService
    ) {
       this.consumer = this._kafka.createConsumer('elasticsearch-proxy-post-created-v2');
    }
@@ -40,18 +40,22 @@ export class PostCreatedEventConsumer implements IConsumer {
             // logger.verbose(JSON.stringify(event, null, 2));
 
             try {
-               if (event.eventType != AppEventsTypes.POST_CREATED) {
-                  throw new EventConsumerMissMatchError();
+               if (
+                  event.eventType === AppEventsTypes.POST_CREATED ||
+                  event.eventType === AppEventsTypes.POST_MODERATION_COMPLETED
+               ) {
+                  const parsed = postSchema.safeParse(event.payload);
+
+                  if (!parsed.success) {
+                     throw new ZodValidationError(parsed.error);
+                  }
+
+                  await this._PostServices.upsert(parsed.data);
+
+                  logger.info(`processed-> ${event.eventId}`);
+               } else {
+                  logger.error(new EventConsumerMissMatchError());
                }
-               const parsed = postSchema.safeParse(event.payload);
-
-               if (!parsed.success) {
-                  throw new ZodValidationError(parsed.error);
-               }
-
-               await this._PostServices.upsert(parsed.data);
-
-               logger.info(`processed-> ${event.eventId}`);
             } catch (e) {
                logger.error(`error processing: ${event.eventId}`);
                logger.error((e as Error).message);
