@@ -150,16 +150,23 @@ export class ModeratePostMedia<ClassNames extends string>
       const frameFiles = await readdir(outputDir);
 
       let completed = 0;
-      const promises = frameFiles.map(async (frameFile) => {
+      const frameClassificationResult: (Prediction<ClassNames>[] | null)[] = [];
+      for (let frameFile of frameFiles) {
          const fullPath = path.join(outputDir, frameFile);
          const res = await this._nsfwImageClassifierService.classify({
             absImagePath: fullPath,
          });
-         logger.debug(`classified ${++completed}/${frameFiles.length} video frames`);
-         return res;
-      });
+         frameClassificationResult.push(res);
 
-      const frameClassificationResult = await Promise.all(promises);
+         await new Promise((r) =>
+            setImmediate(() => {
+               r(undefined);
+               logger.info('giving breathing room for event loop');
+            })
+         );
+
+         logger.debug(`classified ${++completed}/${frameFiles.length} video frames`);
+      }
 
       const flagThreshold = parseFloat(ENV.MEDIA_CONTENT_FLAG_THRESHOLD as string);
       let largestHotClassPropability = 0;
