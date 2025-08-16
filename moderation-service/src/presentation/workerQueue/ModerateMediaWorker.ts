@@ -111,7 +111,9 @@ export class RabbitMQPostMediaModerationWorker implements IConsumer {
                cleanup: true,
             });
 
-            logger.verbose(JSON.stringify({ moderation: 'Result', result: res }, null, 2));
+            // @ts-ignore
+            logger.debug(`event ${event.eventId}: success-${res.success}, flagged:${res.flagged}`);
+            // logger.verbose(JSON.stringify({ moderation: 'Result', result: res }, null, 2));
 
             if (!res.success) {
                event.version = (event.version ?? 0) + 1;
