@@ -1,8 +1,9 @@
 import { CreatePostDTO } from '@application/dtos/CreatePost.dto';
 import { DeletePostDTO } from '@application/dtos/DeletePost.dto';
+import { UpdatePostModerationInputDTO } from '@application/dtos/UpdatePostModeration.dto';
 import { EntityNotFound } from '@application/errors/EntityNotFoundError';
 import { HashTag } from '@domain/entities/hashtag.entity';
-import { Post } from '@domain/entities/Post.entity';
+import { ModerationStatus, Post } from '@domain/entities/Post.entity';
 import { IPostRepository } from '@domain/repository/IPostRepository';
 import { IPostService } from '@ports/IPostService';
 
@@ -31,5 +32,23 @@ export class PostService implements IPostService {
       if (!deletedPost) {
          throw new EntityNotFound(`user does not have post my postId ${dto.postId})`);
       } else return deletedPost;
+   };
+
+   updateModerationData = async (
+      dto: UpdatePostModerationInputDTO
+   ): Promise<Required<Post> | null> => {
+      let moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus] = 'pending';
+      if (!dto.result.success) {
+         moderationStatus = 'failed';
+      } else {
+         if (dto.result.flagged) moderationStatus = 'notAppropriate';
+         else moderationStatus = 'ok';
+      }
+
+      return await this._postRepo.setModeration({
+         postId: dto.postId,
+         moderationStatus: moderationStatus,
+         moderateionMetadata: dto.result.success ? dto.result.moderdationData : undefined,
+      });
    };
 }

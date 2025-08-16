@@ -6,6 +6,7 @@ import {
    commentLikeWorker,
    commentUnlikedWorker,
    commnetUnLikedByPostAuthorWorker,
+   postModeratedEventConsumer,
 } from '@di/consumer.container';
 
 export async function connectKafkaProducer() {
@@ -24,6 +25,7 @@ export const startAllConsumer = async () => {
    await commentUnlikedWorker.start();
    await commentLikedByPostAuthorWorker.start();
    await commnetUnLikedByPostAuthorWorker.start();
+   await postModeratedEventConsumer.start();
 };
 
 export const stopAllConsumer = async () => {
@@ -32,4 +34,5 @@ export const stopAllConsumer = async () => {
    await commentUnlikedWorker.stop();
    await commentLikedByPostAuthorWorker.stop();
    await commnetUnLikedByPostAuthorWorker.stop();
+   await postModeratedEventConsumer.stop();
 };
