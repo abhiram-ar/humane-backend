@@ -84,7 +84,11 @@ export class FeedController {
          if (postIds && postIds.length > 0) {
             hydratedPosts = await this._esProxyService.getPostsDetail(postIds);
          }
+
          // filterout null and no autor posts
+         const filteredPost = hydratedPosts.filter(
+            (post) => post?.moderationStatus !== 'notAppropriate'
+         );
 
          // get hot friends
 
@@ -92,7 +96,7 @@ export class FeedController {
 
          // get hot users profile from read-through cache
          res.status(HttpStatusCodes.OK).json({
-            data: { posts: hydratedPosts, pagination: pagination },
+            data: { posts: filteredPost, pagination: pagination },
          });
       } catch (error) {
          next(error);

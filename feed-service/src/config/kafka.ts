@@ -1,11 +1,11 @@
-import { postcreatedEventConsumer, postDeletedEventComsumer } from '@di/consumers.container';
+import { postModerationCompletedEventConsumer, postDeletedEventComsumer } from '@di/consumers.container';
 
 export const startAllConsumers = async () => {
-   await postcreatedEventConsumer.start();
+   await postModerationCompletedEventConsumer.start();
    await postDeletedEventComsumer.start();
 };
 
 export const stopAllConsumer = async () => {
-   await postcreatedEventConsumer.stop();
+   await postModerationCompletedEventConsumer.stop();
    await postDeletedEventComsumer.stop();
 };

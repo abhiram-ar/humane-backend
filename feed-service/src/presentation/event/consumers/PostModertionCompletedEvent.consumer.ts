@@ -5,17 +5,17 @@ import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
 import { IFeedCache } from '@ports/IFeedCache';
 import { IUserService } from '@ports/IUserService';
 import { FeedServices } from '@services/Feed.services';
+
 import {
    AppEvent,
    AppEventsTypes,
-   EventConsumerMissMatchError,
    IConsumer,
    MessageBrokerTopics,
    ZodValidationError,
 } from 'humane-common';
 import { Consumer } from 'kafkajs';
 
-export class PostCreatedEventConsumer implements IConsumer {
+export class PostModerationCompletedEventConsumer implements IConsumer {
    private consumer: Consumer;
 
    constructor(
@@ -41,18 +41,26 @@ export class PostCreatedEventConsumer implements IConsumer {
                (message.value as Buffer<ArrayBufferLike>).toString()
             ) as AppEvent;
 
-            logger.debug(`new Event-> ${event.eventId}`);
-            logger.verbose(JSON.stringify(event, null, 2));
+            logger.debug(`🔽 new Event-> ${event.eventType} ${event.eventId}`);
+            // logger.verbose(JSON.stringify(event, null, 2));
 
             try {
-               if (event.eventType !== AppEventsTypes.POST_CREATED) {
-                  logger.error(new EventConsumerMissMatchError());
+               if (event.eventType !== AppEventsTypes.POST_MODERATION_COMPLETED) {
+                  logger.warn('foreign event');
                   return;
                }
 
                const validatedPost = postSchema.safeParse(event.payload);
                if (!validatedPost.success) {
                   throw new ZodValidationError(validatedPost.error);
+               }
+
+               if (
+                  validatedPost.data.moderationStatus === 'failed' ||
+                  validatedPost.data.attachmentStatus === 'processing'
+               ) {
+                  logger.warn('consumer: invalid moderation state, skipping adding to timeline');
+                  return;
                }
 
                // get friends list
