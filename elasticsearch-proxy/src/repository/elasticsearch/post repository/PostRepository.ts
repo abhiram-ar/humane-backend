@@ -2,7 +2,7 @@ import { IPostDocument } from 'interfaces/IPostDocument';
 import { IPostRepository } from 'interfaces/repository/IPostRepository';
 import { ES_INDEXES } from '../ES_INDEXES';
 import { Client, errors } from '@elastic/elasticsearch';
-import { PostVisibility } from 'humane-common';
+import { ModerationStatus, PostVisibility } from 'humane-common';
 import { logger } from '@config/logger';
 
 export class PostRepository implements IPostRepository {
@@ -113,7 +113,10 @@ export class PostRepository implements IPostRepository {
       userId: string,
       from: string | null,
       limit: number,
-      filter: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined
+      filter: {
+         visibility: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined;
+         moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus] | undefined;
+      }
    ): Promise<{ posts: IPostDocument[]; from: string | null; hasMore: boolean }> => {
       const res = await this._client.search<IPostDocument>({
          index: ES_INDEXES.POST_INDEX,
@@ -121,11 +124,13 @@ export class PostRepository implements IPostRepository {
          sort: [{ id: 'desc' }],
          search_after: from ? [from] : undefined,
          query: {
-            bool: {
-               filter: filter
-                  ? [{ term: { authorId: userId } }, { term: { visibility: filter } }]
-                  : [{ term: { authorId: userId } }],
-            },
+         bool: {
+            filter: [
+            { term: { authorId: userId } },
+            ...(filter.visibility ? [{ term: { visibility: filter.visibility } }] : []),
+            ...(filter.moderationStatus ? [{ term: { moderationStatus: filter.moderationStatus } }] : []),
+            ],
+         },
          },
       });
 

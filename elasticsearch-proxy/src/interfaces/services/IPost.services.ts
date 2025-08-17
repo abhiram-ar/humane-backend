@@ -3,7 +3,7 @@ import { PostInputDTO } from 'interfaces/dto/post/Post.dto';
 
 import { IPostDocument } from 'interfaces/IPostDocument';
 import { GetUserTimelineInputDTO } from 'interfaces/dto/post/GetUserTimeline.dto';
-import { PostVisibility } from 'humane-common';
+import { ModerationStatus, PostVisibility } from 'humane-common';
 import { GetPostsByHashtagInputDTO } from 'interfaces/dto/post/GetPostsByHashtag.dto';
 
 export interface IPostService {
@@ -18,7 +18,10 @@ export interface IPostService {
    >;
    getUserTimeline(
       dto: GetUserTimelineInputDTO,
-      filter: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined
+      filter: {
+         visibility: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined;
+         moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus] | undefined;
+      }
    ): Promise<{
       posts: (Omit<IPostDocument, 'processedAttachmentKey'> & { attachmentURL: string | null })[];
       pagination: { from: string | null; hasMore: boolean };

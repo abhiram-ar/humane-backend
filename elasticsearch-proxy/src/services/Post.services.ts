@@ -6,7 +6,7 @@ import { CDNService } from './CDN.services';
 import { IPostDocument } from 'interfaces/IPostDocument';
 import { GetUserTimelineInputDTO } from 'interfaces/dto/post/GetUserTimeline.dto';
 import { IPostService } from 'interfaces/services/IPost.services';
-import { PostVisibility } from 'humane-common';
+import { ModerationStatus, PostVisibility } from 'humane-common';
 import { GetPostsByHashtagInputDTO } from 'interfaces/dto/post/GetPostsByHashtag.dto';
 
 export class PostService implements IPostService {
@@ -64,7 +64,10 @@ export class PostService implements IPostService {
 
    getUserTimeline = async (
       dto: GetUserTimelineInputDTO,
-      filter: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined = undefined
+      filter: {
+         visibility: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined;
+         moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus] | undefined;
+      }
    ): Promise<{
       posts: (Omit<IPostDocument, 'processedAttachmentKey'> & { attachmentURL: string | null })[];
       pagination: { from: string | null; hasMore: boolean };
@@ -107,7 +110,7 @@ export class PostService implements IPostService {
          dto.from || null,
          dto.limit
       );
-      
+
       const postURLHydratedPosts = res.posts.map((post) => {
          const { processedAttachmentKey, ...data } = post;
 
