@@ -6,6 +6,7 @@ import {
 } from '@application/dtos/generatePresingedURL.dto';
 import { StorageError } from '@application/errors/StorageError';
 import { logger } from '@config/logget';
+import { Post } from '@domain/entities/Post.entity';
 import { ICommentService } from '@ports/ICommentServices';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IPostService } from '@ports/IPostService';
@@ -56,8 +57,18 @@ export class PostController {
             logger.warn(`post ${createdPost.id} created event not publised in eventbus`);
          }
 
+         let { rawAttachmentKey, ...postData } = createdPost;
+         let attachmentURLHydratedPost: Omit<Required<Post>, 'rawAttachmentKey'> & {
+            attachmentURL?: string | null;
+         } = postData;
+         
+         if (rawAttachmentKey) {
+            attachmentURLHydratedPost.attachmentURL =
+               this._storageService.getPublicCDNURL(rawAttachmentKey);
+         }
+
          res.status(HttpStatusCode.Created).json({
-            data: { post: createdPost },
+            data: { post: attachmentURLHydratedPost },
          });
       } catch (error) {
          next(error);
