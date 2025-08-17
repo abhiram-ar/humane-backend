@@ -94,6 +94,16 @@ export class PublicPostQueryControllet {
             throw new PostNotFoundError();
          }
 
+         // if the does not pass the moderation. 
+         // Then It cannot read publicly apart form the user who created the post
+         const authenticatedUserId = req.user?.type === 'user' && req.user.userId;
+         if (
+            postdetails.moderationStatus !== 'ok' &&
+            (!authenticatedUserId || authenticatedUserId !== postdetails.authorId)
+         ) {
+            throw new PostNotFoundError();
+         }
+
          const [authorBasicDetails] = await this._userSerives.getBasicUserProfile([
             postdetails.authorId,
          ]);
