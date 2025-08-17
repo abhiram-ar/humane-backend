@@ -1,10 +1,10 @@
 import KafkaSingleton from '@infrastructure/eventBus/KafkaSingleton';
-import { PostCreatedEventConsumer } from '@presentation/event/consumers/PostCreatedEvent.consumer';
+import { PostModerationCompletedEventConsumer } from '@presentation/event/consumers/PostModertionCompletedEvent.consumer';
 import { feedServices, userServices } from './services.container';
 import { PostDeletedEventConsumer } from '@presentation/event/consumers/PostDeletedEvent.consumer';
 import { feedCache } from './cache.container';
 
-export const postcreatedEventConsumer = new PostCreatedEventConsumer(
+export const postModerationCompletedEventConsumer = new PostModerationCompletedEventConsumer(
    KafkaSingleton.getInstance(),
    feedServices,
    userServices,

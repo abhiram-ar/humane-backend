@@ -1,7 +1,12 @@
 import { HttpStatusCode } from 'axios';
 import { PostNotFoundError } from 'errors/PostNotFound.error';
 import { NextFunction, Request, Response } from 'express';
-import { HttpStatusCodes, PostVisibility, ZodValidationError } from 'humane-common';
+import {
+   HttpStatusCodes,
+   ModerationStatus,
+   PostVisibility,
+   ZodValidationError,
+} from 'humane-common';
 import { BasicUserDetails } from 'interfaces/dto/GetUserBasicProfileFromIDs';
 import {
    GetPostsByHashtagInputDTO,
@@ -25,8 +30,6 @@ export class PublicPostQueryControllet {
 
    getUserTimeline = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         let filter: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined;
-
          const dto: GetUserTimelineInputDTO = {
             targetUserId: req.params.targetUserId,
             limit: parseInt((req.query.limit as string) || '10'),
@@ -37,10 +40,17 @@ export class PublicPostQueryControllet {
             throw new ZodValidationError(validatedDTO.error);
          }
 
+         let filter: {
+            visibility: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined; // undefiend => no filter for visibility
+            moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus] | undefined;
+         } = { visibility: undefined, moderationStatus: undefined };
+
          if (!req.user || req.user.type !== 'user') {
-            filter = 'public'; // if no user get only the public posts of targetUser
+            filter.visibility = 'public'; // if no user get only the public posts of targetUser
+            filter.moderationStatus = 'ok';
          } else if (req.user.userId === validatedDTO.data.targetUserId) {
-            filter = undefined;
+            filter.visibility = undefined;
+            filter.moderationStatus = undefined;
          } else {
             const relStatus = await this._externalUserService.getRelationshipStatus(
                req.user.userId,
@@ -48,9 +58,11 @@ export class PublicPostQueryControllet {
             );
 
             if (relStatus !== 'friends') {
-               filter = 'public';
+               filter.visibility = 'public'; // if not, user get only the public posts of targetUser
+               filter.moderationStatus = 'ok';
             } else {
-               filter = undefined;
+               filter.moderationStatus = 'ok';
+               filter.visibility = undefined;
             }
          }
          const { posts, pagination } = await this._postServices.getUserTimeline(
@@ -79,6 +91,16 @@ export class PublicPostQueryControllet {
          const [postdetails] = await this._postServices.getPostByIds(parsed.data);
 
          if (!postdetails) {
+            throw new PostNotFoundError();
+         }
+
+         // if the does not pass the moderation. 
+         // Then It cannot read publicly apart form the user who created the post
+         const authenticatedUserId = req.user?.type === 'user' && req.user.userId;
+         if (
+            postdetails.moderationStatus !== 'ok' &&
+            (!authenticatedUserId || authenticatedUserId !== postdetails.authorId)
+         ) {
             throw new PostNotFoundError();
          }
 

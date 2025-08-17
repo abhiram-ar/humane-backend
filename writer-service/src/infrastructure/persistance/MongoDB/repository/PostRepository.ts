@@ -1,4 +1,4 @@
-import { Post, PostAttachmentStatus } from '@domain/entities/Post.entity';
+import { ModerationStatus, Post, PostAttachmentStatus } from '@domain/entities/Post.entity';
 import { IPostRepository } from '@domain/repository/IPostRepository';
 import postModel from '../Models/postModel';
 import { postAutoMapper } from '../mapper/postAutoMapper';
@@ -6,6 +6,24 @@ import mongoose from 'mongoose';
 import hashtagModel from '../Models/hashtagModel';
 
 export class PostRepository implements IPostRepository {
+   setModeration = async (dto: {
+      postId: string;
+      moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus];
+      moderateionMetadata: any;
+   }): Promise<Required<Post> | null> => {
+      const res = await postModel.findByIdAndUpdate(
+         dto.postId,
+         {
+            $set: {
+               moderationStatus: dto.moderationStatus,
+               moderationMetadata: dto.moderateionMetadata,
+            },
+         },
+         { new: true }
+      );
+
+      return res ? postAutoMapper(res) : null;
+   };
    create = async (post: Post): Promise<Required<Post>> => {
       const session = await mongoose.startSession();
 

@@ -11,6 +11,8 @@ import notificationModel, {
    friendReqNotificationModel,
    ICommentLikesNotificationDocument,
    postGotCommnetNotificationModel,
+   postModerationFailedNofiticationModel,
+   postModerationFlaggedNofiticationModel,
 } from '../models/Notification.model.v2';
 import {
    FRIEND_REQ_ACCEPTED_NOTIFICATION_TYPE,
@@ -31,6 +33,10 @@ import { FilterQuery, UpdateQuery } from 'mongoose';
 import { CommnetLikeDTO } from '@application/dtos/CommentLike.dto';
 import { commentLikesNotiAutoMapper } from '../automapper/commentLikesNotification.automapper';
 import { logger } from '@config/logger';
+import { PostModerationFailedNotification } from '@domain/entities/PostModerationFailedNotification.entity';
+import { PostModerationFlaggedNotification } from '@domain/entities/PostModerationFlaggedNotification.entity';
+import { postModerationFailedNotiAutoMapper } from '../automapper/postModerationFailedNotiAutoMapper copy';
+import { postModerationFlaggedNotiAutoMapper } from '../automapper/postModerationFlaggedNotiAutoMapper';
 
 export class MongoNotificationRepository implements INotificationRepository {
    constructor() {}
@@ -280,5 +286,30 @@ export class MongoNotificationRepository implements INotificationRepository {
       logger.debug(
          `delted ${deleted.deletedCount} commentlikeNotification realted to comment(${commentId})`
       );
+   };
+
+   createPostModerationFailedNotification = async (
+      noti: PostModerationFailedNotification
+   ): Promise<Required<PostModerationFailedNotification>> => {
+      const res = await postModerationFailedNofiticationModel.create({
+         reciverId: noti.reciverId,
+         type: noti.type,
+         entityId: noti.entityId,
+         metadata: { moderationResult: noti.metadata.moderationResult },
+      });
+
+      return postModerationFailedNotiAutoMapper(res);
+   };
+   createPostModerationFlaggedNotification = async (
+      noti: PostModerationFlaggedNotification
+   ): Promise<Required<PostModerationFlaggedNotification>> => {
+      const res = await postModerationFlaggedNofiticationModel.create({
+         reciverId: noti.reciverId,
+         type: noti.type,
+         entityId: noti.entityId,
+         metadata: { moderationResult: noti.metadata.moderationResult },
+      });
+
+      return postModerationFlaggedNotiAutoMapper(res);
    };
 }

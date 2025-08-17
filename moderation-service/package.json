@@ -1,0 +1,33 @@
+{
+   "name": "moderation-service",
+   "version": "1.0.0",
+   "description": "humane moderations service",
+   "license": "ISC",
+   "author": "abhiram-ar",
+   "type": "commonjs",
+   "main": "/src/index.js",
+   "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "dev": "tsx watch --include \"./src/**/*\" ./src/main.ts",
+      "uc": "npm uninstall humane-common && npm i humane-common"
+   },
+   "devDependencies": {
+      "@tsconfig/node22": "^22.0.2",
+      "@types/amqplib": "^0.10.7",
+      "@types/fluent-ffmpeg": "^2.1.27",
+      "tsx": "^4.20.3",
+      "typescript": "^5.9.2"
+   },
+   "dependencies": {
+      "@aws-sdk/client-s3": "^3.864.0",
+      "@tensorflow/tfjs-node": "^4.22.0",
+      "amqplib": "^0.10.8",
+      "date-fns": "^4.1.0",
+      "dotenv": "^17.2.1",
+      "fluent-ffmpeg": "^2.1.3",
+      "humane-common": "^1.0.99",
+      "kafkajs": "^2.2.4",
+      "nsfwjs": "^4.2.1",
+      "winston": "^3.17.0"
+   }
+}

@@ -1,4 +1,4 @@
-### Responsibility
+## Responsibility
 
 -  This service only stores the IDs of the post to construct a feed
 -  Ids are postIds are saturated at read time from post read model
@@ -6,6 +6,8 @@
 -  When a new post is created,
 -  that post is added to all the friend's timeline to the curresponding author who made the post
 -  at the same time this is written to cache
+
+## NOTES
 
 ### cache expirty
 
@@ -32,6 +34,12 @@
 -  edge condition: what if the query.limit is filled by the dynamic caching when post is created
 -  then this condition will not execute, and our cache will only have this most recent post,and not the full cache size
 -  but its oky, if a user's timeline is filling up fast, it means they are a heavy user and the full cache will be populated with time
+
+### why writing the the flagged post also in the timeline?
+
+-  because admin can change the flagged status of a post
+-  if admin unflagged the conent, we don't want to rewrite the post, else it would be very hard to find this post from all timelines
+-  its easy the filtering at the read time
 
 ## Production changes
 

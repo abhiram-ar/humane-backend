@@ -2,6 +2,7 @@ import { CommentLikesNotificationService } from '@application/usercase/CommentLi
 import { FriendReqAcceptedNotificationService } from '@application/usercase/FriendReqAcceptedNotificationService.usercase';
 import { FriendReqNotificationService } from '@application/usercase/FriendReqNotificationService.usecase';
 import { PostGotCommentNotificationService } from '@application/usercase/PostGotCommentNotification.usecase';
+import { PostModerationNotificationService } from '@application/usercase/PostModerationNotitificationService.usercase';
 import { UserNotificationService } from '@application/usercase/UserNotification.usecase';
 import { notificationRespository } from '@di/repository.container';
 import { elasticSearchProxyService } from '@di/services.contaner';
@@ -24,4 +25,8 @@ export const postGotCommnetNotificationService = new PostGotCommentNotificationS
 export const commentLikesNotificationService = new CommentLikesNotificationService(
    notificationRespository,
    elasticSearchProxyService
+);
+
+export const postModerationNotificationServices = new PostModerationNotificationService(
+   notificationRespository
 );

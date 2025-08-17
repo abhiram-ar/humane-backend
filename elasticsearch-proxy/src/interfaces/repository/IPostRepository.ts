@@ -1,6 +1,6 @@
 import { IBaseRepository } from './IBaseRepository';
 import { IPostDocument } from '../IPostDocument';
-import { PostVisibility } from 'humane-common';
+import { ModerationStatus, PostVisibility } from 'humane-common';
 
 export interface IPostRepository extends IBaseRepository<IPostDocument> {
    replace(postId: string, doc: IPostDocument): Promise<void>;
@@ -9,7 +9,10 @@ export interface IPostRepository extends IBaseRepository<IPostDocument> {
       userId: string,
       from: string | null,
       limit: number,
-      filter: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined
+      filter: {
+         visibility: (typeof PostVisibility)[keyof typeof PostVisibility] | undefined;
+         moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus] | undefined;
+      }
    ): Promise<{ posts: IPostDocument[]; from: string | null; hasMore: boolean }>;
 
    bulkUpdateCommentsCount(updates: { postId: string; delta: number }[]): Promise<{ ack: boolean }>;

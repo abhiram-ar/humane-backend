@@ -76,6 +76,14 @@ build:
         manual:
           - dest: .
             src: "src/**/*.ts"
+    - image: abhiramar/humane-moderation-service
+      context: moderation-service
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: "src/**/*.ts"
 
 deploy:
   kubectl: {}

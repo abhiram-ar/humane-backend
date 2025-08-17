@@ -12,7 +12,7 @@ export type IPostDocument = {
    attachmentStatus?: (typeof PostAttachmentStatus)[keyof typeof PostAttachmentStatus];
    processedAttachmentKey?: string | null;
 
-   moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus] | undefined; //TOTO: remove undfiend when mooderation service is implmented
+   moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus];
    moderationMetadata?: any;
 
    createdAt: Date;

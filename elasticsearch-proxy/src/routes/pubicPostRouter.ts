@@ -10,7 +10,7 @@ publicPostRouter.get(
    publicPostQueryController.getUserTimeline
 );
 
-publicPostRouter.get('/:postId', publicPostQueryController.postFullDetails);
+publicPostRouter.get('/:postId', AuthenticateWithNoError, publicPostQueryController.postFullDetails);
 
 publicPostRouter.get(
    '/:postId/comment',
