@@ -1,0 +1,83 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: protected-routes
+  namespace: default
+  annotations:
+    konghq.com/plugins: jwt-auth, jwt-claims-to-headers
+spec:
+  parentRefs:
+    - name: kong
+      namespace: kong # your Gateway is in kong namespace
+  hostnames:
+    - "localhost"
+  rules:
+    - matches:
+        - path:
+            type: PathMatchRegularExpression
+            value: "^/api/v[0-9]+/(admin|user|global)/.*"
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: user-srv
+          port: 3000
+
+    - matches:
+        - path:
+            type: PathMatchRegularExpression
+            value: "^/api/v[0-9]+/notification/.*"
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: notification-srv
+          port: 3000
+
+    - matches:
+        - path:
+            type: PathMatchRegularExpression
+            value: "^/api/v[0-9]+/query/.*"
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: elasticsearch-proxy-srv
+          port: 3000
+
+    - matches:
+        - path:
+            type: PathMatchRegularExpression
+            value: "^/api/v[0-9]+/feed/.*"
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: feed-srv
+          port: 3000
+
+    - matches:
+        - path:
+            type: PathMatchRegularExpression
+            value: "^/api/v[0-9]+/(post|comment|writer)/.*"
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: writer-srv
+          port: 3000
+
+    - matches:
+        - path:
+            type: PathMatchRegularExpression
+            value: "^/api/v[0-9]+/reward/.*"
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: reward-srv
+          port: 3000
+
+    - matches:
+        - path:
+            type: PathMatchRegularExpression
+            value: "^/api/v[0-9]+/chat/.*"
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: chat-srv
+          port: 3000

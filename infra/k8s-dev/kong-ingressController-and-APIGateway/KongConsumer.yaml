@@ -1,0 +1,5 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongConsumer
+metadata:
+  name: my-app
+username: my-app
