@@ -21,3 +21,8 @@ plugin: jwt
 config:
   key_claim_name: iss
   run_on_preflight: false
+  uri_param_names: # for socket.io handshakes
+    - token
+    - auth
+  header_names:
+    - authorization
