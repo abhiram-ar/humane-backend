@@ -13,14 +13,8 @@ const bootstrap = async () => {
       await connectDB();
 
       await connectKafkaProducer();
-      process.on('SIGINT', async () => {
-         await stopAllConsumer();
-         await disconnectKafkaProducer();
-      });
-      process.on('SIGTERM', async () => {
-         await stopAllConsumer();
-         await disconnectKafkaProducer();
-      });
+      process.on('SIGINT', cleanup);
+      process.on('SIGTERM', cleanup);
 
       app.listen(3000, () => {
          logger.info('writer server started on port 3000');
@@ -33,4 +27,10 @@ const bootstrap = async () => {
       logger.error(JSON.stringify(error, null, 2));
    }
 };
+
+const cleanup = () => {
+   stopAllConsumer();
+   disconnectKafkaProducer();
+};
+
 bootstrap();
