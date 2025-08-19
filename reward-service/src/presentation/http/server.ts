@@ -18,7 +18,7 @@ app.use(morgan('dev'));
 app.use(cookieParse());
 
 app.get('/api/v1/reward/health', (req, res) => {
-   res.status(200).json({ status: 'OK' });
+   res.status(200).json({ status: 'OK', headers: req.headers });
 });
 
 app.use('/api/v1/reward', router);
