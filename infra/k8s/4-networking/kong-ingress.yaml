@@ -4,25 +4,21 @@ kind: HTTPRoute
 metadata:
   name: user-public-routes
   annotations:
-    # This annotation applies the JWT plugin to all paths in this route
+    # this annotation applies cors to all path in this route
     konghq.com/plugins: cors
 spec:
   parentRefs:
     - name: kong
-      namespace: kong
+      namespace: kong # note: without specifying the gateway in otheraname space we will get route not found error from kong
       kind: Gateway
       group: gateway.networking.k8s.io
   hostnames:
-    - "localhost"
+    - "localhost" # this is optional
   rules:
     - matches:
         - path:
-            # This regex specifically matches only the auth-related endpoints
             type: RegularExpression
-            value: /api/v[0-9]+/user/auth/login/email
-        - path:
-            type: RegularExpression
-            value: /api/v[0-9]+/user/auth/signup
+            value: /api/v[0-9]+/user/auth(/.*)?$ # auth related endpoints
         - path:
             type: RegularExpression
             value: /api/v[0-9]+/global/auth/refresh
@@ -36,8 +32,7 @@ kind: HTTPRoute
 metadata:
   name: user-routes
   annotations:
-    # This annotation applies the JWT plugin to all paths in this route
-    konghq.com/plugins: require-jwt-auth,cors
+    konghq.com/plugins: require-jwt-auth,cors # order matters
 spec:
   parentRefs:
     - name: kong
