@@ -1,31 +1,33 @@
 import { conversationController, messsageController } from '@di/controller.container';
 import express from 'express';
-import { isAuthenticated } from 'humane-common';
+import { isAuthenticatedV2 } from 'humane-common';
 
 const chatRouter = express.Router();
 
-chatRouter.get('/recent', isAuthenticated, conversationController.getUserRecentConversations);
+chatRouter.get('/recent', isAuthenticatedV2, conversationController.getUserRecentConversations);
 
 chatRouter.post('/convo', conversationController.createConversation);
 
 chatRouter.get(
    '/convo/one-to-one',
-   isAuthenticated,
+   isAuthenticatedV2,
    conversationController.getOneToOneConversation
 );
 
 chatRouter.get(
    '/convo/one-to-one/messages',
-   isAuthenticated,
+   isAuthenticatedV2,
    messsageController.getOneToOneConvoMessages
 );
 
-chatRouter.get('/convo/search', isAuthenticated, conversationController.searchUserConvo);
+chatRouter.get('/convo/search', isAuthenticatedV2, conversationController.searchUserConvo);
 
+chatRouter.get('/convo/:convoId', isAuthenticatedV2, conversationController.getUserConvoById);
 
-chatRouter.get('/convo/:convoId', isAuthenticated, conversationController.getUserConvoById);
-
-chatRouter.patch("/convo/:convoId/clearedAt", isAuthenticated ,conversationController.setUserConvoClearedAt)
-
+chatRouter.patch(
+   '/convo/:convoId/clearedAt',
+   isAuthenticatedV2,
+   conversationController.setUserConvoClearedAt
+);
 
 export default chatRouter;
