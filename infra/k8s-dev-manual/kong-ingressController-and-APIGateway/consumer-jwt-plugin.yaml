@@ -1,0 +1,23 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongConsumer
+metadata:
+  name: humane-app
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: kong
+username: humane-app
+credentials:
+  - humane-app-jwt
+---
+# 3. JWT Plugin
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: require-jwt-auth
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: kong
+plugin: jwt
+config:
+  key_claim_name: iss
+  run_on_preflight: false

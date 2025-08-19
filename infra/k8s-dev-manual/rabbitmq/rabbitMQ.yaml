@@ -1,0 +1,17 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: humane-rabbitmq
+spec:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 800m
+      memory: 1Gi
+  persistence:
+    storageClassName: hostpath # for docker desktop, change this to appropriate storage class for the cloud
+    storage: 1Gi
+# note rabbitmq operater need to be deployed in the cluster for this deployemtn to work

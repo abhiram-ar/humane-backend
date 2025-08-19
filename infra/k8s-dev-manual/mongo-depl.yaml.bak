@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-depl
+spec:
+  selector:
+    matchLabels:
+      app: humane
+      service: mongo
+      type: db
+  template:
+    metadata:
+      labels:
+        app: humane
+        service: mongo
+        type: db
+    spec:
+      containers:
+      - name: mongo
+        image: mongo
+        volumeMounts:
+        - name: mongo-storage
+          mountPath: /data/db 
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes: 
+      - name: mongo-storage
+        persistentVolumeClaim: 
+          claimName: mongo-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-srv
+spec:
+  selector:
+    app: humane
+    service: mongo
+    type: db
+  ports:
+  - name: db
+    protocol: TCP
+    port: 27017
+    targetPort: 27017
