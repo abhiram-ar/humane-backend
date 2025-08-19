@@ -60,6 +60,7 @@ export class UserGoogleAuth implements IUserGoogleAuth {
       const tokenPayload: UserJWTTokenPayload = {
          userId: user.id,
          type: 'user',
+         iss: 'humane',
       };
 
       const accessToken = this._jetService.sign(

@@ -1,20 +1,24 @@
 import { publicCommentController, publicPostQueryController } from '@di/controllers';
 import { Router } from 'express';
-import { AuthenticateWithNoError, isAuthenticated } from 'humane-common';
+import { AuthenticateWithNoErrorV2, isAuthenticatedV2 } from 'humane-common';
 
 const publicPostRouter = Router();
 
 publicPostRouter.get(
    '/timeline/:targetUserId',
-   isAuthenticated,
+   isAuthenticatedV2,
    publicPostQueryController.getUserTimeline
 );
 
-publicPostRouter.get('/:postId', AuthenticateWithNoError, publicPostQueryController.postFullDetails);
+publicPostRouter.get(
+   '/:postId',
+   AuthenticateWithNoErrorV2,
+   publicPostQueryController.postFullDetails
+);
 
 publicPostRouter.get(
    '/:postId/comment',
-   AuthenticateWithNoError,
+   AuthenticateWithNoErrorV2,
    publicCommentController.getPostComments
 );
 

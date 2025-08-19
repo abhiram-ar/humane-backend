@@ -1,0 +1,23 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: cors
+plugin: cors
+config:
+  origins:
+    - http://localhost:5173 # Change in prod
+  methods:
+    - GET
+    - POST
+    - PUT
+    - PATCH
+    - DELETE
+    - OPTIONS
+  headers:
+    - Authorization
+    - Content-Type
+  credentials: true
+  max_age: 3600
+# why not attaching to a kong consumer
+# This approach is documented in the Kong Ingress Controller and plugin usage guides,
+# which show that plugins like CORS are commonly attached to Ingress, HTTPRoute, or Service

@@ -1,0 +1,15 @@
+# NOTE: this only works in enterprise version of kong
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: jwt-minimal-headers
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: kong
+plugin: request-transformer
+config:
+  add:
+    headers:
+      - "X-JWT-Iss:$(jwt_claims.iss)"
+      - "X-JWT-Exp:$(jwt_claims.exp)"
+# Request Transformer plugin (to pull fields from JWT claims and inject them into headers)

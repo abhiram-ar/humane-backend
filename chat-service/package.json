@@ -17,7 +17,7 @@
       "cors": "^2.8.5",
       "date-fns": "^4.1.0",
       "express": "^5.1.0",
-      "humane-common": "^1.0.94",
+      "humane-common": "^1.0.106",
       "kafkajs": "^2.2.4",
       "mongoose": "^8.15.1",
       "morgan": "^1.10.0",

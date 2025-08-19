@@ -1,20 +1,19 @@
 import { userRelationshipController } from '@di/controller/userController.container';
-import { authorizedRoles } from '@presentation/middlewares/authorization.middleware';
-import { isAuthenticated } from '@presentation/middlewares/isAuthenticated.middleware';
 import express from 'express';
+import { authorizedRoles, isAuthenticatedV2 } from 'humane-common';
 
 const relationshipRouter = express.Router();
 
 relationshipRouter.get(
    '/rel-status',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userRelationshipController.getRelationshipStatus
 );
 
 relationshipRouter.get(
    '/friend-req/sent',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userRelationshipController.getUserSendFriendRequestList
 );
@@ -22,37 +21,37 @@ relationshipRouter.get(
 // ---- friend-req
 relationshipRouter.get(
    '/friend-req',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userRelationshipController.getFriendRequestList
 );
 relationshipRouter.get(
    '/friend-req/count',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userRelationshipController.getFriendsRequestCount
 );
 relationshipRouter.post(
    '/friend-req',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userRelationshipController.sendFriendRequest
 );
 relationshipRouter.patch(
    '/friend-req/status',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userRelationshipController.acceptFriendRequest
 );
 relationshipRouter.delete(
    '/friend-req',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userRelationshipController.cancelFriendRequest
 );
 relationshipRouter.delete(
    '/friend-req/decline/:targetUserId',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userRelationshipController.declineFriendReq
 );
@@ -60,33 +59,33 @@ relationshipRouter.delete(
 //-----friend
 relationshipRouter.get(
    '/friend',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userRelationshipController.getFriendList
 );
 relationshipRouter.delete(
    '/friend/:targetUserId',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userRelationshipController.removeFriendship
 );
 
 relationshipRouter.get(
    '/friend/count',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userRelationshipController.getFriendsCount
 );
 
 relationshipRouter.get(
    '/friend/mutual',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userRelationshipController.getMutualFriendsList
 );
 relationshipRouter.get(
    '/friend/mutual/count',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userRelationshipController.getMutualFriendsCount
 );

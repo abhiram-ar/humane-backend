@@ -7,13 +7,12 @@ import cors from 'cors';
 import adminAuthRouter from './routes/adminAuth.router';
 import globalRefreshRouter from './routes/globalRefresh.router';
 import adminUserManagementRouter from './routes/adminUserManagement.router';
-import { isAuthenticated } from './middlewares/isAuthenticated.middleware';
-import { authorizedRoles } from './middlewares/authorization.middleware';
 import userProfileRouter from './routes/userProfile.router';
 import { seedUser } from 'test/seedController';
 import userRelationshipRouter from './routes/userRelationship.router';
 import { sendBulkFriendReq } from 'test/sendBulkFriendReq';
 import internalRouter from './routes/internal.router';
+import { authorizedRoles, isAuthenticatedV2 } from 'humane-common';
 
 const app = express();
 
@@ -42,11 +41,11 @@ app.use('/api/v1/admin/auth', adminAuthRouter);
 
 app.use('/api/v1/user/social', userRelationshipRouter);
 
-app.use('/api/v1/user/profile', isAuthenticated, authorizedRoles('user'), userProfileRouter);
+app.use('/api/v1/user/profile', isAuthenticatedV2, authorizedRoles('user'), userProfileRouter);
 
 app.use(
    '/api/v1/admin/manage/user',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('admin'),
    adminUserManagementRouter
 );

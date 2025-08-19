@@ -1,19 +1,19 @@
 import { userNotificationController } from '@di/controller.container';
 import express from 'express';
-import { authorizedRoles, isAuthenticated } from 'humane-common';
+import { authorizedRoles, isAuthenticatedV2 } from 'humane-common';
 
 const userNotificationRouter = express.Router();
 
 userNotificationRouter.get(
    '/',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userNotificationController.getRecentNotifications
 );
 
 userNotificationRouter.patch(
    '/isRead',
-   isAuthenticated,
+   isAuthenticatedV2,
    authorizedRoles('user'),
    userNotificationController.markAsReadFrom
 );

@@ -1,0 +1,198 @@
+# http-route-user-public.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: user-public-routes
+  annotations:
+    # this annotation applies cors to all path in this route
+    konghq.com/plugins: cors
+spec:
+  parentRefs:
+    - name: kong
+      namespace: kong # note: without specifying the gateway in otheraname space we will get route not found error from kong
+      kind: Gateway
+      group: gateway.networking.k8s.io
+  hostnames:
+    - "localhost" # this is optional
+  rules:
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/v[0-9]+/user/auth(/.*)?$ # auth related endpoints
+        - path:
+            type: RegularExpression
+            value: /api/v[0-9]+/admin/auth(/.*)?$ # auth related endpoints
+        - path:
+            type: RegularExpression
+            value: /api/v[0-9]+/global/auth/refresh
+      backendRefs:
+        - name: user-srv
+          port: 3000
+---
+# Route for User, Admin, and Global services
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: user-routes
+  annotations:
+    konghq.com/plugins: require-jwt-auth,cors # order matters
+spec:
+  parentRefs:
+    - name: kong
+      namespace: kong
+      kind: Gateway
+      group: gateway.networking.k8s.io
+  hostnames:
+    - "localhost"
+  rules:
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/v[0-9]+/(admin|user|global)/.*
+      backendRefs:
+        - name: user-srv
+          port: 3000
+---
+# --------------------------------route for notification service-------------------------------------
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: notification-routes
+  annotations:
+    konghq.com/plugins: require-jwt-auth,cors
+spec:
+  parentRefs:
+    - name: kong
+      namespace: kong
+      kind: Gateway
+      group: gateway.networking.k8s.io
+  hostnames:
+    - "localhost"
+  rules:
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/v[0-9]+/notification/.*
+      backendRefs:
+        - name: notification-srv
+          port: 3000
+---
+# ------------------------------------ route for Elasticsearch Proxy ---------------------------------
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: query-routes
+  annotations:
+    konghq.com/plugins: require-jwt-auth,cors
+spec:
+  parentRefs:
+    - name: kong
+      namespace: kong
+      kind: Gateway
+      group: gateway.networking.k8s.io
+  hostnames:
+    - "localhost"
+  rules:
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/v[0-9]+/query/.*
+      backendRefs:
+        - name: elasticsearch-proxy-srv
+          port: 3000
+---
+# ---------------------------------------route for feed service -----------------------------------------
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: feed-routes
+  annotations:
+    konghq.com/plugins: require-jwt-auth,cors
+spec:
+  parentRefs:
+    - name: kong
+      namespace: kong
+      kind: Gateway
+      group: gateway.networking.k8s.io
+  hostnames:
+    - "localhost"
+  rules:
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/v[0-9]+/feed/.*
+      backendRefs:
+        - name: feed-srv
+          port: 3000
+---
+# --------------------------------------- route for Writer service -----------------------------------------
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: writer-routes
+  annotations:
+    konghq.com/plugins: require-jwt-auth,cors
+spec:
+  parentRefs:
+    - name: kong
+      namespace: kong
+      kind: Gateway
+      group: gateway.networking.k8s.io
+  hostnames:
+    - "localhost"
+  rules:
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/v[0-9]+/(post|comment|writer)/.*
+      backendRefs:
+        - name: writer-srv
+          port: 3000
+---
+# --------------------------------------- route for Reward service -------------------------------------------
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: reward-routes
+  annotations:
+    konghq.com/plugins: require-jwt-auth,cors
+spec:
+  parentRefs:
+    - name: kong
+      namespace: kong
+      kind: Gateway
+      group: gateway.networking.k8s.io
+  hostnames:
+    - "localhost"
+  rules:
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/v[0-9]+/reward/.*
+      backendRefs:
+        - name: reward-srv
+          port: 3000
+---
+# ----------------------------------------- route for Chat service --------------------------------------------
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: chat-routes
+  annotations:
+    konghq.com/plugins: require-jwt-auth,cors
+spec:
+  parentRefs:
+    - name: kong
+      namespace: kong
+      kind: Gateway
+      group: gateway.networking.k8s.io
+  hostnames:
+    - "localhost"
+  rules:
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/v[0-9]+/chat/.*
+      backendRefs:
+        - name: chat-srv
+          port: 3000

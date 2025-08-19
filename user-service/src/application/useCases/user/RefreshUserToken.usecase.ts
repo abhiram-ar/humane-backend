@@ -43,6 +43,7 @@ export class RefreshUserAccessToken implements IRefreshUserAccessToken {
       let newTokenPaylod: UserJWTTokenPayload = {
          userId: userStatus.id,
          type: 'user',
+         iss: 'humane'
       };
 
       const newAccessToken = this._jwtService.sign(

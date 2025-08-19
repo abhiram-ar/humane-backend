@@ -1,15 +1,6 @@
 import { UnAuthenticatedError } from '@application/errors/UnAuthenticatedError';
-import { JWTTokenPaylod } from '@application/types/JWTTokenPayload.type';
 import { verifyAccessToken } from '@di/usecase/commonUsercase.container';
 import { Request, Response, NextFunction } from 'express';
-
-declare global {
-   namespace Express {
-      interface Request {
-         user?: JWTTokenPaylod;
-      }
-   }
-}
 
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
    const authHeader = req.headers.authorization;
