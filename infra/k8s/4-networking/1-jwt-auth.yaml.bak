@@ -1,0 +1,10 @@
+# 2-jwt-plugin.yaml
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: require-jwt-auth
+plugin: jwt
+config:
+  # This configuration ensures that Kong looks for the JWT in the standard
+  # Authorization: Bearer <token> header.
+  key_claim_name: iss
