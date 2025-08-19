@@ -40,6 +40,7 @@ export class UserEmailLogin implements IUserEmailLogin {
       const jwtTokenPaylod: UserJWTTokenPayload = {
          userId: user.id,
          type: 'user',
+         iss: 'humane',
       };
 
       const accessToken = this._jwtService.sign(

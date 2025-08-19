@@ -35,6 +35,7 @@ export class AdminEmailLogin implements IAdminEmailLogin {
       const jwtTokenPaylod: AdminJWTTokenPaylod = {
          adminId: admin.id,
          type: 'admin',
+         iss: 'humane',
       };
 
       const accessToken = this._jwtService.sign(

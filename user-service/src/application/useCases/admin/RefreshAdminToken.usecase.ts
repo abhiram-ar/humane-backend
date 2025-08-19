@@ -25,6 +25,7 @@ export class RefreshAdminAccessToken implements IRefreshAdminAccessToken {
       let newTokenPaylod: AdminJWTTokenPaylod = {
          adminId: verifedTokenPayload.adminId,
          type: 'admin',
+         iss: 'humane',
       };
 
       const newAccessToken = this._jwtService.sign(
