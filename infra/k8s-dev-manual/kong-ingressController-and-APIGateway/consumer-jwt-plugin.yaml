@@ -20,6 +20,8 @@ metadata:
 plugin: jwt
 config:
   key_claim_name: iss
+  claims_to_verify:
+    - exp
   run_on_preflight: false
   uri_param_names: # for socket.io handshakes
     - token
