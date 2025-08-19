@@ -23,6 +23,34 @@ spec:
       #     envFrom:
       #       - secretRef:
       #           name: reward-pod-secret
+      initContainers: # TODO: if in production a seprate instance of postgres is provided for reward service, remove this init container
+        - name: db-init
+          image: postgres:17.5
+          command:
+            - /bin/bash
+            - -c
+            - |
+              until pg_isready -h user-postgres -p 5432; do
+                echo "Waiting for postgres to be ready..."
+                sleep 2
+              done
+              echo "PostgreSQL is ready!"
+
+              # Create the reward-db database if it doesn't exist
+              PGPASSWORD=$POSTGRES_PASSWORD psql -h user-postgres -U postgres -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'reward-db'" | grep -q 1 || PGPASSWORD=$POSTGRES_PASSWORD psql -h user-postgres -U postgres -d postgres -c "CREATE DATABASE \"reward-db\""
+              echo "Database reward-db is ready!"
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: user-postgres-secret
+                  key: POSTGRES_PASSWORD
+        - name: prisma-migrate
+          image: abhiramar/humane-reward-service
+          command: ["npx", "prisma", "migrate", "deploy"]
+          envFrom:
+            - secretRef:
+                name: reward-pod-secret
       containers:
         - name: reward-server
           image: abhiramar/humane-reward-service

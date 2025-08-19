@@ -16,13 +16,13 @@ spec:
         service: user
         type: web-server
     spec:
-      # initContainers:
-      #   - name: prisma-migrate
-      #     image: abhiramar/userservice
-      #     command: ["npx", "prisma", "migrate", "deploy"]
-      #     envFrom:
-      #       - secretRef:
-      #           name: user-pod-secret
+      initContainers:
+        - name: prisma-migrate
+          image: abhiramar/userservice
+          command: ["npx", "prisma", "migrate", "deploy"]
+          envFrom:
+            - secretRef:
+                name: user-pod-secret
       containers:
         - name: user-server
           image: abhiramar/userservice
