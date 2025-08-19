@@ -17,19 +17,19 @@ const bootstrap = async () => {
       });
 
       await startAllConsumers();
-      process.on('SIGINT', () => {
-         esClient.close();
-         stopAllConsumer();
-      });
-      process.on('SIGTERM', () => {
-         esClient.close();
-         stopAllConsumer();
-      });
+      process.on('SIGINT', cleanup);
+      process.on('SIGTERM', cleanup);
+
       await userRepository.pingES();
       logger.info('es proxy full operational');
    } catch (error) {
       logger.error('error starting es-proxy');
    }
+};
+
+const cleanup = () => {
+   esClient.close();
+   stopAllConsumer();
 };
 
 bootstrap();
