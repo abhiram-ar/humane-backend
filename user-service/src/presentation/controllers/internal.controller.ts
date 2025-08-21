@@ -1,12 +1,12 @@
 import { GenericError } from '@application/errors/GenericError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
-import { GetFriends } from '@application/useCases/friendship/GetFriends.usercase';
-import { GetRelationShipStatus } from '@application/useCases/friendship/GetRelationshipStatus';
 import { IsHotUser } from '@application/useCases/user/isHotUser.usecase';
 import {
    GetRelationShipStatusInputDTO,
    getRelationshipStatusSchema,
 } from '@dtos/friendship/GetRelationshipStatus.dto';
+import { IGetFriends } from '@ports/usecases/friendship/IGetFriends.usercase';
+import { IGetRelationShipStatus } from '@ports/usecases/friendship/IGetRelationshipStatus';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
@@ -14,8 +14,8 @@ import { Request, Response, NextFunction } from 'express';
 export class InternalController {
    constructor(
       private readonly _isHotUser: IsHotUser,
-      private readonly _getFriends: GetFriends,
-      private readonly _getRelationshipStatus: GetRelationShipStatus
+      private readonly _getFriends: IGetFriends,
+      private readonly _getRelationshipStatus: IGetRelationShipStatus
    ) {}
 
    getAllFriends = async (req: Request, res: Response, next: NextFunction) => {

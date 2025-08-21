@@ -1,4 +1,3 @@
-import { OTP } from '@domain/services/otpGenerator';
 import { IJWTService } from '@ports/IJWTService';
 import { IUserRepository } from '@ports/IUserRepository';
 import { IHashService } from '@ports/IHashService';
@@ -14,12 +13,13 @@ import {
 } from 'humane-common';
 import { EventBusError } from '@application/errors/EventbusError';
 import { ISignupUser } from '@ports/usecases/user/ISignupUser.usecase';
+import { IOTP } from '@domain/interfaces/IOtpGenerator';
 
 export class SignupUser implements ISignupUser {
    constructor(
       private readonly _userRepository: IUserRepository,
       private readonly _JWTService: IJWTService,
-      private readonly _OTPService: OTP,
+      private readonly _OTPService: IOTP,
       private readonly _hashService: IHashService,
       private readonly _eventPublisher: IEventPublisher
    ) {}

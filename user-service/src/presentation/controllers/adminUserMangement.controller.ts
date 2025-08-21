@@ -1,15 +1,15 @@
-import { AdminUpdateUserBlockStatus } from '@application/useCases/admin/BlockUser.usecase';
-import { AdminGetUserList } from '@application/useCases/admin/GetUserList.usecase';
 import { updateuserblockStatusSchema } from '@dtos/admin/updateUserBlockStatus.dto';
 import { GetUserDTO, getUsersForAdminSchema } from '@dtos/admin/getUsers.dto';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
 import { Request, Response, NextFunction } from 'express';
 import { HttpStatusCode } from 'axios';
+import { IAdminGetUserList } from '@ports/usecases/admin/IGetUserList.usecase';
+import { IAdminUpdateUserBlockStatus } from '@ports/usecases/admin/IBlockUser.usecase';
 
 export class AdminUserManagementController {
    constructor(
-      private readonly _getUserList: AdminGetUserList,
-      private readonly _updateUserBlockStatus: AdminUpdateUserBlockStatus
+      private readonly _getUserList: IAdminGetUserList,
+      private readonly _updateUserBlockStatus: IAdminUpdateUserBlockStatus
    ) {}
 
    getUsers = async (req: Request, res: Response, next: NextFunction) => {

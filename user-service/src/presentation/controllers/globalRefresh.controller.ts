@@ -3,19 +3,19 @@ import { UnAuthenticatedError } from '@application/errors/UnAuthenticatedError';
 import { UserBlockedError } from '@application/errors/UserBlockedError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { JWTTokenPaylod } from '@application/types/JWTTokenPayload.type';
-import { RefreshAdminAccessToken } from '@application/useCases/admin/RefreshAdminToken.usecase';
-import { RefreshUserAccessToken } from '@application/useCases/user/RefreshUserToken.usecase';
 import { ENV } from '@config/env';
 import { logger } from '@config/logger';
 import { IJWTService } from '@ports/IJWTService';
+import { IRefreshAdminAccessToken } from '@ports/usecases/admin/IRefreshAdminToken.usecase';
+import { IRefreshUserAccessToken } from '@ports/usecases/user/IRefreshUserToken.usecase';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 
 export class GlobalRefreshController {
    constructor(
       private readonly _jwtService: IJWTService,
-      private readonly _refreshAdminToken: RefreshAdminAccessToken,
-      private readonly _refreshUserToken: RefreshUserAccessToken
+      private readonly _refreshAdminToken: IRefreshAdminAccessToken,
+      private readonly _refreshUserToken: IRefreshUserAccessToken
    ) {}
 
    refresh = async (req: Request, res: Response, next: NextFunction) => {
