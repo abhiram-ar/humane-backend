@@ -36,7 +36,8 @@ export class UserEmailLogin implements IUserEmailLogin {
          throw new PasswordError('password does not match');
       }
 
-      // create JWT
+      await this._userRepository.updateLastLoginedAt(user.id);
+
       const jwtTokenPaylod: UserJWTTokenPayload = {
          userId: user.id,
          type: 'user',

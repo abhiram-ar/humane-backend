@@ -6,6 +6,15 @@ import { IUserRepository } from '@ports/IUserRepository';
 import db from '../prisma-client';
 
 export class PostresUserRepository implements IUserRepository {
+   updateLastLoginedAt = async (userId: string, time: Date = new Date()): Promise<void> => {
+      // this utility is not of high priority so gradecully handling errors
+
+      try {
+         await db.user.update({ where: { id: userId }, data: { lastLoginTime: time } });
+      } catch (error) {
+         throw new Error('Method not implemented.');
+      }
+   };
    create = async (dto: createUserDTO): Promise<Omit<User, 'passwordHash'>> => {
       const res = await db.user.create({
          data: {

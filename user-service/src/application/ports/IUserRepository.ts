@@ -42,4 +42,6 @@ export interface IUserRepository extends IBaseRepository {
    ): Promise<{ updatedCoverPhotoKey: string } | null>;
 
    isHotUser(userId: string): Promise<boolean | null>;
+
+   updateLastLoginedAt(userId: string): Promise<void>;
 }
