@@ -22,8 +22,9 @@ import { IRefreshUserAccessToken } from '@ports/usecases/user/IRefreshUserToken.
 import { IForgotPassword } from '@ports/usecases/user/IForgotPassword.usecase';
 import { IRecoverPassword } from '@ports/usecases/user/IRecoverPassword.usecase';
 import { IUserGoogleAuth } from '@ports/usecases/user/IGoogleAuth.usecase';
+import { IUserAuthController } from '@presentation/interface/IUserAuth.controller';
 
-export class UserAuthController {
+export class UserAuthController implements IUserAuthController {
    constructor(
       private readonly _singupUser: ISignupUser,
       private readonly _verifyUser: IVerifyUser,
@@ -35,7 +36,7 @@ export class UserAuthController {
       private readonly _userGooglgAuth: IUserGoogleAuth
    ) {}
 
-   signup = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+   signup = async (req: Request, res: Response, next: NextFunction) => {
       try {
          const parsed = signupUserSchema.safeParse(req.body);
 
@@ -53,7 +54,7 @@ export class UserAuthController {
       }
    };
 
-   verify = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+   verify = async (req: Request, res: Response, next: NextFunction) => {
       try {
          const parsed = verifyUserSchema.safeParse(req.body);
          if (!parsed.success) {
@@ -70,7 +71,7 @@ export class UserAuthController {
       }
    };
 
-   login = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+   login = async (req: Request, res: Response, next: NextFunction) => {
       try {
          const parsed = userLoginSchema.safeParse(req.body);
          if (!parsed.success) {
@@ -96,7 +97,7 @@ export class UserAuthController {
       }
    };
 
-   refreshAccessToken = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+   refreshAccessToken = async (req: Request, res: Response, next: NextFunction) => {
       try {
          const { refreshJWT } = req.cookies;
          if (!refreshJWT) {

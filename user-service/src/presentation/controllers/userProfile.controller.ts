@@ -13,8 +13,9 @@ import { IUpdateUserProfile } from '@ports/usecases/user/IUpdateUserProfile';
 import { IUpdateUserAvatar } from '@ports/usecases/user/IUpdateUserAvatar';
 import { IUpdateUserCoverPhoto } from '@ports/usecases/user/IUpdateUserCoverPhoto';
 import { IGeneratePresignedURL } from '@ports/usecases/user/IGeneratePresignedURL';
+import { IUserProfileController } from '@presentation/interface/IUserProfile.controller';
 
-export class UserProfileController {
+export class UserProfileController implements IUserProfileController {
    constructor(
       private readonly _getCurrentUserProfile: IGetCurrentUserProfile,
       private readonly _updateUserProfile: IUpdateUserProfile,

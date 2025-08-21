@@ -8,10 +8,11 @@ import { logger } from '@config/logger';
 import { IJWTService } from '@ports/IJWTService';
 import { IRefreshAdminAccessToken } from '@ports/usecases/admin/IRefreshAdminToken.usecase';
 import { IRefreshUserAccessToken } from '@ports/usecases/user/IRefreshUserToken.usecase';
+import { IGlobalRefreshController } from '@presentation/interface/IGlobalRefresh.controller';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 
-export class GlobalRefreshController {
+export class GlobalRefreshController implements IGlobalRefreshController {
    constructor(
       private readonly _jwtService: IJWTService,
       private readonly _refreshAdminToken: IRefreshAdminAccessToken,

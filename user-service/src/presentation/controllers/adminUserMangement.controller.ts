@@ -5,8 +5,9 @@ import { Request, Response, NextFunction } from 'express';
 import { HttpStatusCode } from 'axios';
 import { IAdminGetUserList } from '@ports/usecases/admin/IGetUserList.usecase';
 import { IAdminUpdateUserBlockStatus } from '@ports/usecases/admin/IBlockUser.usecase';
+import { IAdminUserManagementController } from '@presentation/interface/IAdminUserMangement.controller';
 
-export class AdminUserManagementController {
+export class AdminUserManagementController implements IAdminUserManagementController {
    constructor(
       private readonly _getUserList: IAdminGetUserList,
       private readonly _updateUserBlockStatus: IAdminUpdateUserBlockStatus

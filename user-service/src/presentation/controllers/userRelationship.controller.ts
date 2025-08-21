@@ -51,8 +51,9 @@ import { IGetRelationShipStatus } from '@ports/usecases/friendship/IGetRelations
 import { IMutualFriends } from '@ports/usecases/friendship/IMutualFriends.usecase';
 import { IRemoveFriendship } from '@ports/usecases/friendship/IRemoveFriendship.usecase';
 import { IGetUserSendFriendRequestList } from '@ports/usecases/friendship/IGetUserSendFriendRequestList.usercase';
+import { IUserRelationshipController } from '@presentation/interface/IUserRelationship.controller';
 
-export class UserRelationshipController {
+export class UserRelationshipController implements IUserRelationshipController {
    constructor(
       private readonly _friendRequest: IFriendRequest,
       private readonly _getFriendRequest: IGetFriendRequest,

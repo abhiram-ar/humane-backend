@@ -8,10 +8,11 @@ import {
 import { IGetFriends } from '@ports/usecases/friendship/IGetFriends.usercase';
 import { IGetRelationShipStatus } from '@ports/usecases/friendship/IGetRelationshipStatus';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
+import { IInternalController } from '@presentation/interface/IInternal.controller';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 
-export class InternalController {
+export class InternalController implements IInternalController {
    constructor(
       private readonly _isHotUser: IsHotUser,
       private readonly _getFriends: IGetFriends,
