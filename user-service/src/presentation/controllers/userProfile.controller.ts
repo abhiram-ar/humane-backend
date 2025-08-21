@@ -1,5 +1,4 @@
 import { AuthorizationError } from '@application/errors/AuthorizationError';
-import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { generatePresignedURLInputSchema } from '@dtos/user/generatePreSignedURL.input.dto';
 import { getCurrentAnonProfileSchema } from '@dtos/user/getCurrentAnonProfile.input.dto';
 import { updateUserCoverPhotoSchema } from '@dtos/user/updateUserCoverPhoto.input.dto';
@@ -27,7 +26,7 @@ export class UserProfileController implements IUserProfileController {
    getProfile = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user') {
-            throw new AuthorizationError('only user can user this resource');
+            throw new AuthorizationError();
          }
 
          const parsed = getCurrentAnonProfileSchema.safeParse({
@@ -50,12 +49,8 @@ export class UserProfileController implements IUserProfileController {
 
    updateProfile = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         if (req.user?.type !== 'user') {
-            throw new AuthorizationError('only user can user this resource');
-         }
-
-         if (!req.user.userId) {
-            throw new UserNotFoundError('userId is missing');
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new AuthorizationError();
          }
 
          const parsed = updateUserProfileSchema.safeParse(req.body);
@@ -94,14 +89,11 @@ export class UserProfileController implements IUserProfileController {
 
    updateAvatarPhoto = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         if (req.user?.type !== 'user') {
-            throw new AuthorizationError('only user can user this resource');
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new AuthorizationError();
          }
 
          const userId = req.user.userId;
-         if (!userId) {
-            throw new UserNotFoundError('no userId in resolved JWT bearer');
-         }
 
          const parsed = updateUserAvatarSchema.safeParse(req.body);
          if (!parsed.success) {
@@ -126,14 +118,11 @@ export class UserProfileController implements IUserProfileController {
 
    updateCoverPhoto = async (req: Request, res: Response, next: NextFunction) => {
       try {
-         if (req.user?.type !== 'user') {
-            throw new AuthorizationError('only anon can user this resource');
+         if (req.user?.type !== 'user' || !req.user.userId) {
+            throw new AuthorizationError();
          }
 
          const userId = req.user.userId;
-         if (!userId) {
-            throw new UserNotFoundError('no userId in resolved JWT bearer');
-         }
 
          const parsed = updateUserCoverPhotoSchema.safeParse(req.body);
          if (!parsed.success) {

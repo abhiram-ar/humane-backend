@@ -5,7 +5,10 @@ import { ZodValidationError } from '@presentation/errors/ZodValidationError';
 import { userLoginSchema } from '@dtos/user/userLogin.dto';
 import { JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 import { ENV } from '@config/env';
-import { UnAuthenticatedError } from '@application/errors/UnAuthenticatedError';
+import {
+   UnAuthenticatedError,
+   UnAuthenticatedErrorMsgs,
+} from '@application/errors/UnAuthenticatedError';
 import { JWTRefreshError } from '@application/errors/JWTRefreshError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { UserBlockedError } from '@application/errors/UserBlockedError';
@@ -101,7 +104,7 @@ export class UserAuthController implements IUserAuthController {
       try {
          const { refreshJWT } = req.cookies;
          if (!refreshJWT) {
-            throw new UnAuthenticatedError('refresh token not found in cookies');
+            throw new UnAuthenticatedError(UnAuthenticatedErrorMsgs.COOKIE_REFRESH_TOKEN_NOT_FOUND);
          }
 
          const { newAccessToken } = await this._refreshUserAccessToken.execute(refreshJWT);
@@ -130,7 +133,7 @@ export class UserAuthController implements IUserAuthController {
       try {
          const { refreshJWT } = req.cookies;
          if (!refreshJWT) {
-            throw new UnAuthenticatedError('refresh token not found in cookies');
+            throw new UnAuthenticatedError(UnAuthenticatedErrorMsgs.COOKIE_REFRESH_TOKEN_NOT_FOUND);
          }
 
          res.clearCookie('refreshJWT', {

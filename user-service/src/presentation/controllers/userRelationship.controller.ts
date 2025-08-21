@@ -291,7 +291,7 @@ export class UserRelationshipController implements IUserRelationshipController {
    getFriendList = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
-            throw new UnAuthenticatedError('No userId in auth header');
+            throw new UnAuthenticatedError();
          }
          const { size = 10, createdAt, lastId, targetUserId } = req.query;
 

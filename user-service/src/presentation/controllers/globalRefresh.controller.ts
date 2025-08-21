@@ -1,5 +1,8 @@
 import { JWTRefreshError } from '@application/errors/JWTRefreshError';
-import { UnAuthenticatedError } from '@application/errors/UnAuthenticatedError';
+import {
+   UnAuthenticatedError,
+   UnAuthenticatedErrorMsgs,
+} from '@application/errors/UnAuthenticatedError';
 import { UserBlockedError } from '@application/errors/UserBlockedError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { JWTTokenPaylod } from '@application/types/JWTTokenPayload.type';
@@ -23,7 +26,7 @@ export class GlobalRefreshController implements IGlobalRefreshController {
       try {
          const { refreshJWT } = req.cookies;
          if (!refreshJWT) {
-            throw new UnAuthenticatedError('refresh token not found in cookies');
+            throw new UnAuthenticatedError(UnAuthenticatedErrorMsgs.COOKIE_REFRESH_TOKEN_NOT_FOUND);
          }
 
          let payload: JWTTokenPaylod;
