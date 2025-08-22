@@ -6,11 +6,13 @@ import { HttpStatusCode } from 'axios';
 import { IAdminGetUserList } from '@ports/usecases/admin/IGetUserList.usecase';
 import { IAdminUpdateUserBlockStatus } from '@ports/usecases/admin/IBlockUser.usecase';
 import { IAdminUserManagementController } from '@presentation/interface/IAdminUserMangement.controller';
+import { IUsersStat } from '@ports/usecases/admin/IUserStats.usecase';
 
 export class AdminUserManagementController implements IAdminUserManagementController {
    constructor(
       private readonly _getUserList: IAdminGetUserList,
-      private readonly _updateUserBlockStatus: IAdminUpdateUserBlockStatus
+      private readonly _updateUserBlockStatus: IAdminUpdateUserBlockStatus,
+      private readonly _userStats: IUsersStat
    ) {}
 
    getUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -52,6 +54,15 @@ export class AdminUserManagementController implements IAdminUserManagementContro
          res.status(HttpStatusCode.Ok).json({
             data: { user: updatedUser },
          });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getUserstats = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const result = await this._userStats.execute();
+         res.status(HttpStatusCode.Ok).json({ data: result });
       } catch (error) {
          next(error);
       }

@@ -5,6 +5,7 @@ import {
    adminUpdateUserBlockStatus,
    createAdmin,
    refreshAccessToken,
+   userStats,
 } from '@di/usecase/adminUsercase.container';
 import { AdminUserManagementController } from '@presentation/controllers/adminUserMangement.controller';
 
@@ -16,5 +17,6 @@ export const adminAuthController = new AdminAuthController(
 
 export const adminUserManagementController = new AdminUserManagementController(
    adminGetUserList,
-   adminUpdateUserBlockStatus
+   adminUpdateUserBlockStatus,
+   userStats
 );

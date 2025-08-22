@@ -5,5 +5,6 @@ const adminUserManagementRouter = Router();
 
 adminUserManagementRouter.get('/list', adminUserManagementController.getUsers);
 adminUserManagementRouter.patch('/block-status', adminUserManagementController.updateBlockStatus);
+adminUserManagementRouter.get('/stats', adminUserManagementController.getUserstats);
 
 export default adminUserManagementRouter;

@@ -6,9 +6,45 @@ import { IUserRepository } from '@ports/IUserRepository';
 import db from '../prisma-client';
 
 export class PostresUserRepository implements IUserRepository {
+   findUsersLoggedInXTime(startTimeInMs: number): Promise<number> {
+      const startTime = new Date();
+      startTime.setTime(startTime.getTime() - startTimeInMs);
+
+      const res = db.user.count({ where: { lastLoginTime: { gt: startTime } } });
+      return res;
+   }
+   findTotalUsers = async (endTime: Date): Promise<number> => {
+      return await db.user.count({ where: { createdAt: { lte: endTime } } });
+   };
+   userSingupsHistory = async (): Promise<{ month: string; count: number }[]> => {
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+
+      const results = [];
+
+      for (let i = 0; i < 6; i++) {
+         const month = new Date(currentYear, currentDate.getMonth() - i, 1);
+         const nextMonth = new Date(currentYear, currentDate.getMonth() - i + 1, 1);
+
+         const count = await db.user.count({
+            where: {
+               createdAt: {
+                  gte: month,
+                  lt: nextMonth,
+               },
+            },
+         });
+
+         results.unshift({
+            month: month.toLocaleString('default', { month: 'long' }),
+            count: count,
+         });
+      }
+
+      return results;
+   };
    updateLastLoginedAt = async (userId: string, time: Date = new Date()): Promise<void> => {
       // this utility is not of high priority so gradecully handling errors
-
       try {
          await db.user.update({ where: { id: userId }, data: { lastLoginTime: time } });
       } catch (error) {

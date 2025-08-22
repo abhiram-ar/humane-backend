@@ -44,4 +44,10 @@ export interface IUserRepository extends IBaseRepository {
    isHotUser(userId: string): Promise<boolean | null>;
 
    updateLastLoginedAt(userId: string): Promise<void>;
+
+   findUsersLoggedInXTime(startTimeInMs: number): Promise<number>;
+
+   findTotalUsers(endTime: Date): Promise<number>;
+
+   userSingupsHistory(): Promise<{ month: string; count: number }[]>;
 }

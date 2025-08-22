@@ -3,6 +3,7 @@ import { AdminUpdateUserBlockStatus } from '@application/useCases/admin/BlockUse
 import { CreateAdmin } from '@application/useCases/admin/createNewAdmin.usercase';
 import { AdminGetUserList } from '@application/useCases/admin/GetUserList.usecase';
 import { RefreshAdminAccessToken } from '@application/useCases/admin/RefreshAdminToken.usecase';
+import { UsersStat } from '@application/useCases/admin/UserStats.usecase';
 import { adminRepository, userRepository } from '@di/repository.container';
 import {
    bcryptHashService,
@@ -23,3 +24,5 @@ export const adminUpdateUserBlockStatus = new AdminUpdateUserBlockStatus(
    userRepository,
    kafkaPubliserService
 );
+
+export const userStats = new UsersStat(userRepository);
