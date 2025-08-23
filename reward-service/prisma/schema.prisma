@@ -32,6 +32,11 @@ model Rewards {
   @@index([actorId, idempotencyKey])
 }
 
+model RewardConfig {
+  type   RewardType @id
+  amount Int
+}
+
 enum RewardType {
   HELPFUL_COMMENT
   CHAT_CHECKIN
