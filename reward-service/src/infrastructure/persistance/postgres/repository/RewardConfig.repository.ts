@@ -3,6 +3,9 @@ import { RewardConfig, $Enums } from '../../../../../generated/prisma';
 import db from '../prisma-client';
 
 export class RewardConfigRepository implements IRewardConfigRepositoy {
+   findAll = async (): Promise<RewardConfig[]> => {
+      return db.rewardConfig.findMany();
+   };
    setAmount = async (entity: RewardConfig): Promise<RewardConfig> => {
       const res = await db.rewardConfig.upsert({
          where: { type: entity.type },

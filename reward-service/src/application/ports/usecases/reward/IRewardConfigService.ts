@@ -6,4 +6,6 @@ export interface IRewardConfigServices {
    getRewardAmount(type: keyof RewardPoints): Promise<number>;
 
    setAmount(type: keyof RewardPoints, amount: number): Promise<RewardConfi>;
+
+   getFullConfig(): Promise<RewardConfi[]>;
 }

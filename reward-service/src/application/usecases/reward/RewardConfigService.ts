@@ -34,4 +34,8 @@ export class RewardConfigServices implements IRewardConfigServices {
    setAmount = async (type: keyof RewardPoints, amount: number): Promise<RewardConfi> => {
       return await this.rewardConfigRepo.setAmount({ type, amount });
    };
+
+   getFullConfig = async (): Promise<RewardConfi[]> => {
+      return await this.rewardConfigRepo.findAll();
+   };
 }

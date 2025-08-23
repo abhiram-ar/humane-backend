@@ -13,4 +13,9 @@ router.get(
    adminController.getPlatfromRewardStats
 );
 
+router
+   .route('/config')
+   .get(isAuthenticatedV2, authorizedRoles('admin'), adminController.getRewardConfig)
+   .put(isAuthenticatedV2, authorizedRoles('admin'), adminController.setRewardConfig);
+
 export default router;
