@@ -9,4 +9,6 @@ export interface IPostRepository extends IBaseRepository<Post> {
       moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus];
       moderateionMetadata: any;
    }): Promise<Required<Post> | null>;
+
+   getPostCount(from?: Date): Promise<number>;
 }

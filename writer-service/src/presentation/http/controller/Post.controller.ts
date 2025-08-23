@@ -20,8 +20,9 @@ import {
    UnAuthenticatedError,
    ZodValidationError,
 } from 'humane-common';
+import { IPostController } from '../interfaces/IPost.controller';
 
-export class PostController {
+export class PostController implements IPostController {
    constructor(
       private readonly _postService: IPostService,
       private readonly _eventPubliser: IEventPublisher,
@@ -61,7 +62,7 @@ export class PostController {
          let attachmentURLHydratedPost: Omit<Required<Post>, 'rawAttachmentKey'> & {
             attachmentURL?: string | null;
          } = postData;
-         
+
          if (rawAttachmentKey) {
             attachmentURLHydratedPost.attachmentURL =
                this._storageService.getPublicCDNURL(rawAttachmentKey);

@@ -6,6 +6,9 @@ import mongoose from 'mongoose';
 import hashtagModel from '../Models/hashtagModel';
 
 export class PostRepository implements IPostRepository {
+   getPostCount = async (from?: Date): Promise<number> => {
+      return await postModel.countDocuments(from ? { createdAt: { $gte: from } } : {});
+   };
    setModeration = async (dto: {
       postId: string;
       moderationStatus: (typeof ModerationStatus)[keyof typeof ModerationStatus];
