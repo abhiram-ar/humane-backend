@@ -2,10 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import cookieParse from 'cookie-parser';
-import { errorHandler } from 'humane-common';
+import { authorizedRoles, errorHandler, isAuthenticatedV2 } from 'humane-common';
 import postRouter from './router/postRouter';
 import internalRouter from './router/internalRouter';
 import hashtagRouter from './router/hashtagRouter';
+import adminRouter from './router/adminRouter';
 
 const app = express();
 
@@ -25,14 +26,9 @@ app.get('/api/v1/writer/health', (_, res) => {
 
 app.use('/api/v1/post', postRouter);
 app.use('/api/v1/writer/hashtag', hashtagRouter);
+app.use('/api/v1/writer/admin', isAuthenticatedV2, authorizedRoles('admin'), adminRouter);
 
 app.use('/api/v1/internal', internalRouter);
-
-app.post('/api/v1/writer/test', async (req, res) => {
-   const result = '';
-
-   res.status(200).json(result);
-});
 
 app.use(errorHandler);
 
