@@ -18,4 +18,5 @@ router
    .get(isAuthenticatedV2, authorizedRoles('admin'), adminController.getRewardConfig)
    .put(isAuthenticatedV2, authorizedRoles('admin'), adminController.setRewardConfig);
 
+router.get('/list', isAuthenticatedV2, authorizedRoles('admin'), adminController.getRewardList);
 export default router;

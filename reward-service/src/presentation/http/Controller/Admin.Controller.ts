@@ -6,10 +6,19 @@ import { IRewardConfigServices } from '@ports/usecases/reward/IRewardConfigServi
 import { setRewardConfigInputSchema } from '@application/dto/setRewardConfig.dto';
 import { ZodValidationError } from 'humane-common';
 import { RewardPoints } from '@domain/RewardConfig';
+import {
+   getScoreListInputSchema,
+   UserHydratedScoreData,
+} from '@application/dto/GetScoreList.dto';
+import { IUserQueryService } from '@ports/usecases/IUserQueryService';
+import { BasicUserDetails } from '@application/types/BasicUserDetails';
+import { IHumaneScoreServices } from '@ports/usecases/humaneScore/IHumaneScoreServices.usecase';
 export class AdminController implements IAdminController {
    constructor(
       private readonly _plaformRewardStats: IPlatformRewardStats,
-      private readonly _rewardConfigService: IRewardConfigServices
+      private readonly _rewardConfigService: IRewardConfigServices,
+      private readonly _scoreServices: IHumaneScoreServices,
+      private readonly _userQueryService: IUserQueryService
    ) {}
 
    getPlatfromRewardStats = async (req: Request, res: Response, next: NextFunction) => {
@@ -46,6 +55,51 @@ export class AdminController implements IAdminController {
          }
 
          res.status(HttpStatusCode.Ok).json({ success: true });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   getRewardList = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+         const { search, limit = '10', page = '1' } = req.query;
+
+         const {
+            data: validatedDTO,
+            success,
+            error,
+         } = getScoreListInputSchema.safeParse({ search, limit, page });
+         if (!success) throw new ZodValidationError(error);
+
+         if (validatedDTO.search) {
+         } else {
+            const { rewards, pagination } = await this._scoreServices.getlist({
+               page: validatedDTO.page,
+               limit: validatedDTO.limit,
+            });
+
+            const userIds = rewards.map((reward) => reward.userId);
+            const userDetails = await this._userQueryService.getUserBasicDetails(userIds);
+            const userId2UserDetailsMap = new Map<string, BasicUserDetails>();
+            userDetails.forEach((user) => {
+               if (!user) return;
+               userId2UserDetailsMap.set(user.id, user);
+            });
+
+            const hydratedRewards: UserHydratedScoreData[] = rewards.map((reward) => {
+               const userDetails = userId2UserDetailsMap.get(reward.userId);
+
+               return {
+                  ...reward,
+                  firstName: userDetails?.firstName,
+                  lastName: userDetails?.lastName,
+               };
+            });
+
+            res.status(HttpStatusCode.Ok).json({ data: { rewards: hydratedRewards, pagination } });
+         }
+
+         // find reward data
       } catch (error) {
          next(error);
       }
