@@ -3,8 +3,9 @@ import { IHumaneScoreServices } from '@ports/usecases/humaneScore/IHumaneScoreSe
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 import { ZodValidationError } from 'humane-common';
+import { IHumaneScoreController } from '../interfaces/IHumaneScore.controller';
 
-export class HumaneScoreController {
+export class HumaneScoreController implements IHumaneScoreController {
    constructor(private _humneScoreServices: IHumaneScoreServices) {}
 
    getUserScore = async (req: Request, res: Response, next: NextFunction) => {

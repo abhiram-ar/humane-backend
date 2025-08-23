@@ -1,7 +1,8 @@
 import { IPlatformRewardStats } from '@ports/usecases/admin/IPlatformRewardStats.usecase';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
-export class AdminController {
+import { IAdminController } from '../interfaces/IAdmin.Controller';
+export class AdminController implements IAdminController {
    constructor(private readonly _plaformRewardStats: IPlatformRewardStats) {}
 
    getPlatfromRewardStats = async (req: Request, res: Response, next: NextFunction) => {
