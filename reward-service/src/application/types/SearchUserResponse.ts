@@ -21,7 +21,6 @@ export type SearchUserData = {
 };
 
 export type SearchUserResponse = {
-   status: number;
    message: string;
    data: SearchUserData;
 };

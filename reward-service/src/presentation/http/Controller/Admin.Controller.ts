@@ -6,10 +6,7 @@ import { IRewardConfigServices } from '@ports/usecases/reward/IRewardConfigServi
 import { setRewardConfigInputSchema } from '@application/dto/setRewardConfig.dto';
 import { ZodValidationError } from 'humane-common';
 import { RewardPoints } from '@domain/RewardConfig';
-import {
-   getScoreListInputSchema,
-   UserHydratedScoreData,
-} from '@application/dto/GetScoreList.dto';
+import { getScoreListInputSchema, UserHydratedScoreData } from '@application/dto/GetScoreList.dto';
 import { IUserQueryService } from '@ports/usecases/IUserQueryService';
 import { BasicUserDetails } from '@application/types/BasicUserDetails';
 import { IHumaneScoreServices } from '@ports/usecases/humaneScore/IHumaneScoreServices.usecase';
@@ -72,6 +69,30 @@ export class AdminController implements IAdminController {
          if (!success) throw new ZodValidationError(error);
 
          if (validatedDTO.search) {
+            const result = await this._userQueryService.searchUser({
+               searchQuery: validatedDTO.search,
+               limit: validatedDTO.limit,
+               page: validatedDTO.page,
+            });
+
+            const userIds = result.data.users.map((user) => user.id);
+            const userScores = await this._scoreServices.getlist({ userIds, page: 1, limit: 100 });
+            const userId2ScoreMap = new Map<string, number>();
+            userScores.rewards.forEach((user) => userId2ScoreMap.set(user.userId, user.score));
+
+            const hydratedRewards: UserHydratedScoreData[] = result.data.users.map((user) => {
+               const userScore = userId2ScoreMap.get(user.id) ?? 0;
+               return {
+                  firstName: user.firstName,
+                  lastName: user.lastName,
+                  userId: user.id,
+                  score: userScore,
+               };
+            });
+
+            res.status(HttpStatusCode.Ok).json({
+               data: { rewards: hydratedRewards, pagination: result.data.pagination },
+            });
          } else {
             const { rewards, pagination } = await this._scoreServices.getlist({
                page: validatedDTO.page,
