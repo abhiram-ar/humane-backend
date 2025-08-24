@@ -4,14 +4,14 @@ import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { UserJWTTokenPayload } from '@application/types/JWTTokenPayload.type';
 import { ENV } from '@config/env';
 import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
-import { JWTService } from '@infrastructure/service/JWTService';
+import { IJWTService } from '@ports/IJWTService';
 import { IUserRepository } from '@ports/IUserRepository';
 import { IRefreshUserAccessToken } from '@ports/usecases/user/IRefreshUserToken.usecase';
 
 export class RefreshUserAccessToken implements IRefreshUserAccessToken {
    constructor(
       private readonly _userReporitory: IUserRepository,
-      private readonly _jwtService: JWTService
+      private readonly _jwtService: IJWTService
    ) {}
 
    execute = async (refreshToken: string): Promise<{ newAccessToken: string }> => {
@@ -43,7 +43,7 @@ export class RefreshUserAccessToken implements IRefreshUserAccessToken {
       let newTokenPaylod: UserJWTTokenPayload = {
          userId: userStatus.id,
          type: 'user',
-         iss: 'humane'
+         iss: 'humane',
       };
 
       const newAccessToken = this._jwtService.sign(

@@ -14,8 +14,9 @@ import { CombinedNotificationWithActionableUser } from '@presentation/Types/Comb
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 import { UnAuthenticatedError, ZodValidationError } from 'humane-common';
+import { IUserNotificationController } from '../interfaces/IUserNotification.controller';
 
-export class UserNotificationController {
+export class UserNotificationController implements IUserNotificationController {
    constructor(
       private readonly _userNotificationService: UserNotificationService,
       private readonly _esProxyService: IElasticSearchProxyService
@@ -44,7 +45,9 @@ export class UserNotificationController {
 
          const notiToActionableUserMap = new Map<string, string>();
          noti.forEach((combinedNoti) => {
+            // @ts-ignore
             if (combinedNoti?.actorId) {
+               // @ts-ignore
                notiToActionableUserMap.set(combinedNoti.id!, combinedNoti.actorId);
             }
          });

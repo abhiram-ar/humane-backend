@@ -5,6 +5,28 @@ import { Prisma, RewardType } from '../../../../../generated/prisma';
 import { logger } from '@config/logger';
 
 export class RewardRepository implements IRewardRepostory {
+   platformTotalRewards = async (dto: { from?: Date; filter?: RewardType }): Promise<number> => {
+      const where: Prisma.RewardsWhereInput = {};
+
+      if (dto.filter) {
+         where.type = dto.filter;
+      }
+
+      if (dto.from) {
+         where.createdAt = {
+            gte: dto.from,
+         };
+      }
+
+      const res = await db.rewards.aggregate({
+         where,
+         _sum: {
+            pointsRewarded: true,
+         },
+      });
+
+      return res._sum.pointsRewarded ?? 0;
+   };
    create = async (entity: Reward): Promise<Required<Reward> | null> => {
       let res: Required<Reward> | null = null;
 

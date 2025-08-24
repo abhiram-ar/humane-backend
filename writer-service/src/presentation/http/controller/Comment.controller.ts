@@ -12,8 +12,9 @@ import {
    UnAuthenticatedError,
    ZodValidationError,
 } from 'humane-common';
+import { ICommentController } from '../interfaces/IComment.controller';
 
-export class CommentController {
+export class CommentController implements ICommentController {
    constructor(
       private readonly _commentServices: ICommentService,
       private readonly _eventPubliser: IEventPublisher

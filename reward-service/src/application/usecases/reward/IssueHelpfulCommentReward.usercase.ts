@@ -12,6 +12,7 @@ import {
    MessageBrokerTopics,
    UserRewardedEventPayload,
 } from 'humane-common';
+import { IRewardConfigServices } from '@ports/usecases/reward/IRewardConfigService';
 
 export class IssueHelpfulCommnetReward implements IIssueHelpfulCommnetReward {
    static generateIdempotencyKey = (dto: IssueHelpFulCommentInputDTO): string => {
@@ -21,7 +22,8 @@ export class IssueHelpfulCommnetReward implements IIssueHelpfulCommnetReward {
    constructor(
       private readonly _rewardRepo: IRewardRepostory,
       private readonly _userServices: IUserServices,
-      private readonly _eventPubliser: IEventPublisher
+      private readonly _eventPubliser: IEventPublisher,
+      private readonly _rewardConfigService: IRewardConfigServices
    ) {}
 
    execute = async (dto: IssueHelpFulCommentInputDTO): Promise<Required<Reward> | null> => {
@@ -36,9 +38,16 @@ export class IssueHelpfulCommnetReward implements IIssueHelpfulCommnetReward {
          return null;
       }
 
+      const rewardAmount = await this._rewardConfigService.getRewardAmount('HELPFUL_COMMENT');
+
       // generate reward entirt
       const idempotencyKey = IssueHelpfulCommnetReward.generateIdempotencyKey(dto);
-      const reward = new Reward(dto.commentAutorId, idempotencyKey, 'HELPFUL_COMMENT');
+      const reward = new Reward(
+         dto.commentAutorId,
+         idempotencyKey,
+         'HELPFUL_COMMENT',
+         rewardAmount
+      );
 
       const newReward = await this._rewardRepo.create(reward);
       if (!newReward) {

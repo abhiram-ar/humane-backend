@@ -101,7 +101,8 @@ const names = [
    'Caroline',
 ];
 
-const spread = 3 // max: 3
+// variation in names
+const spread = names.length; // max: names.length
 export const demoUsers = Array.from({ length: 40 }, (_, i) => ({
    firstName: names[Math.floor(Math.random() * spread)],
    lastName: names[Math.floor(Math.random() * spread)],

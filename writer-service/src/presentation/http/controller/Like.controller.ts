@@ -19,8 +19,9 @@ import {
    UnAuthenticatedError,
    ZodValidationError,
 } from 'humane-common';
+import { ILikeController } from '../interfaces/ILike.controller';
 
-export class LikeController {
+export class LikeController implements ILikeController {
    constructor(private readonly _eventPublishser: IEventPublisher) {}
 
    addCommentLikeRequest = async (req: Request, res: Response, next: NextFunction) => {

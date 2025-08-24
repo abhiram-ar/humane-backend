@@ -1,5 +1,4 @@
 import { IEventPublisher } from '@ports/IEventProducer';
-import { JWTService } from '../../../infrastructure/service/JWTService';
 import { verifedUserToken, verifyUserDTO } from '../../DTOs/user/verifyUser.dto';
 import { OTPError } from '../../errors/OTPError';
 import { IHashService } from '../../ports/IHashService';
@@ -12,11 +11,12 @@ import {
 } from 'humane-common';
 import { EventBusError } from '@application/errors/EventbusError';
 import { IVerifyUser } from '@ports/usecases/user/IVerifyUser.usecase';
+import { IJWTService } from '@ports/IJWTService';
 
 export class VerifyUser implements IVerifyUser {
    constructor(
       private readonly _userRepository: IUserRepository,
-      private readonly _JWT: JWTService,
+      private readonly _JWT: IJWTService,
       private readonly _hashService: IHashService,
 
       private readonly _eventPubliser: IEventPublisher

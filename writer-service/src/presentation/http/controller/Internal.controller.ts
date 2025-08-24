@@ -10,8 +10,9 @@ import { ILikeServices } from '@ports/ILikeServices';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 import { ZodValidationError } from 'humane-common';
+import { IInternalController } from '../interfaces/IInternal.controller';
 
-export class InternalController {
+export class InternalController implements IInternalController {
    constructor(
       private readonly _commentServices: ICommentService,
       private readonly _likeServies: ILikeServices

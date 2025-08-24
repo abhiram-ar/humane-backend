@@ -1,20 +1,21 @@
 import { UnAuthenticatedError } from '@application/errors/UnAuthenticatedError';
-import { AdminEmailLogin } from '@application/useCases/admin/AdminEmailLogin.usecase';
-import { CreateAdmin } from '@application/useCases/admin/createNewAdmin.usercase';
-import { RefreshAdminAccessToken } from '@application/useCases/admin/RefreshAdminToken.usecase';
 import { ENV } from '@config/env';
 import { JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 import { adminLoginSchema } from '@dtos/admin/adminLogin.dto';
 import { signupAdminSchema } from '@dtos/admin/signupAdmin.dto';
+import { IAdminEmailLogin } from '@ports/usecases/admin/IAdminEmailLogin';
+import { ICreateAdmin } from '@ports/usecases/admin/ICreateNewAdmin.usercase';
+import { IRefreshAdminAccessToken } from '@ports/usecases/admin/IRefreshAdminToken.usecase';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
+import { IAdminAuthController } from '@presentation/interface/IAdminAuth.controller';
 import { HttpStatusCode } from 'axios';
 import { NextFunction, Request, Response } from 'express';
 
-export class AdminAuthController {
+export class AdminAuthController implements IAdminAuthController {
    constructor(
-      private readonly _createAdmin: CreateAdmin,
-      private readonly _adminEmailLogin: AdminEmailLogin,
-      private readonly _refreshToken: RefreshAdminAccessToken
+      private readonly _createAdmin: ICreateAdmin,
+      private readonly _adminEmailLogin: IAdminEmailLogin,
+      private readonly _refreshToken: IRefreshAdminAccessToken
    ) {}
 
    signup = async (req: Request, res: Response, next: NextFunction) => {

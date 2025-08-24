@@ -7,6 +7,7 @@ import { IRewardRepostory } from '@ports/repository/IRewardRepository';
 import { IEventPublisher } from '@ports/services/IEventProducer';
 import { IUserServices } from '@ports/services/IUserService';
 import { IIssueChatRepliedWithinResonableTimeReward } from '@ports/usecases/reward/IIssueChatRepliedWithinResonableTime,usecase';
+import { IRewardConfigServices } from '@ports/usecases/reward/IRewardConfigService';
 import {
    AppEventsTypes,
    createEvent,
@@ -20,7 +21,8 @@ export class IssueChatRepliedWithinResonableTimeReward
    constructor(
       private readonly _userServices: IUserServices,
       private readonly _rewardRepo: IRewardRepostory,
-      private readonly _eventPubliser: IEventPublisher
+      private readonly _eventPubliser: IEventPublisher,
+      private readonly _rewardConfigService: IRewardConfigServices
    ) {}
 
    static generateIdempotencyKey = (dto: IssueChatRepliedWithinResonableTimeInputDTO): string => {
@@ -64,8 +66,10 @@ export class IssueChatRepliedWithinResonableTimeReward
          }
       }
 
+      const rewardAmount = await this._rewardConfigService.getRewardAmount('CHAT_CHECKIN');
+
       const idempotencyKey = IssueChatRepliedWithinResonableTimeReward.generateIdempotencyKey(dto);
-      const reward = new Reward(dto.senderId, idempotencyKey, 'CHAT_CHECKIN');
+      const reward = new Reward(dto.senderId, idempotencyKey, 'CHAT_CHECKIN', rewardAmount);
 
       const newReward = await this._rewardRepo.create(reward);
       if (!newReward) {

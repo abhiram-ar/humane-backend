@@ -17,4 +17,18 @@ export class HumaneScoreServices implements IHumaneScoreServices {
    delete = async (userId: string): Promise<HumaneScore | null> => {
       return await this.humaneRepository.delete(userId);
    };
+
+   getlist = async (dto: {
+      userIds?: string[];
+      page: number;
+      limit: number;
+   }): Promise<{
+      rewards: Required<HumaneScore>[];
+      pagination: { page: number; limit: number; totalItems: number; totalPages: number };
+   }> => {
+      const { rewards, totalItems } = await this.humaneRepository.getlist(dto);
+      const totalPages = Math.ceil(totalItems / dto.limit) || 1;
+
+      return { rewards, pagination: { page: dto.page, limit: dto.limit, totalPages, totalItems } };
+   };
 }

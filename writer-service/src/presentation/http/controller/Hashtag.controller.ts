@@ -6,7 +6,8 @@ import { IHashtagServices } from '@ports/IHashtagServices';
 import { HttpStatusCode } from 'axios';
 import { Request, Response, NextFunction } from 'express';
 import { ZodValidationError } from 'humane-common';
-export class HashtagController {
+import { IHashtagController } from '../interfaces/IHashtag.controller';
+export class HashtagController implements IHashtagController {
    constructor(private readonly _hashtagServices: IHashtagServices) {}
 
    prefixSearch = async (req: Request, res: Response, next: NextFunction) => {

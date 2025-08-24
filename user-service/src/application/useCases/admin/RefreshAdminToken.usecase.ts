@@ -2,11 +2,11 @@ import { JWTRefreshError } from '@application/errors/JWTRefreshError';
 import { AdminJWTTokenPaylod } from '@application/types/JWTTokenPayload.type';
 import { ENV } from '@config/env';
 import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
-import { JWTService } from '@infrastructure/service/JWTService';
+import { IJWTService } from '@ports/IJWTService';
 import { IRefreshAdminAccessToken } from '@ports/usecases/admin/IRefreshAdminToken.usecase';
 
 export class RefreshAdminAccessToken implements IRefreshAdminAccessToken {
-   constructor(private readonly _jwtService: JWTService) {}
+   constructor(private readonly _jwtService: IJWTService) {}
 
    execute = async (refreshToken: string): Promise<{ newAccessToken: string }> => {
       let verifedTokenPayload: AdminJWTTokenPaylod;

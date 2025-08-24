@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { FriendRequest } from '@application/useCases/friendship/FriendRequest.usecase';
 import {
    SendFriendRequestInputDTO,
    sendFriendRequestInputSchema,
@@ -22,12 +21,10 @@ import {
    GetFriendCountInputDTO,
    getFriendsCountInputSchema,
 } from '@dtos/friendship/GetFriends.dto';
-import { GetFriends } from '@application/useCases/friendship/GetFriends.usercase';
 import {
    cancelFriendRequestInputDTO,
    cancelFriendRequestInputSchema,
 } from '@dtos/friendship/cancelFriendRequestInput.dto';
-import { GetRelationShipStatus } from '@application/useCases/friendship/GetRelationshipStatus';
 import {
    GetRelationShipStatusInputDTO,
    getRelationshipStatusSchema,
@@ -38,29 +35,33 @@ import {
    MutualFriendsListInputDTO,
    mutualFriendsListInputSchema,
 } from '@dtos/friendship/MutualFriends.dto';
-import { MutualFriends } from '@application/useCases/friendship/MutualFriends.usecase';
-import { RemoveFriendship } from '@application/useCases/friendship/RemoveFriendship.usecase';
 import {
    RemoveFriendshipInputDTO,
    removeFriendshipInputSchema,
 } from '@dtos/friendship/RemoveFriendshipInput.dto';
-import { GetUserSendFriendRequestList } from '@application/useCases/friendship/GetUserSendFriendRequestList.usercase';
 import {
    getUserSendFriendRequestInputSchema,
    GetUserSendFriendRequestListInputDTO,
 } from '@dtos/friendship/GetUserSendFriendRequests.dto';
-import { GetFriendRequest } from '@application/useCases/friendship/GetFriendRequestList.usercase';
 import { HttpStatusCode } from 'axios';
+import { IFriendRequest } from '@ports/usecases/friendship/IFriendRequest.usecase';
+import { IGetFriendRequest } from '@ports/usecases/friendship/IGetFriendRequestList.usercase';
+import { IGetFriends } from '@ports/usecases/friendship/IGetFriends.usercase';
+import { IGetRelationShipStatus } from '@ports/usecases/friendship/IGetRelationshipStatus';
+import { IMutualFriends } from '@ports/usecases/friendship/IMutualFriends.usecase';
+import { IRemoveFriendship } from '@ports/usecases/friendship/IRemoveFriendship.usecase';
+import { IGetUserSendFriendRequestList } from '@ports/usecases/friendship/IGetUserSendFriendRequestList.usercase';
+import { IUserRelationshipController } from '@presentation/interface/IUserRelationship.controller';
 
-export class UserRelationshipController {
+export class UserRelationshipController implements IUserRelationshipController {
    constructor(
-      private readonly _friendRequest: FriendRequest,
-      private readonly _getFriendRequest: GetFriendRequest,
-      private readonly _getFriends: GetFriends,
-      private readonly _getRelationshipStatus: GetRelationShipStatus,
-      private readonly _mutualFriends: MutualFriends,
-      private readonly _removeFriendship: RemoveFriendship,
-      private readonly _getUserSendFriendReq: GetUserSendFriendRequestList
+      private readonly _friendRequest: IFriendRequest,
+      private readonly _getFriendRequest: IGetFriendRequest,
+      private readonly _getFriends: IGetFriends,
+      private readonly _getRelationshipStatus: IGetRelationShipStatus,
+      private readonly _mutualFriends: IMutualFriends,
+      private readonly _removeFriendship: IRemoveFriendship,
+      private readonly _getUserSendFriendReq: IGetUserSendFriendRequestList
    ) {}
 
    sendFriendRequest = async (req: Request, res: Response, next: NextFunction) => {
@@ -290,7 +291,7 @@ export class UserRelationshipController {
    getFriendList = async (req: Request, res: Response, next: NextFunction) => {
       try {
          if (req.user?.type !== 'user' || !req.user.userId) {
-            throw new UnAuthenticatedError('No userId in auth header');
+            throw new UnAuthenticatedError();
          }
          const { size = 10, createdAt, lastId, targetUserId } = req.query;
 

@@ -57,6 +57,8 @@ export class UserGoogleAuth implements IUserGoogleAuth {
          throw new UserBlockedError('User is blocked, cannot do social auth');
       }
 
+      await this._userRepository.updateLastLoginedAt(user.id);
+
       const tokenPayload: UserJWTTokenPayload = {
          userId: user.id,
          type: 'user',

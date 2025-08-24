@@ -21,4 +21,27 @@ export class HumaneScoreRepository implements IHumaneScoreRepository {
          return null;
       }
    };
+
+   getlist = async (config: {
+      userIds?: string[];
+      page: number;
+      limit: number;
+   }): Promise<{
+      rewards: Required<HumaneScore>[];
+      totalItems: number;
+   }> => {
+      const skip = (config.page - 1) * config.limit;
+      const res = await db.humaneScore.findMany({
+         where: config.userIds ? { userId: { in: config.userIds } } : {},
+         skip,
+         take: config.limit,
+      });
+
+      const count = await db.humaneScore.count();
+
+      return {
+         rewards: res,
+         totalItems: count,
+      };
+   };
 }

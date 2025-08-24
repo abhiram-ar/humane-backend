@@ -1,41 +1,45 @@
 import { NextFunction, Request, Response } from 'express';
 import { signupUserSchema } from '@application/DTOs/user/signupUser.dto';
 import { verifyUserSchema } from '@application/DTOs/user/verifyUser.dto';
-import { VerifyUser } from '@application/useCases/user/VerifyUser.usecase';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
-import { SignupUser } from '@application/useCases/user/SignupUser.usecase';
-import { UserEmailLogin } from '@application/useCases/user/UserEmailLogin.usecase';
-import { RefreshUserAccessToken } from '@application/useCases/user/RefreshUserToken.usecase';
 import { userLoginSchema } from '@dtos/user/userLogin.dto';
 import { JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 import { ENV } from '@config/env';
-import { UnAuthenticatedError } from '@application/errors/UnAuthenticatedError';
+import {
+   UnAuthenticatedError,
+   UnAuthenticatedErrorMsgs,
+} from '@application/errors/UnAuthenticatedError';
 import { JWTRefreshError } from '@application/errors/JWTRefreshError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { UserBlockedError } from '@application/errors/UserBlockedError';
 import { forgotPasswordSchema } from '@dtos/user/forgotPassword.dto';
-import { ForgotPassword } from '@application/useCases/user/ForgotPassword.usecase';
-import { RecoverPassword } from '@application/useCases/user/RecoverPassword.usecase';
 import { recoverPasswordSchema } from '@dtos/user/recoverPassword.dto';
 import { OAuth2Client } from 'google-auth-library';
 import { GenericError } from '@application/errors/GenericError';
 import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
-import { UserGoogleAuth } from '@application/useCases/user/googleAuth.usecase';
 import { HttpStatusCode } from 'axios';
+import { ISignupUser } from '@ports/usecases/user/ISignupUser.usecase';
+import { IVerifyUser } from '@ports/usecases/user/IVerifyUser.usecase';
+import { IUserEmailLogin } from '@ports/usecases/user/IUserEmailLogin.usecase';
+import { IRefreshUserAccessToken } from '@ports/usecases/user/IRefreshUserToken.usecase';
+import { IForgotPassword } from '@ports/usecases/user/IForgotPassword.usecase';
+import { IRecoverPassword } from '@ports/usecases/user/IRecoverPassword.usecase';
+import { IUserGoogleAuth } from '@ports/usecases/user/IGoogleAuth.usecase';
+import { IUserAuthController } from '@presentation/interface/IUserAuth.controller';
 
-export class UserAuthController {
+export class UserAuthController implements IUserAuthController {
    constructor(
-      private readonly _singupUser: SignupUser,
-      private readonly _verifyUser: VerifyUser,
-      private readonly _userEmailLogin: UserEmailLogin,
-      private readonly _refreshUserAccessToken: RefreshUserAccessToken,
-      private readonly _forgotPassoword: ForgotPassword,
-      private readonly _recoverPassword: RecoverPassword,
+      private readonly _singupUser: ISignupUser,
+      private readonly _verifyUser: IVerifyUser,
+      private readonly _userEmailLogin: IUserEmailLogin,
+      private readonly _refreshUserAccessToken: IRefreshUserAccessToken,
+      private readonly _forgotPassoword: IForgotPassword,
+      private readonly _recoverPassword: IRecoverPassword,
       private readonly _googleAuth2Client: OAuth2Client,
-      private readonly _userGooglgAuth: UserGoogleAuth
+      private readonly _userGooglgAuth: IUserGoogleAuth
    ) {}
 
-   signup = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+   signup = async (req: Request, res: Response, next: NextFunction) => {
       try {
          const parsed = signupUserSchema.safeParse(req.body);
 
@@ -53,7 +57,7 @@ export class UserAuthController {
       }
    };
 
-   verify = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+   verify = async (req: Request, res: Response, next: NextFunction) => {
       try {
          const parsed = verifyUserSchema.safeParse(req.body);
          if (!parsed.success) {
@@ -70,7 +74,7 @@ export class UserAuthController {
       }
    };
 
-   login = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+   login = async (req: Request, res: Response, next: NextFunction) => {
       try {
          const parsed = userLoginSchema.safeParse(req.body);
          if (!parsed.success) {
@@ -96,11 +100,11 @@ export class UserAuthController {
       }
    };
 
-   refreshAccessToken = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+   refreshAccessToken = async (req: Request, res: Response, next: NextFunction) => {
       try {
          const { refreshJWT } = req.cookies;
          if (!refreshJWT) {
-            throw new UnAuthenticatedError('refresh token not found in cookies');
+            throw new UnAuthenticatedError(UnAuthenticatedErrorMsgs.COOKIE_REFRESH_TOKEN_NOT_FOUND);
          }
 
          const { newAccessToken } = await this._refreshUserAccessToken.execute(refreshJWT);
@@ -129,7 +133,7 @@ export class UserAuthController {
       try {
          const { refreshJWT } = req.cookies;
          if (!refreshJWT) {
-            throw new UnAuthenticatedError('refresh token not found in cookies');
+            throw new UnAuthenticatedError(UnAuthenticatedErrorMsgs.COOKIE_REFRESH_TOKEN_NOT_FOUND);
          }
 
          res.clearCookie('refreshJWT', {
