@@ -19,6 +19,7 @@ import {
    otpService,
 } from '../services.container';
 import { IsHotUser } from '@application/useCases/user/isHotUser.usecase';
+import { ChangePassword } from '@application/useCases/user/ChangePassword.usecase';
 
 export const singupUser = new SignupUser(
    userRepository,
@@ -67,3 +68,5 @@ export const updateUserCoverPhoto = new UpdateUserCoverPhoto(
 );
 
 export const isHotUser = new IsHotUser(userRepository);
+
+export const changePassword = new ChangePassword(userRepository, bcryptHashService);

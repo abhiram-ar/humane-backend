@@ -8,5 +8,6 @@ anonProfileRouter.patch('/', userProfileController.updateProfile);
 anonProfileRouter.post('/upload/pre-signed', userProfileController.generatePreSignedURL);
 anonProfileRouter.patch('/avatar', userProfileController.updateAvatarPhoto);
 anonProfileRouter.patch('/cover-photo', userProfileController.updateCoverPhoto);
+anonProfileRouter.patch('/password', userProfileController.changePassword);
 
 export default anonProfileRouter;

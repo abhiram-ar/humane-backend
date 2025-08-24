@@ -1,5 +1,6 @@
 import { UserAuthController } from '@presentation/controllers/user.controller';
 import {
+   changePassword,
    forgotPassoword,
    generatePresignedURL,
    getCurrentUserProfile,
@@ -42,7 +43,8 @@ export const userProfileController = new UserProfileController(
    updateUserProfile,
    generatePresignedURL,
    updateUserAvatar,
-   updateUserCoverPhoto
+   updateUserCoverPhoto,
+   changePassword
 );
 
 export const userRelationshipController = new UserRelationshipController(

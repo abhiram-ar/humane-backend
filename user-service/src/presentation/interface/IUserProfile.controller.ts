@@ -6,4 +6,5 @@ export interface IUserProfileController {
    generatePreSignedURL(req: Request, res: Response, next: NextFunction): Promise<void>;
    updateAvatarPhoto(req: Request, res: Response, next: NextFunction): Promise<void>;
    updateCoverPhoto(req: Request, res: Response, next: NextFunction): Promise<void>;
+   changePassword(req: Request, res: Response, next: NextFunction): Promise<void>;
 }

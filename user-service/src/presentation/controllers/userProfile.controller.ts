@@ -13,6 +13,9 @@ import { IUpdateUserAvatar } from '@ports/usecases/user/IUpdateUserAvatar';
 import { IUpdateUserCoverPhoto } from '@ports/usecases/user/IUpdateUserCoverPhoto';
 import { IGeneratePresignedURL } from '@ports/usecases/user/IGeneratePresignedURL';
 import { IUserProfileController } from '@presentation/interface/IUserProfile.controller';
+import { UnAuthenticatedError } from 'humane-common';
+import { ChangePasswordInputDTO, changePasswordInputSchema } from '@dtos/user/ChangePassword.dto';
+import { IChangePassword } from '@ports/usecases/user/ChangePassword.usecase';
 
 export class UserProfileController implements IUserProfileController {
    constructor(
@@ -20,7 +23,8 @@ export class UserProfileController implements IUserProfileController {
       private readonly _updateUserProfile: IUpdateUserProfile,
       private readonly _generatePreSignedURL: IGeneratePresignedURL,
       private readonly _updatUserAvatar: IUpdateUserAvatar,
-      private readonly _updateUserCoverPhoto: IUpdateUserCoverPhoto
+      private readonly _updateUserCoverPhoto: IUpdateUserCoverPhoto,
+      private readonly _changePassword: IChangePassword
    ) {}
 
    getProfile = async (req: Request, res: Response, next: NextFunction) => {
@@ -138,6 +142,28 @@ export class UserProfileController implements IUserProfileController {
                coverPhotoURL: newCoverPhotoURL,
             },
          });
+      } catch (error) {
+         next(error);
+      }
+   };
+
+   changePassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+         if (req.user?.type !== 'user' || !req.user.userId) throw new UnAuthenticatedError();
+
+         console.log(req.body);
+
+         const dto: ChangePasswordInputDTO = {
+            userId: req.user.userId,
+            password: req.body?.password,
+            newPassword: req.body?.newPassword,
+         };
+
+         const { data: validatedDTO, error, success } = changePasswordInputSchema.safeParse(dto);
+         if (!success) throw new ZodValidationError(error);
+
+         const result = await this._changePassword.execute(validatedDTO);
+         res.status(HttpStatusCode.Accepted).json({ data: result });
       } catch (error) {
          next(error);
       }
