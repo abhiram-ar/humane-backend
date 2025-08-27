@@ -35,13 +35,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: writer-srv
+  labels:
+    metrics: "true"
 spec:
   selector:
     app: humane
     service: writer
     type: web-server
   ports:
-    - name: writer
+    - name: web
       protocol: TCP
       port: 3000
       targetPort: 3000
