@@ -1,0 +1,1 @@
+kubectl --namespace monitoring get secrets kpstack-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
