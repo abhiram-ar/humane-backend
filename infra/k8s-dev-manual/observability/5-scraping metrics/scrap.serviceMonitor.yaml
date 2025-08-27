@@ -1,0 +1,24 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: microservices-monitor
+  namespace: monitoring # imp: deploy in same namespace as kube-prometheus-stack
+  labels:
+    app: microservices-monitor
+    # Important: This label must match the serviceMonitorSelector in your Prometheus config
+    release: kpstack # helm release name of kube-prometheus-stack
+spec:
+  # Select services to monitor
+  selector:
+    matchLabels:
+      metrics: "true" # Your services need this label
+  # Specify namespaces to look for services
+  namespaceSelector:
+    matchNames:
+      - default
+  # Define the endpoints to scrape
+  endpoints:
+    - port: web # Port name in your service
+      interval: 15s
+      path: /metrics # Metrics endpoint path
+      scheme: http

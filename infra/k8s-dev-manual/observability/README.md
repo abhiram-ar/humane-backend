@@ -52,3 +52,15 @@ helm install kpstack prometheus-community/kube-prometheus-stack --version 77.0.2
 ```
 
 > [all configurable chart values]("https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml")
+
+### 5. Selecting microservices to scap metrics
+
+-  Annotating a service to scrap only works for instace deployment of prometeus, because we are using kube-prometesu stack which uses prometheus operator to deploy prometheus
+-  We either need to use `serviceMonitor` or `podMonitor` to configure targets for prometheus
+
+deploy `k8s-dev-manual/observability/scrap.serviceMonitor.yaml`
+
+-  Make sure each serviceMonitor has label release : {Helm kube prometheus release name}
+-  make usre the services need to be monitored have /metrics endpoint
+-  has label `monitor: "true"`
+-  the port name of the service is same as that mentioned in serviceMonitor (web)
