@@ -4,7 +4,6 @@ import morgan from 'morgan';
 import { errorHandler, UnifiedPrometheusMetricsMonitoring } from 'humane-common';
 import chatRouter from './router/chat.router';
 import * as promClient from 'prom-client';
-import { logger } from '@config/logger';
 
 const expressApp = express();
 
@@ -27,9 +26,7 @@ expressApp.use(monitoring.metricsMiddleware);
 expressApp.use(morgan('dev'));
 
 expressApp.get('/metrics', async (_req: Request, res: Response) => {
-   logger.warn('hit metrics endpoint');
    res.set('Content-Type', register.contentType);
-
    res.end(await register.metrics());
 });
 
