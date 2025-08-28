@@ -7,7 +7,6 @@ import publicUserQueryRouter from 'routes/publicUserQuery.router';
 import { errorHandler, UnifiedPrometheusMetricsMonitoring } from 'humane-common';
 import publicPostRouter from 'routes/pubicPostRouter';
 import * as promClient from 'prom-client';
-import { logger } from '@config/logger';
 
 const app = express();
 
@@ -29,9 +28,7 @@ app.use(morgan('dev'));
 app.use(cookieParse());
 
 app.get('/metrics', async (_req, res: Response) => {
-   logger.warn('hit metrics endpoint');
    res.set('Content-Type', register.contentType);
-
    res.end(await register.metrics());
 });
 
