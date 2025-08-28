@@ -35,13 +35,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: notification-srv
+  labels:
+    metrics: "true"
 spec:
   selector:
     app: humane
     service: notification
     type: web-server
   ports:
-    - name: user
+    - name: web
       protocol: TCP
       port: 3000
       targetPort: 3000
