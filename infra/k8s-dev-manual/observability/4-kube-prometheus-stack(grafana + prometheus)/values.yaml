@@ -1,5 +1,9 @@
 # Grafana configuration
 grafana:
+  initChownData:
+    # the init container will try to modify the chown data for PV it mounted
+    # dokcker destop wont allow a container to change the chonw on the host path
+    enabled: false # TODO: can change this to true in a cloud deployemnt
   persistence:
     enabled: true
     type: pvc
