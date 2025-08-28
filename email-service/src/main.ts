@@ -1,6 +1,8 @@
-import checkEnv from '@config/env';
+import checkEnv, { ENV } from '@config/env';
 import { connectKafkaProducer, startAllConsumers } from '@config/kafka';
+import { logger } from '@config/logger';
 import { shutdownCleanup } from '@config/shutdown';
+import app from '@presentation/http/server';
 
 const boostrap = async () => {
    try {
@@ -12,6 +14,10 @@ const boostrap = async () => {
 
       process.on('SIGINT', shutdownCleanup);
       process.on('SIGTERM', shutdownCleanup);
+
+      app.listen(ENV.SERVER_PORT, () => {
+         logger.info(`Email service start listening on ${ENV.SERVER_PORT}`);
+      });
    } catch (error) {
       console.error('error while starting notification service');
       console.error(error);
