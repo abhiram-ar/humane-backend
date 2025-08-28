@@ -1,9 +1,10 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import { errorHandler } from 'humane-common';
+import { errorHandler, UnifiedPrometheusMetricsMonitoring } from 'humane-common';
 import chatRouter from './router/chat.router';
-import { conversationRepository } from '@di/repository.container';
+import * as promClient from 'prom-client';
+import { logger } from '@config/logger';
 
 const expressApp = express();
 
@@ -15,7 +16,22 @@ expressApp.use('/api/v1/chat/socket.io', (req: Request, res: Response, next: Nex
 });
 
 expressApp.use(cors({ origin: ['http://localhost:5173'], credentials: true }));
+
+const register = new promClient.Registry();
+promClient.collectDefaultMetrics({ register });
+const monitoring = new UnifiedPrometheusMetricsMonitoring(promClient);
+register.registerMetric(monitoring.httpRequestTotal);
+register.registerMetric(monitoring.httpRequestDuration);
+
+expressApp.use(monitoring.metricsMiddleware);
 expressApp.use(morgan('dev'));
+
+expressApp.get('/metrics', async (_req: Request, res: Response) => {
+   logger.warn('hit metrics endpoint');
+   res.set('Content-Type', register.contentType);
+
+   res.end(await register.metrics());
+});
 
 expressApp.get('/api/v1/chat/health', (req, res) => {
    res.status(200).json({ status: 'ok' });
@@ -23,12 +39,7 @@ expressApp.get('/api/v1/chat/health', (req, res) => {
 
 expressApp.get('/api/v1/chat/test', async (req, res, next) => {
    try {
-      const result = await conversationRepository.findManyUserOneToOneConvoByParticipantIds(
-         '5315c3dd-a5bc-4754-9ce7-817018f97f7d',
-         ['4208d67b-1af8-488b-97e7-a719d632af33'],
-         10
-      );
-      res.status(200).json(result);
+      res.status(200).json(true);
    } catch (error) {
       next(error);
    }
