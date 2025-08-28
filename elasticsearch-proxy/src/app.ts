@@ -38,7 +38,11 @@ app.get('/api/v1/query/health', (req, res) => {
 
 app.post('/api/v1/query/test', async (req, res) => {
    try {
-      throw new Error();
+      const rand = Math.random();
+      if (rand < 0.01) {
+         throw new Error();
+      }
+      res.status(200).json({ success: true });
    } catch (error) {
       res.status(500).json(error);
    }
