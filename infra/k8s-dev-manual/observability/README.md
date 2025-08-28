@@ -64,3 +64,22 @@ deploy `k8s-dev-manual/observability/scrap.serviceMonitor.yaml`
 -  make usre the services need to be monitored have /metrics endpoint
 -  has label `monitor: "true"`
 -  the port name of the service is same as that mentioned in serviceMonitor (web)
+
+### 6. Install grafana alloy to scrap logs
+
+```bash
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+
+```
+
+deploy grafana alloy
+
+```bash
+helm install galloy grafana/alloy --namespace monitoring --values 7-grafana-alloy/values.yaml
+```
+
+dubug the logged resources (alloy config file)
+```bash
+ kubectl exec -n monitoring -it <galloy-pod-name> -- cat /etc/alloy/config.alloy
+```
