@@ -18,7 +18,6 @@ import {
    UnifiedPrometheusMetricsMonitoring,
 } from 'humane-common';
 import * as promClient from 'prom-client';
-import { logger } from '@config/logger';
 
 const app = express();
 
@@ -42,9 +41,7 @@ app.use(morgan('dev'));
 app.use(cookieParse());
 
 app.get('/metrics', async (_req: Request, res: Response) => {
-   logger.warn('hit metrics endpoint');
    res.set('Content-Type', register.contentType);
-
    res.end(await register.metrics());
 });
 
