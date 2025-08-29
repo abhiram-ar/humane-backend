@@ -15,6 +15,7 @@ spec:
         app: humane
         service: elasticsearch-proxy
         type: web-server
+        service-name: elasticsearch-proxy-srv # for logs service label - must match service.metadata.name
     spec:
       initContainers:
         - name: wait-for-es

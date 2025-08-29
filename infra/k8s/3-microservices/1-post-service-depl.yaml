@@ -15,6 +15,7 @@ spec:
         app: humane
         service: writer
         type: web-server
+        service-name: writer-srv # for logs service label - must match service.metadata.name
     spec:
       containers:
         - name: writer-server

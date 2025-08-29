@@ -15,6 +15,7 @@ spec:
         app: humane
         service: email
         type: web-server
+        service-name: email-srv # for logs service label - must match service.metadata.name
     spec:
       containers:
         - name: email-server

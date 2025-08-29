@@ -15,6 +15,7 @@ spec:
         app: humane
         service: reward
         type: web-server
+        service-name: reward-srv # for logs service label - must match service.metadata.name
     spec:
       # initContainers:
       #   - name: prisma-migrate

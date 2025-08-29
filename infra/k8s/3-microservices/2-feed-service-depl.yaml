@@ -15,6 +15,7 @@ spec:
         app: humane
         service: feed
         type: web-server
+        service-name: feed-srv # for logs service label - must match service.metadata.name
     spec:
       containers:
         - name: feed-server
