@@ -22,7 +22,7 @@ function checkEnv() {
    for (let key in ENV) {
       let typedKey = key as keyof typeof ENV;
       if (ENV[typedKey] === undefined || ENV[typedKey] === null) {
-         console.log(`${key} not found in environment`);
+         console.error(`${key} not found in environment`);
          errorCount++;
       }
    }
