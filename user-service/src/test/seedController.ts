@@ -29,8 +29,8 @@ export const seedUser = (req: Request, res: Response, next: NextFunction) => {
             isBlocked: newUser.isBlocked,
             isHotUser: newUser.isHotUser,
             bio: newUser.bio ?? null,
-            avatarKey: newUser.avatar ?? null,
-            coverPhotoKey: newUser.coverPhoto ?? null,
+            avatarKey: newUser.avatarKey ?? null,
+            coverPhotoKey: newUser.coverPhotoKey ?? null,
             lastLoginTime: newUser.lastLoginTime ?? null,
             humaneScore: newUser.humaneScore,
          };

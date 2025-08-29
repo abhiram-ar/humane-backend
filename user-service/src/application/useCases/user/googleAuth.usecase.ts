@@ -36,8 +36,8 @@ export class UserGoogleAuth implements IUserGoogleAuth {
             isBlocked: user.isBlocked,
             isHotUser: user.isHotUser,
             bio: user.bio ?? null,
-            avatarKey: user.avatar ?? null,
-            coverPhotoKey: user.coverPhoto ?? null,
+            avatarKey: user.avatarKey ?? null,
+            coverPhotoKey: user.coverPhotoKey ?? null,
             lastLoginTime: user.lastLoginTime ?? null,
             humaneScore: user.humaneScore,
          };

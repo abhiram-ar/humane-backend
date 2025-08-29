@@ -28,13 +28,13 @@ export class GetCurrentUserProfile implements IGetCurrentUserProfile {
       }
 
       let avatarURL: string | undefined;
-      if (currentUser.avatar) {
-         avatarURL = this._storageService.getPublicCDNURL(currentUser.avatar);
+      if (currentUser.avatarKey) {
+         avatarURL = this._storageService.getPublicCDNURL(currentUser.avatarKey);
       }
 
       let coverPhotoURL: string | undefined;
-      if (currentUser.coverPhoto) {
-         coverPhotoURL = this._storageService.getPublicCDNURL(currentUser.coverPhoto);
+      if (currentUser.coverPhotoKey) {
+         coverPhotoURL = this._storageService.getPublicCDNURL(currentUser.coverPhotoKey);
       }
 
       return {
