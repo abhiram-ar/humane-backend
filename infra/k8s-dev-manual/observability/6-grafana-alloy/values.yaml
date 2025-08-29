@@ -33,6 +33,11 @@ alloy:
         targets = discovery.kubernetes.pods.targets
 
         rule {
+          source_labels = ["__meta_kubernetes_pod_label_service_name"]
+          target_label  = "service_name"
+        }
+
+        rule {
           source_labels = ["__meta_kubernetes_namespace"]
           target_label  = "namespace"
         }
@@ -50,12 +55,6 @@ alloy:
         rule {
           source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
           target_label  = "app"
-        }
-
-        rule {
-          source_labels = ["__meta_kubernetes_namespace", "__meta_kubernetes_pod_container_name"]
-          separator     = "/"
-          target_label  = "job"
         }
       }
 
