@@ -89,8 +89,7 @@ export class UserProfileEventsConsumer implements IConsumer {
 
                logger.info(`processed-> ${tempTraceId}`);
             } catch (e) {
-               logger.error(`error processing: ${tempTraceId}`);
-               logger.error((e as Error).message);
+               logger.error(`error processing: ${tempTraceId}`, { error: e });
             }
          },
       });

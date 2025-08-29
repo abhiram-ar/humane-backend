@@ -209,7 +209,7 @@ export class UserRepository implements IUserRepository {
 
          return { ...res._source, id: res._id };
       } catch (error) {
-         logger.error(`error while retiving id:${userId} from ES`);
+         logger.error(`error while retiving id:${userId} from ES`, { error });
          if (error instanceof errors.ResponseError) {
             error.meta.statusCode === 404;
             return null;

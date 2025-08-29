@@ -178,8 +178,7 @@ export class PostRepository implements IPostRepository {
 
          return { ack: true };
       } catch (error) {
-         logger.error('error while bulk updating post comments');
-         console.log(error);
+         logger.error('error while bulk updating post comments', {error});
          return { ack: false };
       }
    };
