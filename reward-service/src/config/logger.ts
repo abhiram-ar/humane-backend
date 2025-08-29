@@ -1,5 +1,5 @@
-import winston from 'winston';
 import { ENV } from './env';
+import winston from 'winston';
 const { combine, errors, timestamp, json } = winston.format;
 
 // dev: logger

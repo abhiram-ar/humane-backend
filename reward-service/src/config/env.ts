@@ -1,5 +1,3 @@
-import { logger } from './logger';
-
 export const ENV = {
    NODE_ENV: process.env.NODE_ENV as 'production' | 'development',
    SERVER_PORT: '3000',
@@ -15,7 +13,7 @@ function checkEnv() {
    for (let key in ENV) {
       let typedKey = key as keyof typeof ENV;
       if (ENV[typedKey] === undefined || ENV[typedKey] === null) {
-         logger.error(`${key} not found in environment`);
+         console.error(`${key} not found in environment`);
          errorCount++;
       }
    }
