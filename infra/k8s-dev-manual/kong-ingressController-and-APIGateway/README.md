@@ -7,7 +7,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 ```
 
 2. Create a Gateway and GatewayClass instance to use. (in the current path look for `APIGateway.yaml`)
-   > node: The Gateway must be in the same namespace as the Kong deployment (here we used namespace kong)gateway should be in the same namespace
+   > node: The Gateway must be in the same namespace as the Kong deployment (here we used namespace kong)
 
 ```bash
 kubectl apply -n kong -f ./APIGateway.yaml
@@ -34,18 +34,56 @@ helm install kong kong/ingress -n kong --create-namespace
 
 ## 2. Services and Routes
 
-### Have your services ready
+Ensure that your services and routes are properly defined before enabling authentication and other plugins. Kong supports both classic and modern Kubernetes APIs for managing these:
 
-Kong Ingress Controller (KIC) actually supports two APIs right now:
+-  **Ingress API** – Uses standard Kubernetes Ingress objects along with Kong CRDs (e.g., `KongPlugin`, `KongIngress`).
+-  **Gateway API** – A newer Kubernetes standard, using `GatewayClass`, `Gateway`, `HTTPRoute`, `ReferenceGrant`, and related resources.
 
-1. Ingress API (the classic Kubernetes Ingress objects, plus Kong CRDs like KongPlugin, KongIngress).
-2. Gateway API (the newer Kubernetes standard: GatewayClass, Gateway, HTTPRoute, ReferenceGrant, etc.).
+> we have used gateway API in the `k8s/4-networking`
 
-## 3. Rate limiting
+## 3. Request Authorization – JWT
 
-Configuring plugins with Kong Ingress Controller is different compared to how you’d do it with Kong Gateway. Rather than attaching a configuration directly to a service or route, you create a `KongPlugin` definition and then annotate your Kubernetes resource with the konghq.com/plugins annotation.
-Apply the `./RatelimitingPlugin.yaml`
+To secure your APIs, we use JWT (JSON Web Token) authentication for request authorization. Follow these steps:
 
-## 4. Proxy caching
+### 1. Configure the JWT Secret
 
-In the previous section used created a KongPlugin that was applied to a specific service or route. You can also use a `KongClusterPlugin` which is a global plugin that applies to all services.
+Define your JWT secret in `jwtsecret.yaml`.
+This file contains the JWT access token secret that will be used to validate tokens.
+
+> **Important:** Ensure that the secret is properly managed and updated for production environments.
+
+```bash
+kubectl apply -f jwtsecret.yaml
+```
+
+### 2. Deploy the Kong Request Consumer
+
+Deploy the consumer that will use the JWT plugin for authentication.
+
+-  A **consumer** can represent either a **microservice** or a **frontend client**.
+-  In this setup, we are using a **frontend client as the consumer**.
+
+Instead of attaching the plugin configuration directly to a service or route, create a `KongPlugin` resource for JWT authentication and annotate the respective Kubernetes resource with:
+
+```
+konghq.com/plugins: <jwt-plugin-name>
+```
+
+### 3. Annotate Routes for JWT Verification
+
+Locate the route definitions in `infra/k8s/4-networking` and annotate the routes that require JWT authentication.
+
+This ensures that only requests with valid JWT tokens can access those routes.
+
+## 4. Rate Limiting
+
+To prevent abuse and ensure fair usage of APIs, we implement rate limiting using Kong’s built-in capabilities.
+
+1. **Create a `KongPlugin` resource** defining the desired rate-limiting configuration.
+2. **Apply the plugin manifest**:
+   ```bash
+   kubectl apply -f ./RatelimitingPlugin.yaml
+   ```
+3. **Annotate the target route or resource** with the `konghq.com/plugins` annotation to bind the rate-limiting plugin.
+
+> This ensures that incoming requests are throttled based on the configured limits (e.g., requests per second/minute), protecting backend services from overuse or denial-of-service attacks.
