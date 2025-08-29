@@ -64,6 +64,7 @@
               "mode": "off"
             }
           },
+          "links": [],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -92,7 +93,7 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "table",
+          "displayMode": "list",
           "placement": "right",
           "showLegend": true,
           "width": 0
@@ -112,7 +113,9 @@
           },
           "disableTextWrap": false,
           "editorMode": "code",
+          "exemplar": false,
           "expr": "sum by(method, route) (rate(http_requests_total{service=~\"$service\"}[1m]))",
+          "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": false,
           "instant": true,
@@ -211,7 +214,7 @@
       "targets": [
         {
           "disableTextWrap": false,
-          "editorMode": "code",
+          "editorMode": "builder",
           "expr": "histogram_quantile(0.95, sum by(le) (rate(http_request_duration_seconds_bucket{service=~\"$service\"}[$__rate_interval])))",
           "fullMetaSearch": false,
           "includeNullMetadata": false,
@@ -293,18 +296,21 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds",
+            "seriesBy": "max"
           },
           "custom": {
-            "axisBorderShow": false,
+            "axisBorderShow": true,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
+            "axisSoftMax": 101,
+            "axisSoftMin": 0,
             "barAlignment": 0,
             "barWidthFactor": 0.6,
             "drawStyle": "line",
-            "fillOpacity": 0,
+            "fillOpacity": 20,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -312,7 +318,10 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -333,15 +342,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "yellow",
                 "value": 0
               },
               {
-                "color": "red",
-                "value": 80
+                "color": "orange",
+                "value": 2
+              },
+              {
+                "color": "semi-dark-red",
+                "value": 5
               }
             ]
-          }
+          },
+          "unit": "percent"
         },
         "overrides": []
       },
@@ -356,7 +370,7 @@
         "legend": {
           "calcs": [],
           "displayMode": "list",
-          "placement": "bottom",
+          "placement": "right",
           "showLegend": true
         },
         "tooltip": {
@@ -370,10 +384,11 @@
         {
           "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "100 *\r\n(\r\n  sum by (route) (\r\n    rate(http_requests_total{status_code=~\"5..\", service=~\"$service\"}[5m])\r\n  )\r\n)\r\n/\r\n(\r\n  sum by (route) (\r\n    rate(http_requests_total{service=~\"$service\"}[5m])\r\n  )\r\n)\r\n",
+          "expr": "100 *\r\n(\r\n  sum by (route) (\r\n    rate(http_requests_total{status_code=~\"5..\", service=~\"$service\"}[5m])\r\n  )\r\n  or\r\n  vector(0)\r\n)\r\n/\r\nsum by (route) (\r\n  rate(http_requests_total{service=~\"$service\"}[5m])\r\n)\r\n",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
-          "legendFormat": "{{rotue}}",
+          "instant": false,
+          "legendFormat": "{{route}}",
           "range": true,
           "refId": "A",
           "useBackend": false
@@ -381,15 +396,60 @@
       ],
       "title": "Error rates",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "P8E80F9AEF21F6940"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "id": 5,
+      "options": {
+        "dedupStrategy": "none",
+        "enableInfiniteScrolling": false,
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "pluginVersion": "12.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "P8E80F9AEF21F6940"
+          },
+          "direction": "backward",
+          "editorMode": "builder",
+          "expr": "{service_name=~\"$service\"} | json | __error__=``",
+          "legendFormat": "",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "logs",
+      "type": "logs"
     }
   ],
   "preload": false,
+  "refresh": "auto",
   "schemaVersion": 41,
   "tags": [],
   "templating": {
     "list": [
       {
-        "allValue": "",
         "current": {
           "text": [
             "All"
@@ -415,12 +475,12 @@
     ]
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "Humane HTTP",
   "uid": "50036e2a-7138-4860-9cd9-1fcc71015bdc",
-  "version": 30
+  "version": 61
 }
