@@ -15,6 +15,7 @@ spec:
         app: humane
         service: chat
         type: web-server
+        service-name: chat-srv # for logs service label - must match service.metadata.name
     spec:
       containers:
         - name: chat-service
@@ -35,13 +36,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: chat-srv
+  labels:
+    metrics: "true"
 spec:
   selector:
     app: humane
     service: chat
     type: web-server
   ports:
-    - name: user
+    - name: web
       protocol: TCP
       port: 3000
       targetPort: 3000

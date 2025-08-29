@@ -9,8 +9,8 @@ export class User {
       public isHotUser: boolean = false,
       public createdAt: string,
       public lastLoginTime?: string | null,
-      public avatar?: string | null,
-      public coverPhoto?: string | null,
+      public avatarKey?: string | null,
+      public coverPhotoKey?: string | null,
       public lastName?: string | null,
       public passwordHash?: string,
       public bio?: string | null

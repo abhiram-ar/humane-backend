@@ -1,0 +1,54 @@
+# Deployment mode: SingleBinary (simple), SimpleScalable (medium), Distributed (large)
+deploymentMode: SingleBinary
+
+# Number of replicas
+singleBinary:
+  replicas: 1
+  persistence:
+    enabled: true
+    # -- Size of persistent disk
+    size: 1Gi
+    # -- Storage class to be used.
+    # If defined, storageClassName: <storageClass>.
+    # If set to "-", storageClassName: "", which disables dynamic provisioning.
+    # If empty or set to null, no storageClassName spec is
+    # set, choosing the default provisioner (gp2 on AWS, standard on GKE, AWS, and OpenStack).
+    storageClass: hostpath # TODO: change this to appropriate cloud on hosring
+    # -- Selector for persistent disk
+    selector: null
+    # -- Annotations for volume claim
+    annotations: {}
+    # -- Labels for volume claim
+    labels: {}
+
+# Component replicas
+# for single binary all the compoent relica will be 0
+write:
+  replicas: 0
+read:
+  replicas: 0
+backend:
+  replicas: 0
+
+# Caching
+chunksCache:
+  enabled: false
+resultsCache:
+  enabled: false
+
+# Helm test
+test:
+  enabled: false
+
+# All loki settings combined under one key
+loki:
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 1
+  storage:
+    type: filesystem
+    filesystem:
+      chunks_directory: /var/loki/chunks
+      rules_directory: /var/loki/rules
+
+  useTestSchema: true

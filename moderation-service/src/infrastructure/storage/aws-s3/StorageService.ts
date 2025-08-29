@@ -53,7 +53,7 @@ export class AWSStorageService implements IStorageService {
                await unlink(fullFilePath);
             }
          } catch (error) {
-            console.log('cleanup failed');
+            logger.error('download media cleanup failed', { error });
          }
          return { ok: false };
       }

@@ -52,7 +52,7 @@ export class ClientEventHandler implements IClientToServerEvents {
          const userOnlineStatus = await isUserOnline(userId);
          callback(userOnlineStatus);
       } catch (error) {
-         logger.error(error);
+         logger.error('error-checking is-user-online', { error });
          callback(false);
       }
    };
@@ -97,8 +97,8 @@ export class ClientEventHandler implements IClientToServerEvents {
 
          callback(true);
       } catch (error) {
+         logger.error('error deleting one to one message', { error });
          callback(false);
-         logger.error(error);
       }
    };
 
@@ -142,8 +142,7 @@ export class ClientEventHandler implements IClientToServerEvents {
 
          await this._eventPublisher.send(MessageBrokerTopics.MESSAGE_EVENTS_TOPIC, newMessageEvent);
       } catch (e) {
-         console.log('error while one to one message');
-         console.log(e);
+         logger.error('error while one to one message', { error: e });
          callback({ message: undefined, success: false });
       }
    };
@@ -185,8 +184,7 @@ export class ClientEventHandler implements IClientToServerEvents {
             conversationId: event.convoId,
          });
       } catch (error) {
-         logger.error('error while setting convo opened');
-         console.log(error);
+         logger.error('error while setting convo opened', { error });
       }
    };
    hello = () => {
@@ -238,7 +236,7 @@ export class ClientEventHandler implements IClientToServerEvents {
             callback({ ringing: false, callId: callDescription.callId });
          }
       } catch (error) {
-         logger.error(error);
+         logger.error('error initialing call', { error });
          if (error instanceof AppError) {
             callback({ ringing: false, error: error.message });
          } else {
@@ -323,7 +321,7 @@ export class ClientEventHandler implements IClientToServerEvents {
             });
          }
       } catch (error) {
-         logger.error(error);
+         logger.error('error while acting on call', { error });
          if (callback) callback({ status: 'callEnded' });
       }
    };
@@ -374,7 +372,7 @@ export class ClientEventHandler implements IClientToServerEvents {
             }
          }
       } catch (error) {
-         logger.error(error);
+         logger.error('error hanging up call', { error });
       }
    };
 
@@ -394,7 +392,7 @@ export class ClientEventHandler implements IClientToServerEvents {
             throw new CallDeviceNotFoundError();
          }
       } catch (error) {
-         logger.error(error);
+         logger.error('error on call-ice.candiate exchange', { error });
       }
    };
 
@@ -414,7 +412,7 @@ export class ClientEventHandler implements IClientToServerEvents {
             throw new CallDeviceNotFoundError();
          }
       } catch (error) {
-         logger.error(error);
+         logger.error('error on media state exchange', { error });
       }
    };
 
@@ -434,7 +432,7 @@ export class ClientEventHandler implements IClientToServerEvents {
             throw new CallDeviceNotFoundError();
          }
       } catch (error) {
-         logger.error(error);
+         logger.error('error on call-sdp.offer exchange', { error });
       }
    };
 
@@ -454,7 +452,7 @@ export class ClientEventHandler implements IClientToServerEvents {
             throw new CallDeviceNotFoundError();
          }
       } catch (error) {
-         logger.error(error);
+         logger.error('error on call-spd.answer exchange', { error });
       }
    };
 }

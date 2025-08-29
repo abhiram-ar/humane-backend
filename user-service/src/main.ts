@@ -1,3 +1,4 @@
+import { logger } from '@config/logger';
 import checkEnv from './config/env';
 import app from './presentation/server';
 import { connectKafkaProducer, disconnectKafkaProducer } from '@config/kafka';
@@ -16,10 +17,9 @@ const start = async () => {
          await disconnectKafkaProducer();
       });
 
-      app.listen(3000, () => console.log('user service start listening on port 3000'));
+      app.listen(3000, () => logger.info('user service start listening on port 3000'));
    } catch (error) {
-      console.error('Error while starting user service');
-      console.error(error);
+      logger.error('Error while starting user service', { error });
    }
 };
 

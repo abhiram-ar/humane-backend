@@ -5,10 +5,10 @@ import {
    startAllConsumer,
    stopAllConsumer,
 } from '@config/kafka';
-import { logger } from '@config/logger';
 import { rewardConfigServices } from '@di/usecase/reward.usecase.constiner';
 import db from '@infrastructure/persistance/postgres/prisma-client';
 import app from '@presentation/http/server';
+import { logger } from '@config/logger';
 
 const bootStrap = async () => {
    try {
@@ -27,8 +27,7 @@ const bootStrap = async () => {
          logger.info('Reward service fully opeational');
       });
    } catch (error) {
-      logger.error('erorr while starting reward service');
-      console.log(error);
+      logger.error('erorr while starting reward service', { error });
    }
 };
 

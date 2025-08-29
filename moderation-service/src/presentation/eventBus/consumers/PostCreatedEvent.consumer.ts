@@ -112,8 +112,7 @@ export class PostCreatedEventConsumer implements IConsumer {
                await this._commitOffset(message.offset, partition);
                logger.info(`Processed event -> ${event.eventId}`);
             } catch (e) {
-               logger.error(`consumer: error processing: ${event.eventId}`);
-               logger.error((e as Error).message);
+               logger.error(`consumer: error processing: ${event.eventId}`, { error });
 
                try {
                   if (event.eventType === AppEventsTypes.POST_CREATED) {
@@ -133,7 +132,7 @@ export class PostCreatedEventConsumer implements IConsumer {
                   // commit offset so we dont get stuck on the same message
                } catch (commitErr) {
                   // @ts-ignore
-                  logger.error(`consumer: Failed to commit or send to retry: ${commitErr.message}`);
+                  logger.error(`consumer: Failed to commit or send to retry`, { error: commitErr });
                   await this._commitOffset(message.offset, partition);
                }
             }

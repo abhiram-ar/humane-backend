@@ -15,6 +15,7 @@ spec:
         app: humane
         service: reward
         type: web-server
+        service-name: reward-srv # for logs service label - must match service.metadata.name
     spec:
       # initContainers:
       #   - name: prisma-migrate
@@ -70,13 +71,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: reward-srv
+  labels:
+    metrics: "true"
 spec:
   selector:
     app: humane
     service: reward
     type: web-server
   ports:
-    - name: reward
+    - name: web
       protocol: TCP
       port: 3000
       targetPort: 3000

@@ -47,7 +47,7 @@ export class UserServices implements IUserServices {
       const currnentTimeStamp = new Date(res.updatedAt ?? 0); // in case updateAT does not exist
 
       if (incomingTimestamp > currnentTimeStamp) {
-         this._userRepository.updateCommand(eventTimeStamp, dto);
+         await this._userRepository.updateCommand(eventTimeStamp, dto);
       } else {
          logger.warn('Skipping user update. Reason: old event');
       }
@@ -62,7 +62,7 @@ export class UserServices implements IUserServices {
       }
       const currnentTimeStamp = new Date(res.updatedAt ?? 0);
       if (incommingTimestamp > currnentTimeStamp) {
-         this._userRepository.updateUserAvatarKeyCommand(eventTimestamp, dto.id, dto.avatarKey);
+         await this._userRepository.updateUserAvatarKeyCommand(eventTimestamp, dto.id, dto.avatarKey);
       } else {
          logger.warn('Skipping avatarKey update. Reason: old event');
       }
@@ -77,7 +77,7 @@ export class UserServices implements IUserServices {
       }
       const currnentTimeStamp = new Date(res.updatedAt ?? 0);
       if (incommingTimestamp > currnentTimeStamp) {
-         this._userRepository.updateUserCoverPhotoKeyCommand(
+         await this._userRepository.updateUserCoverPhotoKeyCommand(
             eventTimestamp,
             dto.id,
             dto.coverPhotoKey
@@ -96,7 +96,7 @@ export class UserServices implements IUserServices {
       }
       const currnentTimeStamp = new Date(res.updatedAt ?? 0);
       if (incommingTimestamp > currnentTimeStamp) {
-         this._userRepository.updateUserBlockStatusCommand(eventTimestamp, dto.id, dto.isBlocked);
+         await this._userRepository.updateUserBlockStatusCommand(eventTimestamp, dto.id, dto.isBlocked);
       } else {
          logger.warn('Skipping blockstatus update. Reason: old event');
       }

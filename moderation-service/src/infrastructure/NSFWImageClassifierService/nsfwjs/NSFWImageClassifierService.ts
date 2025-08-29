@@ -22,7 +22,7 @@ export class NSFWJSImageClassifierService<T extends NSFWJSClassNames>
 
    classify = async (dto: { absImagePath: string }): Promise<Prediction<T>[] | null> => {
       if (!this._model) {
-         logger.error(ModelNotLoadedError.name);
+         logger.error('moderation model not found', { error: new ModelNotLoadedError() });
          return null;
       }
 
@@ -34,7 +34,7 @@ export class NSFWJSImageClassifierService<T extends NSFWJSClassNames>
          if (typedError.code && typedError.code && typedError.code === 'ENOENT') {
             throw new FileSystemError(fileSystemErrorMessages.NON_EXISTING_RESOURCE);
          }
-         logger.error(error);
+         logger.error('error claffiying content', { error });
          return null;
       }
 

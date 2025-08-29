@@ -151,9 +151,7 @@ export class RepliedWithinResonableTimeWorker implements IConsumer {
                   return;
                }
 
-               logger.error(`error processing: ${event.eventId}`);
-               logger.error((e as Error).message);
-               console.log(e);
+               logger.error(`error processing: ${event.eventId}`, { error: e });
 
                // DEAD-letter queue
             }

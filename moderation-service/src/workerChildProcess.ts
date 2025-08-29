@@ -26,7 +26,7 @@ const start = async () => {
       process.on('SIGTERM', close);
       process.on('SIGINT', close);
    } catch (error) {
-      console.log('error starting worker');
+      logger.error('error starting moderation worker', { error });
    }
 };
 

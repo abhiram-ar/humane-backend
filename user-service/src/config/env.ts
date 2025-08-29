@@ -1,24 +1,4 @@
-type ENVValue = string | undefined;
-
-type ENVConfig = {
-   readonly NODE_ENV: 'production' | 'development';
-   readonly SERVER_PORT: ENVValue;
-   readonly PASSWORD_SALT: ENVValue;
-   readonly OTP_SALT: ENVValue;
-   readonly ACCESS_TOKEN_SECRET: ENVValue;
-   readonly REFRESH_TOKEN_SECRET: ENVValue;
-   readonly RESET_PASSWORD_SECRET: ENVValue;
-   readonly GOOGLE_CLIENT_ID: ENVValue;
-   readonly GOOGLE_CLIENT_SECRET: ENVValue;
-   readonly AWS_ACCESS_KEY: ENVValue;
-   readonly AWS_SECRET_KEY: ENVValue;
-   readonly AWS_REGION: ENVValue;
-   readonly AWS_S3_BUCKET_NAME: ENVValue;
-   readonly AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME: ENVValue;
-   readonly ELASTICSEARCH_PROXY_BASE_URL: ENVValue
-};
-
-export const ENV: ENVConfig = {
+export const ENV = {
    NODE_ENV: process.env.NODE_ENV as 'production' | 'development',
    SERVER_PORT: '3000',
    PASSWORD_SALT: process.env.passwordSalt || '10',
@@ -33,16 +13,16 @@ export const ENV: ENVConfig = {
    AWS_REGION: process.env.AWS_REGION,
    AWS_S3_BUCKET_NAME: process.env.AWS_S3_BUCKET_NAME,
    AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME: process.env.AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME,
-   ELASTICSEARCH_PROXY_BASE_URL: process.env.ELASTICSEARCH_PROXY_BASE_URL
-};
+   ELASTICSEARCH_PROXY_BASE_URL: process.env.ELASTICSEARCH_PROXY_BASE_URL,
+} as const;
 
 function checkEnv() {
    let errorCount = 0;
 
    for (let key in ENV) {
-      let typedKey = key as keyof ENVConfig;
+      let typedKey = key as keyof typeof ENV;
       if (ENV[typedKey] === undefined || ENV[typedKey] === null) {
-         console.log(`${key} not found in environment`);
+         console.error(`${key} not found in environment`);
          errorCount++;
       }
    }

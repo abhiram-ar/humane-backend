@@ -1,0 +1,42 @@
+# Grafana configuration
+grafana:
+  initChownData:
+    # the init container will try to modify the chown data for PV it mounted
+    # dokcker destop wont allow a container to change the chonw on the host path
+    enabled: false # TODO: can change this to true in a cloud deployemnt
+  persistence:
+    enabled: true
+    type: pvc
+    storageClassName: hostpath # TODO: on cloud use standard
+    accessModes:
+      - ReadWriteOnce
+    size: 1Gi
+  # Add Loki as a data source
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      url: http://loki-gateway.monitoring.svc.cluster.local
+      access: proxy
+      # Even with auth_enabled: false, Loki requires an org ID header
+      # This is a known quirk - the value can be anything since auth is disabled
+      jsonData:
+        httpHeaderName1: "X-Scope-OrgID"
+      secureJsonData:
+        httpHeaderValue1: "fake"
+
+prometheus:
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: hostpath # TODO: on cloud use standard, or appropriate storageClass
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 1Gi
+# Production options (commented out):
+# Alertmanager high availability:
+# alertmanager:
+#   alertmanagerSpec:
+#     replicas: 3
+

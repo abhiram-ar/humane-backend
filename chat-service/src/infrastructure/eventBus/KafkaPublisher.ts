@@ -21,8 +21,7 @@ export class KafkaPublisher implements IEventPublisher {
 
          return { ack: true };
       } catch (error) {
-         logger.error(`Failed to send ${event.eventType}`);
-         console.log(error);
+         logger.error(`Failed to send ${event.eventType}`, { error });
          return { ack: false };
       }
    };

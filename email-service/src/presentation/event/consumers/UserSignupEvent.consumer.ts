@@ -6,6 +6,7 @@ import {
    SendUserVerificationMailDTO,
    sendUserVerificationMailInputSchema,
 } from '@dtos/sendVerificationMailInput.dto';
+import { logger } from '@config/logger';
 
 export class UserSingupEventConsumer implements IConsumer {
    private _consumer: Consumer;
@@ -18,7 +19,7 @@ export class UserSingupEventConsumer implements IConsumer {
 
    start = async () => {
       await this._consumer.connect();
-      console.log('User signup consumer connected');
+      logger.info('User signup consumer connected');
 
       await this._consumer.subscribe({ topic: MessageBrokerTopics.USER_SINGUP_EVENTS_TOPIC });
 
@@ -40,7 +41,7 @@ export class UserSingupEventConsumer implements IConsumer {
             }
 
             await this._handleSingupMailSend.execute(parsed.data);
-            console.log(`veififaction mail send to ${dto.email}`);
+            logger.info(`veififaction mail send to ${dto.email}`);
          },
       });
    };

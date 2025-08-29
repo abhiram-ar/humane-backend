@@ -1,0 +1,81 @@
+controller:
+  type: deployment # TODO: convert this to daemonSet in a multi-node enviroment
+  replicas: 1 # single replica for dev mode
+
+serviceAccount:
+  create: true # Creates a ServiceAccount with necessary RBAC for pod discovery and log streaming
+
+alloy:
+  configMap:
+    create: true
+    content: |-
+      logging {
+        level  = "info"
+        format = "logfmt"
+      }
+
+      discovery.kubernetes "pods" {
+        role = "pod"
+        // Optional: Filter to specific namespaces where your microservices run (e.g., if not in "monitoring").
+        namespaces {
+          names = ["default", "my-app-ns"]
+        }
+        // Optional: Filter pods by labels (e.g., if your microservices have a common label like app.kubernetes.io/name).
+        // selectors {
+        //   match_labels = {
+        //     "app.kubernetes.io/name" = "my-microservice"
+        //   }
+        // }
+      }
+
+      // Optional but recommended: Relabel to extract useful Loki labels from Kubernetes metadata (e.g., namespace, pod, container).
+      discovery.relabel "pod_logs" {
+        targets = discovery.kubernetes.pods.targets
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_label_service_name"]
+          target_label  = "service_name"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_namespace"]
+          target_label  = "namespace"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_name"]
+          target_label  = "pod"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_name"]
+          target_label  = "container"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+          target_label  = "app"
+        }
+      }
+
+      loki.source.kubernetes "pod_logs" {
+        targets    = discovery.relabel.pod_logs.output
+        forward_to = [loki.process.pod_logs.receiver]
+      }
+
+      // Optional: Process logs to add static labels (e.g., cluster) or drop high-cardinality ones if needed.
+      loki.process "pod_logs" {
+        forward_to = [loki.write.loki.receiver]
+
+        stage.static_labels {
+          values = {
+            cluster = "dev-cluster", // Custom label for your dev environment; adjust as needed.
+          }
+        }
+      }
+
+      loki.write "loki" {
+        endpoint {
+          url = "http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push"
+        }
+      }

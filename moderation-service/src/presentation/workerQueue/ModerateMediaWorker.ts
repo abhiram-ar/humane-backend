@@ -85,7 +85,7 @@ export class RabbitMQPostMediaModerationWorker implements IConsumer {
          logger.debug(`🔽 new job -> ${event.eventType} ${event.eventId}`);
 
          if (event.eventType !== AppEventsTypes.POST_CREATED) {
-            logger.error(new EventConsumerMissMatchError());
+            logger.warn(new EventConsumerMissMatchError());
             consumerChan.ack(msg);
             return;
          }
@@ -174,9 +174,7 @@ export class RabbitMQPostMediaModerationWorker implements IConsumer {
 
             consumerChan.ack(msg);
          } catch (e) {
-            logger.error(`worker: error processing: ${event.eventId}`);
-            logger.error((e as Error).message);
-            console.log(e);
+            logger.error(`worker: error processing: ${event.eventId}`, { error: e });
 
             try {
                // we dont want to nack this message every this this is failed
@@ -214,7 +212,7 @@ export class RabbitMQPostMediaModerationWorker implements IConsumer {
                }
                return;
             } catch (error) {
-               logger.error('wokrer all fallback mechanism faliled');
+               logger.error('wokrer all fallback mechanism faliled', { error });
             }
          }
       });

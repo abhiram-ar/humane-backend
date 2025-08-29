@@ -26,7 +26,7 @@ export class ExternalWriterService implements IExternalWriterService {
 
          return res.data.data.commmentLikeMetadata;
       } catch (error) {
-         logger.error('error while fetching comment metadata ' + error);
+         logger.error('error while fetching comment metadata ', { error });
          return null;
       }
    };

@@ -15,6 +15,7 @@ spec:
         app: humane
         service: email
         type: web-server
+        service-name: email-srv # for logs service label - must match service.metadata.name
     spec:
       containers:
         - name: email-server
@@ -34,13 +35,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: email-srv
+  labels:
+    metrics: "true"
 spec:
   selector:
     app: humane
     service: email
     type: web-server
-  ports:                # might not need service for this usecase
-    - name: email
+  ports: # might not need service for this usecase
+    - name: web
       protocol: TCP
       port: 3000
       targetPort: 3000

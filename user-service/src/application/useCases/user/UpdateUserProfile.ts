@@ -41,8 +41,8 @@ export class UpdateUserProfile implements IUpdateUserProfile {
          firstName: updatedUserProfile.firstName,
          lastName: updatedUserProfile.lastName || null,
          bio: updatedUserProfile.bio || null,
-         avatarKey: updatedUserProfile.avatar || null,
-         coverPhotoKey: updatedUserProfile.coverPhoto || null,
+         avatarKey: updatedUserProfile.avatarKey || null,
+         coverPhotoKey: updatedUserProfile.coverPhotoKey || null,
          createdAt: updatedUserProfile.createdAt,
          lastLoginTime: updatedUserProfile.lastLoginTime || null,
          isBlocked: updatedUserProfile.isBlocked,
@@ -52,7 +52,6 @@ export class UpdateUserProfile implements IUpdateUserProfile {
 
       //
       const userNameBioUpdatedEvent = createEvent(AppEventsTypes.USER_UPDATED, eventPayload);
-      console.log(AppEventsTypes);
       const { ack } = await this._eventPublisher.send(
          MessageBrokerTopics.USER_PROFILE_EVENTS_TOPIC,
          userNameBioUpdatedEvent

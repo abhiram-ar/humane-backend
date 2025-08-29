@@ -142,8 +142,7 @@ export class FriendReqEventConsumer implements IConsumer {
                }
                logger.info(`Processed ${event.eventType}: ${event.eventId}`);
             } catch (error) {
-               logger.error(`Error while processing ${event.eventId}`);
-               logger.error(error);
+               logger.error(`Error while processing ${event.eventId}`, { error });
             }
          },
       });

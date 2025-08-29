@@ -137,8 +137,7 @@ export class ModeratePostMedia<ClassNames extends string>
       });
 
       if (!ok) {
-         logger.warn('unable to extract frames');
-         console.log(error);
+         logger.error('unable to extract frames', { error });
          return null;
       }
 
@@ -234,7 +233,7 @@ export class ModeratePostMedia<ClassNames extends string>
             await rm(resoureDir, { recursive: true });
          }
       } catch (error) {
-         logger.error(error);
+         logger.error('moderation cleanup fauled', { error });
       }
    };
 }

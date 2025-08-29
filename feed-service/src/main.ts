@@ -26,7 +26,9 @@ const bootstrap = async () => {
          logger.info('feed server started lisign on port 3000');
       });
       logger.info('Feed service started succssfully');
-   } catch (error) {}
+   } catch (error) {
+      logger.error('Error starting feed service', { error });
+   }
 };
 
 bootstrap();

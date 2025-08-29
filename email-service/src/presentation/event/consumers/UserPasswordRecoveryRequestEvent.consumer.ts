@@ -6,6 +6,7 @@ import {
    SendPasswordRecoveryMailInputDTO,
    sendPasswordRecoveryMailInputSchema,
 } from '@dtos/sendPasswordRecoveryMailInput.dto';
+import { logger } from '@config/logger';
 
 export class UserPasswordRecoveryRequestEventConsumer implements IConsumer {
    private consumer: Consumer;
@@ -19,7 +20,7 @@ export class UserPasswordRecoveryRequestEventConsumer implements IConsumer {
 
    start = async () => {
       await this.consumer.connect();
-      console.log('User password recovery event consumer connected ');
+      logger.info('User password recovery event consumer connected ');
 
       await this.consumer.subscribe({
          topic: MessageBrokerTopics.USER_PASSWORD_RECOVERY_EVENTS_TOPIC,
@@ -27,7 +28,7 @@ export class UserPasswordRecoveryRequestEventConsumer implements IConsumer {
 
       await this.consumer.run({
          eachMessage: async ({ message }) => {
-            console.log('got new messsage: userPassowrd recovery');
+            logger.info('got new messsage: userPassowrd recovery', { message });
 
             const event = JSON.parse(
                (message.value as Buffer<ArrayBufferLike>).toString()
@@ -44,7 +45,7 @@ export class UserPasswordRecoveryRequestEventConsumer implements IConsumer {
             }
 
             await this._sendPasswordRecoveryMail.execute(parsed.data);
-            console.log(`event handled: mail send to ${dto.email}`);
+            logger.info(`event handled: mail send to ${dto.email}`);
          },
       });
    };

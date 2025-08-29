@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import authRouter from './routes/userAuth.router';
 import morgan from 'morgan';
 import { errorHandler } from './middlewares/error.middeware';
@@ -12,7 +12,12 @@ import { seedUser } from 'test/seedController';
 import userRelationshipRouter from './routes/userRelationship.router';
 import { sendBulkFriendReq } from 'test/sendBulkFriendReq';
 import internalRouter from './routes/internal.router';
-import { authorizedRoles, isAuthenticatedV2 } from 'humane-common';
+import {
+   authorizedRoles,
+   isAuthenticatedV2,
+   UnifiedPrometheusMetricsMonitoring,
+} from 'humane-common';
+import * as promClient from 'prom-client';
 
 const app = express();
 
@@ -22,12 +27,22 @@ app.use(
       credentials: true,
    })
 );
+
+const register = new promClient.Registry();
+promClient.collectDefaultMetrics({ register });
+const monitoring = new UnifiedPrometheusMetricsMonitoring(promClient);
+
+register.registerMetric(monitoring.httpRequestTotal);
+register.registerMetric(monitoring.httpRequestDuration);
+
+app.use(monitoring.metricsMiddleware);
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(cookieParse());
 
-app.get('/api/v1/user/health', (req, res) => {
-   res.status(200).json({ status: 'OK' });
+app.get('/metrics', async (_req: Request, res: Response) => {
+   res.set('Content-Type', register.contentType);
+   res.end(await register.metrics());
 });
 
 app.use('/api/v1/internal', internalRouter);

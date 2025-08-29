@@ -1,7 +1,7 @@
 import { ChildProcess, spawn } from 'child_process';
 import { logger } from '@config/logger';
 
-import checkEnv from '@config/env';
+import checkEnv, { ENV } from '@config/env';
 import { startRabbiMqProducer, stopRabbitMQProducer } from '@config/rabbitMq';
 import {
    connectKafkaProducer,
@@ -9,6 +9,7 @@ import {
    startAllKafkaConsumers,
    stopAllKafkaConsumers,
 } from '@config/kafka';
+import app from '@presentation/http/server';
 
 let childprocess: ChildProcess | undefined;
 
@@ -23,6 +24,10 @@ const bootstrap = async () => {
 
       await connectKafkaProducer();
       await startAllKafkaConsumers();
+
+      app.listen(ENV.SERVER_PORT, () => {
+         logger.info('Moderation server started');
+      });
 
       let retryCount = 0;
       const maxRetries = 3;
@@ -53,8 +58,7 @@ const bootstrap = async () => {
       startChildProcess();
       process.on('exit', shutdown);
    } catch (error) {
-      logger.error('Error while starting moderation service');
-      console.log(error);
+      logger.error('Error while starting moderation service', {error});
    }
 };
 

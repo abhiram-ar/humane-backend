@@ -23,7 +23,7 @@ const bootstrap = async () => {
       await userRepository.pingES();
       logger.info('es proxy full operational');
    } catch (error) {
-      logger.error('error starting es-proxy');
+      logger.error('error starting es-proxy', { error });
    }
 };
 

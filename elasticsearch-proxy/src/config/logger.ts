@@ -1,19 +1,27 @@
 import winston from 'winston';
-import { formatDate } from 'date-fns';
-const { combine, errors, timestamp, colorize, printf } = winston.format;
+import { ENV } from './env';
+const { combine, errors, timestamp, json } = winston.format;
+
+// dev logger
+// export const logger = winston.createLogger({
+//    level: 'silly',
+//    format: combine(
+//       timestamp({
+//          format: () => formatDate(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+//       }),
+//       printf(({ timestamp, level, message }) => {
+//          return `[${timestamp}] ${level.toUpperCase().padEnd(5, ' ')}: ${message}`;
+//       }),
+//       errors({ stack: true }),
+//       colorize({ all: true })
+//    ),
+//    // defaultMeta: { service: 'elasticsearch-proxy' },
+//    transports: [new winston.transports.Console()],
+// });
 
 export const logger = winston.createLogger({
-   level: 'silly',
-   format: combine(
-      timestamp({
-         format: () => formatDate(new Date(), 'yyyy-MM-dd HH:mm:ss'),
-      }),
-      printf(({ timestamp, level, message }) => {
-         return `[${timestamp}] ${level.toUpperCase().padEnd(5, ' ')}: ${message}`;
-      }),
-      errors({ stack: true }),
-      colorize({ all: true })
-   ),
-   // defaultMeta: { service: 'elasticsearch-proxy' },
+   level: ENV.NODE_ENV === 'production' ? 'info' : 'silly',
+   format: combine(timestamp(), errors({ stack: true }), json()),
+   defaultMeta: { service: 'elasticsearch-proxy-srv' },
    transports: [new winston.transports.Console()],
 });

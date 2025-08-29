@@ -22,7 +22,7 @@ export class KafkaPublisher implements IEventPublisher {
 
          return { ack: true };
       } catch (error) {
-         console.log(error);
+         logger.error("error pushishing event", {error})
          return { ack: false };
       }
    };

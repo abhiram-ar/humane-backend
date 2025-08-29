@@ -56,9 +56,7 @@ export class PostCreatedEventConsumer implements IConsumer {
                   logger.warn(`foregin event-> ${event.eventType} ${event.eventId}, skipped`);
                }
             } catch (e) {
-               logger.error(`error processing: ${event.eventId}`);
-               logger.error((e as Error).message);
-               console.log(e);
+               logger.error(`error processing: ${event.eventId}`, { error: e });
             }
          },
       });

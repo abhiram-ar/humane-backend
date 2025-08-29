@@ -54,7 +54,7 @@ export class LikeServices implements ILikeServices {
          `published ${successCount}/${dto.length} ${AppEventsTypes.COMMENT_UNLIKED} events`
       );
 
-      // TODO: handle author liked or handle in the hasPostAuthorLiked/unlied consumer or here
+      // TODO: handle author liked or handle in the hasPostAuthorLiked/unlied in consumer or here
    };
 
    bulkInsert = async (dto: BulkCommnetLikeInsertInputDTO): Promise<void> => {

@@ -31,7 +31,7 @@ export class RedisCacheService implements ICacheService {
          });
          return { ack: res ? true : false };
       } catch (error) {
-         logger.error(error);
+         logger.error('error setting redix cache', { error });
          return { ack: false };
       }
    };

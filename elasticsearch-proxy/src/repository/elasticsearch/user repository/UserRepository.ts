@@ -40,9 +40,9 @@ export class UserRepository implements IUserRepository {
    pingES = async () => {
       try {
          const health = await this._client.cluster.health();
-         console.log('cluster health', health);
+         logger.info('cluster health', { health });
       } catch (error) {
-         console.log('error pingitg es cluster', error);
+         logger.error('error pingitg es cluster', { error });
       }
    };
 
@@ -209,7 +209,7 @@ export class UserRepository implements IUserRepository {
 
          return { ...res._source, id: res._id };
       } catch (error) {
-         logger.error(`error while retiving id:${userId} from ES`);
+         logger.error(`error while retiving id:${userId} from ES`, { error });
          if (error instanceof errors.ResponseError) {
             error.meta.statusCode === 404;
             return null;
