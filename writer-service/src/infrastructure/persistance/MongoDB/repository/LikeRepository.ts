@@ -78,7 +78,7 @@ export class LikeRepository implements ILikesRepository {
          await session.endSession();
          return likesFound.map(likeAutoMapper);
       } catch (error) {
-         logger.error('errro while commnet like bulk delete transaction');
+         logger.error('errro while commnet like bulk delete transaction', { error });
          session.abortTransaction();
          await session.endSession();
          throw error;
@@ -114,14 +114,11 @@ export class LikeRepository implements ILikesRepository {
 
             const insertedDocs = (err as any).insertedDocs as Array<InstanceType<typeof likeModel>>;
             if (insertedDocs.length > 0) {
-               logger.verbose(
-                  '✅ Partial batch inserted. Inserted docs:' +
-                     JSON.stringify((err as any).insertedDocs, null, 2)
-               );
+               logger.verbose('✅ Partial batch inserted. Inserted docs:', { error: err });
                return insertedDocs.map((doc) => likeAutoMapper(doc));
             } else return [];
          } else {
-            logger.error('🚨 Unexpected error while batch inserting likes:', err);
+            logger.error('🚨 Unexpected error while batch inserting likes:', { error: err });
             return null;
          }
       }

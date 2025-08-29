@@ -66,9 +66,7 @@ export class CommentUnlikeWorker implements IConsumer {
          );
          await this.consumer.commitOffsets(offsetEntries);
       } catch (error) {
-         logger.error(
-            'error while bulk removing commnet likes flush: ' + (error as Error)?.message
-         );
+         logger.error('error while bulk removing commnet likes flush: ', { error });
       } finally {
          this.flushingBatch.updates.clear();
          this.flushingBatch.partitionOffsets.clear();
@@ -129,9 +127,7 @@ export class CommentUnlikeWorker implements IConsumer {
 
                logger.info(`batched for processing-> ${event.eventType} ${event.eventId}`);
             } catch (e) {
-               logger.error(`error processing: ${event.eventType} ${event.eventId}`);
-               logger.error((e as Error).message);
-               console.log(e);
+               logger.error(`error processing: ${event.eventType} ${event.eventId}`, { error: e });
             }
          },
       });

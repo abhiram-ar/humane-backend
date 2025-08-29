@@ -23,8 +23,7 @@ const bootstrap = async () => {
       await startAllConsumer();
       logger.info('writer server full operational');
    } catch (error) {
-      logger.error('Error starting writer service');
-      logger.error(JSON.stringify(error, null, 2));
+      logger.error('Error starting writer service', { error });
    }
 };
 
