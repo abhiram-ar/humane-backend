@@ -7,6 +7,7 @@ import publicUserQueryRouter from 'routes/publicUserQuery.router';
 import { errorHandler, UnifiedPrometheusMetricsMonitoring } from 'humane-common';
 import publicPostRouter from 'routes/pubicPostRouter';
 import * as promClient from 'prom-client';
+import { logger } from '@config/logger';
 
 const app = express();
 
@@ -39,11 +40,12 @@ app.get('/api/v1/query/health', (req, res) => {
 app.post('/api/v1/query/test', async (req, res) => {
    try {
       const rand = Math.random();
-      if (rand < 0.01) {
-         throw new Error();
+      if (rand > 0.5) {
+         throw new Error('Something went wrong');
       }
       res.status(200).json({ success: true });
    } catch (error) {
+      logger.error(error);
       res.status(500).json(error);
    }
 });
