@@ -26,8 +26,7 @@ const bootStrap = async () => {
 
       await startAllConsumer();
    } catch (error) {
-      logger.error('error while starting chat-service-pod');
-      console.log(error);
+      logger.error('error while starting chat-service-pod', { error });
    }
 };
 
