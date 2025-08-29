@@ -19,8 +19,7 @@ const boostrap = async () => {
          logger.info(`Email service start listening on ${ENV.SERVER_PORT}`);
       });
    } catch (error) {
-      console.error('error while starting notification service');
-      console.error(error);
+      logger.error('error while starting notification service', { error });
    }
 };
 

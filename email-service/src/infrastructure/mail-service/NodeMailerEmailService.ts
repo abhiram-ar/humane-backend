@@ -2,6 +2,7 @@ import ejs from 'ejs';
 import nodeMailer from 'nodemailer';
 import path from 'path';
 import { IEmailService } from '@ports/IEmailService';
+import { logger } from '@config/logger';
 
 export class NodeMailerEmailService implements IEmailService {
    private transporter = nodeMailer.createTransport({
@@ -36,7 +37,7 @@ export class NodeMailerEmailService implements IEmailService {
          await this.transporter.sendMail(mailOptions);
          return { ack: true };
       } catch (error) {
-         console.log('error while sending mail', error);
+         logger.error('error while sending mail', { error });
          return { ack: false };
       }
    };

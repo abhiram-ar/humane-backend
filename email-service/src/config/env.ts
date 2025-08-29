@@ -1,3 +1,5 @@
+import { logger } from "./logger";
+
 type ENVValue = string | undefined;
 
 type ENVConfig = {
@@ -30,7 +32,7 @@ function checkEnv() {
    for (let key in ENV) {
       let typedKey = key as keyof ENVConfig;
       if (ENV[typedKey] === undefined || ENV[typedKey] === null) {
-         console.log(`${key} not found in environment`);
+         logger.error(`${key} not found in environment`);
          errorCount++;
       }
    }

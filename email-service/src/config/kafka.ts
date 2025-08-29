@@ -3,15 +3,16 @@ import {
    useSignupEventConsumer,
 } from '@DI-container/consumers/sendEmailConsumer.container';
 import KafkaSingleton from '@infrastructure/event-bus/KafkaSingleton';
+import { logger } from './logger';
 
 export async function connectKafkaProducer() {
    await KafkaSingleton.getInstance().getProducer().connect();
-   console.log('kafka producer connected');
+   logger.info('kafka producer connected');
 }
 
 export const disconnectKafkaProducer = async () => {
    await KafkaSingleton.getInstance().getProducer().disconnect();
-   console.log('kafka producer disconnected');
+   logger.info('kafka producer disconnected');
 };
 
 export const startAllConsumers = async () => {
