@@ -40,9 +40,9 @@ export class UserRepository implements IUserRepository {
    pingES = async () => {
       try {
          const health = await this._client.cluster.health();
-         console.log('cluster health', health);
+         logger.info('cluster health', { health });
       } catch (error) {
-         console.log('error pingitg es cluster', error);
+         logger.error('error pingitg es cluster', { error });
       }
    };
 
