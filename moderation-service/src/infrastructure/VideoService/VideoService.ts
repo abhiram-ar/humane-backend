@@ -29,7 +29,7 @@ export class FFMPEGVideoService {
                res({ ok: true });
             })
             .on('error', (err) => {
-               console.log(err);
+               logger.error('error extracting frames', { error: err });
                rej({ ok: false, error: err });
             })
             .run();

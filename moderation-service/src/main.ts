@@ -58,8 +58,7 @@ const bootstrap = async () => {
       startChildProcess();
       process.on('exit', shutdown);
    } catch (error) {
-      logger.error('Error while starting moderation service');
-      console.log(error);
+      logger.error('Error while starting moderation service', {error});
    }
 };
 
