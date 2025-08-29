@@ -27,8 +27,7 @@ const bootStrap = async () => {
          logger.info('Reward service fully opeational');
       });
    } catch (error) {
-      logger.error('erorr while starting reward service');
-      console.log(error);
+      logger.error('erorr while starting reward service', { error });
    }
 };
 

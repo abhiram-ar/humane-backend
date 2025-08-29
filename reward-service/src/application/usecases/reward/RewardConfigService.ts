@@ -25,7 +25,6 @@ export class RewardConfigServices implements IRewardConfigServices {
       let res = await this.rewardConfigRepo.get(type);
       if (!res) {
          logger.error(new RewardError(RewardErrorMsg.NO_REWARD_CONFIG));
-         logger.warn('Manually crashing the process');
          process.exit(1);
       }
       return res.amount;
