@@ -18,8 +18,7 @@ const bootstrap = async () => {
 
       logger.info('notification service fully operational');
    } catch (error) {
-      logger.error('Error while starting notificaion serviec');
-      logger.error(error);
+      logger.error('Error while starting notificaion serviec', { error });
    }
 };
 

@@ -70,9 +70,7 @@ export class CommentCreatedEventConsumer implements IConsumer {
 
                logger.info(`processed-> ${event.eventType} ${event.eventId}`);
             } catch (e) {
-               logger.error(`error processing: ${event.eventType} ${event.eventId}`);
-               logger.error((e as Error).message);
-               console.log(e);
+               logger.error(`error processing: ${event.eventType} ${event.eventId}`, { error: e });
             }
          },
       });
