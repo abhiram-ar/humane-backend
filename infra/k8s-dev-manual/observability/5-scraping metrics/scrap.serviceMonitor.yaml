@@ -19,6 +19,6 @@ spec:
   # Define the endpoints to scrape
   endpoints:
     - port: web # Port name in your service
-      interval: 15s
+      interval: 30s
       path: /metrics # Metrics endpoint path
       scheme: http

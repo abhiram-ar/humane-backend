@@ -1,6 +1,6 @@
 controller:
-  type: deployment
-  replicas: 1 # Single replica for dev mode
+  type: deployment # TODO: convert this to daemonSet in a multi-node enviroment
+  replicas: 1 # single replica for dev mode
 
 serviceAccount:
   create: true # Creates a ServiceAccount with necessary RBAC for pod discovery and log streaming
