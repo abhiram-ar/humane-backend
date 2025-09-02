@@ -1,0 +1,78 @@
+name: Build & Push Microservices
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed_services: ${{ steps.detect.outputs.changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Detect changed services
+        id: detect
+        run: |
+          # Get changed files from the last merge base
+          BASE=${{ github.base_ref || 'origin/main' }}
+          CHANGED_FILES=$(git diff --name-only $BASE ${{ github.sha }})
+
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          SERVICES=()
+          for file in $CHANGED_FILES; do
+            SERVICE=$(echo "$file" | cut -d'/' -f1)
+            if [[ -d "$SERVICE" && -f "$SERVICE/Dockerfile" ]]; then
+              SERVICES+=("$SERVICE")
+            fi
+          done
+
+          UNIQUE_SERVICES=$(printf "%s\n" "${SERVICES[@]}" | sort -u | xargs)
+          echo "Changed services: $UNIQUE_SERVICES"
+          echo "changed=$UNIQUE_SERVICES" >> $GITHUB_OUTPUT
+
+  build-and-push:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.changed_services != ''
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: ${{ fromJSON(format('["{0}"]', join(needs.detect-changes.outputs.changed_services, '","'))) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: |
+          cd ${{ matrix.service }}
+          npm ci
+
+      - name: Run strict TypeScript check
+        run: |
+          cd ${{ matrix.service }}
+          npx tsc --noEmit
+        continue-on-error: false # Fail the job if TypeScript errors exist
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        run: |
+          SERVICE_NAME=${{ matrix.service }}
+          IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/$SERVICE_NAME:latest
+          docker build -t $IMAGE_NAME $SERVICE_NAME
+          docker push $IMAGE_NAME
