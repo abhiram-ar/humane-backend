@@ -1,72 +1,156 @@
 name: Build and Push Docker Images (Simple)
 
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-env:
-  DOCKER_USERNAME: your-dockerhub-username
+   push:
+      branches: [main]
+   workflow_dispatch:
 
 jobs:
-  build-services:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-    
-    # Build each service individually
-    - name: Build and push chat-service
-      run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chat-service:latest ./chat-service
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/chat-service:latest
-    
-    - name: Build and push elasticsearch-proxy
-      run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/elasticsearch-proxy:latest ./elasticsearch-proxy
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/elasticsearch-proxy:latest
-    
-    - name: Build and push email-service
-      run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/email-service:latest ./email-service
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/email-service:latest
-    
-    - name: Build and push feed-service
-      run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/feed-service:latest ./feed-service
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/feed-service:latest
-    
-    - name: Build and push moderation-service
-      run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/moderation-service:latest ./moderation-service
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/moderation-service:latest
-    
-    - name: Build and push notification-service
-      run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/notification-service:latest ./notification-service
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/notification-service:latest
-    
-    - name: Build and push reward-service
-      run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/reward-service:latest ./reward-service
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/reward-service:latest
-    
-    - name: Build and push user-service
-      run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/user-service:latest ./user-service
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/user-service:latest
-    
-    - name: Build and push writer-service
-      run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/writer-service:latest ./writer-service
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/writer-service:latest
+   detect-changes:
+      runs-on: ubuntu-latest
+      outputs:
+         chat-service: ${{ steps.changes.outputs.chat-service }}
+         elasticsearch-proxy: ${{ steps.changes.outputs.elasticsearch-proxy }}
+         email-service: ${{ steps.changes.outputs.email-service }}
+         feed-service: ${{ steps.changes.outputs.feed-service }}
+         moderation-service: ${{ steps.changes.outputs.moderation-service }}
+         notification-service: ${{ steps.changes.outputs.notification-service }}
+         reward-service: ${{ steps.changes.outputs.reward-service }}
+         user-service: ${{ steps.changes.outputs.user-service }}
+         writer-service: ${{ steps.changes.outputs.writer-service }}
+         humane-common: ${{ steps.changes.outputs.humane-common }}
+
+      steps:
+         - name: Checkout code
+           uses: actions/checkout@v4
+           with:
+              fetch-depth: 0
+
+         - name: Check for changes
+           uses: dorny/paths-filter@v2
+           id: changes
+           with:
+              filters: |
+                 chat-service:
+                   - 'chat-service/**'
+                   - 'humane-common/**'
+                 elasticsearch-proxy:
+                   - 'elasticsearch-proxy/**'
+                   - 'humane-common/**'
+                 email-service:
+                   - 'email-service/**'
+                   - 'humane-common/**'
+                 feed-service:
+                   - 'feed-service/**'
+                   - 'humane-common/**'
+                 moderation-service:
+                   - 'moderation-service/**'
+                   - 'humane-common/**'
+                 notification-service:
+                   - 'notification-service/**'
+                   - 'humane-common/**'
+                 reward-service:
+                   - 'reward-service/**'
+                   - 'humane-common/**'
+                 user-service:
+                   - 'user-service/**'
+                   - 'humane-common/**'
+                 writer-service:
+                   - 'writer-service/**'
+                   - 'humane-common/**'
+                 humane-common:
+                   - 'humane-common/**'
+
+   build-services:
+      runs-on: ubuntu-latest
+      needs: detect-changes
+
+      steps:
+         - name: Checkout code
+           uses: actions/checkout@v4
+
+         - name: Set up Docker Buildx
+           uses: docker/setup-buildx-action@v3
+
+         - name: Log in to Docker Hub
+           uses: docker/login-action@v3
+           with:
+              username: ${{ secrets.DOCKERHUB_USERNAME }}
+              password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+         # Build each service individually only if changed
+         - name: Build and push chat-service
+           if: needs.detect-changes.outputs.chat-service == 'true'
+           run: |
+              echo "Building chat-service (changes detected)"
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chat-service:latest ./chat-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/chat-service:latest
+
+         - name: Build and push elasticsearch-proxy
+           if: needs.detect-changes.outputs.elasticsearch-proxy == 'true'
+           run: |
+              echo "Building elasticsearch-proxy (changes detected)"
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/elasticsearch-proxy:latest ./elasticsearch-proxy
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/elasticsearch-proxy:latest
+
+         - name: Build and push email-service
+           if: needs.detect-changes.outputs.email-service == 'true'
+           run: |
+              echo "Building email-service (changes detected)"
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/email-service:latest ./email-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/email-service:latest
+
+         - name: Build and push feed-service
+           if: needs.detect-changes.outputs.feed-service == 'true'
+           run: |
+              echo "Building feed-service (changes detected)"
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/feed-service:latest ./feed-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/feed-service:latest
+
+         - name: Build and push moderation-service
+           if: needs.detect-changes.outputs.moderation-service == 'true'
+           run: |
+              echo "Building moderation-service (changes detected)"
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/moderation-service:latest ./moderation-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/moderation-service:latest
+
+         - name: Build and push notification-service
+           if: needs.detect-changes.outputs.notification-service == 'true'
+           run: |
+              echo "Building notification-service (changes detected)"
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/notification-service:latest ./notification-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/notification-service:latest
+
+         - name: Build and push reward-service
+           if: needs.detect-changes.outputs.reward-service == 'true'
+           run: |
+              echo "Building reward-service (changes detected)"
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/reward-service:latest ./reward-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/reward-service:latest
+
+         - name: Build and push user-service
+           if: needs.detect-changes.outputs.user-service == 'true'
+           run: |
+              echo "Building user-service (changes detected)"
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/user-service:latest ./user-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/user-service:latest
+
+         - name: Build and push writer-service
+           if: needs.detect-changes.outputs.writer-service == 'true'
+           run: |
+              echo "Building writer-service (changes detected)"
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/writer-service:latest ./writer-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/writer-service:latest
+
+         - name: Summary
+           run: |
+              echo "Build Summary:"
+              echo "chat-service: ${{ needs.detect-changes.outputs.chat-service == 'true' && '✅ Built' || '⏭️ Skipped' }}"
+              echo "elasticsearch-proxy: ${{ needs.detect-changes.outputs.elasticsearch-proxy == 'true' && '✅ Built' || '⏭️ Skipped' }}"
+              echo "email-service: ${{ needs.detect-changes.outputs.email-service == 'true' && '✅ Built' || '⏭️ Skipped' }}"
+              echo "feed-service: ${{ needs.detect-changes.outputs.feed-service == 'true' && '✅ Built' || '⏭️ Skipped' }}"
+              echo "moderation-service: ${{ needs.detect-changes.outputs.moderation-service == 'true' && '✅ Built' || '⏭️ Skipped' }}"
+              echo "notification-service: ${{ needs.detect-changes.outputs.notification-service == 'true' && '✅ Built' || '⏭️ Skipped' }}"
+              echo "reward-service: ${{ needs.detect-changes.outputs.reward-service == 'true' && '✅ Built' || '⏭️ Skipped' }}"
+              echo "user-service: ${{ needs.detect-changes.outputs.user-service == 'true' && '✅ Built' || '⏭️ Skipped' }}"
+              echo "writer-service: ${{ needs.detect-changes.outputs.writer-service == 'true' && '✅ Built' || '⏭️ Skipped' }}"
