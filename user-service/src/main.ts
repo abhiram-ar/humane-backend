@@ -22,5 +22,5 @@ const start = async () => {
       logger.error('Error while starting user service', { error });
    }
 };
-console.log("hodssdfdfsdfdiasdasdsfsdfsf fddff")
+console.log("hodssdfdfsdfdiasdasdsfsdfsf fddffsdfdsfdf")
 start();
