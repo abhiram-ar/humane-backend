@@ -1,8 +1,8 @@
 import { RelationshipStatus } from '@application/types/RelationshipStatus';
-import { AcceptFriendshipInputDTO } from '@dtos/friendship/AcceptFriendRequset.dto';
-import { cancelFriendRequestInputDTO } from '@dtos/friendship/cancelFriendRequestInput.dto';
-import { RemoveFriendshipInputDTO } from '@dtos/friendship/RemoveFriendshipInput.dto';
-import { SendFriendRequestInputDTO } from '@dtos/friendship/SendFriendRequestInput.dto';
+import { AcceptFriendshipInputDTO } from '@application/DTO-mapper/friendship/AcceptFriendRequset.dto';
+import { cancelFriendRequestInputDTO } from '@application/DTO-mapper/friendship/cancelFriendRequestInput.dto';
+import { RemoveFriendshipInputDTO } from '@application/DTO-mapper/friendship/RemoveFriendshipInput.dto';
+import { SendFriendRequestInputDTO } from '@application/DTO-mapper/friendship/SendFriendRequestInput.dto';
 
 export interface IFriendRequest {
    send(

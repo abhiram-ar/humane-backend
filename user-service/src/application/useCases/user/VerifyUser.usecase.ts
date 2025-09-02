@@ -1,5 +1,5 @@
 import { IEventPublisher } from '@ports/IEventProducer';
-import { verifedUserToken, verifyUserDTO } from '../../DTOs/user/verifyUser.dto';
+import { verifedUserToken, verifyUserDTO } from '../../DTO-mapper/user/verifyUser.dto';
 import { OTPError } from '../../errors/OTPError';
 import { IHashService } from '../../ports/IHashService';
 import { IUserRepository } from '../../ports/IUserRepository';

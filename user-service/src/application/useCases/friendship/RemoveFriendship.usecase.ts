@@ -3,7 +3,7 @@ import { FriendshipError } from '@application/errors/FriendshipError';
 import { GenericError } from '@application/errors/GenericError';
 import { RelationshipStatus } from '@application/types/RelationshipStatus';
 import { Friendship } from '@domain/entities/friendship.entity';
-import { RemoveFriendshipInputDTO } from '@dtos/friendship/RemoveFriendshipInput.dto';
+import { RemoveFriendshipInputDTO } from '@application/DTO-mapper/friendship/RemoveFriendshipInput.dto';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IUserRepository } from '@ports/IUserRepository';

@@ -6,7 +6,7 @@ import { AdminJWTTokenPaylod } from '@application/types/JWTTokenPayload.type';
 import { JWT_ACCESS_TOKEN_EXPIRY_SECONDS, JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 import { EmailError } from '@application/errors/EmailError';
 import { IAdminRepository } from '@ports/IAdminRepository';
-import { adminLoginDTO } from '@dtos/admin/adminLogin.dto';
+import { adminLoginDTO } from '@application/DTO-mapper/admin/adminLogin.dto';
 import { IAdminEmailLogin } from '@ports/usecases/admin/IAdminEmailLogin';
 
 export class AdminEmailLogin implements IAdminEmailLogin {

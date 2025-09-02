@@ -1,4 +1,4 @@
-import { UpdateUserProfileInputDTO } from '@dtos/user/updateUserProfile.input.dto';
+import { UpdateUserProfileInputDTO } from '@application/DTO-mapper/user/updateUserProfile.input.dto';
 
 export interface IUpdateUserProfile {
    execute(

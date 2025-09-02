@@ -1,7 +1,7 @@
 import { HTTPServiceError } from '@application/errors/HTTPServiceError';
 import { SearchUserResponse } from '@application/types/SearchUserResponse';
 import { ENV } from '@config/env';
-import { GetUserDTO } from '@dtos/admin/getUsers.dto';
+import { GetUserDTO } from '@application/DTO-mapper/admin/getUsers.dto';
 import { IHTTPService } from '@ports/IHTTPService';
 import { IUserQueryService } from '@ports/IUserQueryService';
 

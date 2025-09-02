@@ -1,7 +1,7 @@
 import { PasswordError } from '@application/errors/PasswordError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { ENV } from '@config/env';
-import { ChangePasswordInputDTO } from '@dtos/user/ChangePassword.dto';
+import { ChangePasswordInputDTO } from '@application/DTO-mapper/user/ChangePassword.dto';
 import { IHashService } from '@ports/IHashService';
 import { IUserRepository } from '@ports/IUserRepository';
 import { IChangePassword } from '@ports/usecases/user/ChangePassword.usecase';

@@ -1,7 +1,7 @@
 import { userRepository } from '@di/repository.container';
 import { Request, Response, NextFunction } from 'express';
 import { demoUsers } from './seedUsers';
-import { createUserDTO } from '@dtos/user/createUser.dto';
+import { createUserDTO } from '@application/DTO-mapper/user/createUser.dto';
 import {
    AppEventsTypes,
    createEvent,

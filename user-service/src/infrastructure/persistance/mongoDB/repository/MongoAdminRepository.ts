@@ -1,5 +1,5 @@
 import { Admin } from '@domain/entities/admin.entity';
-import { createAdminDTO } from '@dtos/admin/createAdmin.dto';
+import { createAdminDTO } from '@application/DTO-mapper/admin/createAdmin.dto';
 import { IAdminRepository } from '@ports/IAdminRepository';
 import { adminModel } from '../models/admin.model';
 

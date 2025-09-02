@@ -4,7 +4,7 @@ import {
    FriendRequestList,
    GetFriendRequestCountInputDTO,
    GetFriendRequestListInputDTO,
-} from '@dtos/friendship/GetFriendRequests.dto';
+} from '@application/DTO-mapper/friendship/GetFriendRequests.dto';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IStorageService } from '@ports/IStorageService';
 import { IGetFriendRequest } from '@ports/usecases/friendship/IGetFriendRequestList.usercase';

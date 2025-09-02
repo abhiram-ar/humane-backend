@@ -1,7 +1,7 @@
 import {
    GetRelationShipStatusInputDTO,
    GetRelationShipStatusOutputDTO,
-} from '@dtos/friendship/GetRelationshipStatus.dto';
+} from '@application/DTO-mapper/friendship/GetRelationshipStatus.dto';
 
 export interface IGetRelationShipStatus {
    execute(dto: GetRelationShipStatusInputDTO): Promise<GetRelationShipStatusOutputDTO>;

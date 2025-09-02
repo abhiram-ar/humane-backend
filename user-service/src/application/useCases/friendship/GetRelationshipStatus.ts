@@ -5,7 +5,7 @@ import { Friendship } from '@domain/entities/friendship.entity';
 import {
    GetRelationShipStatusInputDTO,
    GetRelationShipStatusOutputDTO,
-} from '@dtos/friendship/GetRelationshipStatus.dto';
+} from '@application/DTO-mapper/friendship/GetRelationshipStatus.dto';
 import { IBlockedRelationshipRepository } from '@ports/IBlockedRelationshipRepository';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IUserRepository } from '@ports/IUserRepository';

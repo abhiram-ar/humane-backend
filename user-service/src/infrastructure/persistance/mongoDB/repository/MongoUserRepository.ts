@@ -1,8 +1,8 @@
 import { User } from '../../../../domain/entities/user.entity';
 import userModel, { IUser } from '../models/user.model';
-import { createUserDTO } from '../../../../application/DTOs/user/createUser.dto';
-import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
-import { AdminGetUserResponseDTO, GetUserDTO } from '@dtos/admin/getUsers.dto';
+import { createUserDTO } from '../../../../application/DTO-mapper/user/createUser.dto';
+import { googleAuthDTO } from '@application/DTO-mapper/user/googleAuth.dto';
+import { AdminGetUserResponseDTO, GetUserDTO } from '@application/DTO-mapper/admin/getUsers.dto';
 import { FilterQuery } from 'mongoose';
 
 export class MongoUserRepository {

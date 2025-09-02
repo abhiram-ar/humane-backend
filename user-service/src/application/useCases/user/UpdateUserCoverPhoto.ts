@@ -1,6 +1,6 @@
 import { IUserRepository } from '@ports/IUserRepository';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
-import { UpdateUserCoverPhotoInputDTO } from '@dtos/user/updateUserCoverPhoto.input.dto';
+import { UpdateUserCoverPhotoInputDTO } from '@application/DTO-mapper/user/updateUserCoverPhoto.input.dto';
 import { IStorageService } from '@ports/IStorageService';
 import {
    AppEventsTypes,

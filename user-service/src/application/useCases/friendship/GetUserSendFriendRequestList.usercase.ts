@@ -3,7 +3,7 @@ import { UserListInfinityScollParams } from '@application/types/UserListInfinity
 import {
    FriendRequestList,
    GetFriendRequestListInputDTO,
-} from '@dtos/friendship/GetFriendRequests.dto';
+} from '@application/DTO-mapper/friendship/GetFriendRequests.dto';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IStorageService } from '@ports/IStorageService';
 import { IGetUserSendFriendRequestList } from '@ports/usecases/friendship/IGetUserSendFriendRequestList.usercase';

@@ -1,8 +1,8 @@
 import { IJWTService } from '@ports/IJWTService';
 import { IUserRepository } from '@ports/IUserRepository';
 import { IHashService } from '@ports/IHashService';
-import { signupUserDTO } from '@dtos/user/signupUser.dto';
-import { verifedUserToken } from '@dtos/user/verifyUser.dto';
+import { signupUserDTO } from '@application/DTO-mapper/user/signupUser.dto';
+import { verifedUserToken } from '@application/DTO-mapper/user/verifyUser.dto';
 import { EmailError } from '@application/errors/EmailError';
 import { IEventPublisher } from '@application/ports/IEventProducer';
 import {

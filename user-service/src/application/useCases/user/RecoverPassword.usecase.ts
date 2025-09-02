@@ -2,7 +2,7 @@ import { JWTError } from '@application/errors/JWTError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { ForgotPasswordPayload } from '@application/types/ForgotPasswordTokenPayload';
 import { ENV } from '@config/env';
-import { recoverPasswordDTO } from '@dtos/user/recoverPassword.dto';
+import { recoverPasswordDTO } from '@application/DTO-mapper/user/recoverPassword.dto';
 import { IHashService } from '@ports/IHashService';
 import { IJWTService } from '@ports/IJWTService';
 import { IUserRepository } from '@ports/IUserRepository';

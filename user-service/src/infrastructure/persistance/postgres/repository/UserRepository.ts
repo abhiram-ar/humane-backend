@@ -1,7 +1,7 @@
 import { User } from '@domain/entities/user.entity';
-import { GetUserDTO, AdminGetUserResponseDTO } from '@dtos/admin/getUsers.dto';
-import { createUserDTO } from '@dtos/user/createUser.dto';
-import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
+import { GetUserDTO, AdminGetUserResponseDTO } from '@application/DTO-mapper/admin/getUsers.dto';
+import { createUserDTO } from '@application/DTO-mapper/user/createUser.dto';
+import { googleAuthDTO } from '@application/DTO-mapper/user/googleAuth.dto';
 import { IUserRepository } from '@ports/IUserRepository';
 import db from '../prisma-client';
 

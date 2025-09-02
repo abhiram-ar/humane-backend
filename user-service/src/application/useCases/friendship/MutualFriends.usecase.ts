@@ -4,7 +4,7 @@ import {
    MutualFriendsCountInputDTO,
    MutualFriendsListInputDTO,
    MutualFriendsListOutputDTO,
-} from '@dtos/friendship/MutualFriends.dto';
+} from '@application/DTO-mapper/friendship/MutualFriends.dto';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IStorageService } from '@ports/IStorageService';
 import { IUserRepository } from '@ports/IUserRepository';

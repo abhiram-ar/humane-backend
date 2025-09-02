@@ -1,4 +1,4 @@
-import { UpdateUserCoverPhotoInputDTO } from '@dtos/user/updateUserCoverPhoto.input.dto';
+import { UpdateUserCoverPhotoInputDTO } from '@application/DTO-mapper/user/updateUserCoverPhoto.input.dto';
 
 export interface IUpdateUserCoverPhoto {
    execute(

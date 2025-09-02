@@ -1,5 +1,5 @@
 import { IUserRepository } from '@ports/IUserRepository';
-import { UpdateUserProfileInputDTO } from '@dtos/user/updateUserProfile.input.dto';
+import { UpdateUserProfileInputDTO } from '@application/DTO-mapper/user/updateUserProfile.input.dto';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import {
    AppEventsTypes,

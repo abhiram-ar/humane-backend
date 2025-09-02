@@ -1,5 +1,5 @@
 import { UserBlockedError } from '@application/errors/UserBlockedError';
-import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
+import { googleAuthDTO } from '@application/DTO-mapper/user/googleAuth.dto';
 import { IUserRepository } from '@ports/IUserRepository';
 import { IJWTService } from '@ports/IJWTService';
 import { ENV } from '@config/env';

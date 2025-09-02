@@ -2,7 +2,7 @@ import { UserListInfinityScollParams } from '@application/types/UserListInfinity
 import {
    FriendRequestList,
    GetFriendRequestListInputDTO,
-} from '@dtos/friendship/GetFriendRequests.dto';
+} from '@application/DTO-mapper/friendship/GetFriendRequests.dto';
 
 export interface IGetUserSendFriendRequestList {
    execute(dto: GetFriendRequestListInputDTO): Promise<{

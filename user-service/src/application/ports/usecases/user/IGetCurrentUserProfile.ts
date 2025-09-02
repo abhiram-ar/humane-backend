@@ -1,4 +1,4 @@
-import { GetCurrentAnonProfileInputDTO } from '@dtos/user/getCurrentAnonProfile.input.dto';
+import { GetCurrentAnonProfileInputDTO } from '@application/DTO-mapper/user/getCurrentAnonProfile.input.dto';
 
 export interface IGetCurrentUserProfile {
    execute(dto: GetCurrentAnonProfileInputDTO): Promise<{

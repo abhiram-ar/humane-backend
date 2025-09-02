@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import {
    SendFriendRequestInputDTO,
    sendFriendRequestInputSchema,
-} from '@dtos/friendship/SendFriendRequestInput.dto';
+} from '@application/DTO-mapper/friendship/SendFriendRequestInput.dto';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
 import { UnAuthenticatedError } from '@application/errors/UnAuthenticatedError';
 import {
@@ -10,39 +10,39 @@ import {
    getFriendRequestInputSchema,
    GetFriendRequestListInputDTO,
    getFriendsRequestCountInputSchema,
-} from '@dtos/friendship/GetFriendRequests.dto';
+} from '@application/DTO-mapper/friendship/GetFriendRequests.dto';
 import {
    acceptFriendRequestSchema,
    AcceptFriendshipInputDTO,
-} from '@dtos/friendship/AcceptFriendRequset.dto';
+} from '@application/DTO-mapper/friendship/AcceptFriendRequset.dto';
 import {
    getFriendsListInputSchema,
    GetFriendListInputDTO,
    GetFriendCountInputDTO,
    getFriendsCountInputSchema,
-} from '@dtos/friendship/GetFriends.dto';
+} from '@application/DTO-mapper/friendship/GetFriends.dto';
 import {
    cancelFriendRequestInputDTO,
    cancelFriendRequestInputSchema,
-} from '@dtos/friendship/cancelFriendRequestInput.dto';
+} from '@application/DTO-mapper/friendship/cancelFriendRequestInput.dto';
 import {
    GetRelationShipStatusInputDTO,
    getRelationshipStatusSchema,
-} from '@dtos/friendship/GetRelationshipStatus.dto';
+} from '@application/DTO-mapper/friendship/GetRelationshipStatus.dto';
 import {
    MutualFriendsCountInputDTO,
    mutualFriendsCountInputSchema,
    MutualFriendsListInputDTO,
    mutualFriendsListInputSchema,
-} from '@dtos/friendship/MutualFriends.dto';
+} from '@application/DTO-mapper/friendship/MutualFriends.dto';
 import {
    RemoveFriendshipInputDTO,
    removeFriendshipInputSchema,
-} from '@dtos/friendship/RemoveFriendshipInput.dto';
+} from '@application/DTO-mapper/friendship/RemoveFriendshipInput.dto';
 import {
    getUserSendFriendRequestInputSchema,
    GetUserSendFriendRequestListInputDTO,
-} from '@dtos/friendship/GetUserSendFriendRequests.dto';
+} from '@application/DTO-mapper/friendship/GetUserSendFriendRequests.dto';
 import { HttpStatusCode } from 'axios';
 import { IFriendRequest } from '@ports/usecases/friendship/IFriendRequest.usecase';
 import { IGetFriendRequest } from '@ports/usecases/friendship/IGetFriendRequestList.usercase';

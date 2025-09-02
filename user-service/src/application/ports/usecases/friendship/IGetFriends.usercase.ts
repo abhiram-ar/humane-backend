@@ -2,7 +2,7 @@ import {
    GetFriendCountInputDTO,
    GetFriendListInputDTO,
    GetFriendListOutputDTO,
-} from '@dtos/friendship/GetFriends.dto';
+} from '@application/DTO-mapper/friendship/GetFriends.dto';
 
 export interface IGetFriends {
    list(dto: GetFriendListInputDTO): Promise<GetFriendListOutputDTO>;

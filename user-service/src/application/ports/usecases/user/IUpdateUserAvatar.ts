@@ -1,4 +1,4 @@
-import { UpdateUserAvatarInputDTO } from '@dtos/user/updateAnonProfileAvatar.input.dto';
+import { UpdateUserAvatarInputDTO } from '@application/DTO-mapper/user/updateAnonProfileAvatar.input.dto';
 
 export interface IUpdateUserAvatar {
    execute(

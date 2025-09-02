@@ -1,4 +1,4 @@
-import { adminLoginDTO } from "@dtos/admin/adminLogin.dto";
+import { adminLoginDTO } from "@application/DTO-mapper/admin/adminLogin.dto";
 
 
 export interface IAdminEmailLogin {

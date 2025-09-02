@@ -1,6 +1,6 @@
 import { IUserRepository } from '@ports/IUserRepository';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
-import { GetCurrentAnonProfileInputDTO } from '@dtos/user/getCurrentAnonProfile.input.dto';
+import { GetCurrentAnonProfileInputDTO } from '@application/DTO-mapper/user/getCurrentAnonProfile.input.dto';
 import { IStorageService } from '@ports/IStorageService';
 import { IGetCurrentUserProfile } from '@ports/usecases/user/IGetCurrentUserProfile';
 

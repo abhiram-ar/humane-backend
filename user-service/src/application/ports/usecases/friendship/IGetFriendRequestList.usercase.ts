@@ -3,7 +3,7 @@ import {
    FriendRequestList,
    GetFriendRequestCountInputDTO,
    GetFriendRequestListInputDTO,
-} from '@dtos/friendship/GetFriendRequests.dto';
+} from '@application/DTO-mapper/friendship/GetFriendRequests.dto';
 
 export interface IGetFriendRequest {
    list(dto: GetFriendRequestListInputDTO): Promise<{

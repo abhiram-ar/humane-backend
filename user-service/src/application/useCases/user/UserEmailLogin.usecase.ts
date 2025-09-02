@@ -1,5 +1,5 @@
 import { ENV } from '@config/env';
-import { userLoginDTO } from '@application/DTOs/user/userLogin.dto';
+import { userLoginDTO } from '@application/DTO-mapper/user/userLogin.dto';
 import { PasswordError } from '@application/errors/PasswordError';
 import { UserBlockedError } from '@application/errors/UserBlockedError';
 import { IHashService } from '@ports/IHashService';

@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import { signupUserSchema } from '@application/DTOs/user/signupUser.dto';
-import { verifyUserSchema } from '@application/DTOs/user/verifyUser.dto';
+import { signupUserSchema } from '@application/DTO-mapper/user/signupUser.dto';
+import { verifyUserSchema } from '@application/DTO-mapper/user/verifyUser.dto';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
-import { userLoginSchema } from '@dtos/user/userLogin.dto';
+import { userLoginSchema } from '@application/DTO-mapper/user/userLogin.dto';
 import { JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
 import { ENV } from '@config/env';
 import {
@@ -12,11 +12,11 @@ import {
 import { JWTRefreshError } from '@application/errors/JWTRefreshError';
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
 import { UserBlockedError } from '@application/errors/UserBlockedError';
-import { forgotPasswordSchema } from '@dtos/user/forgotPassword.dto';
-import { recoverPasswordSchema } from '@dtos/user/recoverPassword.dto';
+import { forgotPasswordSchema } from '@application/DTO-mapper/user/forgotPassword.dto';
+import { recoverPasswordSchema } from '@application/DTO-mapper/user/recoverPassword.dto';
 import { OAuth2Client } from 'google-auth-library';
 import { GenericError } from '@application/errors/GenericError';
-import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
+import { googleAuthDTO } from '@application/DTO-mapper/user/googleAuth.dto';
 import { HttpStatusCode } from 'axios';
 import { ISignupUser } from '@ports/usecases/user/ISignupUser.usecase';
 import { IVerifyUser } from '@ports/usecases/user/IVerifyUser.usecase';

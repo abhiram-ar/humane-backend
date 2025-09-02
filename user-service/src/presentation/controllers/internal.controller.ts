@@ -4,7 +4,7 @@ import { IsHotUser } from '@application/useCases/user/isHotUser.usecase';
 import {
    GetRelationShipStatusInputDTO,
    getRelationshipStatusSchema,
-} from '@dtos/friendship/GetRelationshipStatus.dto';
+} from '@application/DTO-mapper/friendship/GetRelationshipStatus.dto';
 import { IGetFriends } from '@ports/usecases/friendship/IGetFriends.usercase';
 import { IGetRelationShipStatus } from '@ports/usecases/friendship/IGetRelationshipStatus';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';

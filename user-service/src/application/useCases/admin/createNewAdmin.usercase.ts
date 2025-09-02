@@ -1,7 +1,7 @@
 import { IAdminRepository } from '@ports/IAdminRepository';
 import { IHashService } from '../../ports/IHashService';
-import { createAdminDTO } from '@dtos/admin/createAdmin.dto';
-import { signupAdminDTO } from '@dtos/admin/signupAdmin.dto';
+import { createAdminDTO } from '@application/DTO-mapper/admin/createAdmin.dto';
+import { signupAdminDTO } from '@application/DTO-mapper/admin/signupAdmin.dto';
 import { ENV } from '@config/env';
 import { EmailError } from '@application/errors/EmailError';
 import { ICreateAdmin } from '@ports/usecases/admin/ICreateNewAdmin.usercase';

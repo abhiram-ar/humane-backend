@@ -1,8 +1,8 @@
 import { UnAuthenticatedError } from '@application/errors/UnAuthenticatedError';
 import { ENV } from '@config/env';
 import { JWT_REFRESH_TOKEN_EXPIRY_SECONDS } from '@config/jwt';
-import { adminLoginSchema } from '@dtos/admin/adminLogin.dto';
-import { signupAdminSchema } from '@dtos/admin/signupAdmin.dto';
+import { adminLoginSchema } from '@application/DTO-mapper/admin/adminLogin.dto';
+import { signupAdminSchema } from '@application/DTO-mapper/admin/signupAdmin.dto';
 import { IAdminEmailLogin } from '@ports/usecases/admin/IAdminEmailLogin';
 import { ICreateAdmin } from '@ports/usecases/admin/ICreateNewAdmin.usercase';
 import { IRefreshAdminAccessToken } from '@ports/usecases/admin/IRefreshAdminToken.usecase';

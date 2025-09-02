@@ -1,6 +1,6 @@
 import { UserNotFoundError } from '@application/errors/UserNotFoundError';
-import { AdminGetUserResponseDTO } from '@dtos/admin/getUsers.dto';
-import { UpdateUserBlockStatusDTO } from '@dtos/admin/updateUserBlockStatus.dto';
+import { AdminGetUserResponseDTO } from '@application/DTO-mapper/admin/getUsers.dto';
+import { UpdateUserBlockStatusDTO } from '@application/DTO-mapper/admin/updateUserBlockStatus.dto';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IUserRepository } from '@ports/IUserRepository';
 import { IAdminUpdateUserBlockStatus } from '@ports/usecases/admin/IBlockUser.usecase';

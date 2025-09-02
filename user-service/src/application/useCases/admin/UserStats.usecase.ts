@@ -1,4 +1,4 @@
-import { GetUserStatsOutputDTO } from '@dtos/admin/userStats.dto';
+import { GetUserStatsOutputDTO } from '@application/DTO-mapper/admin/userStats.dto';
 import { IUserRepository } from '@ports/IUserRepository';
 import { IUsersStat } from '@ports/usecases/admin/IUserStats.usecase';
 

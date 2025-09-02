@@ -1,5 +1,5 @@
 import { StorageError } from '@application/errors/StorageError';
-import { GeneratePresignedURLInputDTO } from '@dtos/user/generatePreSignedURL.input.dto';
+import { GeneratePresignedURLInputDTO } from '@application/DTO-mapper/user/generatePreSignedURL.input.dto';
 import { IStorageService } from '@ports/IStorageService';
 import { IGeneratePresignedURL } from '@ports/usecases/user/IGeneratePresignedURL';
 

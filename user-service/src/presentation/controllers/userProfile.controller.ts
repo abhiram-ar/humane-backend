@@ -1,9 +1,9 @@
 import { AuthorizationError } from '@application/errors/AuthorizationError';
-import { generatePresignedURLInputSchema } from '@dtos/user/generatePreSignedURL.input.dto';
-import { getCurrentAnonProfileSchema } from '@dtos/user/getCurrentAnonProfile.input.dto';
-import { updateUserCoverPhotoSchema } from '@dtos/user/updateUserCoverPhoto.input.dto';
-import { updateUserProfileSchema } from '@dtos/user/updateUserProfile.input.dto';
-import { updateUserAvatarSchema } from '@dtos/user/updateAnonProfileAvatar.input.dto';
+import { generatePresignedURLInputSchema } from '@application/DTO-mapper/user/generatePreSignedURL.input.dto';
+import { getCurrentAnonProfileSchema } from '@application/DTO-mapper/user/getCurrentAnonProfile.input.dto';
+import { updateUserCoverPhotoSchema } from '@application/DTO-mapper/user/updateUserCoverPhoto.input.dto';
+import { updateUserProfileSchema } from '@application/DTO-mapper/user/updateUserProfile.input.dto';
+import { updateUserAvatarSchema } from '@application/DTO-mapper/user/updateAnonProfileAvatar.input.dto';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
 import { NextFunction, Request, Response } from 'express';
 import { HttpStatusCode } from 'axios';
@@ -14,7 +14,7 @@ import { IUpdateUserCoverPhoto } from '@ports/usecases/user/IUpdateUserCoverPhot
 import { IGeneratePresignedURL } from '@ports/usecases/user/IGeneratePresignedURL';
 import { IUserProfileController } from '@presentation/interface/IUserProfile.controller';
 import { UnAuthenticatedError } from 'humane-common';
-import { ChangePasswordInputDTO, changePasswordInputSchema } from '@dtos/user/ChangePassword.dto';
+import { ChangePasswordInputDTO, changePasswordInputSchema } from '@application/DTO-mapper/user/ChangePassword.dto';
 import { IChangePassword } from '@ports/usecases/user/ChangePassword.usecase';
 
 export class UserProfileController implements IUserProfileController {

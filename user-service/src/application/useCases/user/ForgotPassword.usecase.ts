@@ -2,7 +2,7 @@ import { EmailError } from '@application/errors/EmailError';
 import { EventBusError } from '@application/errors/EventbusError';
 import { ForgotPasswordPayload } from '@application/types/ForgotPasswordTokenPayload';
 import { ENV } from '@config/env';
-import { forgotPasswordDTO } from '@dtos/user/forgotPassword.dto';
+import { forgotPasswordDTO } from '@application/DTO-mapper/user/forgotPassword.dto';
 import { IEventPublisher } from '@ports/IEventProducer';
 import { IJWTService } from '@ports/IJWTService';
 import { IUserRepository } from '@ports/IUserRepository';

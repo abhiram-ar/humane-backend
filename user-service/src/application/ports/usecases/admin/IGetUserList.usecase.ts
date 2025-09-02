@@ -1,5 +1,5 @@
 import { IPagination } from '@application/types/Pagination.type';
-import { AdminGetUserResponseDTO, GetUserDTO } from '@dtos/admin/getUsers.dto';
+import { AdminGetUserResponseDTO, GetUserDTO } from '@application/DTO-mapper/admin/getUsers.dto';
 
 export interface IAdminGetUserList {
    execute(dto: GetUserDTO): Promise<{

@@ -1,7 +1,7 @@
-import { createUserDTO } from '../DTOs/user/createUser.dto';
+import { createUserDTO } from '../DTO-mapper/user/createUser.dto';
 import { User } from '../../domain/entities/user.entity';
-import { googleAuthDTO } from '@dtos/user/googleAuth.dto';
-import { AdminGetUserResponseDTO, GetUserDTO } from '@dtos/admin/getUsers.dto';
+import { googleAuthDTO } from '@application/DTO-mapper/user/googleAuth.dto';
+import { AdminGetUserResponseDTO, GetUserDTO } from '@application/DTO-mapper/admin/getUsers.dto';
 import { IBaseRepository } from './IBaseRepository';
 
 export interface IUserRepository extends IBaseRepository {

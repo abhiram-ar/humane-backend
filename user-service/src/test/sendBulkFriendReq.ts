@@ -1,6 +1,6 @@
 import { friendshipRepository, userRepository } from '@di/repository.container';
 import { Friendship } from '@domain/entities/friendship.entity';
-import { GetUserDTO } from '@dtos/admin/getUsers.dto';
+import { GetUserDTO } from '@application/DTO-mapper/admin/getUsers.dto';
 import { Request, Response, NextFunction } from 'express';
 
 export const sendBulkFriendReq = async (req: Request, res: Response, next: NextFunction) => {

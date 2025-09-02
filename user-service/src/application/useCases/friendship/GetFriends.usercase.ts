@@ -2,7 +2,7 @@ import {
    GetFriendCountInputDTO,
    GetFriendListInputDTO,
    GetFriendListOutputDTO,
-} from '@dtos/friendship/GetFriends.dto';
+} from '@application/DTO-mapper/friendship/GetFriends.dto';
 import { IFriendshipRepository } from '@ports/IFriendshipRepository';
 import { IStorageService } from '@ports/IStorageService';
 import { IGetFriends } from '@ports/usecases/friendship/IGetFriends.usercase';

@@ -1,5 +1,5 @@
-import { updateuserblockStatusSchema } from '@dtos/admin/updateUserBlockStatus.dto';
-import { GetUserDTO, getUsersForAdminSchema } from '@dtos/admin/getUsers.dto';
+import { updateuserblockStatusSchema } from '@application/DTO-mapper/admin/updateUserBlockStatus.dto';
+import { GetUserDTO, getUsersForAdminSchema } from '@application/DTO-mapper/admin/getUsers.dto';
 import { ZodValidationError } from '@presentation/errors/ZodValidationError';
 import { Request, Response, NextFunction } from 'express';
 import { HttpStatusCode } from 'axios';
