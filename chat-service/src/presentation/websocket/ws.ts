@@ -17,7 +17,7 @@ const io = new Server<IClientToServerEvents, IServerToClientEvents, InterServerE
    {
       path: '/api/v1/chat/socket.io',
       cors: {
-         origin: 'http://localhost:5173', //TODO: better cors in prod
+         origin: ['http://localhost:5173', 'https://humane.abhiram-ar.com'], //TODO: better cors in prod
          credentials: true, // required
       },
    }
