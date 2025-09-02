@@ -28,45 +28,45 @@ jobs:
     # Build each service individually
     - name: Build and push chat-service
       run: |
-        docker build -t ${{ env.DOCKER_USERNAME }}/chat-service:latest ./chat-service
-        docker push ${{ env.DOCKER_USERNAME }}/chat-service:latest
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/chat-service:latest ./chat-service
+        docker push ${{ secrets.DOCKER_USERNAME }}/chat-service:latest
     
     - name: Build and push elasticsearch-proxy
       run: |
-        docker build -t ${{ env.DOCKER_USERNAME }}/elasticsearch-proxy:latest ./elasticsearch-proxy
-        docker push ${{ env.DOCKER_USERNAME }}/elasticsearch-proxy:latest
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/elasticsearch-proxy:latest ./elasticsearch-proxy
+        docker push ${{ secrets.DOCKER_USERNAME }}/elasticsearch-proxy:latest
     
     - name: Build and push email-service
       run: |
-        docker build -t ${{ env.DOCKER_USERNAME }}/email-service:latest ./email-service
-        docker push ${{ env.DOCKER_USERNAME }}/email-service:latest
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/email-service:latest ./email-service
+        docker push ${{ secrets.DOCKER_USERNAME }}/email-service:latest
     
     - name: Build and push feed-service
       run: |
-        docker build -t ${{ env.DOCKER_USERNAME }}/feed-service:latest ./feed-service
-        docker push ${{ env.DOCKER_USERNAME }}/feed-service:latest
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/feed-service:latest ./feed-service
+        docker push ${{ secrets.DOCKER_USERNAME }}/feed-service:latest
     
     - name: Build and push moderation-service
       run: |
-        docker build -t ${{ env.DOCKER_USERNAME }}/moderation-service:latest ./moderation-service
-        docker push ${{ env.DOCKER_USERNAME }}/moderation-service:latest
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/moderation-service:latest ./moderation-service
+        docker push ${{ secrets.DOCKER_USERNAME }}/moderation-service:latest
     
     - name: Build and push notification-service
       run: |
-        docker build -t ${{ env.DOCKER_USERNAME }}/notification-service:latest ./notification-service
-        docker push ${{ env.DOCKER_USERNAME }}/notification-service:latest
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/notification-service:latest ./notification-service
+        docker push ${{ secrets.DOCKER_USERNAME }}/notification-service:latest
     
     - name: Build and push reward-service
       run: |
-        docker build -t ${{ env.DOCKER_USERNAME }}/reward-service:latest ./reward-service
-        docker push ${{ env.DOCKER_USERNAME }}/reward-service:latest
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/reward-service:latest ./reward-service
+        docker push ${{ secrets.DOCKER_USERNAME }}/reward-service:latest
     
     - name: Build and push user-service
       run: |
-        docker build -t ${{ env.DOCKER_USERNAME }}/user-service:latest ./user-service
-        docker push ${{ env.DOCKER_USERNAME }}/user-service:latest
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/user-service:latest ./user-service
+        docker push ${{ secrets.DOCKER_USERNAME }}/user-service:latest
     
     - name: Build and push writer-service
       run: |
-        docker build -t ${{ env.DOCKER_USERNAME }}/writer-service:latest ./writer-service
-        docker push ${{ env.DOCKER_USERNAME }}/writer-service:latest
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/writer-service:latest ./writer-service
+        docker push ${{ secrets.DOCKER_USERNAME }}/writer-service:latest
