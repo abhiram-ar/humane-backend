@@ -83,64 +83,64 @@ jobs:
            if: needs.detect-changes.outputs.chat-service == 'true'
            run: |
               echo "Building chat-service (changes detected)"
-              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chat-service:latest ./chat-service
-              docker push ${{ secrets.DOCKERHUB_USERNAME }}/chat-service:latest
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/humane-chat-service:latest ./chat-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/humane-chat-service:latest
 
          - name: Build and push elasticsearch-proxy
            if: needs.detect-changes.outputs.elasticsearch-proxy == 'true'
            run: |
               echo "Building elasticsearch-proxy (changes detected)"
-              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/elasticsearch-proxy:latest ./elasticsearch-proxy
-              docker push ${{ secrets.DOCKERHUB_USERNAME }}/elasticsearch-proxy:latest
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/humane-elasticsearch-proxy:latest ./elasticsearch-proxy
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/humane-elasticsearch-proxy:latest
 
          - name: Build and push email-service
            if: needs.detect-changes.outputs.email-service == 'true'
            run: |
               echo "Building email-service (changes detected)"
-              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/email-service:latest ./email-service
-              docker push ${{ secrets.DOCKERHUB_USERNAME }}/email-service:latest
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/humane-email:latest ./email-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/humane-email:latest
 
          - name: Build and push feed-service
            if: needs.detect-changes.outputs.feed-service == 'true'
            run: |
               echo "Building feed-service (changes detected)"
-              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/feed-service:latest ./feed-service
-              docker push ${{ secrets.DOCKERHUB_USERNAME }}/feed-service:latest
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/humane-feed-service:latest ./feed-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/humane-feed-service:latest
 
          - name: Build and push moderation-service
            if: needs.detect-changes.outputs.moderation-service == 'true'
            run: |
               echo "Building moderation-service (changes detected)"
-              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/moderation-service:latest ./moderation-service
-              docker push ${{ secrets.DOCKERHUB_USERNAME }}/moderation-service:latest
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/humane-moderation-service:latest ./moderation-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/humane-moderation-service:latest
 
          - name: Build and push notification-service
            if: needs.detect-changes.outputs.notification-service == 'true'
            run: |
               echo "Building notification-service (changes detected)"
-              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/notification-service:latest ./notification-service
-              docker push ${{ secrets.DOCKERHUB_USERNAME }}/notification-service:latest
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/humane-notification-service:latest ./notification-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/humane-notification-service:latest
 
          - name: Build and push reward-service
            if: needs.detect-changes.outputs.reward-service == 'true'
            run: |
               echo "Building reward-service (changes detected)"
-              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/reward-service:latest ./reward-service
-              docker push ${{ secrets.DOCKERHUB_USERNAME }}/reward-service:latest
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/humane-reward-service:latest ./reward-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/humane-reward-service:latest
 
          - name: Build and push user-service
            if: needs.detect-changes.outputs.user-service == 'true'
            run: |
               echo "Building user-service (changes detected)"
-              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/user-service:latest ./user-service
-              docker push ${{ secrets.DOCKERHUB_USERNAME }}/user-service:latest
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/userservice:latest ./user-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/userservice:latest
 
          - name: Build and push writer-service
            if: needs.detect-changes.outputs.writer-service == 'true'
            run: |
               echo "Building writer-service (changes detected)"
-              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/writer-service:latest ./writer-service
-              docker push ${{ secrets.DOCKERHUB_USERNAME }}/writer-service:latest
+              docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/humane-writer-service:latest ./writer-service
+              docker push ${{ secrets.DOCKERHUB_USERNAME }}/humane-writer-service:latest
 
          - name: Summary
            run: |
