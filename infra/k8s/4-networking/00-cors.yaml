@@ -6,6 +6,7 @@ plugin: cors
 config:
   origins:
     - http://localhost:5173 # Change in prod
+    - https://humane.abhiram-ar.com
   methods:
     - GET
     - POST

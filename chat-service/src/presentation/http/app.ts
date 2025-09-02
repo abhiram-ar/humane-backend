@@ -14,7 +14,9 @@ expressApp.use('/api/v1/chat/socket.io', (req: Request, res: Response, next: Nex
    next();
 });
 
-expressApp.use(cors({ origin: ['http://localhost:5173'], credentials: true }));
+expressApp.use(
+   cors({ origin: ['http://localhost:5173', 'https://humane.abhiram-ar.com'], credentials: true })
+);
 
 const register = new promClient.Registry();
 promClient.collectDefaultMetrics({ register });

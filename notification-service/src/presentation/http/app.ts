@@ -16,7 +16,7 @@ const app = express();
 
 app.use(
    cors({
-      origin: ['http://localhost:5173', 'http://humanedevfe.abhiram-ar.com:5173'],
+      origin: ['http://localhost:5173', 'https://humane.abhiram-ar.com'],
       credentials: true,
    })
 );
