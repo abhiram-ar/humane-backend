@@ -1,49 +1,37 @@
-# humane-backend
+# Humane Backend
 
-starting dev cluster
+Humane Backend powers the server-side infrastructure for the Humane platform - a privacy-first, real-time social network built on a **microservices architecture**.  
+This repository manages user, post, moderation, notification, chat, and search services orchestrated through **Kubernetes** and **Kafka**, with persistence handled via **PostgreSQL**, **MongoDB**, and **Elasticsearch**.
+
+## System Design
+
+![Alt text](/Docs/full-architecture-light.png)
+
+### Key Components
+
+- Kafka - Event-driven message bus connecting services.
+- PostgreSQL / MongoDB - Main persistence layers for structured and unstructured data.
+- Elasticsearch - High-performance search and query service.
+- Redis - Caching and feed optimization.
+
+
+## Development Setup
+
+Start the local Kubernetes dev cluster:
 
 ```bash
 skaffold dev
 ```
 
-Exposing a mongoDB container port to inspect via mongoDB compass
+## 🤝 Contributing
 
-```bash
-kubectl port-forward svc/user-mongo-srv 27017:27017
-```
+1. Fork → branch → PR
+2. Use linting & consistent style
+3. Write unit + integration tests
+4. Document APIs & data schema changes
 
-postgres
-
-```bash
-kubectl port-forward svc/user-postgres-srv 5432:5432
-```
-
-elasticsearhc
-
-```bash
-kubectl port-forward service/elasticsearch 9200:9200
-```
-
-production change
-
--  kafka ui nodePort need to be closed
--  convert kafka srv to stateful set
--  query service ingress rotues, close off internal routes
-
-## doubts
-
--  where to keep the instace config files - like for s3 and kafka
-
-## learning
-
--  clean/delte the pv/pvc when changing the version of pods in services to avoid conflit
--  kafka offset are exclusive. Meaning if we commit the current offset, it tells kafka consumers should read next doc from currently commited offset. So when commiting, commit at offset+1
--  Mutex locks and Buffer rotation for counter aggregation
-
-choices;
-
--  why not moderating comments? Good commets are rewarded so people are forces to put good comments
-
-### System Design
-
-![Alt text](/Docs/full-architecture-light.png)
+## Production Notes
+- [] Close Kafka UI NodePort before deployment to production.
+- [] Convert Kafka Deployment → StatefulSet for persistence and fault tolerance.
+- [] Restrict internal ingress routes for the query service (close public exposure).
+- Skaffold + Kubernetes - Local dev, CI/CD, and deployment automation.
