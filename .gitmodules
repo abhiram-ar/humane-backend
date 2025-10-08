@@ -1,3 +1,6 @@
 [submodule "humane-common"]
 	path = humane-common
 	url = https://github.com/abhiram-ar/humane-common
+[submodule "humane-frontend"]
+	path = humane-frontend
+	url = https://github.com/abhiram-ar/humane-frontend
