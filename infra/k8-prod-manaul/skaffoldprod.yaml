@@ -1,0 +1,100 @@
+apiVersion: skaffold/v4beta13
+kind: Config
+
+metadata:
+  name: humane-backend
+
+manifests:
+  rawYaml:
+    - ./infra/k8s/*
+
+deploy:
+  kubectl:
+    defaultNamespace: default
+
+profiles:
+  - name: development
+    build:
+      local:
+        push: false
+        useDockerCLI: true
+      artifacts:
+        - image: abhiramar/userservice
+          context: user-service
+          docker:
+            dockerfile: Dockerfile
+          sync:
+            manual:
+              - dest: .
+                src: "src/**/*.ts"
+        - image: abhiramar/humane-email
+          context: email-service
+          docker:
+            dockerfile: Dockerfile
+          sync:
+            manual:
+              - dest: .
+                src: "src/**/*.ts"
+        - image: abhiramar/humane-elasticsearch-proxy
+          context: elasticsearch-proxy
+          docker:
+            dockerfile: Dockerfile
+          sync:
+            manual:
+              - dest: .
+                src: "src/**/*.ts"
+        - image: abhiramar/humane-notification-service
+          context: notification-service
+          docker:
+            dockerfile: Dockerfile
+          sync:
+            manual:
+              - dest: .
+                src: "src/**/*.ts"
+        - image: abhiramar/humane-feed-service
+          context: feed-service
+          docker:
+            dockerfile: Dockerfile
+          sync:
+            manual:
+              - dest: .
+                src: "src/**/*.ts"
+        - image: abhiramar/humane-writer-service
+          context: writer-service
+          docker:
+            dockerfile: Dockerfile
+          sync:
+            manual:
+              - dest: .
+                src: "src/**/*.ts"
+        - image: abhiramar/humane-reward-service
+          context: reward-service
+          docker:
+            dockerfile: Dockerfile
+          sync:
+            manual:
+              - dest: .
+                src: "src/**/*.ts"
+        - image: abhiramar/humane-chat-service
+          context: chat-service
+          docker:
+            dockerfile: Dockerfile
+          sync:
+            manual:
+              - dest: .
+                src: "src/**/*.ts"
+        - image: abhiramar/humane-moderation-service
+          context: moderation-service
+          docker:
+            dockerfile: Dockerfile
+          sync:
+            manual:
+              - dest: .
+                src: "src/**/*.ts"
+    activation:
+      - command: dev
+
+  - name: production
+    deploy:
+      kubectl:
+        defaultNamespace: default
