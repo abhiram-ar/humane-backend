@@ -332,11 +332,95 @@ full_install() {
     fi
 }
 
+show_menu() {
+    clear
+    print_section "Kong Gateway Management Menu"
+    
+    echo "1)  Full Installation (CRDs, Gateway, Kong, JWT, Rate Limiting)"
+    echo "2)  Install Gateway API CRDs only"
+    echo "3)  Create Gateway and GatewayClass"
+    echo "4)  Install Kong Ingress Controller only"
+    echo "5)  Create JWT Secret Manifest"
+    echo "6)  Apply JWT Authentication Configuration"
+    echo "7)  Apply Rate Limiting Configuration"
+    echo "8)  Check Kong Gateway Status"
+    echo "9)  Uninstall Kong Ingress Controller"
+    echo "10) Cleanup All Kong Resources"
+    echo "11) Show Help"
+    echo "0)  Exit"
+    echo ""
+}
+
+handle_menu_choice() {
+    local choice=$1
+    
+    case $choice in
+        1)
+            full_install
+            ;;
+        2)
+            check_prerequisites
+            install_gateway_api_crds
+            ;;
+        3)
+            check_prerequisites
+            create_gateway
+            ;;
+        4)
+            check_prerequisites
+            install_kong
+            ;;
+        5)
+            create_jwt_secret
+            ;;
+        6)
+            apply_jwt_config
+            ;;
+        7)
+            apply_rate_limiting
+            ;;
+        8)
+            check_status
+            ;;
+        9)
+            uninstall_kong
+            ;;
+        10)
+            cleanup_all
+            ;;
+        11)
+            show_help
+            ;;
+        0)
+            print_info "Exiting..."
+            exit 0
+            ;;
+        *)
+            print_error "Invalid option: $choice"
+            ;;
+    esac
+}
+
+interactive_mode() {
+    while true; do
+        show_menu
+        read -p "Enter your choice [0-11]: " choice
+        echo ""
+        
+        handle_menu_choice "$choice"
+        
+        echo ""
+        read -p "Press Enter to continue..."
+    done
+}
+
 show_help() {
     cat << EOF
 Kong Gateway Management Script
 
 Usage: $0 [COMMAND]
+
+Run without arguments for interactive menu mode.
 
 Commands:
     install            Full installation (CRDs, Gateway, Kong, JWT, Rate Limiting)
@@ -352,6 +436,7 @@ Commands:
     help               Show this help message
 
 Examples:
+    $0                      # Interactive menu mode
     $0 install              # Full installation
     $0 create-jwt-secret    # Create JWT secret manifest
     $0 status               # Check status
@@ -362,47 +447,53 @@ EOF
 }
 
 # Main script logic
-case "${1:-}" in
-    install)
-        full_install
-        ;;
-    install-crds)
-        check_prerequisites
-        install_gateway_api_crds
-        ;;
-    install-gateway)
-        check_prerequisites
-        create_gateway
-        ;;
-    install-kong)
-        check_prerequisites
-        install_kong
-        ;;
-    create-jwt-secret)
-        create_jwt_secret
-        ;;
-    apply-jwt)
-        apply_jwt_config
-        ;;
-    apply-ratelimit)
-        apply_rate_limiting
-        ;;
-    status)
-        check_status
-        ;;
-    uninstall)
-        uninstall_kong
-        ;;
-    cleanup)
-        cleanup_all
-        ;;
-    help|--help|-h)
-        show_help
-        ;;
-    *)
-        print_error "Invalid command: ${1:-}"
-        echo ""
-        show_help
-        exit 1
-        ;;
-esac
+if [ $# -eq 0 ]; then
+    # No arguments provided - run interactive menu
+    interactive_mode
+else
+    # Arguments provided - run command directly
+    case "${1}" in
+        install)
+            full_install
+            ;;
+        install-crds)
+            check_prerequisites
+            install_gateway_api_crds
+            ;;
+        install-gateway)
+            check_prerequisites
+            create_gateway
+            ;;
+        install-kong)
+            check_prerequisites
+            install_kong
+            ;;
+        create-jwt-secret)
+            create_jwt_secret
+            ;;
+        apply-jwt)
+            apply_jwt_config
+            ;;
+        apply-ratelimit)
+            apply_rate_limiting
+            ;;
+        status)
+            check_status
+            ;;
+        uninstall)
+            uninstall_kong
+            ;;
+        cleanup)
+            cleanup_all
+            ;;
+        help|--help|-h)
+            show_help
+            ;;
+        *)
+            print_error "Invalid command: ${1}"
+            echo ""
+            show_help
+            exit 1
+            ;;
+    esac
+fi
