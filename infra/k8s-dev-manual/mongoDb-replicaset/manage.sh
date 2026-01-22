@@ -500,7 +500,7 @@ port_forward() {
     fi
 }
 
-# Main menu
+
 show_menu() {
     echo ""
     echo "======================================"
@@ -542,7 +542,7 @@ show_menu() {
 main() {
     check_kubectl
     
-    # If arguments provided, run in command mode (backward compatible)
+    # If arguments provided, run in command mode 
     if [ $# -gt 0 ]; then
         case ${1} in
             install)
@@ -656,5 +656,5 @@ main() {
     done
 }
 
-# Entry point
+# entry point
 main "$@"
