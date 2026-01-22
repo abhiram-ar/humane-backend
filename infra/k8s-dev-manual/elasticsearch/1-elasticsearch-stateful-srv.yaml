@@ -47,6 +47,13 @@ spec:
               value: "false"
             - name: ES_JAVA_OPTS
               value: "-Xms512m -Xmx512m" #java heap size limit, remove the limit in production
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "1"
+            limits:
+              memory: "2Gi"
+              cpu: "2"
           volumeMounts:
             - name: elasticsearch-data
               mountPath: /usr/share/elasticsearch/data
