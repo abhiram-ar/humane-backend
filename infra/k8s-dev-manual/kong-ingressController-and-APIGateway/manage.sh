@@ -124,17 +124,64 @@ install_kong() {
     print_success "Kong pods are ready"
 }
 
+create_jwt_secret() {
+    print_section "Creating JWT Secret Manifest"
+    
+    local jwt_file="$SCRIPT_DIR/jwtsecret.yaml"
+    
+    # Check if file already exists
+    if [ -f "$jwt_file" ]; then
+        print_warning "jwtsecret.yaml already exists at $jwt_file"
+        read -p "Do you want to override the existing file? (yes/no): " override
+        
+        if [ "$override" != "yes" ]; then
+            print_info "Keeping existing JWT secret file"
+            return 0
+        fi
+    fi
+    
+    # Prompt for JWT secret
+    print_info "Please enter the JWT secret (this will be used to sign/verify tokens):"
+    read -s jwt_secret
+    echo ""
+    
+    if [ -z "$jwt_secret" ]; then
+        print_error "JWT secret cannot be empty"
+        return 1
+    fi
+    
+    # Create the manifest file
+    cat > "$jwt_file" << EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: humane-app-jwt
+  namespace: default
+  labels:
+    konghq.com/credential: jwt
+stringData:
+  key: humane ## iss
+  secret: $jwt_secret
+  algorithm: HS256
+EOF
+    
+    print_success "JWT secret manifest created at $jwt_file"
+}
+
 apply_jwt_config() {
     print_section "Applying JWT Configuration"
     
-    # Apply JWT secret
-    if [ -f "$SCRIPT_DIR/jwtsecret.yaml" ]; then
-        print_info "Applying JWT secret..."
-        kubectl apply -f "$SCRIPT_DIR/jwtsecret.yaml"
-        print_success "JWT secret applied"
-    else
-        print_warning "jwtsecret.yaml not found in $SCRIPT_DIR"
+    # Check if JWT secret file exists
+    if [ ! -f "$SCRIPT_DIR/jwtsecret.yaml" ]; then
+        print_error "jwtsecret.yaml not found in $SCRIPT_DIR"
+        print_info "Please create the JWT secret first by running: './manage.sh create-jwt-secret'"
+        return 1
     fi
+    
+    # Apply JWT secret
+    print_info "Applying JWT secret..."
+    kubectl apply -f "$SCRIPT_DIR/jwtsecret.yaml"
+    print_success "JWT secret applied"
     
     # Apply consumer JWT plugin
     if [ -f "$SCRIPT_DIR/consumer-jwt-plugin.yaml" ]; then
@@ -243,16 +290,46 @@ full_install() {
     print_section "Starting Full Kong Gateway Installation"
     
     check_prerequisites
+    
+    # Check if JWT secret exists
+    if [ ! -f "$SCRIPT_DIR/jwtsecret.yaml" ]; then
+        print_warning "JWT secret file (jwtsecret.yaml) not found!"
+        print_info "You have the following options:"
+        print_info "  1. Create it now by running: './manage.sh create-jwt-secret'"
+        print_info "  2. Create it manually and place it in: $SCRIPT_DIR/jwtsecret.yaml"
+        print_info "  3. Continue installation without JWT (not recommended for production)"
+        echo ""
+        read -p "Do you want to continue installation without JWT configuration? (yes/no): " continue_without_jwt
+        
+        if [ "$continue_without_jwt" != "yes" ]; then
+            print_info "Installation cancelled. Please create JWT secret and run installation again."
+            return 1
+        fi
+        print_warning "Continuing without JWT configuration..."
+    fi
+    
     install_gateway_api_crds
     create_gateway
     install_kong
-    apply_jwt_config
+    
+    # Only apply JWT config if file exists
+    if [ -f "$SCRIPT_DIR/jwtsecret.yaml" ]; then
+        apply_jwt_config
+    else
+        print_warning "Skipping JWT configuration"
+    fi
+    
     apply_rate_limiting
     
     print_section "Installation Complete"
     check_status
     
-    print_success "Kong Gateway is now ready to use!"
+    if [ ! -f "$SCRIPT_DIR/jwtsecret.yaml" ]; then
+        print_warning "Kong Gateway installed without JWT authentication!"
+        print_info "To add JWT authentication later, run: './manage.sh create-jwt-secret' then './manage.sh apply-jwt'"
+    else
+        print_success "Kong Gateway is now ready to use!"
+    fi
 }
 
 show_help() {
@@ -262,19 +339,21 @@ Kong Gateway Management Script
 Usage: $0 [COMMAND]
 
 Commands:
-    install         Full installation (CRDs, Gateway, Kong, JWT, Rate Limiting)
-    install-crds    Install Gateway API CRDs only
-    install-gateway Create Gateway and GatewayClass
-    install-kong    Install Kong Ingress Controller only
-    apply-jwt       Apply JWT authentication configuration
-    apply-ratelimit Apply rate limiting configuration
-    status          Check Kong Gateway status
-    uninstall       Uninstall Kong Ingress Controller
-    cleanup         Remove all Kong resources (including namespace and CRDs)
-    help            Show this help message
+    install            Full installation (CRDs, Gateway, Kong, JWT, Rate Limiting)
+    install-crds       Install Gateway API CRDs only
+    install-gateway    Create Gateway and GatewayClass
+    install-kong       Install Kong Ingress Controller only
+    create-jwt-secret  Create JWT secret manifest (prompts for secret)
+    apply-jwt          Apply JWT authentication configuration
+    apply-ratelimit    Apply rate limiting configuration
+    status             Check Kong Gateway status
+    uninstall          Uninstall Kong Ingress Controller
+    cleanup            Remove all Kong resources (including namespace and CRDs)
+    help               Show this help message
 
 Examples:
     $0 install              # Full installation
+    $0 create-jwt-secret    # Create JWT secret manifest
     $0 status               # Check status
     $0 apply-jwt            # Apply JWT configuration
     $0 uninstall            # Uninstall Kong
@@ -298,6 +377,9 @@ case "${1:-}" in
     install-kong)
         check_prerequisites
         install_kong
+        ;;
+    create-jwt-secret)
+        create_jwt_secret
         ;;
     apply-jwt)
         apply_jwt_config
