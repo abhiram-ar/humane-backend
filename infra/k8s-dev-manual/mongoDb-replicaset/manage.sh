@@ -186,7 +186,7 @@ init_replica() {
     kubectl exec mongo-0 -n $NAMESPACE -- mongosh --quiet --eval "rs.status().members.forEach(m => print(m.name + ': ' + m.stateStr))"
 }
 
-# Manual initialization instructions
+# Manual replicaset initialization instructions
 manual_init() {
     print_msg $BLUE "======================================="
     print_msg $BLUE "Manual Replica Set Initialization"
@@ -216,7 +216,7 @@ manual_init() {
     print_msg $GREEN "kubectl exec -it mongo-0 -n $NAMESPACE -- mongosh --eval 'rs.initiate({_id:\"rs0\",members:[{_id:0,host:\"mongo-0.mongo:27017\"},{_id:1,host:\"mongo-1.mongo:27017\"},{_id:2,host:\"mongo-2.mongo:27017\"}]})'"
 }
 
-# Check status of MongoDB replica set
+
 status() {
     print_msg $BLUE "======================================="
     print_msg $BLUE "MongoDB Replica Set Status"
@@ -249,7 +249,7 @@ status() {
     fi
 }
 
-# Show logs
+
 logs() {
     echo ""
     echo "Select pod to view logs:"
@@ -267,7 +267,7 @@ logs() {
     fi
 }
 
-# Restart MongoDB pods
+
 restart() {
     print_msg $BLUE "======================================="
     print_msg $BLUE "Restarting MongoDB Replica Set"
@@ -289,7 +289,7 @@ restart() {
     print_msg $GREEN "All pods restarted successfully!"
 }
 
-# Uninstall MongoDB replica set
+
 uninstall() {
     print_msg $BLUE "======================================="
     print_msg $BLUE "Uninstalling MongoDB Replica Set"
@@ -334,7 +334,6 @@ uninstall() {
     print_msg $GREEN "MongoDB uninstalled successfully!"
 }
 
-# Test connection
 test_connection() {
     print_msg $BLUE "======================================="
     print_msg $BLUE "Testing MongoDB Connection"
@@ -365,7 +364,7 @@ enable_external_access() {
     show_connection_info
 }
 
-# Disable external access
+
 disable_external_access() {
     print_msg $BLUE "======================================="
     print_msg $BLUE "Disabling External Access"
@@ -380,7 +379,7 @@ disable_external_access() {
     fi
 }
 
-# Show connection information
+
 show_connection_info() {
     print_msg $BLUE "\n======================================="
     print_msg $BLUE "Connection Information"
@@ -410,7 +409,7 @@ show_connection_info() {
     fi
 }
 
-# Add hosts file entries helper
+# add hosts file entries helper
 add_hosts_entries() {
     print_msg $BLUE "======================================="
     print_msg $BLUE "Add /etc/hosts Entries"
@@ -453,7 +452,7 @@ EOF'
     fi
 }
 
-# Port forward to MongoDB
+
 port_forward() {
     print_msg $BLUE "======================================="
     print_msg $BLUE "Port Forwarding to MongoDB"
