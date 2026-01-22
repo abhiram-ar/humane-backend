@@ -1,0 +1,46 @@
+# NodePort service for external access to MongoDB replica set
+# Use this for MongoDB Compass or other external clients
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-nodeport-0
+spec:
+  type: NodePort
+  selector:
+    statefulset.kubernetes.io/pod-name: mongo-0
+  ports:
+    - port: 27017
+      targetPort: 27017
+      nodePort: 30017
+      protocol: TCP
+      name: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-nodeport-1
+spec:
+  type: NodePort
+  selector:
+    statefulset.kubernetes.io/pod-name: mongo-1
+  ports:
+    - port: 27017
+      targetPort: 27017
+      nodePort: 30018
+      protocol: TCP
+      name: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-nodeport-2
+spec:
+  type: NodePort
+  selector:
+    statefulset.kubernetes.io/pod-name: mongo-2
+  ports:
+    - port: 27017
+      targetPort: 27017
+      nodePort: 30019
+      protocol: TCP
+      name: mongo

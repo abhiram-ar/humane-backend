@@ -5,7 +5,7 @@ metadata:
   name: mongo
 spec:
   serviceName: "mongo"
-  replicas: 3
+  replicas: 3 # need min 3 instance for configure as replicaSet and to support transitions
   selector:
     matchLabels:
       app: mongo
@@ -27,7 +27,6 @@ spec:
           volumeMounts:
             - name: mongo-persistent-storage
               mountPath: /data/db
-      volumes: []
   volumeClaimTemplates:
     - metadata:
         name: mongo-persistent-storage

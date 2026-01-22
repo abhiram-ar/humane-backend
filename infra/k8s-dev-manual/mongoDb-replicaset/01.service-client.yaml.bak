@@ -1,3 +1,6 @@
+# Note: use this only for loadbalacing to any one pod of monogo Replicaset
+# this will be causeing issue if if we are in relicaset configuration of monogoDB
+
 apiVersion: v1
 kind: Service
 metadata:
