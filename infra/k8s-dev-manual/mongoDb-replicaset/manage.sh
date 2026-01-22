@@ -49,10 +49,73 @@ check_kubectl() {
     fi
 }
 
+# Generate persistence manifest with configured storage path
+generate_persistence_manifest() {
+    print_msg $BLUE "======================================="
+    print_msg $BLUE "Generating Persistence Manifest"
+    print_msg $BLUE "======================================="
+    
+    print_info "Storage base path: $STORAGE_BASE_PATH"
+    print_step "Generating $PERSISTENCE_FILE..."
+    
+    cat > "$PERSISTENCE_FILE" << EOF
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-pv-0
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: $STORAGE_BASE_PATH/mongo-0
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-pv-1
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: $STORAGE_BASE_PATH/mongo-1
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-pv-2
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: $STORAGE_BASE_PATH/mongo-2
+EOF
+    
+    print_msg $GREEN "Persistence manifest generated successfully!"
+    print_info "File: $PERSISTENCE_FILE"
+    echo ""
+    print_msg $YELLOW "PersistentVolume paths:"
+    for i in $(seq 0 $((REPLICA_COUNT - 1))); do
+        print_msg $GREEN "  mongo-pv-$i: $STORAGE_BASE_PATH/mongo-$i"
+    done
+}
+
 install_mongodb() {
     print_msg $BLUE "======================================="
     print_msg $BLUE "Installing MongoDB Replica Set"
     print_msg $BLUE "======================================="
+    
+    # Generate persistence manifest if needed
+    if [ ! -f "$PERSISTENCE_FILE" ]; then
+        print_warn "Persistence file not found. Generating from configured storage path..."
+        generate_persistence_manifest
+        echo ""
+    fi
     
     if [ -f "$PERSISTENCE_FILE" ]; then
         print_step "Creating PersistentVolumes..."
@@ -449,24 +512,27 @@ show_menu() {
     echo "  2. Initialize Replica Set (Automatic)"
     echo "  3. Show Manual Init Instructions"
     echo ""
+    echo "Configuration:"
+    echo "  4. Generate Persistence Manifest"
+    echo ""
     echo "Monitoring:"
-    echo "  4. Show Status"
-    echo "  5. View Logs"
-    echo "  6. Test Connection"
+    echo "  5. Show Status"
+    echo "  6. View Logs"
+    echo "  7. Test Connection"
     echo ""
     echo "External Access (MongoDB Compass):"
-    echo "  7. Enable External Access (NodePort)"
-    echo "  8. Disable External Access"
-    echo "  9. Show Connection Info"
-    echo " 10. Add /etc/hosts Entries (for replica discovery)"
-    echo " 11. Port Forward (localhost)"
+    echo "  8. Enable External Access (NodePort)"
+    echo "  9. Disable External Access"
+    echo " 10. Show Connection Info"
+    echo " 11. Add /etc/hosts Entries (for replica discovery)"
+    echo " 12. Port Forward (localhost)"
     echo ""
     echo "Maintenance:"
-    echo " 12. Restart MongoDB Pods"
+    echo " 13. Restart MongoDB Pods"
     echo ""
     echo "Cleanup:"
-    echo " 13. Uninstall MongoDB"
-    echo " 14. Exit"
+    echo " 14. Uninstall MongoDB"
+    echo " 15. Exit"
     echo ""
     echo "Storage Path: $STORAGE_BASE_PATH"
     echo ""
@@ -487,6 +553,9 @@ main() {
                 ;;
             manual-init|manual)
                 manual_init
+                ;;
+            generate-manifest|generate)
+                generate_persistence_manifest
                 ;;
             status)
                 status
@@ -528,7 +597,7 @@ main() {
     # Interactive menu mode
     while true; do
         show_menu
-        read -p "Select an option (1-14): " choice
+        read -p "Select an option (1-15): " choice
         
         case $choice in
             1)
@@ -541,41 +610,44 @@ main() {
                 manual_init
                 ;;
             4)
-                status
+                generate_persistence_manifest
                 ;;
             5)
-                logs
+                status
                 ;;
             6)
-                test_connection
+                logs
                 ;;
             7)
-                enable_external_access
+                test_connection
                 ;;
             8)
-                disable_external_access
+                enable_external_access
                 ;;
             9)
-                show_connection_info
+                disable_external_access
                 ;;
             10)
-                add_hosts_entries
+                show_connection_info
                 ;;
             11)
-                port_forward
+                add_hosts_entries
                 ;;
             12)
-                restart
+                port_forward
                 ;;
             13)
-                uninstall
+                restart
                 ;;
             14)
+                uninstall
+                ;;
+            15)
                 print_info "Exiting..."
                 exit 0
                 ;;
             *)
-                
+                print_error "Invalid option. Please select 1-15"
                 ;;
         esac
         

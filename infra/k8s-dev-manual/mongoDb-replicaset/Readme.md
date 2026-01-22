@@ -34,23 +34,27 @@ Deployment:
   2. Initialize Replica Set (Automatic)
   3. Show Manual Init Instructions
 
+Configuration:
+  4. Generate Persistence Manifest
+
 Monitoring:
-  4. Show Status
-  5. View Logs
-  6. Test Connection
+  5. Show Status
+  6. View Logs
+  7. Test Connection
 
 External Access (MongoDB Compass):
-  7. Enable External Access (NodePort)
-  8. Disable External Access
-  9. Show Connection Info
- 10. Port Forward (localhost)
+  8. Enable External Access (NodePort)
+  9. Disable External Access
+ 10. Show Connection Info
+ 11. Add /etc/hosts Entries (for replica discovery)
+ 12. Port Forward (localhost)
 
 Maintenance:
- 11. Restart MongoDB Pods
+ 13. Restart MongoDB Pods
 
 Cleanup:
- 12. Uninstall MongoDB
- 13. Exit
+ 14. Uninstall MongoDB
+ 15. Exit
 ```
 
 ### Command-Line Mode (Backward Compatible)
@@ -60,6 +64,9 @@ You can also use direct commands:
 ```bash
 # Deploy MongoDB replica set
 ./manage.sh install
+
+# Generate persistence manifest with custom storage path
+./manage.sh generate-manifest
 
 # Initialize replica set (automatic using Job)
 ./manage.sh init-replica
@@ -92,6 +99,9 @@ You can also use direct commands:
 - **Deploy MongoDB** - Deploy StatefulSet, headless service, and create storage directories
 - **Initialize Replica Set** - Initialize replica set using Kubernetes Job (automatic)
 - **Manual Init Instructions** - Show manual initialization steps
+
+**Configuration:**
+- **Generate Persistence Manifest** - Dynamically create 0-mongo-peristance.yaml using the configured STORAGE_BASE_PATH
 
 **Monitoring:**
 - **Show Status** - Display pods, services, PVs, PVCs, and replica set configuration
@@ -373,7 +383,7 @@ mongodb://localhost:30017/?directConnection=true
 
 ## Files
 
-- `0-mongo-peristance.yaml` - 3 PersistentVolumes for hostPath storage (one per replica)
+- `0-mongo-peristance.yaml` - 3 PersistentVolumes for hostPath storage (can be auto-generated)
 - `02-service-headless.yaml` - Headless service for StatefulSet DNS
 - `03-service-nodeport.yaml` - NodePort services for external access (optional)
 - `04-statefulset.yaml` - MongoDB StatefulSet with 3 replicas and volumeClaimTemplates
@@ -381,6 +391,41 @@ mongodb://localhost:30017/?directConnection=true
 - `manage.sh` - Management script for all operations
 
 ## Important Notes
+
+### Dynamic Persistence Manifest Generation
+
+The persistence manifest file (`0-mongo-peristance.yaml`) can be dynamically generated based on the `STORAGE_BASE_PATH` configured in `manage.sh`:
+
+**Generate manually:**
+```bash
+./manage.sh generate-manifest
+```
+
+**Or from the menu:**
+Select option 4: "Generate Persistence Manifest"
+
+**Benefits:**
+- No need to manually edit hostPath values in the YAML file
+- Automatically uses the `STORAGE_BASE_PATH` from configuration
+- Easy to regenerate if you change the storage location
+- The install command will auto-generate if the file doesn't exist
+
+**What it creates:**
+```yaml
+# Example for STORAGE_BASE_PATH="/data/mongo"
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-pv-0
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /data/mongo/mongo-0
+# ... (similar for mongo-pv-1 and mongo-pv-2)
+```
 
 ### Storage Path Configuration
 - The storage base path is configurable at the top of `manage.sh`
