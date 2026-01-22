@@ -12,7 +12,6 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Configuration
 NAMESPACE="default"
 KAFKA_PERSISTENCE_FILE="kafka-persitance.yaml"
 KAFKA_SRV_FILE="kafka-srv.yaml"
@@ -41,7 +40,6 @@ KAFKA_TOPICS=(
     "message.special.events"
 )
 
-# Function to print colored messages
 print_info() {
     echo -e "${GREEN}[INFO]${NC} $1"
 }
@@ -58,7 +56,6 @@ print_step() {
     echo -e "${BLUE}[STEP]${NC} $1"
 }
 
-# Function to check if kubectl is installed
 check_kubectl() {
     if ! command -v kubectl &> /dev/null; then
         print_error "kubectl is not installed. Please install kubectl first."
@@ -66,7 +63,6 @@ check_kubectl() {
     fi
 }
 
-# Function to check if manifest files exist
 check_manifest_files() {
     local missing_files=()
     
@@ -93,7 +89,6 @@ check_manifest_files() {
     print_info "All required manifest files found"
 }
 
-# Function to deploy Kafka
 deploy_kafka() {
     print_step "Deploying Kafka PersistentVolume and PersistentVolumeClaim..."
     kubectl apply -f "$KAFKA_PERSISTENCE_FILE"
@@ -104,14 +99,12 @@ deploy_kafka() {
     print_info "Kafka deployed successfully"
 }
 
-# Function to deploy Kafka UI
 deploy_kafka_ui() {
     print_step "Deploying Kafka UI..."
     kubectl apply -f "$KAFKA_UI_SRV_FILE"
     print_info "Kafka UI deployed successfully"
 }
 
-# Function to wait for Kafka to be ready
 wait_for_kafka() {
     print_info "Waiting for Kafka to be ready..."
     kubectl wait --for=condition=available --timeout=300s deployment/kafka -n $NAMESPACE 2>/dev/null || {
@@ -120,7 +113,6 @@ wait_for_kafka() {
     }
 }
 
-# Function to wait for Kafka UI to be ready
 wait_for_kafka_ui() {
     print_info "Waiting for Kafka UI to be ready..."
     kubectl wait --for=condition=available --timeout=120s deployment/kafka-ui -n $NAMESPACE 2>/dev/null || {
@@ -129,11 +121,9 @@ wait_for_kafka_ui() {
     }
 }
 
-# Function to create Kafka topics
 create_kafka_topics() {
     print_step "Creating Kafka topics..."
     
-    # Get Kafka pod name
     KAFKA_POD=$(kubectl get pods -n $NAMESPACE -l app=kafka -o jsonpath='{.items[0].metadata.name}')
     
     if [ -z "$KAFKA_POD" ]; then
@@ -175,7 +165,6 @@ create_kafka_topics() {
     fi
 }
 
-# Function to list Kafka topics
 list_kafka_topics() {
     print_step "Listing Kafka topics..."
     
@@ -191,7 +180,6 @@ list_kafka_topics() {
         --bootstrap-server localhost:9092
 }
 
-# Function to describe a specific topic
 describe_kafka_topic() {
     read -p "Enter topic name: " topic_name
     
@@ -214,7 +202,6 @@ describe_kafka_topic() {
         --bootstrap-server localhost:9092
 }
 
-# Function to delete all topics
 delete_all_topics() {
     print_warn "This will delete ALL Kafka topics"
     read -p "Are you sure? (yes/no): " confirm
@@ -249,7 +236,6 @@ delete_all_topics() {
     print_info "Topic deletion completed"
 }
 
-# Function to show deployment status
 show_status() {
     echo ""
     print_info "=== Deployment Status ==="
@@ -269,7 +255,6 @@ show_status() {
     echo ""
 }
 
-# Function to get access information
 show_access_info() {
     echo ""
     print_info "=== Access Information ==="
@@ -309,7 +294,6 @@ delete_kafka() {
     fi
 }
 
-# Function to restart Kafka
 restart_kafka() {
     print_step "Restarting Kafka..."
     kubectl rollout restart deployment/kafka -n $NAMESPACE
@@ -317,7 +301,6 @@ restart_kafka() {
     print_info "Kafka restarted successfully"
 }
 
-# Function to restart Kafka UI
 restart_kafka_ui() {
     if kubectl get deployment kafka-ui -n $NAMESPACE &> /dev/null; then
         print_step "Restarting Kafka UI..."
@@ -329,7 +312,6 @@ restart_kafka_ui() {
     fi
 }
 
-# Function to view logs
 view_logs() {
     echo ""
     echo "1. Kafka logs"
@@ -361,7 +343,6 @@ view_logs() {
     esac
 }
 
-# Function to show menu
 show_menu() {
     echo ""
     echo "======================================"
@@ -391,7 +372,6 @@ show_menu() {
     echo ""
 }
 
-# Main function
 main() {
     # Pre-flight checks
     check_kubectl
@@ -474,5 +454,5 @@ main() {
     done
 }
 
-# Run main function
+# entrypoint
 main
