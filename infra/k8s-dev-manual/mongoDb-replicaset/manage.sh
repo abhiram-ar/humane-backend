@@ -329,19 +329,64 @@ show_connection_info() {
     
     echo ""
     if kubectl get svc mongo-nodeport-0 -n $NAMESPACE &>/dev/null; then
-        print_info "External Connection (MongoDB Compass, host machine):"
-        print_msg $GREEN "  mongodb://localhost:30017/?directConnection=true"
-        print_msg $YELLOW "  Note: directConnection=true prevents DNS resolution errors"
+        print_info "External Connection with Replica Discovery (Recommended):"
+        print_msg $YELLOW "  First, add these entries to /etc/hosts:"
+        print_msg $GREEN "    127.0.0.1 mongo-0.mongo"
+        print_msg $GREEN "    127.0.0.1 mongo-1.mongo"
+        print_msg $GREEN "    127.0.0.1 mongo-2.mongo"
+        print_msg $YELLOW "  Then use this connection string:"
+        print_msg $GREEN "  mongodb://mongo-0.mongo:30017,mongo-1.mongo:30018,mongo-2.mongo:30019/?replicaSet=rs0"
         echo ""
-        print_info "Direct Access to Each Replica:"
-        print_msg $GREEN "  mongo-0: mongodb://localhost:30017/?directConnection=true"
-        print_msg $GREEN "  mongo-1: mongodb://localhost:30018/?directConnection=true"
-        print_msg $GREEN "  mongo-2: mongodb://localhost:30019/?directConnection=true"
+        print_info "External Direct Connection (No replica discovery):"
+        print_msg $GREEN "  mongodb://localhost:30017/?directConnection=true"
         echo ""
         print_info "NodePort Services Status:"
         kubectl get svc -n $NAMESPACE | grep mongo-nodeport
     else
         print_warn "External access not enabled. Run 'Enable External Access' from menu."
+    fi
+}
+
+# Add hosts file entries helper
+add_hosts_entries() {
+    print_msg $BLUE "======================================="
+    print_msg $BLUE "Add /etc/hosts Entries"
+    print_msg $BLUE "======================================="
+    echo ""
+    print_info "To enable replica set discovery from MongoDB Compass,"
+    print_info "you need to add these entries to your /etc/hosts file:"
+    echo ""
+    print_msg $GREEN "127.0.0.1 mongo-0.mongo"
+    print_msg $GREEN "127.0.0.1 mongo-1.mongo"
+    print_msg $GREEN "127.0.0.1 mongo-2.mongo"
+    echo ""
+    print_info "Quick command (Linux/Mac):"
+    print_msg $YELLOW "sudo bash -c 'cat >> /etc/hosts << EOF"
+    print_msg $YELLOW "127.0.0.1 mongo-0.mongo"
+    print_msg $YELLOW "127.0.0.1 mongo-1.mongo"
+    print_msg $YELLOW "127.0.0.1 mongo-2.mongo"
+    print_msg $YELLOW "EOF'"
+    echo ""
+    print_info "Windows (Run PowerShell as Administrator):"
+    print_msg $YELLOW "Add-Content -Path C:\\Windows\\System32\\drivers\\etc\\hosts -Value '127.0.0.1 mongo-0.mongo'"
+    print_msg $YELLOW "Add-Content -Path C:\\Windows\\System32\\drivers\\etc\\hosts -Value '127.0.0.1 mongo-1.mongo'"
+    print_msg $YELLOW "Add-Content -Path C:\\Windows\\System32\\drivers\\etc\\hosts -Value '127.0.0.1 mongo-2.mongo'"
+    echo ""
+    read -p "Do you want to add these entries now? (requires sudo) [y/N]: " -r
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        if [[ "$OSTYPE" == "linux-gnu"* ]] || [[ "$OSTYPE" == "darwin"* ]]; then
+            sudo bash -c 'cat >> /etc/hosts << EOF
+127.0.0.1 mongo-0.mongo
+127.0.0.1 mongo-1.mongo
+127.0.0.1 mongo-2.mongo
+EOF'
+            print_msg $GREEN "Entries added successfully!"
+            print_info "You can now use: mongodb://mongo-0.mongo:30017,mongo-1.mongo:30018,mongo-2.mongo:30019/?replicaSet=rs0"
+        else
+            print_warn "Automatic addition not supported on this OS. Please add manually."
+        fi
+    else
+        print_info "Please add the entries manually to use full replica set features."
     fi
 }
 
@@ -413,14 +458,15 @@ show_menu() {
     echo "  7. Enable External Access (NodePort)"
     echo "  8. Disable External Access"
     echo "  9. Show Connection Info"
-    echo " 10. Port Forward (localhost)"
+    echo " 10. Add /etc/hosts Entries (for replica discovery)"
+    echo " 11. Port Forward (localhost)"
     echo ""
     echo "Maintenance:"
-    echo " 11. Restart MongoDB Pods"
+    echo " 12. Restart MongoDB Pods"
     echo ""
     echo "Cleanup:"
-    echo " 12. Uninstall MongoDB"
-    echo " 13. Exit"
+    echo " 13. Uninstall MongoDB"
+    echo " 14. Exit"
     echo ""
     echo "Storage Path: $STORAGE_BASE_PATH"
     echo ""
@@ -462,6 +508,9 @@ main() {
                 ;;
             connection-info|info)
                 show_connection_info
+                ;;   
+           add-hosts)
+                add_hosts_entries
                 ;;
             port-forward|pf)
                 port_forward
@@ -479,7 +528,7 @@ main() {
     # Interactive menu mode
     while true; do
         show_menu
-        read -p "Select an option (1-13): " choice
+        read -p "Select an option (1-14): " choice
         
         case $choice in
             1)
@@ -510,20 +559,23 @@ main() {
                 show_connection_info
                 ;;
             10)
-                port_forward
+                add_hosts_entries
                 ;;
             11)
-                restart
+                port_forward
                 ;;
             12)
-                uninstall
+                restart
                 ;;
             13)
+                uninstall
+                ;;
+            14)
                 print_info "Exiting..."
                 exit 0
                 ;;
             *)
-                print_error "Invalid option. Please select 1-13"
+                
                 ;;
         esac
         

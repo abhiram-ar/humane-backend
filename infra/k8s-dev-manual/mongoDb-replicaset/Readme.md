@@ -113,23 +113,46 @@ You can also use direct commands:
    ./manage.sh enable-external
    ```
 
-2. **Get connection information**:
+2. **Add host file entries** to make internal DNS names resolvable:
+   
+   **On Linux/Mac:**
    ```bash
-   ./manage.sh connection-info
+   sudo bash -c 'cat >> /etc/hosts << EOF
+127.0.0.1 mongo-0.mongo
+127.0.0.1 mongo-1.mongo
+127.0.0.1 mongo-2.mongo
+EOF'
+   ```
+   
+   **On Windows (Run as Administrator):**
+   ```powershell
+   Add-Content -Path C:\Windows\System32\drivers\etc\hosts -Value "127.0.0.1 mongo-0.mongo"
+   Add-Content -Path C:\Windows\System32\drivers\etc\hosts -Value "127.0.0.1 mongo-1.mongo"
+   Add-Content -Path C:\Windows\System32\drivers\etc\hosts -Value "127.0.0.1 mongo-2.mongo"
    ```
 
-3. **Connect with MongoDB Compass**:
-   - Open MongoDB Compass
-   - **Important**: Use `directConnection=true` to prevent hostname resolution issues
-   - Connection string: `mongodb://localhost:30017/?directConnection=true`
-   - This connects directly to mongo-0 (primary)
+3. **Connect with MongoDB Compass using full replica set connection string**:
+   ```
+   mongodb://mongo-0.mongo:30017,mongo-1.mongo:30018,mongo-2.mongo:30019/?replicaSet=rs0
+   ```
+   
+   This allows MongoDB to discover all replicas and handle automatic failover.
+
+### Alternative: Single Node Connection (No Replica Discovery)
+
+If you don't want to modify your hosts file:
+
+1. **Connect with MongoDB Compass** using direct connection:
+   ```
+   mongodb://localhost:30017/?directConnection=true
+   ```
+   
+   **Trade-off**: You connect to only one node, and MongoDB won't discover other replicas. This is fine for development but you won't get automatic failover if that node goes down.
 
    **Individual replica connections:**
    - mongo-0: `mongodb://localhost:30017/?directConnection=true`
    - mongo-1: `mongodb://localhost:30018/?directConnection=true`
    - mongo-2: `mongodb://localhost:30019/?directConnection=true`
-
-   > **Note**: Without `directConnection=true`, MongoDB will try to resolve internal Kubernetes DNS names (mongo-0.mongo) which causes connection errors.
 
 ### Method 2: Port Forwarding (Alternative)
 
@@ -138,14 +161,16 @@ You can also use direct commands:
    ./manage.sh port-forward
    ```
 
-2. **Select a pod** to forward (or forward all)
+2. **Select option 4** to forward all pods
 
-3. **Connect with MongoDB Compass**:
-   - Use connection string: `mongodb://localhost:27017/?directConnection=true` (for mongo-0)
-   - Or `mongodb://localhost:27018/?directConnection=true` (for mongo-1)
-   - Or `mongodb://localhost:27019/?directConnection=true` (for mongo-2)
+3. **Add host file entries** (same as Method 1 above)
 
-> **Note**: Port forwarding requires keeping the terminal open. NodePort is more permanent but uses fixed ports (30017-30019). Always add `?directConnection=true` to prevent hostname resolution errors.
+4. **Connect with MongoDB Compass**:
+   ```
+   mongodb://mongo-0.mongo:27017,mongo-1.mongo:27018,mongo-2.mongo:27019/?replicaSet=rs0
+   ```
+
+> **Note**: Port forwarding requires keeping the terminal open. NodePort is more permanent but uses fixed ports (30017-30019).
 
 ### Connection Strings Summary
 
@@ -154,17 +179,36 @@ You can also use direct commands:
 mongodb://mongo-0.mongo:27017,mongo-1.mongo:27017,mongo-2.mongo:27017/?replicaSet=rs0
 ```
 
-**External via NodePort (MongoDB Compass):**
+**External with Replica Discovery (NodePort + /etc/hosts):**
+```
+mongodb://mongo-0.mongo:30017,mongo-1.mongo:30018,mongo-2.mongo:30019/?replicaSet=rs0
+```
+
+**External Direct Connection (NodePort only, no discovery):**
 ```
 mongodb://localhost:30017/?directConnection=true
 ```
 
-**External via Port Forward (MongoDB Compass):**
+**External Port Forward with Replica Discovery:**
+```
+mongodb://mongo-0.mongo:27017,mongo-1.mongo:27018,mongo-2.mongo:27019/?replicaSet=rs0
+```
+
+**External Port Forward Direct Connection:**
 ```
 mongodb://localhost:27017/?directConnection=true
 ```
 
-> **Important**: The `?directConnection=true` parameter prevents MongoDB from trying to resolve internal Kubernetes DNS names.
+### Why /etc/hosts is Needed
+
+When you connect to MongoDB replica set:
+1. You connect to the primary node
+2. MongoDB returns the replica set configuration with internal hostnames (mongo-0.mongo, etc.)
+3. Compass tries to connect to these hostnames for replica discovery
+4. Without /etc/hosts entries, these DNS names fail to resolve
+
+**With /etc/hosts entries**: Full replica set features (automatic failover, read preference)
+**Without /etc/hosts**: Single node connection only (no automatic failover)
 
 ## Architecture
 
@@ -276,26 +320,56 @@ If pods are in a bad state:
 
 ### MongoDB Compass Connection Error: "getaddrinfo ENOTFOUND mongo-0.mongo"
 
-**Problem**: MongoDB Compass tries to resolve internal Kubernetes DNS names.
+**Problem**: MongoDB Compass tries to resolve internal Kubernetes DNS names (mongo-0.mongo, mongo-1.mongo, mongo-2.mongo).
 
-**Solution**: Add `?directConnection=true` to your connection string:
-```
-mongodb://localhost:30017/?directConnection=true
-```
+**Solution 1 - Full Replica Set with Discovery (Recommended)**:
 
-**Why this happens**: 
-- The replica set is configured with internal hostnames (mongo-0.mongo, mongo-1.mongo, etc.)
-- When you connect without `directConnection=true`, MongoDB returns these hostnames to the client
-- Compass tries to connect to these internal names, which don't resolve outside Kubernetes
+Add entries to your `/etc/hosts` file to map internal DNS names to localhost:
 
-**Alternative Solution** (if you need full replica set features):
-Add entries to your `/etc/hosts` file:
+**Linux/Mac:**
 ```bash
+sudo bash -c 'cat >> /etc/hosts << EOF
+127.0.0.1 mongo-0.mongo
+127.0.0.1 mongo-1.mongo
+127.0.0.1 mongo-2.mongo
+EOF'
+```
+
+**Windows (as Administrator):**
+Edit `C:\Windows\System32\drivers\etc\hosts` and add:
+```
 127.0.0.1 mongo-0.mongo
 127.0.0.1 mongo-1.mongo
 127.0.0.1 mongo-2.mongo
 ```
-Then use: `mongodb://localhost:30017,localhost:30018,localhost:30019/?replicaSet=rs0`
+
+Then use full replica set connection string:
+```
+mongodb://mongo-0.mongo:30017,mongo-1.mongo:30018,mongo-2.mongo:30019/?replicaSet=rs0
+```
+
+**Benefits**: 
+- Automatic failover if primary goes down
+- Can use read preferences (read from secondaries)
+- MongoDB Compass shows all replica set members
+
+**Solution 2 - Direct Connection (Quick but Limited)**:
+
+Use `directConnection=true` parameter:
+```
+mongodb://localhost:30017/?directConnection=true
+```
+
+**Trade-offs**:
+- No automatic failover
+- No replica discovery
+- Single node connection only
+- Good for quick testing or simple use cases
+
+**Why this happens**: 
+- The replica set is configured with internal hostnames that only work inside Kubernetes
+- When you connect, MongoDB returns these hostnames for replica discovery
+- Without proper DNS resolution, Compass can't connect to the other replicas
 
 ## Files
 
