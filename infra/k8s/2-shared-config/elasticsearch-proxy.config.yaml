@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elasticsearch-proxy-pod-config
+data:
+  NODE_ENV: "development"
+  KAFKAJS_NO_PARTITIONER_WARNING: "1" # get rid of kafkaks legacy support warning
+  KAFKA_CLIENT_ID: humane-elasticsearch-proxy
+  KAFKA_BROKER_URI: kafka:9092
+  ELASTICSEARCH_URI: "http://elasticsearch:9200"
+  AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME: https://d4pllizvq43wd.cloudfront.net
+  USER_SERVICE_BASE_URL: http://user-srv:3000
