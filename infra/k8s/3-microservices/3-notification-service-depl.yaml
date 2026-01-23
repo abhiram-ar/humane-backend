@@ -21,6 +21,8 @@ spec:
         - name: notification-service
           image: abhiramar/humane-notification-service
           envFrom:
+            - configMapRef:
+                name: notification-pod-config
             - secretRef:
                 name: notification-pod-secret
           resources:

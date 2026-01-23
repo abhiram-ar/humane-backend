@@ -34,6 +34,8 @@ spec:
         - name: elasticsearch-proxy
           image: abhiramar/humane-elasticsearch-proxy
           envFrom:
+            - configMapRef:
+                name: elasticsearch-proxy-pod-config
             - secretRef:
                 name: elasticsearch-proxy-pod-secret
           resources:
