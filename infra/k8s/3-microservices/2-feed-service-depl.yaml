@@ -21,6 +21,8 @@ spec:
         - name: feed-server
           image: abhiramar/humane-feed-service
           envFrom:
+            - configMapRef:
+                name: feed-pod-config
             - secretRef:
                 name: feed-pod-secret
           resources:

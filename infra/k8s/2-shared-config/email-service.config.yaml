@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: email-pod-config
+data:
+  NODE_ENV: "development"
+  SMTP_HOST: "smtp.gmail.com"
+  SMTP_PORT: "465"
+  SMTP_SERVICE: "gmail"
+  KAFKAJS_NO_PARTITIONER_WARNING: "1" # get rid of kafkaks legacy support warning

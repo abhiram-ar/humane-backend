@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reward-pod-config
+data:
+  NODE_ENV: "development"
+  KAFKAJS_NO_PARTITIONER_WARNING: "1" # get rid of kafkaks legacy support warning
+  USER_SERVICE_BASE_URL: http://user-srv:3000
+  ELASTICSEARCH_PROXY_BASE_URL: http://elasticsearch-proxy-srv:3000

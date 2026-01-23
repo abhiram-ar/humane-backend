@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+   name: moderation-pod-config
+data:
+   NODE_ENV: 'development'
+   KAFKAJS_NO_PARTITIONER_WARNING: '1' # get rid of kafkaks legacy support warning
+   KAFKA_CLIENT_ID: humane-moderation-srv
+   KAFKA_BROKER_URI: kafka:9092
+   AWS_REGION: ap-south-1
+   AWS_S3_BUCKET_NAME: humane.social
+   AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME: https://d4pllizvq43wd.cloudfront.net

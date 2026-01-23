@@ -21,6 +21,8 @@ spec:
         - name: writer-server
           image: abhiramar/humane-writer-service
           envFrom:
+            - configMapRef:
+                name: writer-pod-config
             - secretRef:
                 name: writer-pod-secret
           resources:

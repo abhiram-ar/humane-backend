@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-pod-config
+data:
+  NODE_ENV: "development"
+  KAFKAJS_NO_PARTITIONER_WARNING: "1" # get rid of kafkaks legacy support warning
+  AWS_REGION: ap-south-1
+  AWS_S3_BUCKET_NAME: humane.social
+  AWS_CLOUDFRONT_DISTRIBUTION_DOMAIN_NAME: https://d4pllizvq43wd.cloudfront.net
+  POSTGRES_URI: "postgresql://postgres:mysecretpassword@user-postgres:5432/user-db"
+  ELASTICSEARCH_PROXY_BASE_URL: http://elasticsearch-proxy-srv:3000

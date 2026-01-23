@@ -50,12 +50,16 @@ spec:
           image: abhiramar/humane-reward-service
           command: ["npx", "prisma", "migrate", "deploy"]
           envFrom:
+            - configMapRef:
+                name: reward-pod-config
             - secretRef:
                 name: reward-pod-secret
       containers:
         - name: reward-server
           image: abhiramar/humane-reward-service
           envFrom:
+            - configMapRef:
+                name: reward-pod-config
             - secretRef:
                 name: reward-pod-secret
           resources:

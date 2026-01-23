@@ -21,6 +21,8 @@ spec:
         - name: moderation-service
           image: abhiramar/humane-moderation-service
           envFrom:
+            - configMapRef:
+                name:  moderation-pod-config
             - secretRef:
                 name: moderation-pod-secret
           resources:

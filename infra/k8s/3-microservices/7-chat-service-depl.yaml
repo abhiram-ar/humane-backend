@@ -21,6 +21,8 @@ spec:
         - name: chat-service
           image: abhiramar/humane-chat-service
           envFrom:
+            - configMapRef:
+                name: chat-pod-config
             - secretRef:
                 name: chat-pod-secret
           resources:

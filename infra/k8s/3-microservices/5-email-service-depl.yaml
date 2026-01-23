@@ -21,6 +21,8 @@ spec:
         - name: email-server
           image: abhiramar/humane-email
           envFrom:
+            - configMapRef:
+                name: email-pod-config
             - secretRef:
                 name: email-pod-secret
           resources:
