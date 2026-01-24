@@ -87,3 +87,9 @@ build:
 
 deploy:
   kubectl: {}
+
+profiles:
+  - name: prod # no builds, only deploy existing images
+    build: {}
+    deploy:
+      kubectl: {}
