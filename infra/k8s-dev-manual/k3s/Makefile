@@ -1,4 +1,4 @@
-.PHONY: all deploy-k3s configure-kubeconfig fix-permissions install-helm remove-traefik install-k9s install-skaffold setup-k3s setup-tools help
+.PHONY: all deploy-k3s exkc fp install-helm remove-traefik install-k9s install-skaffold setup-k3s setup-tools help
 
 # Default target - shows help
 help:
@@ -12,8 +12,8 @@ help:
 	@echo ""
 	@echo "Individual targets:"
 	@echo "  make deploy-k3s           - Deploy K3s cluster"
-	@echo "  make configure-kubeconfig - Export KUBECONFIG environment variable"
-	@echo "  make fix-permissions      - Fix kubectl permissions (run after k3s restart)"
+	@echo "  make exkc  					  - Export KUBECONFIG environment variable"
+	@echo "  make fp                   - Fix kubectl permissions (run after k3s restart)"
 	@echo "  make install-helm         - Install Helm package manager"
 	@echo "  make remove-traefik       - Remove Traefik gateway (for using another gateway like Kong)"
 	@echo "  make install-k9s          - Install k9s terminal UI"
@@ -42,13 +42,26 @@ deploy-k3s:
 	@echo "✓ K3s deployed"
 
 # 2. Configure kubeconfig path
-configure-kubeconfig:
+exkc:
 	@echo "Configuring KUBECONFIG..."
 	@echo "Note: Add 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' to your shell profile"
 	@echo "For current session, run: export KUBECONFIG=/etc/rancher/k3s/k3s.yaml"
+	@echo ""
+	@echo "To add to ~/.bashrc automatically, run: make exkc-bashrc"
+
+# Add KUBECONFIG to .bashrc (optional)
+exkc-bashrc:
+	@echo "Adding KUBECONFIG to ~/.bashrc..."
+	@if ! grep -q "KUBECONFIG=/etc/rancher/k3s/k3s.yaml" ~/.bashrc 2>/dev/null; then \
+		echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> ~/.bashrc; \
+		echo "✓ Added KUBECONFIG to ~/.bashrc"; \
+		echo "Run 'source ~/.bashrc' to apply changes"; \
+	else \
+		echo "KUBECONFIG already exists in ~/.bashrc"; \
+	fi
 
 # 3. Fix kubectl permissions
-fix-permissions:
+fp:
 	@echo "Fixing kubectl permissions..."
 	sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 	@echo "✓ Permissions fixed"
