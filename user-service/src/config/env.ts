@@ -19,6 +19,8 @@ export const ENV = {
 function checkEnv() {
    let errorCount = 0;
 
+   console.log("Node Env:", ENV.NODE_ENV);
+
    for (let key in ENV) {
       let typedKey = key as keyof typeof ENV;
       if (ENV[typedKey] === undefined || ENV[typedKey] === null) {

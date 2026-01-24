@@ -87,3 +87,63 @@ To prevent abuse and ensure fair usage of APIs, we implement rate limiting using
 3. **Annotate the target route or resource** with the `konghq.com/plugins` annotation to bind the rate-limiting plugin.
 
 > This ensures that incoming requests are throttled based on the configured limits (e.g., requests per second/minute), protecting backend services from overuse or denial-of-service attacks.
+
+
+### HTTPS - TLS/SSL config
+
+[Reference - kong docs](https://developer.konghq.com/kubernetes-ingress-controller/routing/https-tls-termination/)
+
+#### 1. Create cert keys 
+
+```bash
+openssl req -subj '/CN=humanebe.abhiram-ar.com' -new -newkey rsa:2048 -sha256 \
+   -days 365 -nodes -x509 -keyout server.key -out server.crt \
+   -addext "subjectAltName = DNS:humanebe.abhiram-ar.com" \
+   -addext "keyUsage = digitalSignature" \
+   -addext "extendedKeyUsage = serverAuth" 2> /dev/null;
+   openssl x509 -in server.crt -subject -noout
+ ```
+
+> OR: If having issue with self-signed certificate - use the one provided by cloudflare for the DNS 
+> Note: for the cloudflare cert to work request need to be proxied through cloudflare, because of cert chaining
+
+
+#### 2. Apply the cert
+When we go a hands on a cert and key apply it to the cluster
+
+Create a Secret containing the certificate:
+```bash
+kubectl create secret -n kong tls humanebe.abhiram-ar.com --cert=./server.crt --key=./server.key
+```
+
+
+#### 3. Path the gateway to for addding a listner for HTTPs
+To listen for HTTPS traffic, configure an additional TLS listener on your Gateway resource:
+
+```bash
+kubectl patch -n kong --type=json gateway kong -p='[
+    {
+        "op":"add",
+        "path":"/spec/listeners/-",
+        "value":{
+            "name": "https",
+            "port": 443,
+            "protocol":"HTTPS",
+            "hostname":"humanebe.abhiram-ar.com",
+            "allowedRoutes": {
+              "namespaces": {
+                "from": "All"
+              }
+            },
+            "tls": {
+              "mode": "Terminate",
+              "certificateRefs":[{
+                "group":"",
+                "kind":"Secret",
+                "name":"humanebe.abhiram-ar.com"
+              }]
+            }
+        }
+    }
+]'
+```

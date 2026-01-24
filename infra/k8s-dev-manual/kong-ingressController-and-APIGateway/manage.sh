@@ -78,7 +78,7 @@ create_gateway() {
     # Create namespace if it doesn't exist
     if ! kubectl get namespace "$NAMESPACE" &> /dev/null; then
         print_info "Creating namespace: $NAMESPACE"
-        kubectl create namespace "$NAMESPACE"
+        kubectl create namespace "$NAMESPACE" --save-config
     else
         print_info "Namespace $NAMESPACE already exists"
     fi
