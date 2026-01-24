@@ -89,7 +89,7 @@ To prevent abuse and ensure fair usage of APIs, we implement rate limiting using
 > This ensures that incoming requests are throttled based on the configured limits (e.g., requests per second/minute), protecting backend services from overuse or denial-of-service attacks.
 
 
-### HTTPS - TLS/SSL config
+## manual HTTPS - TLS/SSL config  
 
 [Reference - kong docs](https://developer.konghq.com/kubernetes-ingress-controller/routing/https-tls-termination/)
 
@@ -106,6 +106,7 @@ openssl req -subj '/CN=humanebe.abhiram-ar.com' -new -newkey rsa:2048 -sha256 \
 
 > OR: If having issue with self-signed certificate - use the one provided by cloudflare for the DNS 
 > Note: for the cloudflare cert to work request need to be proxied through cloudflare, because of cert chaining
+> Proxying through cloudflare could be slow sometimes
 
 
 #### 2. Apply the cert
@@ -146,4 +147,143 @@ kubectl patch -n kong --type=json gateway kong -p='[
         }
     }
 ]'
+```
+
+
+## Cert-manger config
+
+#### 1. Install cert-manager
+
+```bash
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.0/cert-manager.yaml
+
+# wait for cert manager to be ready
+kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=300s
+```
+
+#### 2. create lets encrypt clusterIssuer
+
+##### create clusterIssuer.yaml
+```bash
+# clusterIssuer.yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: your-email@example.com  # IMPORTANT: Replace with actual domain owner email
+    privateKeySecretRef:
+      name: letsencrypt-prod-key
+    solvers:
+    - http01:
+        ingress:
+          class: kong
+```
+
+##### apply it
+
+```bash
+kubectl apply -f clusterIssuer.yaml
+```
+##### verify the clusterIssuer is ready
+
+```bash
+kubectl get clusterissuer letsencrypt-prod
+kubectl describe clusterissuer letsencrypt-prod
+```
+
+#### 3. create certificate
+
+```bash
+# certificate.yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: kong-tls-cert
+  namespace: kong
+spec:
+  secretName: kong-tls-cert
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    # Add subdomains as needed, 
+    # add root domain only if current server has ingress to root domain 
+    - humanebe.abhiram-ar.com  
+```
+
+###### Apply it
+
+```bash
+kubectl apply -f certificate.yaml
+```
+
+#### 4. patch kong ingress controller gateway
+
+```bash
+kubectl patch -n kong --type=json gateway kong -p='[
+    {
+        "op":"add",
+        "path":"/spec/listeners/-",
+        "value":{
+            "name": "https",
+            "port": 443,
+            "protocol":"HTTPS",
+            "hostname":"humanebe.abhiram-ar.com",
+            "allowedRoutes": {
+              "namespaces": {
+                "from": "All"
+              }
+            },
+            "tls": {
+              "mode": "Terminate",
+              "certificateRefs":[{
+                "group":"",
+                "kind":"Secret",
+                "name":"kong-tls-cert"
+              }]
+            }
+        }
+    }
+]'
+
+```
+
+#### 5. verify
+
+```bash
+# Check if certificate is ready
+kubectl get certificate -n kong
+
+# Expected output:
+# NAME            READY   SECRET          AGE
+# kong-tls-cert   True    kong-tls-cert   2m
+
+# Check certificate details
+kubectl describe certificate kong-tls-cert -n kong
+
+# Verify the secret was created
+kubectl get secret kong-tls-cert -n kong
+
+# Check certificate expiry
+kubectl get secret kong-tls-cert -n kong -o jsonpath='{.data.tls\.crt}' | base64 -d | openssl x509 -noout -dates
+
+```
+
+##### Troubleshooting - if the certificate isnt being issued check
+
+```bash
+# Check certificate order
+kubectl get certificaterequest -n kong
+
+# Check challenges
+kubectl get challenges -n kong
+
+# Check cert-manager logs
+kubectl logs -n cert-manager -l app=cert-manager -f
+
+# Describe the certificate for events
+kubectl describe certificate kong-tls-cert -n kong
 ```
