@@ -54,12 +54,3 @@ sudo install skaffold /usr/local/bin/
 
 
 
-mongodb+srv://abhiram:Abhi%40123@humane-prod-cluster.u2lj1nd.mongodb.net/
-
-mongodb+srv://abhiram:Abhi%40123@humane-prod-cluster.u2lj1nd.mongodb.net/?appName=humane-prod-cluster
-
-mongodb+srv://abhiram:gbCv56DNV0oy2lKs@cluster0.th4j6.mongodb.net/lms?retryWrites=true&w=majority&appName=Cluster0
-
-
-
-mongodb+srv://abhiram:Abhi%40123@humane-prod-cluster.mongodb.net/notification?retryWrites=true&w=majority&appName=notification-service-prod
