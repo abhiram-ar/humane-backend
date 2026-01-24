@@ -12,7 +12,7 @@ help:
 	@echo ""
 	@echo "Individual targets:"
 	@echo "  make deploy-k3s           - Deploy K3s cluster"
-	@echo "  make exkc  					  - Export KUBECONFIG environment variable"
+	@echo "  make exkc                 - Export KUBECONFIG environment variable"
 	@echo "  make fp                   - Fix kubectl permissions (run after k3s restart)"
 	@echo "  make install-helm         - Install Helm package manager"
 	@echo "  make remove-traefik       - Remove Traefik gateway (for using another gateway like Kong)"
