@@ -5,5 +5,4 @@
 -  Mutex locks and Buffer rotation for counter aggregation
 
 choices;
-
 -  why not moderating comments? Good commets are rewarded so people are forces to put good comments
