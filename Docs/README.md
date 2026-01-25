@@ -250,8 +250,7 @@ High-level architecture of the Humane backend system showing service interaction
 5. **Moderation Service**
    - Content moderation (text and media)
    - ML-based classification
-   - Manual review queue
-   - Tech: Python, ML models, PostgreSQL
+   - Tech: Node.js, RabbitMQ, Kafka
 
 6. **Notification Service**
    - Push notifications
@@ -262,7 +261,6 @@ High-level architecture of the Humane backend system showing service interaction
 7. **Reward Service**
    - Gamification and humane score tracking
    - Reward calculation and distribution
-   - Leaderboards
    - Tech: Node.js/TypeScript, PostgreSQL
 
 8. **ES Proxy**
@@ -276,13 +274,13 @@ High-level architecture of the Humane backend system showing service interaction
 1. **PostgreSQL**
    - Primary database for:
      - Users
-     - Posts (metadata)
-     - Comments
      - Relationships
    - Multiple instances (per service)
 
 2. **MongoDB**
    - Document storage for:
+     - Posts
+     - Comments
      - Chat messages
      - Rich user profiles
      - Moderation history
@@ -314,6 +312,10 @@ High-level architecture of the Humane backend system showing service interaction
 - Enables async, decoupled architecture
 - Event sourcing and replay capability
 
+**RabbitMQ**
+- long-running tasks
+- Moderation queue processing
+
 ### Infrastructure
 
 1. **Kubernetes (K8s)**
@@ -328,7 +330,7 @@ High-level architecture of the Humane backend system showing service interaction
    - Configs: `skaffold.yaml`, `skaffold.prod.yaml`
 
 3. **Load Balancers**
-   - Nginx Ingress Controller
+   - Kong Ingress Controller (Gateway API)
    - Routes traffic to services
    - SSL termination
 
