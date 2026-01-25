@@ -1,0 +1,14 @@
+apiVersion: skaffold/v4beta13
+kind: Config
+
+metadata:
+  name: humane-backend
+
+manifests:
+  rawYaml:
+    - ./infra/k8s/*
+
+# no builds, images are expected to be pre-built and available in the registry
+
+deploy:
+  kubectl: {}
