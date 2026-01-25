@@ -395,7 +395,6 @@ High-level architecture of the Humane backend system showing service interaction
    - Decouples services
    - Enables independent scaling
 
----
 
 ## Additional Notes
 

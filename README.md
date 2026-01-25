@@ -171,9 +171,8 @@ We welcome contributions! Please follow these guidelines:
 
 ### Upcoming Features
 - [ ] **Group Chat**: Multi-user conversations with group admin controls 
-- [ ] **Story Feature**: Ephemeral content with 24-hour expiry
 - [ ] **Advanced Search**: Filters by date, popularity, media type
-- [ ] **Voice**: WebRTC integration for real-time communication
+- [x] **Voice and Video calls**: WebRTC integration for real-time communication
 - [ ] **Analytics Dashboard**: User engagement insights
 - [ ] **Content Recommendations**: ML-based personalized content discovery
 - [ ] **Mobile App**: React Native client
@@ -184,7 +183,7 @@ We welcome contributions! Please follow these guidelines:
 - [x] **API Gateway**: Centralized Kong/Traefik gateway
 - [x] **CI/CD Pipeline**: GitHub Actions for automated testing and deployment
 - [ ] **Multi-region Deployment**: Geographic redundancy
-- [ ] **Internal Route Security**: Restrict public access to internal Elasticsearch proxy
+- [ ] **Internal Route Security**: Restrict public access to internal Elasticsearch proxy routes
 
 ### Documentation & Testing
 - [ ] API documentation with Swagger/OpenAPI
