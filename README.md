@@ -199,7 +199,7 @@ We welcome contributions! Please follow these guidelines:
 ## 📋 Project Roadmap
 
 ### 🎯 Upcoming Features
-- [ ] **Group Chat**: Multi-user conversations with admin controls
+- [ ] **Group Chat**: Multi-user conversations with group admin controls 
 - [ ] **Story Feature**: Ephemeral content with 24-hour expiry
 - [ ] **Advanced Search**: Filters by date, popularity, media type
 - [ ] **Voice**: WebRTC integration for real-time communication
@@ -224,7 +224,6 @@ We welcome contributions! Please follow these guidelines:
 ### 🔐 Security Enhancements
 - [ ] Content encryption at rest
 - [ ] Two-factor authentication (2FA)
-- [ ] Role-based access control (RBAC) improvements
 - [ ] Security audit and penetration testing
 - [ ] GDPR compliance features
 
@@ -235,13 +234,8 @@ We welcome contributions! Please follow these guidelines:
 - [Architecture Diagrams](./Docs/)
 - [Moderation ML Evaluations](./moderation-service/ML-evals/README.md)
 - [Observability Setup](./infra/k8s-dev-manual/observability/)
-- [Individual Service READMEs](./chat-service/README.md)
 
 
-
-## 📄 License
-
-This project is licensed under the ISC License.
 
 
 
