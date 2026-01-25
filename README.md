@@ -15,24 +15,11 @@
 
 ## 📖 Overview
 
-Humane Backend powers the server-side infrastructure for the **Humane** platform, a modern social networking application emphasizing behavior-rewarding, real-time communication, and scalable architecture. Built using a **microservices pattern**, the system orchestrates user management, content creation, moderation, notifications, chat, search, and gamification through **Kubernetes** and **Apache Kafka**, with data persistence handled via **PostgreSQL**, **MongoDB**, **Elasticsearch**, and **Redis**.
+Humane Backend powers the server-side infrastructure of Humane, a human-first social platform focused on meaningful interactions, positive behavior, and real-world connection rather than attention-driven engagement. It is built as a scalable, event-driven microservices system. The platform uses Apache Kafka for asynchronous service communication, Kubernetes for orchestration, and a polyglot persistence strategy to balance consistency, performance, and scalability, while following Clean / Hexagonal Architecture principles for long-term maintainability.
 
 ## 🏗️ System Architecture
 
 ![System Architecture](/Docs/full-architecture-light.png)
-
-### Key Components
-
-| Component | Purpose |
-|-----------|---------|
-| **Apache Kafka** | Event-driven message bus enabling asynchronous communication between services |
-| **PostgreSQL** | Relational database for structured data (users, relationships, rewards) |
-| **MongoDB** | NoSQL database for unstructured data (posts, comments, chats) |
-| **Elasticsearch** | High-performance search and query service for content discovery |
-| **Redis** | In-memory caching and feed optimization |
-| **RabbitMQ** | Worker queue for resource-intensive tasks (video moderation) |
-| **AWS S3** | Object storage for media files |
-| **CloudFront** | CDN for media delivery |
 
 
 
