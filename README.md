@@ -30,8 +30,6 @@ skaffold dev
 3. Write unit + integration tests
 4. Document APIs & data schema changes
 
-## Production Notes
-- [ ] Close Kafka UI NodePort before deployment to production.
+## Production checklist 
 - [ ] Convert Kafka Deployment → StatefulSet for persistence and fault tolerance.
 - [ ] Restrict internal ingress routes for the query service (close public exposure).
-- [ ] Skaffold + Kubernetes - Local dev, CI/CD, and deployment automation.
