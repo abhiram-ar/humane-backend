@@ -78,38 +78,6 @@ Humane Backend powers the server-side infrastructure of Humane, a human-first so
 
 
 
-## 🛠️ Tech Stack
-
-### Backend
-- **Runtime**: Node.js 22+
-- **Language**: TypeScript 5.8+
-- **Framework**: Express.js 5
-- **Validation**: Zod
-
-### Databases
-- **PostgreSQL**: User data, relationships, rewards
-- **MongoDB**: Posts, comments, chats, notifications
-- **Redis**: Caching, session management
-- **Elasticsearch**: Search indices
-
-### Event Streaming
-- **Apache Kafka**: Inter-service communication
-- **RabbitMQ**: Worker queues for async tasks
-
-### Infrastructure
-- **Orchestration**: Kubernetes (Skaffold for dev, K3s for prod)
-- **Monitoring**: Prometheus + Grafana
-- **Logging**: Winston + Grafana Loki
-
-### Cloud & Storage
-- **AWS S3**: Media storage
-- **AWS CloudFront**: CDN
-
-### Machine Learning
-- **TensorFlow.js**: ML inference
-- **Inception v3 CNN model**: Image Classifier for NSFW
-- **FFmpeg**: Video processing
-
 
 ## 🚀 Development Setup
 
