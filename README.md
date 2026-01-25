@@ -79,7 +79,7 @@ Humane Backend powers the server-side infrastructure of Humane, a human-first so
 
 
 
-## 🚀 Development Setup
+## 🛠️ Development Setup
 
 ### Prerequisites
 - Node.js 22+
@@ -146,7 +146,7 @@ Each service requires specific environment variables. Refer to individual servic
 
 
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please follow these guidelines:
 
@@ -164,9 +164,9 @@ We welcome contributions! Please follow these guidelines:
 - Keep services decoupled and event-driven
 
 
-## 📋 Project Roadmap
+## 🧾 Project Roadmap
 
-### 🎯 Upcoming Features
+### Upcoming Features
 - [ ] **Group Chat**: Multi-user conversations with group admin controls 
 - [ ] **Story Feature**: Ephemeral content with 24-hour expiry
 - [ ] **Advanced Search**: Filters by date, popularity, media type
@@ -175,7 +175,7 @@ We welcome contributions! Please follow these guidelines:
 - [ ] **Content Recommendations**: ML-based personalized content discovery
 - [ ] **Mobile App**: React Native client
 
-### 🔧 Infrastructure Improvements
+### Infrastructure Improvements
 - [ ] **Kafka StatefulSet**: Convert from Deployment for persistence and fault tolerance
 - [ ] **Service Mesh**: Implement Istio for advanced traffic management
 - [x] **API Gateway**: Centralized Kong/Traefik gateway
@@ -183,7 +183,7 @@ We welcome contributions! Please follow these guidelines:
 - [ ] **Multi-region Deployment**: Geographic redundancy
 - [ ] **Internal Route Security**: Restrict public access to internal Elasticsearch proxy
 
-### 📚 Documentation & Testing
+### Documentation & Testing
 - [ ] API documentation with Swagger/OpenAPI
 - [ ] Comprehensive unit test coverage (>80%)
 - [ ] End-to-end testing suite
@@ -207,7 +207,7 @@ We welcome contributions! Please follow these guidelines:
 
 
 
-## 👨‍💻 Author
+## 👨‍💻 Maintainers
 
 **Abhiram AR** ([@abhiram-ar](https://github.com/abhiram-ar))
 
