@@ -23,7 +23,7 @@ Humane Backend powers the server-side infrastructure of Humane, a human-first so
 
 
 
-## 🚀 Core Features
+## Core Features
 
 ### 👥 User Management
 - **Authentication & Authorization**: JWT-based auth with Google OAuth integration
