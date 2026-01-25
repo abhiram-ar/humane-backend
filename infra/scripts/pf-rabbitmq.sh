@@ -1,1 +1,0 @@
-kubectl port-forward "service/humane-rabbitmq" 15672
