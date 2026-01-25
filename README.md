@@ -19,7 +19,7 @@ Humane Backend powers the server-side infrastructure of Humane, a human-first so
 
 ## System Architecture
 
-![System Architecture](/Docs/full-architecture-light.png)
+![System Architecture](/Docs/system-design.svg)
 
 
 
@@ -76,6 +76,11 @@ Humane Backend powers the server-side infrastructure of Humane, a human-first so
 - **Distributed Logging**: Centralized logging with Grafana Alloy and Loki
 - **Service Health**: Readiness and liveness probes
 
+## Non-functional requirements: Scalability & Resilience
+- **Batch Processing**: Batching likes, comments, and reward count updates for efficiency
+- **Kubernetes Orchestration**: Automated deployment, scaling, and management
+- **Event-driven Architecture**: Loose coupling via Kafka for scalability
+- **Polyglot Persistence**: Optimized data storage strategies per service
 
 
 ## 🛠️ Development Setup
@@ -137,7 +142,6 @@ This command will:
 ### Environment Variables
 
 Each service requires specific environment variables. Refer to individual service README files for details:
-- [User Service](./user-service/README.md)
 - [Writer Service](./writer-service/README.md)
 - [Chat Service](./chat-service/README.md)
 - [Moderation Service](./moderation-service/README.md)
@@ -199,14 +203,8 @@ We welcome contributions! Please follow these guidelines:
 ## Documentation
 
 - [Architecture Diagrams](./Docs/)
-- [Moderation ML Evaluations](./moderation-service/ML-evals/README.md)
 - [Observability Setup](./infra/k8s-dev-manual/observability/)
 
-
-
-## Maintainers
-
-**Abhiram AR** ([@abhiram-ar](https://github.com/abhiram-ar))
 
 
 
