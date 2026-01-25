@@ -209,7 +209,7 @@ We welcome contributions! Please follow these guidelines:
 
 ## Acknowledgments
 
-- [NSFWJS](https://github.com/infinitered/nsfwjs) for content moderation models
+- [NSFWJS](https://github.com/infinitered/nsfwjs) for NSFW image classification model
 - The open-source community for amazing tools and libraries
 - Inspired by modern social that drifed from what social media should be.
 
