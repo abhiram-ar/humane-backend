@@ -13,69 +13,68 @@
 
 
 
-## 📖 Overview
+## Overview
 
 Humane Backend powers the server-side infrastructure of Humane, a human-first social platform focused on meaningful interactions, positive behavior, and real-world connection rather than attention-driven engagement. It is built as a scalable, event-driven microservices system. The platform uses Apache Kafka for asynchronous service communication, Kubernetes for orchestration, and a polyglot persistence strategy to balance consistency, performance, and scalability, while following Clean / Hexagonal Architecture principles for long-term maintainability.
 
-## 🏗️ System Architecture
+## System Architecture
 
 ![System Architecture](/Docs/full-architecture-light.png)
 
 
 
-## Core Features
+##  Core Features
 
-### 👥 User Management
+### User Management
 - **Authentication & Authorization**: JWT-based auth with Google OAuth integration
 - **User Profiles**: Customizable profiles with avatar and cover photos
 - **Friend System**: Send/accept friend requests, manage relationships
 - **Password Management**: Secure password hashing, reset, and change functionality
 - **Email Verification**: Verification emails via nodemailer
 
-### ✍️ Content Creation & Management
+### Content Creation & Management
 - **Posts**: Create, update, delete posts with text and media attachments
 - **Comments**: Nested commenting system with like/unlike functionality
 - **Hashtags**: Automatic hashtag extraction and trending hashtag tracking
 - **Visibility Controls**: Public, friends-only, and private post visibility
 - **Media Upload**: Pre-signed URL generation for secure client-side uploads
 
-### 🛡️ Content Moderation
+### Content Moderation
 - **AI-Powered Moderation**: Automated NSFW detection using pre-build CNN model
 - **Video Processing**: Frame extraction and analysis using FFmpeg
 - **Multi-frame Analysis**: Identifies "hottest" frames in video content
 - **Configurable Thresholds**: Admin-adjustable sensitivity for content flagging
 - **User Notifications**: Alerts for flagged or failed moderation
 
-### 💬 Real-time Chat
+### Real-time Chat
 - **1-1 Messaging**: WebSocket-based instant messaging via Socket.IO
 - **Online Status**: Real-time user presence tracking
 - **Read Receipts**: Conversation-level read tracking (timestamp-based)
 - **Message Persistence**: Reliable message delivery with acknowledgments
 - **Reward Integration**: Gamified engagement for active conversations
 
-### 🔔 Notifications
+### Notifications
 - **Real-time Delivery**: WebSocket-based instant notifications
 - **Event-driven**: Kafka consumers trigger notifications for various events
 - **Types Supported**: Friend requests, comments, likes, moderation alerts
 - **Pagination**: Efficient infinite scroll for notification history
 
-### 🔍 Search & Discovery
+### Search & Discovery
 - **Full-text Search**: Elasticsearch-powered search for posts, comments, users
 - **User Timeline**: Paginated user post history
 - **Feed Optimization**: Redis-cached personalized feeds
 
-### 🎁 Gamification & Rewards
+### Gamification & Rewards
 - **Humane Score**: Point system for user engagement
 - **Configurable Rewards**: Admin-configurable point values for actions
 - **Activity Tracking**: Automated reward distribution via Kafka events
 - **Leaderboards**: Platform-wide reward statistics
 
-### 📊 Observability
+### Observability
 - **Prometheus Metrics**: Custom metrics for all services
 - **Grafana Dashboards**: Visualization and monitoring
 - **Distributed Logging**: Centralized logging with Grafana Alloy and Loki
 - **Service Health**: Readiness and liveness probes
-
 
 
 
@@ -197,7 +196,7 @@ We welcome contributions! Please follow these guidelines:
 
 
 
-## 📚 Documentation
+## Documentation
 
 - [Architecture Diagrams](./Docs/)
 - [Moderation ML Evaluations](./moderation-service/ML-evals/README.md)
@@ -205,15 +204,13 @@ We welcome contributions! Please follow these guidelines:
 
 
 
-
-
-## 👨‍💻 Maintainers
+## Maintainers
 
 **Abhiram AR** ([@abhiram-ar](https://github.com/abhiram-ar))
 
 
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [NSFWJS](https://github.com/infinitered/nsfwjs) for content moderation models
 - The open-source community for amazing tools and libraries
