@@ -14,10 +14,17 @@ apply `rabbitmq.yaml`
 
 ### Credentials
 
-get the new credential by running the `../scripts/rabbitmq.credentials.sh`
+```bash
+username="$(kubectl get secret humane-rabbitmq-default-user -o jsonpath='{.data.username}' | base64 --decode)"
+echo "username: $username"
+password="$(kubectl get secret humane-rabbitmq-default-user -o jsonpath='{.data.password}' | base64 --decode)"
+echo "password: $password"
+service="$(kubectl get service humane-rabbitmq -o jsonpath='{.spec.clusterIP}')"
+echo "service: $service"
+```
+Use this credential in the rabbit mq connection string
 
-User this credential in the rabbit mq connection string
-
+>note: uri= amqp://$username:$password@$service-name
 
 ### Common issuse
 - deployemnt error/stuck because dynamic PV cannot be provisioned. `./rabbiqMQ.yaml` specify the storage class as `hostpath` which only works for docker like kuberneies environment. To fix change the storageClass to the what the k8s environment provides by running `kubectl get storageclass`. for k3s use `local-path`
