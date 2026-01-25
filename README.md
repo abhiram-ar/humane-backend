@@ -91,22 +91,6 @@ Humane Backend powers the server-side infrastructure for the **Humane** platform
 
 
 
-## 📦 Microservices
-
-| Service | Tech Stack | Description |
-|---------|-----------|-------------|
-| **user-service** | Node.js, TypeScript, PostgreSQL, Prisma | User authentication, profiles, relationships |
-| **writer-service** | Node.js, TypeScript, MongoDB, Mongoose | Post and comment creation/deletion |
-| **feed-service** | Node.js, TypeScript, MongoDB, Redis | Personalized feed generation and caching |
-| **elasticsearch-proxy** | Node.js, TypeScript, Elasticsearch | Search queries and content discovery |
-| **chat-service** | Node.js, TypeScript, MongoDB, Socket.IO | Real-time 1-1 messaging |
-| **notification-service** | Node.js, TypeScript, MongoDB, Socket.IO | Real-time notifications |
-| **email-service** | Node.js, TypeScript, Nodemailer | Transactional email delivery |
-| **moderation-service** | Node.js, TypeScript, TensorFlow.js, FFmpeg | AI-powered content moderation |
-| **reward-service** | Node.js, TypeScript, PostgreSQL, Prisma | Gamification and point system |
-
-
-
 ## 🛠️ Tech Stack
 
 ### Backend
@@ -145,7 +129,7 @@ Humane Backend powers the server-side infrastructure for the **Humane** platform
 ### Prerequisites
 - Node.js 22+
 - Docker & Docker Compose
-- Kubernetes (Docker Desktop or Minikube)
+- Kubernetes (Docker Desktop, k3s or Minikube)
 - Skaffold CLI
 - kubectl
 
@@ -169,7 +153,7 @@ Manually start the infrastructure comonents like kafka, elasticsearch, databases
 #### 4. **Start the microservices**
 
 
-##### *Start in development mode:*
+##### a. **Start in development mode:**
 
 ```bash
 skaffold dev
@@ -179,9 +163,9 @@ This command will:
 - Deploy to local Kubernetes cluster
 - Enable hot-reloading for development when code changes are detected
 
----
 
-##### *Start in production mode:*
+
+##### b. **Start in production mode:**
 ```bash
 skaffold run --config skaffold.prod.yaml
 ```
