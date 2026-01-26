@@ -34,9 +34,10 @@ Humane Backend powers the server-side infrastructure of Humane, a human-first so
 
 ### Content Creation & Management
 - **Posts**: Create, update, delete posts with text and media attachments
-- **Comments**: Nested commenting system with like/unlike functionality
-- **Hashtags**: Automatic hashtag extraction and trending hashtag tracking
-- **Visibility Controls**: Public, friends-only, and private post visibility
+- **Comments**: Commenting system with like/unlike functionality
+- **Likes**: Like/unlike comments with real-time updates
+- **Hashtags**: Automatic hashtag extraction and indexing
+- **Visibility Controls**: Public and friends-only post visibility
 - **Media Upload**: Pre-signed URL generation for secure client-side uploads
 
 ### Content Moderation
@@ -178,6 +179,7 @@ We welcome contributions! Please follow these guidelines:
 - [ ] **Mobile App**: React Native client
 
 ### Infrastructure Improvements
+- [x] **Infra management scripts**: Automate infrastructure setup and teardown
 - [ ] **Kafka StatefulSet**: Convert from Deployment for persistence and fault tolerance
 - [ ] **Service Mesh**: Implement Istio for advanced traffic management
 - [x] **API Gateway**: Centralized Kong/Traefik gateway
