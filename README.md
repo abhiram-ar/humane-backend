@@ -20,7 +20,6 @@ Humane Backend powers the server-side infrastructure of Humane, a human-first so
 ## System Architecture
 
 ![System Architecture](/Docs/system-design.svg)
-
 [Open in interactive mode](https://www.tldraw.com/p/VZJnfLSLZe9YilTwuc4Yf?d=v-1222.-364.6694.3295.page)
 
 
