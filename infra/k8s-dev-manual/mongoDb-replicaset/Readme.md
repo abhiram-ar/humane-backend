@@ -10,7 +10,7 @@ Before running the script, you can customize the storage path by editing the **t
 # Edit these values in manage.sh
 NAMESPACE="default"
 REPLICA_COUNT=3
-STORAGE_BASE_PATH="/home/abhiram/Bootcamp/week-23-to-27/humane/backend/data/mongo"
+STORAGE_BASE_PATH="/home/abhiram/humane/backend/data/mongo"
 ```
 
 ## Quick Start
@@ -23,45 +23,14 @@ Simply run the script without arguments:
 ./manage.sh
 ```
 
-You'll see an interactive menu:
-```
-======================================
-  MongoDB Replica Set Manager
-======================================
-
-Deployment:
-  1. Deploy MongoDB Replica Set
-  2. Initialize Replica Set (Automatic)
-  3. Show Manual Init Instructions
-
-Configuration:
-  4. Generate Persistence Manifest
-
-Monitoring:
-  5. Show Status
-  6. View Logs
-  7. Test Connection
-
-External Access (MongoDB Compass):
-  8. Enable External Access (NodePort)
-  9. Disable External Access
- 10. Show Connection Info
- 11. Add /etc/hosts Entries (for replica discovery)
- 12. Port Forward (localhost)
-
-Maintenance:
- 13. Restart MongoDB Pods
-
-Cleanup:
- 14. Uninstall MongoDB
- 15. Exit
-```
-
-### Command-Line Mode (Backward Compatible)
+### Command-Line Mode 
 
 You can also use direct commands:
 
 ```bash
+./manage.sh <command>
+
+# Examples:
 # Deploy MongoDB replica set
 ./manage.sh install
 
@@ -82,15 +51,6 @@ You can also use direct commands:
 
 # Port forward to localhost
 ./manage.sh port-forward
-
-# View logs
-./manage.sh logs
-
-# Test connection
-./manage.sh test
-
-# Uninstall
-./manage.sh uninstall
 ```
 
 ## Available Commands
@@ -128,10 +88,10 @@ You can also use direct commands:
    **On Linux/Mac:**
    ```bash
    sudo bash -c 'cat >> /etc/hosts << EOF
-127.0.0.1 mongo-0.mongo
-127.0.0.1 mongo-1.mongo
-127.0.0.1 mongo-2.mongo
-EOF'
+   127.0.0.1 mongo-0.mongo
+   127.0.0.1 mongo-1.mongo
+   127.0.0.1 mongo-2.mongo
+   EOF'
    ```
    
    **On Windows (Run as Administrator):**
@@ -220,33 +180,7 @@ When you connect to MongoDB replica set:
 **With /etc/hosts entries**: Full replica set features (automatic failover, read preference)
 **Without /etc/hosts**: Single node connection only (no automatic failover)
 
-## Architecture
 
-The deployment consists of:
-- **PersistentVolumes (3)** (optional): Pre-configured storage using hostPath for each replica
-  - `mongo-pv-0` → `/home/abhiram/Bootcamp/week-23-to-27/humane/backend/data/mongo/mongo-0`
-  - `mongo-pv-1` → `/home/abhiram/Bootcamp/week-23-to-27/humane/backend/data/mongo/mongo-1`
-  - `mongo-pv-2` → `/home/abhiram/Bootcamp/week-23-to-27/humane/backend/data/mongo/mongo-2`
-- **StatefulSet**: 3 MongoDB replicas (mongo-0, mongo-1, mongo-2)
-- **Headless Service**: DNS resolution for replica set members
-- **PersistentVolumeClaims (3)**: Auto-created by StatefulSet (1Gi each)
-**Internal (Kubernetes cluster):**
-```
-mongodb://mongo-0.mongo:27017,mongo-1.mongo:27017,mongo-2.mongo:27017/?replicaSet=rs0
-```
-
-**External (MongoDB Compass - NodePort):**
-```
-mongodb://localhost:30017/
-```
-
-**External (MongoDB Compass - Port Forward):**
-```
-mongodb://localhost:27017/
-  - `mongo-persistent-storage-mongo-2`
-- **Initialization Job**: Automated replica set configuration
-
-> **Note**: The StatefulSet uses `volumeClaimTemplates` which automatically creates one PVC per pod. The persistence file creates 3 matching PVs for these PVCs to bind to. If the persistence file doesn't exist, Kubernetes will use dynamic provisioning.
 
 ## Replica Set Initialization
 
@@ -266,7 +200,7 @@ This uses a Kubernetes Job that:
 
 > **Note**: The job only works if mongo-0 is available. After initialization, MongoDB will use its self-leader election mechanism.
 
-### Manual Approach
+### Manual Approach 
 
 If you prefer manual initialization:
 
@@ -294,13 +228,7 @@ rs.initiate({
 rs.status()
 ```
 
-## Connection String
 
-Use this connection string from your applications:
-
-```
-mongodb://mongo-0.mongo:27017,mongo-1.mongo:27017,mongo-2.mongo:27017/?replicaSet=rs0
-```
 
 ## Troubleshooting
 
@@ -381,15 +309,6 @@ mongodb://localhost:30017/?directConnection=true
 - When you connect, MongoDB returns these hostnames for replica discovery
 - Without proper DNS resolution, Compass can't connect to the other replicas
 
-## Files
-
-- `0-mongo-peristance.yaml` - 3 PersistentVolumes for hostPath storage (can be auto-generated)
-- `02-service-headless.yaml` - Headless service for StatefulSet DNS
-- `03-service-nodeport.yaml` - NodePort services for external access (optional)
-- `04-statefulset.yaml` - MongoDB StatefulSet with 3 replicas and volumeClaimTemplates
-- `05-job(runWhenRequired).yaml` - Initialization job for replica set
-- `manage.sh` - Management script for all operations
-
 ## Important Notes
 
 ### Dynamic Persistence Manifest Generation
@@ -429,21 +348,12 @@ spec:
 
 ### Storage Path Configuration
 - The storage base path is configurable at the top of `manage.sh`
-- Default: `/home/abhiram/Bootcamp/week-23-to-27/humane/backend/data/mongo`
+- Default: `/home/abhiram/humane/backend/data/mongo`
 - The script automatically creates subdirectories: `mongo-0`, `mongo-1`, `mongo-2`
 - Make sure the parent directory is writable before deployment
 
-### Volume Management
-- **StatefulSets automatically create one PVC per pod** using `volumeClaimTemplates`
-- Each PVC is named: `<volumeClaimTemplate-name>-<statefulset-name>-<ordinal>`
-- In this setup: `mongo-persistent-storage-mongo-0`, `mongo-persistent-storage-mongo-1`, `mongo-persistent-storage-mongo-2`
-- The persistence file creates 3 PVs that will bind to these auto-created PVCs
-- The manage.sh script automatically creates the necessary hostPath directories
 
-### Interactive vs Command-Line Mode
-- **No arguments**: Interactive menu mode (user-friendly, guided)
-- **With arguments**: Command-line mode (automation, scripting)
-- Both modes support the same operations
+
 
 ### External Access Options
 1. **NodePort Service** - Exposes MongoDB on ports 30017-30019 (persistent, survives restarts)
@@ -451,7 +361,7 @@ spec:
 3. NodePort is recommended for regular development work
 4. Port forwarding is useful for quick testing or when NodePort ports are unavailable
 
-### Security Note
+#### Security Note
 - External access exposes MongoDB without authentication by default
 - For production, always enable authentication and use proper network policies
 - Consider using port-forward for development instead of NodePort in shared environments
