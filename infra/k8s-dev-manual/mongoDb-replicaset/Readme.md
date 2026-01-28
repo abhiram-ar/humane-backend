@@ -74,6 +74,54 @@ You can also use direct commands:
 **Cleanup:**
 - **Uninstall** - Remove MongoDB replica set and all data (with confirmation)
 
+
+
+## Replica Set Initialization
+
+### Automatic (Recommended)
+
+After deploying with `./manage.sh install`, run:
+
+```bash
+./manage.sh init-replica
+```
+
+This uses a Kubernetes Job that:
+1. Waits for all MongoDB pods to be ready
+2. Connects to mongo-0
+3. Initializes the replica set with all members
+4. Verifies the configuration
+
+> **Note**: The job only works if mongo-0 is available. After initialization, MongoDB will use its self-leader election mechanism.
+
+### Manual Approach 
+
+If you prefer manual initialization:
+
+1. Get inside the mongo-0 pod:
+```bash
+kubectl exec -it mongo-0 -- bash
+```
+
+2. Open MongoDB shell and configure replica set:
+```bash
+mongosh
+
+rs.initiate({
+  _id: "rs0",
+  members: [
+    { _id: 0, host: "mongo-0.mongo:27017" },
+    { _id: 1, host: "mongo-1.mongo:27017" },
+    { _id: 2, host: "mongo-2.mongo:27017" }
+  ]
+})
+```
+
+3. Verify the replica set:
+```bash
+rs.status()
+```
+
 ## Connecting from MongoDB Compass
 
 ### Method 1: NodePort Service (Recommended for Kubernetes)
@@ -179,54 +227,6 @@ When you connect to MongoDB replica set:
 
 **With /etc/hosts entries**: Full replica set features (automatic failover, read preference)
 **Without /etc/hosts**: Single node connection only (no automatic failover)
-
-
-
-## Replica Set Initialization
-
-### Automatic (Recommended)
-
-After deploying with `./manage.sh install`, run:
-
-```bash
-./manage.sh init-replica
-```
-
-This uses a Kubernetes Job that:
-1. Waits for all MongoDB pods to be ready
-2. Connects to mongo-0
-3. Initializes the replica set with all members
-4. Verifies the configuration
-
-> **Note**: The job only works if mongo-0 is available. After initialization, MongoDB will use its self-leader election mechanism.
-
-### Manual Approach 
-
-If you prefer manual initialization:
-
-1. Get inside the mongo-0 pod:
-```bash
-kubectl exec -it mongo-0 -- bash
-```
-
-2. Open MongoDB shell and configure replica set:
-```bash
-mongosh
-
-rs.initiate({
-  _id: "rs0",
-  members: [
-    { _id: 0, host: "mongo-0.mongo:27017" },
-    { _id: 1, host: "mongo-1.mongo:27017" },
-    { _id: 2, host: "mongo-2.mongo:27017" }
-  ]
-})
-```
-
-3. Verify the replica set:
-```bash
-rs.status()
-```
 
 
 
