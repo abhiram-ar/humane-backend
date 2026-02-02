@@ -14,107 +14,122 @@
 
 
 
-## Overview
+Overview
+========
 
 Humane Backend powers the server-side infrastructure of Humane, a human-first social platform focused on meaningful interactions, positive behavior, and real-world connection rather than attention-driven engagement. It is built as a scalable, event-driven microservices system. The platform uses Apache Kafka for asynchronous service communication, Kubernetes for orchestration, and a polyglot persistence strategy to balance consistency, performance, and scalability, while following Clean / Hexagonal Architecture principles for long-term maintainability.
 
-## System Architecture
+System Architecture
+===================
 
 ![System Architecture](/Docs/system-design.svg)
 [Open in interactive mode](https://www.tldraw.com/p/VZJnfLSLZe9YilTwuc4Yf?d=v-1222.-364.6694.3295.page)
 
 
-##  Core Features
+Core Features
+=============
 
-### User Management
-- **Authentication & Authorization**: JWT-based auth with Google OAuth integration
-- **User Profiles**: Customizable profiles with avatar and cover photos
-- **Friend System**: Send/accept friend requests, manage relationships
-- **Password Management**: Secure password hashing, reset, and change functionality
-- **Email Verification**: Verification emails via nodemailer
+User Management
+---------------
+* Authentication & Authorization: JWT-based auth with Google OAuth integration
+* User Profiles: Customizable profiles with avatar and cover photos
+* Friend System: Send/accept friend requests, manage relationships
+* Password Management: Secure password hashing, reset, and change functionality
+* Email Verification: Verification emails via nodemailer
 
-### Content Creation & Management
-- **Posts**: Create, update, delete posts with text and media attachments
-- **Comments**: Commenting system with like/unlike functionality
-- **Likes**: Like/unlike comments with real-time updates
-- **Hashtags**: Automatic hashtag extraction and indexing
-- **Visibility Controls**: Public and friends-only post visibility
-- **Media Upload**: Pre-signed URL generation for secure client-side uploads
+Content Creation & Management
+-----------------------------
+* Posts: Create, update, delete posts with text and media attachments
+* Comments: Commenting system with like/unlike functionality
+* Likes: Like/unlike comments with real-time updates
+* Hashtags: Automatic hashtag extraction and indexing
+* Visibility Controls: Public and friends-only post visibility
+* Media Upload: Pre-signed URL generation for secure client-side uploads
 
-### Content Moderation
-- **AI-Powered Moderation**: Automated NSFW detection using pre-build CNN model
-- **Video Processing**: Frame extraction and analysis using FFmpeg
-- **Multi-frame Analysis**: Identifies "hottest" frames in video content
-- **Configurable Thresholds**: Admin-adjustable sensitivity for content flagging
-- **User Notifications**: Alerts for flagged or failed moderation
+Content Moderation
+------------------
+* AI-Powered Moderation: Automated NSFW detection using pre-build CNN model
+* Video Processing: Frame extraction and analysis using FFmpeg
+* Multi-frame Analysis: Identifies "hottest" frames in video content
+* Configurable Thresholds: Admin-adjustable sensitivity for content flagging
+* User Notifications: Alerts for flagged or failed moderation
 
-### Real-time Chat
-- **1-1 Messaging**: WebSocket-based instant messaging via Socket.IO
-- **Online Status**: Real-time user presence tracking
-- **Read Receipts**: Conversation-level read tracking (timestamp-based)
-- **Message Persistence**: Reliable message delivery with acknowledgments
-- **Reward Integration**: Gamified engagement for active conversations
+Real-time Chat
+--------------
+* 1-1 Messaging: WebSocket-based instant messaging via Socket.IO
+* Online Status: Real-time user presence tracking
+* Read Receipts: Conversation-level read tracking (timestamp-based)
+* Message Persistence: Reliable message delivery with acknowledgments
+* Reward Integration: Gamified engagement for active conversations
 
-### Notifications
-- **Real-time Delivery**: WebSocket-based instant notifications
-- **Event-driven**: Kafka consumers trigger notifications for various events
-- **Types Supported**: Friend requests, comments, likes, moderation alerts
-- **Pagination**: Efficient infinite scroll for notification history
+Notifications
+-------------
+* Real-time Delivery: WebSocket-based instant notifications
+* Event-driven: Kafka consumers trigger notifications for various events
+* Types Supported: Friend requests, comments, likes, moderation alerts
+* Pagination: Efficient infinite scroll for notification history
 
-### Search & Discovery
-- **Full-text Search**: Elasticsearch-powered search for posts, comments, users
-- **User Timeline**: Paginated user post history
-- **Feed Optimization**: Redis-cached personalized feeds
+Search & Discovery
+------------------
+* Full-text Search: Elasticsearch-powered search for posts, comments, users
+* User Timeline: Paginated user post history
+* Feed Optimization: Redis-cached personalized feeds
 
-### Gamification & Rewards
-- **Humane Score**: Point system for user engagement
-- **Configurable Rewards**: Admin-configurable point values for actions
-- **Activity Tracking**: Automated reward distribution via Kafka events
-- **Leaderboards**: Platform-wide reward statistics
+Gamification & Rewards
+----------------------
+* Humane Score: Point system for user engagement
+* Configurable Rewards: Admin-configurable point values for actions
+* Activity Tracking: Automated reward distribution via Kafka events
+* Leaderboards: Platform-wide reward statistics
 
-### Observability
-- **Prometheus Metrics**: Custom metrics for all services
-- **Grafana Dashboards**: Visualization and monitoring
-- **Distributed Logging**: Centralized logging with Grafana Alloy and Loki
-- **Service Health**: Readiness and liveness probes
+Observability
+-------------
+* Prometheus Metrics: Custom metrics for all services
+* Grafana Dashboards: Visualization and monitoring
+* Distributed Logging: Centralized logging with Grafana Alloy and Loki
+* Service Health: Readiness and liveness probes
 
-## Non-functional requirements: Scalability & Resilience
-- **Batch Processing**: Batching likes, comments, and reward count updates for efficiency
-- **Kubernetes Orchestration**: Automated deployment, scaling, and management
-- **Event-driven Architecture**: Loose coupling via Kafka for scalability
-- **Polyglot Persistence**: Optimized data storage strategies per service
+Non-functional requirements: Scalability & Resilience
+------------------------------
+* Batch Processing: Batching likes, comments, and reward count updates for efficiency
+* Kubernetes Orchestration: Automated deployment, scaling, and management
+* Event-driven Architecture: Loose coupling via Kafka for scalability
+* Polyglot Persistence: Optimized data storage strategies per service
 
 
-## 🛠️ Development Setup
+🛠️ Development Setup
+====================
 
-### Prerequisites
+Prerequisites
+------------
 - Node.js 22+
 - Docker & Docker Compose
 - Kubernetes (Docker Desktop, k3s or Minikube)
 - Skaffold CLI
 - kubectl
 
-### Quick Start
+Quick Start
+-----------
 
-#### 1. **Clone the repository**
+1. **Clone the repository**
 ```bash
 git clone https://github.com/abhiram-ar/humane-backend.git
 cd humane-backend
 ```
 
-#### 2. **Initialize submodules**
+2. **Initialize submodules**
 ```bash
 git submodule update --init --recursive
 ```
 
-#### 3. **Start infrastructure components**
+3. **Start infrastructure components**
 
 Manually start the infrastructure comonents like kafka, elasticsearch, databases, Api gateway etc. using the manifests or helper scripts in `infra/k8s-dev-manual/`.
 
-#### 4. **Start the microservices**
+4. **Start the microservices**
 
 
-##### a. **Start in development mode:**
+a. **Start in development mode:**
 
 ```bash
 skaffold dev
@@ -126,7 +141,7 @@ This command will:
 
 
 
-##### b. **Start in production mode:**
+b. **Start in production mode:**
 ```bash
 skaffold run --config skaffold.prod.yaml
 ```
@@ -136,7 +151,7 @@ This command will:
 
 
 
-#### 5. **Access services**
+5. **Access services**
 - Frontend: `http://localhost:5173` (via `humane-frontend` submodule)
 - API Gateway: Available via Kubernetes ingress
 - Grafana: Port-forward to access dashboards
