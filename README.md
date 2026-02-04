@@ -169,38 +169,11 @@ We welcome contributions! Please follow these guidelines:
 - Keep services decoupled and event-driven
 
 
-## 🧾 Project Roadmap
-
-### Upcoming Features
-- [ ] **Group Chat**: Multi-user conversations with group admin controls 
-- [ ] **Advanced Search**: Filters by date, popularity, media type
-- [x] **Voice and Video calls**: WebRTC integration for real-time communication
-- [ ] **Analytics Dashboard**: User engagement insights
-- [ ] **Content Recommendations**: ML-based personalized content discovery
-- [ ] **Mobile App**: React Native client
-
-### Infrastructure Improvements
-- [x] **Infra management scripts**: Automate infrastructure setup and teardown
-- [ ] **Kafka StatefulSet**: Convert from Deployment for persistence and fault tolerance
-- [ ] **Service Mesh**: Implement Istio for advanced traffic management
-- [x] **API Gateway**: Centralized Kong/Traefik gateway
-- [x] **CI/CD Pipeline**: GitHub Actions for automated testing and deployment
-- [ ] **Multi-region Deployment**: Geographic redundancy
-- [ ] **Internal Route Security**: Restrict public access to internal Elasticsearch proxy routes
-
-### Documentation & Testing
-- [ ] API documentation with Swagger/OpenAPI
-- [ ] Comprehensive unit test coverage (>80%)
-- [ ] End-to-end testing suite
-- [ ] Load testing and performance benchmarks
-
-
 
 ## Documentation
 
 - [Architecture Diagrams](./Docs/)
 - [Observability Setup](./infra/k8s-dev-manual/observability/)
-
 
 
 
