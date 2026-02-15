@@ -8,7 +8,6 @@
 [![Node.js](https://img.shields.io/badge/Node.js-22+-green.svg)](https://nodejs.org/)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-Orchestration-326CE5.svg)](https://kubernetes.io/)
 [![Kafka](https://img.shields.io/badge/Apache%20Kafka-Event%20Streaming-231F20.svg)](https://kafka.apache.org/)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/abhiram-ar/humane-backend)
 
 </div>
 
